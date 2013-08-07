@@ -1,0 +1,470 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		EF7BB6DC17B2B718009E2E70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DB17B2B718009E2E70 /* Foundation.framework */; };
+		EF7BB6DE17B2B718009E2E70 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */; };
+		EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DF17B2B718009E2E70 /* UIKit.framework */; };
+		EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */; };
+		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
+		EF7BB6EC17B2B718009E2E70 /* LFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6EB17B2B718009E2E70 /* LFAppDelegate.m */; };
+		EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
+		EF7BB6F217B2B718009E2E70 /* LFViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6F117B2B718009E2E70 /* LFViewController.m */; };
+		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
+		EF7BB6FB17B2B718009E2E70 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6FA17B2B718009E2E70 /* XCTest.framework */; };
+		EF7BB6FC17B2B718009E2E70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DB17B2B718009E2E70 /* Foundation.framework */; };
+		EF7BB6FD17B2B718009E2E70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DF17B2B718009E2E70 /* UIKit.framework */; };
+		EF7BB70517B2B718009E2E70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB70317B2B718009E2E70 /* InfoPlist.strings */; };
+		EF7BB70717B2B718009E2E70 /* CommentStreamTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		EF7BB6FE17B2B718009E2E70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EF7BB6D017B2B718009E2E70 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EF7BB6D717B2B718009E2E70;
+			remoteInfo = CommentStream;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		EF7BB6D817B2B718009E2E70 /* CommentStream.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CommentStream.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EF7BB6DB17B2B718009E2E70 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		EF7BB6DF17B2B718009E2E70 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		EF7BB6E317B2B718009E2E70 /* CommentStream-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CommentStream-Info.plist"; sourceTree = "<group>"; };
+		EF7BB6E517B2B718009E2E70 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EF7BB6E717B2B718009E2E70 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
+		EF7BB6EA17B2B718009E2E70 /* LFAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LFAppDelegate.h; sourceTree = "<group>"; };
+		EF7BB6EB17B2B718009E2E70 /* LFAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LFAppDelegate.m; sourceTree = "<group>"; };
+		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		EF7BB6F017B2B718009E2E70 /* LFViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LFViewController.h; sourceTree = "<group>"; };
+		EF7BB6F117B2B718009E2E70 /* LFViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LFViewController.m; sourceTree = "<group>"; };
+		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		EF7BB6F917B2B718009E2E70 /* CommentStreamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CommentStreamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EF7BB6FA17B2B718009E2E70 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		EF7BB70217B2B718009E2E70 /* CommentStreamTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CommentStreamTests-Info.plist"; sourceTree = "<group>"; };
+		EF7BB70417B2B718009E2E70 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommentStreamTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EF7BB6D517B2B718009E2E70 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF7BB6DE17B2B718009E2E70 /* CoreGraphics.framework in Frameworks */,
+				EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */,
+				EF7BB6DC17B2B718009E2E70 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EF7BB6F617B2B718009E2E70 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF7BB6FB17B2B718009E2E70 /* XCTest.framework in Frameworks */,
+				EF7BB6FD17B2B718009E2E70 /* UIKit.framework in Frameworks */,
+				EF7BB6FC17B2B718009E2E70 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		EF7BB6CF17B2B718009E2E70 = {
+			isa = PBXGroup;
+			children = (
+				EF7BB6E117B2B718009E2E70 /* CommentStream */,
+				EF7BB70017B2B718009E2E70 /* CommentStreamTests */,
+				EF7BB6DA17B2B718009E2E70 /* Frameworks */,
+				EF7BB6D917B2B718009E2E70 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		EF7BB6D917B2B718009E2E70 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EF7BB6D817B2B718009E2E70 /* CommentStream.app */,
+				EF7BB6F917B2B718009E2E70 /* CommentStreamTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EF7BB6DA17B2B718009E2E70 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EF7BB6DB17B2B718009E2E70 /* Foundation.framework */,
+				EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */,
+				EF7BB6DF17B2B718009E2E70 /* UIKit.framework */,
+				EF7BB6FA17B2B718009E2E70 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EF7BB6E117B2B718009E2E70 /* CommentStream */ = {
+			isa = PBXGroup;
+			children = (
+				EF7BB6EA17B2B718009E2E70 /* LFAppDelegate.h */,
+				EF7BB6EB17B2B718009E2E70 /* LFAppDelegate.m */,
+				EF7BB6ED17B2B718009E2E70 /* Main.storyboard */,
+				EF7BB6F017B2B718009E2E70 /* LFViewController.h */,
+				EF7BB6F117B2B718009E2E70 /* LFViewController.m */,
+				EF7BB6F317B2B718009E2E70 /* Images.xcassets */,
+				EF7BB6E217B2B718009E2E70 /* Supporting Files */,
+			);
+			path = CommentStream;
+			sourceTree = "<group>";
+		};
+		EF7BB6E217B2B718009E2E70 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				EF7BB6E317B2B718009E2E70 /* CommentStream-Info.plist */,
+				EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */,
+				EF7BB6E717B2B718009E2E70 /* main.m */,
+				EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		EF7BB70017B2B718009E2E70 /* CommentStreamTests */ = {
+			isa = PBXGroup;
+			children = (
+				EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */,
+				EF7BB70117B2B718009E2E70 /* Supporting Files */,
+			);
+			path = CommentStreamTests;
+			sourceTree = "<group>";
+		};
+		EF7BB70117B2B718009E2E70 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				EF7BB70217B2B718009E2E70 /* CommentStreamTests-Info.plist */,
+				EF7BB70317B2B718009E2E70 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EF7BB6D717B2B718009E2E70 /* CommentStream */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EF7BB70A17B2B718009E2E70 /* Build configuration list for PBXNativeTarget "CommentStream" */;
+			buildPhases = (
+				EF7BB6D417B2B718009E2E70 /* Sources */,
+				EF7BB6D517B2B718009E2E70 /* Frameworks */,
+				EF7BB6D617B2B718009E2E70 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CommentStream;
+			productName = CommentStream;
+			productReference = EF7BB6D817B2B718009E2E70 /* CommentStream.app */;
+			productType = "com.apple.product-type.application";
+		};
+		EF7BB6F817B2B718009E2E70 /* CommentStreamTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EF7BB70D17B2B718009E2E70 /* Build configuration list for PBXNativeTarget "CommentStreamTests" */;
+			buildPhases = (
+				EF7BB6F517B2B718009E2E70 /* Sources */,
+				EF7BB6F617B2B718009E2E70 /* Frameworks */,
+				EF7BB6F717B2B718009E2E70 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EF7BB6FF17B2B718009E2E70 /* PBXTargetDependency */,
+			);
+			name = CommentStreamTests;
+			productName = CommentStreamTests;
+			productReference = EF7BB6F917B2B718009E2E70 /* CommentStreamTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EF7BB6D017B2B718009E2E70 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = LF;
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = Livefyre;
+				TargetAttributes = {
+					EF7BB6F817B2B718009E2E70 = {
+						TestTargetID = EF7BB6D717B2B718009E2E70;
+					};
+				};
+			};
+			buildConfigurationList = EF7BB6D317B2B718009E2E70 /* Build configuration list for PBXProject "CommentStream" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = EF7BB6CF17B2B718009E2E70;
+			productRefGroup = EF7BB6D917B2B718009E2E70 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EF7BB6D717B2B718009E2E70 /* CommentStream */,
+				EF7BB6F817B2B718009E2E70 /* CommentStreamTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EF7BB6D617B2B718009E2E70 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */,
+				EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */,
+				EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EF7BB6F717B2B718009E2E70 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF7BB70517B2B718009E2E70 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EF7BB6D417B2B718009E2E70 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF7BB6EC17B2B718009E2E70 /* LFAppDelegate.m in Sources */,
+				EF7BB6E817B2B718009E2E70 /* main.m in Sources */,
+				EF7BB6F217B2B718009E2E70 /* LFViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EF7BB6F517B2B718009E2E70 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF7BB70717B2B718009E2E70 /* CommentStreamTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EF7BB6FF17B2B718009E2E70 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EF7BB6D717B2B718009E2E70 /* CommentStream */;
+			targetProxy = EF7BB6FE17B2B718009E2E70 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EF7BB6E517B2B718009E2E70 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		EF7BB6ED17B2B718009E2E70 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EF7BB6EE17B2B718009E2E70 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		EF7BB70317B2B718009E2E70 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EF7BB70417B2B718009E2E70 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		EF7BB70817B2B718009E2E70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		EF7BB70917B2B718009E2E70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		EF7BB70B17B2B718009E2E70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
+				INFOPLIST_FILE = "CommentStream/CommentStream-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		EF7BB70C17B2B718009E2E70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
+				INFOPLIST_FILE = "CommentStream/CommentStream-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		EF7BB70E17B2B718009E2E70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/CommentStream.app/CommentStream";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "CommentStreamTests/CommentStreamTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		EF7BB70F17B2B718009E2E70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/CommentStream.app/CommentStream";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
+				INFOPLIST_FILE = "CommentStreamTests/CommentStreamTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		EF7BB6D317B2B718009E2E70 /* Build configuration list for PBXProject "CommentStream" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EF7BB70817B2B718009E2E70 /* Debug */,
+				EF7BB70917B2B718009E2E70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EF7BB70A17B2B718009E2E70 /* Build configuration list for PBXNativeTarget "CommentStream" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EF7BB70B17B2B718009E2E70 /* Debug */,
+				EF7BB70C17B2B718009E2E70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		EF7BB70D17B2B718009E2E70 /* Build configuration list for PBXNativeTarget "CommentStreamTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EF7BB70E17B2B718009E2E70 /* Debug */,
+				EF7BB70F17B2B718009E2E70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EF7BB6D017B2B718009E2E70 /* Project object */;
+}
