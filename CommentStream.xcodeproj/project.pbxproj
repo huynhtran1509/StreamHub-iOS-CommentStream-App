@@ -31,6 +31,27 @@
 			remoteGlobalIDString = EF7BB6D717B2B718009E2E70;
 			remoteInfo = CommentStream;
 		};
+		EF9FD46017B448FC009FE59D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C4CC88116A48B3800C33DEC;
+			remoteInfo = LFClient;
+		};
+		EF9FD46217B448FC009FE59D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C4CC89216A48B3800C33DEC;
+			remoteInfo = LFClientTests;
+		};
+		EF9FD46417B4491E009FE59D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1C4CC88016A48B3800C33DEC;
+			remoteInfo = LFClient;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +74,7 @@
 		EF7BB70217B2B718009E2E70 /* CommentStreamTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CommentStreamTests-Info.plist"; sourceTree = "<group>"; };
 		EF7BB70417B2B718009E2E70 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommentStreamTests.m; sourceTree = "<group>"; };
+		EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LFClient.xcodeproj; path = ../../LFClient.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +104,7 @@
 		EF7BB6CF17B2B718009E2E70 = {
 			isa = PBXGroup;
 			children = (
+				EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */,
 				EF7BB6E117B2B718009E2E70 /* CommentStream */,
 				EF7BB70017B2B718009E2E70 /* CommentStreamTests */,
 				EF7BB6DA17B2B718009E2E70 /* Frameworks */,
@@ -112,9 +135,9 @@
 		EF7BB6E117B2B718009E2E70 /* CommentStream */ = {
 			isa = PBXGroup;
 			children = (
+				EF7BB6ED17B2B718009E2E70 /* Main.storyboard */,
 				EF7BB6EA17B2B718009E2E70 /* LFAppDelegate.h */,
 				EF7BB6EB17B2B718009E2E70 /* LFAppDelegate.m */,
-				EF7BB6ED17B2B718009E2E70 /* Main.storyboard */,
 				EF7BB6F017B2B718009E2E70 /* LFViewController.h */,
 				EF7BB6F117B2B718009E2E70 /* LFViewController.m */,
 				EF7BB6F317B2B718009E2E70 /* Images.xcassets */,
@@ -152,6 +175,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		EF9FD45C17B448FC009FE59D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EF9FD46117B448FC009FE59D /* libLFClient.a */,
+				EF9FD46317B448FC009FE59D /* LFClientTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -166,6 +198,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EF9FD46517B4491E009FE59D /* PBXTargetDependency */,
 			);
 			name = CommentStream;
 			productName = CommentStream;
@@ -216,6 +249,12 @@
 			mainGroup = EF7BB6CF17B2B718009E2E70;
 			productRefGroup = EF7BB6D917B2B718009E2E70 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = EF9FD45C17B448FC009FE59D /* Products */;
+					ProjectRef = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				EF7BB6D717B2B718009E2E70 /* CommentStream */,
@@ -223,6 +262,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		EF9FD46117B448FC009FE59D /* libLFClient.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libLFClient.a;
+			remoteRef = EF9FD46017B448FC009FE59D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EF9FD46317B448FC009FE59D /* LFClientTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = LFClientTests.octest;
+			remoteRef = EF9FD46217B448FC009FE59D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		EF7BB6D617B2B718009E2E70 /* Resources */ = {
@@ -271,6 +327,11 @@
 			isa = PBXTargetDependency;
 			target = EF7BB6D717B2B718009E2E70 /* CommentStream */;
 			targetProxy = EF7BB6FE17B2B718009E2E70 /* PBXContainerItemProxy */;
+		};
+		EF9FD46517B4491E009FE59D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LFClient;
+			targetProxy = EF9FD46417B4491E009FE59D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -377,7 +438,12 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"\"$(OBJROOT)/UninstalledProducts/include\"",
+					"\"$(TARGET_BUILD_DIR)/usr/local/lib/include\"",
+				);
 				INFOPLIST_FILE = "CommentStream/CommentStream-Info.plist";
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -390,7 +456,12 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"\"$(OBJROOT)/UninstalledProducts/include\"",
+					"\"$(TARGET_BUILD_DIR)/usr/local/lib/include\"",
+				);
 				INFOPLIST_FILE = "CommentStream/CommentStream-Info.plist";
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -455,6 +526,7 @@
 				EF7BB70C17B2B718009E2E70 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		EF7BB70D17B2B718009E2E70 /* Build configuration list for PBXNativeTarget "CommentStreamTests" */ = {
 			isa = XCConfigurationList;
@@ -463,6 +535,7 @@
 				EF7BB70F17B2B718009E2E70 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
