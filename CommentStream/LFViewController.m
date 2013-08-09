@@ -7,6 +7,8 @@
 //
 
 #import "LFViewController.h"
+#import <LFClient/JSONKit.h>
+#import <LFClient/LFClient.h>
 
 @interface LFViewController ()
 @property (nonatomic, strong) NSArray *tableData;
@@ -28,13 +30,13 @@
                                  network:@"init-sample"
                              environment:nil
                                onSuccess:^(NSDictionary *collection) {
-                                   bootstrapInitInfo = collection;
-                                   dispatch_semaphore_signal(sema);
+                                   //bootstrapInitInfo = collection;
+                                   //dispatch_semaphore_signal(sema);
                                }
                                onFailure:^(NSError *error) {
                                    if (error)
                                        NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
-                                   dispatch_semaphore_signal(sema);
+                                   //dispatch_semaphore_signal(sema);
                                }];
 }
 
