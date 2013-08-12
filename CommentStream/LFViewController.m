@@ -8,7 +8,6 @@
 
 #import <LFClient/LFClient.h>
 #import "LFViewController.h"
-#import "Config.h"
 
 @interface LFViewController ()
 //@property (nonatomic, strong) NSArray *tableData;
@@ -36,10 +35,10 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
 
-    [LFBootstrapClient getInitForArticle:[Config objectForKey:@"article"]
-                                    site:[Config objectForKey:@"site"]
-                                 network:[Config objectForKey:@"domain"]
-                             environment:[Config objectForKey:@"environment"]
+    [LFBootstrapClient getInitForArticle:[LFConfig objectForKey:@"article"]
+                                    site:[LFConfig objectForKey:@"site"]
+                                 network:[LFConfig objectForKey:@"domain"]
+                             environment:[LFConfig objectForKey:@"environment"]
                                onSuccess:^(NSDictionary *collection) {
                                    //coll = collection;
                                    //dispatch_semaphore_signal(sema);

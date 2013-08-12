@@ -19,7 +19,6 @@ DerivedData
 doc/
 docs/
 
-TestConfig.plist
-Config.plist
+LFConfig.plist
 *.bak
 *.orig
