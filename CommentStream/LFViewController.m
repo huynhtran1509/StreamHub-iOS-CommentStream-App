@@ -10,7 +10,6 @@
 #import "LFViewController.h"
 
 @interface LFViewController ()
-//@property (nonatomic, strong) NSArray *tableData;
 @property (nonatomic, strong) NSDictionary *authors;
 @property (nonatomic, strong) NSArray *content;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
@@ -24,9 +23,13 @@
 
 -(void)setContent:(NSArray *)content authors:(NSDictionary*)authors
 {
-    _content = [content copy];
-    _authors = [authors copy];
-    [self.tableView reloadData];
+    self.content = content;
+    self.authors = authors;
+    
+    // reload table on main thread
+    [self.tableView performSelectorOnMainThread:@selector(reloadData)
+                                     withObject:nil
+                                  waitUntilDone:NO];
 }
 
 #pragma mark - Lifecycle
@@ -34,15 +37,17 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+}
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
     [LFBootstrapClient getInitForArticle:[LFConfig objectForKey:@"article"]
                                     site:[LFConfig objectForKey:@"site"]
                                  network:[LFConfig objectForKey:@"domain"]
                              environment:[LFConfig objectForKey:@"environment"]
                                onSuccess:^(NSDictionary *collection) {
-                                   //coll = collection;
-                                   //dispatch_semaphore_signal(sema);
-                                   NSLog(@"success");
                                    NSDictionary *headDocument = [collection objectForKey:@"headDocument"];
                                    [self setContent:[headDocument objectForKey:@"content"] authors:[headDocument objectForKey:@"authors"]];
                                }
@@ -50,7 +55,6 @@
                                    if (error) {
                                        NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
                                    }
-                                   //dispatch_semaphore_signal(sema);
                                }];
 }
 
