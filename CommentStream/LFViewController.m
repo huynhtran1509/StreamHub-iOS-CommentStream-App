@@ -6,36 +6,51 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import "LFViewController.h"
-#import <LFClient/JSONKit.h>
 #import <LFClient/LFClient.h>
+#import "LFViewController.h"
+#import "Config.h"
 
 @interface LFViewController ()
-@property (nonatomic, strong) NSArray *tableData;
+//@property (nonatomic, strong) NSArray *tableData;
+@property (nonatomic, strong) NSDictionary *authors;
+@property (nonatomic, strong) NSArray *content;
+@property (strong, nonatomic) IBOutlet UITableView *tableView;
 @end
 
 @implementation LFViewController
 
-@synthesize tableData;
+#pragma mark - properties
+@synthesize authors = _authors;
+@synthesize content = _content;
 
+-(void)setContent:(NSArray *)content authors:(NSDictionary*)authors
+{
+    _content = [content copy];
+    _authors = [authors copy];
+    [self.tableView reloadData];
+}
+
+#pragma mark - Lifecycle
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    tableData = [NSArray arrayWithObjects:@"Egg Benedict", @"Mushroom Risotto", @"Full Breakfast", @"Hamburger", @"Ham and Egg Sandwich", @"Creme Brelee", @"White Chocolate Donut", @"Starbucks Coffee", @"Vegetable Curry", @"Instant Noodle with Egg", @"Noodle with BBQ Pork", @"Japanese Noodle with Pork", @"Green Tea", @"Thai Shrimp Cake", @"Angry Birds Cake", @"Ham and Cheese Panini", nil];
-    
-    
-    [LFBootstrapClient getInitForArticle:@"fakeArticle"
-                                    site:@"fakeSite"
-                                 network:@"init-sample"
-                             environment:nil
+
+    [LFBootstrapClient getInitForArticle:[Config objectForKey:@"article"]
+                                    site:[Config objectForKey:@"site"]
+                                 network:[Config objectForKey:@"domain"]
+                             environment:[Config objectForKey:@"environment"]
                                onSuccess:^(NSDictionary *collection) {
-                                   //bootstrapInitInfo = collection;
+                                   //coll = collection;
                                    //dispatch_semaphore_signal(sema);
+                                   NSLog(@"success");
+                                   NSDictionary *headDocument = [collection objectForKey:@"headDocument"];
+                                   [self setContent:[headDocument objectForKey:@"content"] authors:[headDocument objectForKey:@"authors"]];
                                }
                                onFailure:^(NSError *error) {
-                                   if (error)
+                                   if (error) {
                                        NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
+                                   }
                                    //dispatch_semaphore_signal(sema);
                                }];
 }
@@ -48,26 +63,30 @@
 
 - (void) dealloc
 {
-    tableData = nil;
+    _authors = nil;
+    _content = nil;
 }
 
 #pragma mark - UITableViewControllerDelegate
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [tableData count];
+    return [_content count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *simpleTableIdentifier = @"SimpleTableItem";
+    static NSString *simpleTableIdentifier = @"lfcomment";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
     
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];
     }
     
-    cell.textLabel.text = [tableData objectAtIndex:indexPath.row];
+    NSDictionary *datum = [_content objectAtIndex:indexPath.row];
+    NSString *authorId = [[datum objectForKey:@"content"] objectForKey:@"authorId"];
+    cell.textLabel.text = [[_authors objectForKey:authorId] objectForKey:@"displayName"];
+    cell.detailTextLabel.text = [[datum objectForKey:@"content"] objectForKey:@"bodyHtml"];
     return cell;
 }
 

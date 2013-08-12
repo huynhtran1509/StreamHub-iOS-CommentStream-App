@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EF1179D117B5BE3F00D59E54 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF1179D017B5BE3F00D59E54 /* Config.plist */; };
 		EF7BB6DC17B2B718009E2E70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DB17B2B718009E2E70 /* Foundation.framework */; };
 		EF7BB6DE17B2B718009E2E70 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */; };
 		EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DF17B2B718009E2E70 /* UIKit.framework */; };
@@ -22,6 +23,7 @@
 		EF7BB70517B2B718009E2E70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB70317B2B718009E2E70 /* InfoPlist.strings */; };
 		EF7BB70717B2B718009E2E70 /* CommentStreamTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */; };
 		EFA2AADC17B5A9550022DC8E /* libLFClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF9FD46117B448FC009FE59D /* libLFClient.a */; };
+		EFA2AAF617B5B6C70022DC8E /* Config.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA2AAF517B5B6C70022DC8E /* Config.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +58,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EF1179D017B5BE3F00D59E54 /* Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Config.plist; sourceTree = "<group>"; };
 		EF7BB6D817B2B718009E2E70 /* CommentStream.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CommentStream.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF7BB6DB17B2B718009E2E70 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -76,6 +79,8 @@
 		EF7BB70417B2B718009E2E70 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommentStreamTests.m; sourceTree = "<group>"; };
 		EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LFClient.xcodeproj; path = ../../LFClient.xcodeproj; sourceTree = "<group>"; };
+		EFA2AAF417B5B6C70022DC8E /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
+		EFA2AAF517B5B6C70022DC8E /* Config.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Config.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +142,8 @@
 		EF7BB6E117B2B718009E2E70 /* CommentStream */ = {
 			isa = PBXGroup;
 			children = (
+				EFA2AAF417B5B6C70022DC8E /* Config.h */,
+				EFA2AAF517B5B6C70022DC8E /* Config.m */,
 				EF7BB6ED17B2B718009E2E70 /* Main.storyboard */,
 				EF7BB6EA17B2B718009E2E70 /* LFAppDelegate.h */,
 				EF7BB6EB17B2B718009E2E70 /* LFAppDelegate.m */,
@@ -151,6 +158,7 @@
 		EF7BB6E217B2B718009E2E70 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				EF1179D017B5BE3F00D59E54 /* Config.plist */,
 				EF7BB6E317B2B718009E2E70 /* CommentStream-Info.plist */,
 				EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */,
 				EF7BB6E717B2B718009E2E70 /* main.m */,
@@ -287,6 +295,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF1179D117B5BE3F00D59E54 /* Config.plist in Resources */,
 				EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */,
 				EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */,
 				EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */,
@@ -309,6 +318,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF7BB6EC17B2B718009E2E70 /* LFAppDelegate.m in Sources */,
+				EFA2AAF617B5B6C70022DC8E /* Config.m in Sources */,
 				EF7BB6E817B2B718009E2E70 /* main.m in Sources */,
 				EF7BB6F217B2B718009E2E70 /* LFViewController.m in Sources */,
 			);
