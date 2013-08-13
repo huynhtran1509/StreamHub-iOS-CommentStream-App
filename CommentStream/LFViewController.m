@@ -9,8 +9,9 @@
 #import <LFClient/LFClient.h>
 #import "LFViewController.h"
 #import <DTCoreText/DTAttributedTextCell.h>
+#import <DTCoreText/DTLinkButton.h>
 
-@interface LFViewController ()
+@interface LFViewController () <DTAttributedTextContentViewDelegate>
 @property (nonatomic, strong) NSDictionary *authors;
 @property (nonatomic, strong) NSArray *content;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
@@ -148,6 +149,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 		cell.accessoryType = UITableViewCellStyleDefault;
 		cell.hasFixedRowHeight = _useStaticRowHeight;
 		
+        //cell.imageView.image = [UIImage imageNamed:@"myImage.png"];
+        
 		// cache it, if there is a cache
 		[_cellCache setObject:cell forKey:key];
 	}
@@ -174,15 +177,35 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     
     NSDictionary *datum = [_content objectAtIndex:indexPath.row];
-    NSString *authorId = [[datum objectForKey:@"content"] objectForKey:@"authorId"];
-    NSString *authorName = [[_authors objectForKey:authorId] objectForKey:@"displayName"];
-    NSString *bodyHTML = [[datum objectForKey:@"content"] objectForKey:@"bodyHtml"];
+    NSDictionary *content = [datum objectForKey:@"content"];
+    NSString *authorId = [content objectForKey:@"authorId"];
+    NSDictionary *author = [_authors objectForKey:authorId];
+    NSString *authorName = [author objectForKey:@"displayName"];
+    //NSString *avatarURL = [author objectForKey:@"avatar"];
+    NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
 	
 	NSString *html = [NSString stringWithFormat:@"<font face='Avenir-Roman'><h3>%@</h3>%@</font>", authorName, bodyHTML];
+
+    cell.attributedTextContextView.shouldDrawImages = YES;
+    cell.attributedTextContextView.delegate = self;
+    
 	[cell setHTMLString:html];
-	
-	cell.attributedTextContextView.shouldDrawImages = YES;
 }
 
+#pragma mark - DTAttributedTextContentViewDelegate
+-(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView viewForLink:(NSURL *)url identifier:(NSString *)identifier frame:(CGRect)frame
+{
+    DTLinkButton *linkButton = [[DTLinkButton alloc] initWithFrame:frame];
+    linkButton.URL = url;
+    [linkButton addTarget:self action:@selector(linkButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    return linkButton;
+}
+
+#pragma mark - Events
+
+- (IBAction)linkButtonClicked:(DTLinkButton*)sender
+{
+    [[UIApplication sharedApplication] openURL:sender.URL];
+}
 
 @end
