@@ -24,7 +24,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 @implementation LFViewController
 {
 	BOOL _useStaticRowHeight;
-    NSCache *cellCache;
+    NSCache* _cellCache;
 }
 
 #pragma mark - properties
@@ -52,19 +52,19 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _useStaticRowHeight = NO;
     
     /*
-	 if you enable static row height in this demo then the cell height is determined from the tableView.rowHeight. Cells can be reused in this mode.
-	 If you disable this then cells are prepared and cached to reused their internal layouter and layoutFrame. Reuse is not recommended since the cells are cached anyway.
+	 if you enable static row height in this demo then the cell height is determined from the tableView.rowHeight. 
+     Cells can be reused in this mode.
+	 If you disable this then cells are prepared and cached to reused their internal layouter and layoutFrame. 
+     Reuse is not recommended since the cells are cached anyway.
 	 */
 	
-    if (_useStaticRowHeight)
-	{
-		// use a static row height
+    if (_useStaticRowHeight) {
 		self.tableView.rowHeight = 60.0f;
 	}
-	else
-	{
-		// establish a cache for prepared cells because heightForRow... and cellForRow... both need the same cell for an index path
-		cellCache = [[NSCache alloc] init];
+	else {
+		// establish a cache for prepared cells because heightForRowAtIndexPath and cellForRowAtIndexPath
+        // both need the same cell for an index path
+		_cellCache = [[NSCache alloc] init];
 	}
     
     // Hide Status Bar
@@ -101,12 +101,15 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+    
+    _cellCache = nil;
 }
 
 - (void) dealloc
 {
     _authors = nil;
     _content = nil;
+    _cellCache = nil;
 }
 
 #pragma mark - UITableViewControllerDelegate
@@ -114,8 +117,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	if (_useStaticRowHeight)
-	{
+	if (_useStaticRowHeight) {
 		return tableView.rowHeight;
 	}
 	
@@ -134,7 +136,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 	// workaround for iOS 5 bug (TODO: remove this)
 	NSString *key = [NSString stringWithFormat:@"%d-%d", indexPath.section, indexPath.row];
 	
-	DTAttributedTextCell *cell = [cellCache objectForKey:key];
+	DTAttributedTextCell *cell = [_cellCache objectForKey:key];
     
 	if (!cell) {
 		if ([self canReuseCells]) {
@@ -147,7 +149,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 		cell.hasFixedRowHeight = _useStaticRowHeight;
 		
 		// cache it, if there is a cache
-		[cellCache setObject:cell forKey:key];
+		[_cellCache setObject:cell forKey:key];
 	}
 	
 	[self configureCell:cell forIndexPath:indexPath];
