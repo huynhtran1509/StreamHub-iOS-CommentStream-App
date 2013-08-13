@@ -1,0 +1,19 @@
+PODS:
+  - DTCoreText (1.6.3):
+    - DTFoundation/Core (~> 1.5.1)
+    - DTFoundation/DTHTMLParser (~> 1.5.1)
+    - DTFoundation/UIKit (~> 1.5.1)
+  - DTFoundation/Core (1.5.1)
+  - DTFoundation/DTHTMLParser (1.5.1):
+    - DTFoundation/Core
+  - DTFoundation/UIKit (1.5.1):
+    - DTFoundation/Core
+
+DEPENDENCIES:
+  - DTCoreText
+
+SPEC CHECKSUMS:
+  DTCoreText: a864bedf1a8ca3c1d6704567a94d03f65ad64a7c
+  DTFoundation: a2c849216082e54ed753fad1216329b70da66841
+
+COCOAPODS: 0.23.0

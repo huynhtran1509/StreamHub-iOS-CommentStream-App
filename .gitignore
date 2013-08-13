@@ -22,3 +22,6 @@ docs/
 LFConfig.plist
 *.bak
 *.orig
+
+# CocoaPods
+Pods
