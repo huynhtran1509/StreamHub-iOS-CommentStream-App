@@ -13,6 +13,7 @@ static const NSInteger kBottomPadding = 8;
 
 @implementation LFAttributedTextCell
 
+/*
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -22,7 +23,6 @@ static const NSInteger kBottomPadding = 8;
     return self;
 }
 
-/*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
@@ -78,7 +78,41 @@ static const NSInteger kBottomPadding = 8;
 
 - (CGFloat)requiredRowHeightInTableView:(UITableView *)tableView
 {
-    return MAX([super requiredRowHeightInTableView:tableView], self.imageView.frame.size.height + self.imageView.frame.origin.y) + kBottomPadding;
+	if (self.hasFixedRowHeight)
+	{
+		NSLog(@"Warning: you are calling %s even though the cell is configured with fixed row height", (const char *)__PRETTY_FUNCTION__);
+	}
+	
+	CGFloat contentWidth = tableView.frame.size.width - kLeftColumnWidth;
+	
+	// reduce width for accessories
+	switch (self.accessoryType)
+	{
+		case UITableViewCellAccessoryDisclosureIndicator:
+		case UITableViewCellAccessoryCheckmark:
+			contentWidth -= 20.0f;
+			break;
+		case UITableViewCellAccessoryDetailDisclosureButton:
+			contentWidth -= 33.0f;
+			break;
+		case UITableViewCellAccessoryNone:
+			break;
+		default:
+			NSLog(@"Warning: Sizing for UITableViewCellAccessoryDetailButton not implemented on %@", NSStringFromClass([self class]));
+			break;
+	}
+	
+	// reduce width for grouped table views
+	if (tableView.style == UITableViewStyleGrouped)
+	{
+		// left and right 10 px margins on grouped table views
+		contentWidth -= 20;
+	}
+	
+	CGSize neededSize = [self.attributedTextContextView suggestedFrameSizeToFitEntireStringConstraintedToWidth:contentWidth];
+	
+	// note: non-integer row heights caused trouble < iOS 5.0
+	return MAX(neededSize.height, self.imageView.frame.size.height + self.imageView.frame.origin.y) + kBottomPadding;
 }
 
 @end

@@ -190,7 +190,6 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
 	
-    
     // load avatar images in a separate queue
     AFImageRequestOperation* operation = [AFImageRequestOperation
                                           imageRequestOperationWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]]
