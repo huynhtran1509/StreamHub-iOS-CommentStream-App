@@ -8,6 +8,9 @@
 
 #import "LFAttributedTextCell.h"
 
+static const NSInteger kLeftColumnWidth = 50;
+static const NSInteger kBottomPadding = 8;
+
 @implementation LFAttributedTextCell
 
 - (id)initWithFrame:(CGRect)frame
@@ -65,7 +68,7 @@
 		CGFloat neededContentHeight = [self requiredRowHeightInTableView:[self _containingTableView]];
         
 		// after the first call here the content view size is correct
-		CGRect frame = CGRectMake(50.0f, 0, self.contentView.bounds.size.width, neededContentHeight);
+		CGRect frame = CGRectMake(kLeftColumnWidth, 0, self.contentView.bounds.size.width - kLeftColumnWidth, neededContentHeight);
 		self.attributedTextContextView.frame = frame;
         
         CGRect imageFrame = self.imageView.frame;
@@ -75,7 +78,7 @@
 
 - (CGFloat)requiredRowHeightInTableView:(UITableView *)tableView
 {
-    return MAX([super requiredRowHeightInTableView:tableView], self.imageView.frame.size.height + self.imageView.frame.origin.x) + 8;
+    return MAX([super requiredRowHeightInTableView:tableView], self.imageView.frame.size.height + self.imageView.frame.origin.y) + kBottomPadding;
 }
 
 @end
