@@ -10,4 +10,7 @@
 
 @interface LFAttributedTextCell : DTAttributedTextCell
 
+@property (nonatomic, readonly) UILabel *titleView;
+@property (nonatomic, readonly) UILabel *noteView;
+
 @end

@@ -27,8 +27,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 @implementation LFViewController
 {
-	BOOL                 _useStaticRowHeight;
-    NSCache*             _cellCache;
+	BOOL     _useStaticRowHeight;
+    NSCache* _cellCache;
 }
 
 #pragma mark - properties
@@ -158,7 +158,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 		// cache it, if there is a cache
 		[_cellCache setObject:cell forKey:key];
         
-        // DTAttributedTextCell specifics
+        // LFAttributedTextCell specifics
         cell.attributedTextContextView.shouldDrawImages = NO;
         cell.attributedTextContextView.delegate = self;
 	}
@@ -181,15 +181,38 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return (![self respondsToSelector:@selector(tableView:heightForRowAtIndexPath:)]);
 }
 
-- (void)configureCell:(DTAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
+- (BOOL)isToday:(NSDate*)date1
+{
+    NSDate        *date2 = [NSDate date];
+    NSCalendar* calendar = [NSCalendar currentCalendar]; //TODO: cache this
+    
+    unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
+    NSDateComponents* comp1 = [calendar components:unitFlags fromDate:date1];
+    NSDateComponents* comp2 = [calendar components:unitFlags fromDate:date2];
+    
+    return [comp1 day]   == [comp2 day] &&
+           [comp1 month] == [comp2 month] &&
+           [comp1 year]  == [comp2 year];
+}
+
+- (void)configureCell:(LFAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
     NSDictionary *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
+    
+    NSTimeInterval timeStamp = [[content objectForKey:@"createdAt"] doubleValue];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timeStamp];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init]; // TODO: cache this
+    [dateFormatter setDateFormat:([self isToday:date] ? @"HH:mm" : @"MMM dd")];
+    NSString *formattedDateString = [dateFormatter stringFromDate:date];
     
     NSString *authorName = [author objectForKey:@"displayName"];
     NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
 	
+    cell.titleView.text = authorName;
+    cell.noteView.text = formattedDateString;
+    
     // load avatar images in a separate queue
     AFImageRequestOperation* operation = [AFImageRequestOperation
                                           imageRequestOperationWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]]
@@ -206,8 +229,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [operation start];
     
     // To test image downloading:
-	//NSString *html = [NSString stringWithFormat:@"<div><img src=\"%@\"/></div><div style=\"font-family:Avenir\"><h3>%@</h3>%@</div>", avatarURL, authorName, bodyHTML];
-    NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\"><h3>%@</h3>%@</div>", authorName, bodyHTML];
+	//NSString *html = [NSString stringWithFormat:@"<img src=\"%@\"/><div style=\"font-family:Avenir\">%@</div>", avatarURL, bodyHTML];
+    NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\">%@</div>", bodyHTML];
 
 	[cell setHTMLString:html];
 }
