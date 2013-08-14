@@ -19,11 +19,8 @@
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
 		EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
-		EF7BB6FB17B2B718009E2E70 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6FA17B2B718009E2E70 /* XCTest.framework */; };
 		EF7BB6FC17B2B718009E2E70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DB17B2B718009E2E70 /* Foundation.framework */; };
 		EF7BB6FD17B2B718009E2E70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DF17B2B718009E2E70 /* UIKit.framework */; };
-		EF7BB70517B2B718009E2E70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB70317B2B718009E2E70 /* InfoPlist.strings */; };
-		EF7BB70717B2B718009E2E70 /* CommentStreamTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */; };
 		EFA2AADC17B5A9550022DC8E /* libLFClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF9FD46117B448FC009FE59D /* libLFClient.a */; };
 /* End PBXBuildFile section */
 
@@ -41,13 +38,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 1C4CC88116A48B3800C33DEC;
 			remoteInfo = LFClient;
-		};
-		EF9FD46217B448FC009FE59D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1C4CC89216A48B3800C33DEC;
-			remoteInfo = LFClientTests;
 		};
 		EF9FD46417B4491E009FE59D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -78,11 +68,6 @@
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		EF7BB6F917B2B718009E2E70 /* CommentStreamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CommentStreamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		EF7BB6FA17B2B718009E2E70 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		EF7BB70217B2B718009E2E70 /* CommentStreamTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CommentStreamTests-Info.plist"; sourceTree = "<group>"; };
-		EF7BB70417B2B718009E2E70 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommentStreamTests.m; sourceTree = "<group>"; };
 		EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LFClient.xcodeproj; path = ../../LFClient.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,7 +88,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF7BB6FB17B2B718009E2E70 /* XCTest.framework in Frameworks */,
 				EF7BB6FD17B2B718009E2E70 /* UIKit.framework in Frameworks */,
 				EF7BB6FC17B2B718009E2E70 /* Foundation.framework in Frameworks */,
 			);
@@ -138,7 +122,6 @@
 			children = (
 				EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */,
 				EF7BB6E117B2B718009E2E70 /* CommentStream */,
-				EF7BB70017B2B718009E2E70 /* CommentStreamTests */,
 				EF7BB6DA17B2B718009E2E70 /* Frameworks */,
 				EF7BB6D917B2B718009E2E70 /* Products */,
 				BA268D01CA8446E4BA6D3FC3 /* Pods.xcconfig */,
@@ -149,7 +132,6 @@
 			isa = PBXGroup;
 			children = (
 				EF7BB6D817B2B718009E2E70 /* CommentStream.app */,
-				EF7BB6F917B2B718009E2E70 /* CommentStreamTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -160,7 +142,6 @@
 				EF7BB6DB17B2B718009E2E70 /* Foundation.framework */,
 				EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */,
 				EF7BB6DF17B2B718009E2E70 /* UIKit.framework */,
-				EF7BB6FA17B2B718009E2E70 /* XCTest.framework */,
 				6D65DBC239F84930AC53A99C /* libPods.a */,
 			);
 			name = Frameworks;
@@ -190,29 +171,10 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		EF7BB70017B2B718009E2E70 /* CommentStreamTests */ = {
-			isa = PBXGroup;
-			children = (
-				EF7BB70617B2B718009E2E70 /* CommentStreamTests.m */,
-				EF7BB70117B2B718009E2E70 /* Supporting Files */,
-			);
-			path = CommentStreamTests;
-			sourceTree = "<group>";
-		};
-		EF7BB70117B2B718009E2E70 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				EF7BB70217B2B718009E2E70 /* CommentStreamTests-Info.plist */,
-				EF7BB70317B2B718009E2E70 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		EF9FD45C17B448FC009FE59D /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				EF9FD46117B448FC009FE59D /* libLFClient.a */,
-				EF9FD46317B448FC009FE59D /* LFClientTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -239,24 +201,6 @@
 			productName = CommentStream;
 			productReference = EF7BB6D817B2B718009E2E70 /* CommentStream.app */;
 			productType = "com.apple.product-type.application";
-		};
-		EF7BB6F817B2B718009E2E70 /* CommentStreamTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = EF7BB70D17B2B718009E2E70 /* Build configuration list for PBXNativeTarget "CommentStreamTests" */;
-			buildPhases = (
-				EF7BB6F517B2B718009E2E70 /* Sources */,
-				EF7BB6F617B2B718009E2E70 /* Frameworks */,
-				EF7BB6F717B2B718009E2E70 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				EF7BB6FF17B2B718009E2E70 /* PBXTargetDependency */,
-			);
-			name = CommentStreamTests;
-			productName = CommentStreamTests;
-			productReference = EF7BB6F917B2B718009E2E70 /* CommentStreamTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -293,7 +237,6 @@
 			projectRoot = "";
 			targets = (
 				EF7BB6D717B2B718009E2E70 /* CommentStream */,
-				EF7BB6F817B2B718009E2E70 /* CommentStreamTests */,
 			);
 		};
 /* End PBXProject section */
@@ -304,13 +247,6 @@
 			fileType = archive.ar;
 			path = libLFClient.a;
 			remoteRef = EF9FD46017B448FC009FE59D /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		EF9FD46317B448FC009FE59D /* LFClientTests.octest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = LFClientTests.octest;
-			remoteRef = EF9FD46217B448FC009FE59D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -331,7 +267,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF7BB70517B2B718009E2E70 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,7 +321,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF7BB70717B2B718009E2E70 /* CommentStreamTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,14 +354,6 @@
 				EF7BB6EE17B2B718009E2E70 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		EF7BB70317B2B718009E2E70 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				EF7BB70417B2B718009E2E70 /* en */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -545,46 +471,6 @@
 			};
 			name = Release;
 		};
-		EF7BB70E17B2B718009E2E70 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/CommentStream.app/CommentStream";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "CommentStreamTests/CommentStreamTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		EF7BB70F17B2B718009E2E70 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/CommentStream.app/CommentStream";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
-				INFOPLIST_FILE = "CommentStreamTests/CommentStreamTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -602,15 +488,6 @@
 			buildConfigurations = (
 				EF7BB70B17B2B718009E2E70 /* Debug */,
 				EF7BB70C17B2B718009E2E70 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		EF7BB70D17B2B718009E2E70 /* Build configuration list for PBXNativeTarget "CommentStreamTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				EF7BB70E17B2B718009E2E70 /* Debug */,
-				EF7BB70F17B2B718009E2E70 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

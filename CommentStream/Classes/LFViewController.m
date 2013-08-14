@@ -12,7 +12,6 @@
 #import <DTCoreText/DTLinkButton.h>
 #import <DTCoreText/DTImageTextAttachment.h>
 #import "DTLazyImageView+TextContentView.h"
-//#import "DownloadUrlOperation.h"
 #import <AFNetworking/AFImageRequestOperation.h>
 
 @interface LFViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
