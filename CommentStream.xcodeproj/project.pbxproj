@@ -9,14 +9,15 @@
 /* Begin PBXBuildFile section */
 		84D3B603B5D445758CB48FEB /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D65DBC239F84930AC53A99C /* libPods.a */; };
 		EF1179D117B5BE3F00D59E54 /* LFConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF1179D017B5BE3F00D59E54 /* LFConfig.plist */; };
+		EF6683D117BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */; };
+		EF6683E017BB97E2005F5FC3 /* LFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DC17BB97E2005F5FC3 /* LFAppDelegate.m */; };
+		EF6683E117BB97E2005F5FC3 /* LFViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DE17BB97E2005F5FC3 /* LFViewController.m */; };
 		EF7BB6DC17B2B718009E2E70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DB17B2B718009E2E70 /* Foundation.framework */; };
 		EF7BB6DE17B2B718009E2E70 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */; };
 		EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DF17B2B718009E2E70 /* UIKit.framework */; };
 		EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */; };
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
-		EF7BB6EC17B2B718009E2E70 /* LFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6EB17B2B718009E2E70 /* LFAppDelegate.m */; };
 		EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
-		EF7BB6F217B2B718009E2E70 /* LFViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6F117B2B718009E2E70 /* LFViewController.m */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
 		EF7BB6FB17B2B718009E2E70 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6FA17B2B718009E2E70 /* XCTest.framework */; };
 		EF7BB6FC17B2B718009E2E70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DB17B2B718009E2E70 /* Foundation.framework */; };
@@ -61,6 +62,12 @@
 		6D65DBC239F84930AC53A99C /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA268D01CA8446E4BA6D3FC3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		EF1179D017B5BE3F00D59E54 /* LFConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LFConfig.plist; sourceTree = "<group>"; };
+		EF6683CF17BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "DTLazyImageView+TextContentView.h"; path = "CommentStream/Categories/DTLazyImageView+TextContentView.h"; sourceTree = "<group>"; };
+		EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "DTLazyImageView+TextContentView.m"; path = "CommentStream/Categories/DTLazyImageView+TextContentView.m"; sourceTree = "<group>"; };
+		EF6683DB17BB97E2005F5FC3 /* LFAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFAppDelegate.h; path = Classes/LFAppDelegate.h; sourceTree = "<group>"; };
+		EF6683DC17BB97E2005F5FC3 /* LFAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFAppDelegate.m; path = Classes/LFAppDelegate.m; sourceTree = "<group>"; };
+		EF6683DD17BB97E2005F5FC3 /* LFViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFViewController.h; path = Classes/LFViewController.h; sourceTree = "<group>"; };
+		EF6683DE17BB97E2005F5FC3 /* LFViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFViewController.m; path = Classes/LFViewController.m; sourceTree = "<group>"; };
 		EF7BB6D817B2B718009E2E70 /* CommentStream.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CommentStream.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF7BB6DB17B2B718009E2E70 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -69,11 +76,7 @@
 		EF7BB6E517B2B718009E2E70 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		EF7BB6E717B2B718009E2E70 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
-		EF7BB6EA17B2B718009E2E70 /* LFAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LFAppDelegate.h; sourceTree = "<group>"; };
-		EF7BB6EB17B2B718009E2E70 /* LFAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LFAppDelegate.m; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		EF7BB6F017B2B718009E2E70 /* LFViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LFViewController.h; sourceTree = "<group>"; };
-		EF7BB6F117B2B718009E2E70 /* LFViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LFViewController.m; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		EF7BB6F917B2B718009E2E70 /* CommentStreamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CommentStreamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF7BB6FA17B2B718009E2E70 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -109,6 +112,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EF6683D217BAEC03005F5FC3 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				EF6683CF17BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.h */,
+				EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */,
+			);
+			name = Categories;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		EF6683D817BB9785005F5FC3 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				EF6683DB17BB97E2005F5FC3 /* LFAppDelegate.h */,
+				EF6683DC17BB97E2005F5FC3 /* LFAppDelegate.m */,
+				EF6683DD17BB97E2005F5FC3 /* LFViewController.h */,
+				EF6683DE17BB97E2005F5FC3 /* LFViewController.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
 		EF7BB6CF17B2B718009E2E70 = {
 			isa = PBXGroup;
 			children = (
@@ -145,11 +169,9 @@
 		EF7BB6E117B2B718009E2E70 /* CommentStream */ = {
 			isa = PBXGroup;
 			children = (
+				EF6683D217BAEC03005F5FC3 /* Categories */,
+				EF6683D817BB9785005F5FC3 /* Classes */,
 				EF7BB6ED17B2B718009E2E70 /* Main.storyboard */,
-				EF7BB6EA17B2B718009E2E70 /* LFAppDelegate.h */,
-				EF7BB6EB17B2B718009E2E70 /* LFAppDelegate.m */,
-				EF7BB6F017B2B718009E2E70 /* LFViewController.h */,
-				EF7BB6F117B2B718009E2E70 /* LFViewController.m */,
 				EF7BB6F317B2B718009E2E70 /* Images.xcassets */,
 				EF7BB6E217B2B718009E2E70 /* Supporting Files */,
 			);
@@ -353,9 +375,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF7BB6EC17B2B718009E2E70 /* LFAppDelegate.m in Sources */,
+				EF6683E017BB97E2005F5FC3 /* LFAppDelegate.m in Sources */,
+				EF6683E117BB97E2005F5FC3 /* LFViewController.m in Sources */,
 				EF7BB6E817B2B718009E2E70 /* main.m in Sources */,
-				EF7BB6F217B2B718009E2E70 /* LFViewController.m in Sources */,
+				EF6683D117BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

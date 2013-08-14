@@ -10,8 +10,12 @@
 #import "LFViewController.h"
 #import <DTCoreText/DTAttributedTextCell.h>
 #import <DTCoreText/DTLinkButton.h>
+#import <DTCoreText/DTImageTextAttachment.h>
+#import "DTLazyImageView+TextContentView.h"
+//#import "DownloadUrlOperation.h"
+#import <AFNetworking/AFImageRequestOperation.h>
 
-@interface LFViewController () <DTAttributedTextContentViewDelegate>
+@interface LFViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
 @property (nonatomic, strong) NSDictionary *authors;
 @property (nonatomic, strong) NSArray *content;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
@@ -24,8 +28,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 @implementation LFViewController
 {
-	BOOL _useStaticRowHeight;
-    NSCache* _cellCache;
+	BOOL                 _useStaticRowHeight;
+    NSCache*             _cellCache;
 }
 
 #pragma mark - properties
@@ -53,9 +57,9 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _useStaticRowHeight = NO;
     
     /*
-	 if you enable static row height in this demo then the cell height is determined from the tableView.rowHeight. 
+	 if you enable static row height in this demo then the cell height is determined from the tableView.rowHeight.
      Cells can be reused in this mode.
-	 If you disable this then cells are prepared and cached to reused their internal layouter and layoutFrame. 
+	 If you disable this then cells are prepared and cached to reused their internal layouter and layoutFrame.
      Reuse is not recommended since the cells are cached anyway.
 	 */
 	
@@ -77,6 +81,9 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         // iOS 6
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     }
+    
+    // set system cache for URL data to 5MB
+    [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -148,9 +155,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 		}
 		cell.accessoryType = UITableViewCellStyleDefault;
 		cell.hasFixedRowHeight = _useStaticRowHeight;
-		
-        //cell.imageView.image = [UIImage imageNamed:@"myImage.png"];
-        
+
 		// cache it, if there is a cache
 		[_cellCache setObject:cell forKey:key];
 	}
@@ -175,19 +180,36 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 - (void)configureCell:(DTAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
+    NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
+    NSDictionary *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
     
-    NSDictionary *datum = [_content objectAtIndex:indexPath.row];
-    NSDictionary *content = [datum objectForKey:@"content"];
-    NSString *authorId = [content objectForKey:@"authorId"];
-    NSDictionary *author = [_authors objectForKey:authorId];
     NSString *authorName = [author objectForKey:@"displayName"];
-    //NSString *avatarURL = [author objectForKey:@"avatar"];
+    NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
 	
-	NSString *html = [NSString stringWithFormat:@"<font face='Avenir-Roman'><h3>%@</h3>%@</font>", authorName, bodyHTML];
-
-    cell.attributedTextContextView.shouldDrawImages = YES;
+    
+    // load avatar images in a separate queue
+    AFImageRequestOperation* operation = [AFImageRequestOperation
+                                          imageRequestOperationWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]]
+                                          imageProcessingBlock:nil
+                                          success: ^(NSURLRequest *request,
+                                                     NSHTTPURLResponse *response,
+                                                     UIImage *image)
+                                          {
+                                              // display image (this block is on the main thread)
+                                              cell.imageView.image = image;
+                                              [cell setNeedsLayout];
+                                          }
+                                          failure:nil];
+    [operation start];
+    
+    // To test image downloading:
+	//NSString *html = [NSString stringWithFormat:@"<div><img src=\"%@\"/></div><div style=\"font-family:Avenir\"><h3>%@</h3>%@</div>", avatarURL, authorName, bodyHTML];
+    NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\"><h3>%@</h3>%@</div>", authorName, bodyHTML];
+    
+    cell.attributedTextContextView.shouldDrawImages = NO;
     cell.attributedTextContextView.delegate = self;
+    cell.attributedTextContextView.layoutOffset = CGPointMake(100.0f, 0.0f);
     
 	[cell setHTMLString:html];
 }
@@ -195,15 +217,63 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 #pragma mark - DTAttributedTextContentViewDelegate
 -(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView viewForLink:(NSURL *)url identifier:(NSString *)identifier frame:(CGRect)frame
 {
-    DTLinkButton *linkButton = [[DTLinkButton alloc] initWithFrame:frame];
-    linkButton.URL = url;
-    [linkButton addTarget:self action:@selector(linkButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
-    return linkButton;
+    DTLinkButton *btn = [[DTLinkButton alloc] initWithFrame:frame];
+    btn.URL = url;
+    [btn addTarget:self action:@selector(btnDidClick:) forControlEvents:UIControlEventTouchUpInside];
+    return btn;
 }
+
+-(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView viewForAttachment:(DTTextAttachment *)attachment frame:(CGRect)frame
+{
+    if ([attachment isKindOfClass:[DTImageTextAttachment class]]) {
+        
+        DTLazyImageView *imageView = [[DTLazyImageView alloc] initWithFrame:frame];
+        imageView.textContentView = attributedTextContentView;
+        imageView.delegate = self;
+        
+        // defer loading of image under given URL
+        imageView.url = attachment.contentURL;
+        return imageView;
+    }
+    return nil;
+}
+
+-(void)lazyImageView:(DTLazyImageView *)lazyImageView didChangeImageSize:(CGSize)size
+{
+    DTAttributedTextContentView *cv = lazyImageView.textContentView;
+    NSURL *url = lazyImageView.url;
+    //CGSize imageSize = size;
+    
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"contentURL == %@", url];
+    // update all attachments that matchin this URL (possibly multiple images with same size)
+    for (DTTextAttachment *attachment in [cv.layoutFrame textAttachmentsWithPredicate:pred])
+    {
+        /*
+         attachment.originalSize = imageSize;
+         if (!CGSizeEqualToSize(imageSize, attachment.displaySize)) {
+         attachment.displaySize = imageSize;
+         }*/
+        attachment.originalSize = size;
+        lazyImageView.bounds = CGRectMake(0, 0, attachment.displaySize.width, attachment.displaySize.height);
+    }
+    
+    // need to reset the layouter because otherwise we get the old framesetter or cached layout frames
+    // see https://github.com/Cocoanetics/DTCoreText/issues/307
+    cv.layouter = nil;
+    
+    // here we're layouting the entire string, might be more efficient to only relayout the paragraphs that contain these attachments
+    [cv relayoutText];
+}
+/*
+ -(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView viewForAttributedString:(NSAttributedString *)string frame:(CGRect)frame
+ {
+     // initialize and return your view here
+ }
+*/
 
 #pragma mark - Events
 
-- (IBAction)linkButtonClicked:(DTLinkButton*)sender
+- (IBAction)btnDidClick:(DTLinkButton*)sender
 {
     [[UIApplication sharedApplication] openURL:sender.URL];
 }
