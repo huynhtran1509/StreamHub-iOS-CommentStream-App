@@ -9,7 +9,7 @@
 #import "LFAttributedTextCell.h"
 
 static const NSInteger kLeftColumnWidth = 50;
-static const NSInteger kTopInset = 5;
+static const NSInteger kTopInset = 8;
 static const NSInteger kBottomInset = 5;
 static const NSInteger kHeaderHeight = 30;
 static const NSInteger kNoteWidth = 60;
@@ -97,7 +97,7 @@ static const NSInteger kNoteWidth = 60;
 {
 	if (!_titleView) {
 		_titleView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _noteView.font = [UIFont boldSystemFontOfSize:16.0f];
+        _titleView.font = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f]; //[UIFont boldSystemFontOfSize:16.0f];
 		[self.contentView addSubview:_titleView];
 	}
 	return _titleView;
@@ -107,8 +107,8 @@ static const NSInteger kNoteWidth = 60;
 {
 	if (!_noteView) {
 		_noteView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _noteView.font = [UIFont italicSystemFontOfSize:12.0f];
-        _noteView.textColor = [UIColor darkGrayColor];
+        _noteView.font = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
+        _noteView.textColor = [UIColor grayColor];
 		[self.contentView addSubview:_noteView];
 	}
 	return _noteView;
