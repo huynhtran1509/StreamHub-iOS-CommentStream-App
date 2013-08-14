@@ -13,6 +13,7 @@
 #import <DTCoreText/DTImageTextAttachment.h>
 #import "DTLazyImageView+TextContentView.h"
 #import <AFNetworking/AFImageRequestOperation.h>
+#import "LFAttributedTextCell.h"
 
 @interface LFViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
 @property (nonatomic, strong) NSDictionary *authors;
@@ -128,7 +129,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 		return tableView.rowHeight;
 	}
 	
-	DTAttributedTextCell *cell = (DTAttributedTextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
+	LFAttributedTextCell *cell = (LFAttributedTextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
 	return [cell requiredRowHeightInTableView:tableView];
 }
 
@@ -143,20 +144,24 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 	// workaround for iOS 5 bug (TODO: remove this)
 	NSString *key = [NSString stringWithFormat:@"%d-%d", indexPath.section, indexPath.row];
 	
-	DTAttributedTextCell *cell = [_cellCache objectForKey:key];
+	LFAttributedTextCell *cell = [_cellCache objectForKey:key];
     
 	if (!cell) {
 		if ([self canReuseCells]) {
-			cell = (DTAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:AttributedTextCellReuseIdentifier];
+			cell = (LFAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:AttributedTextCellReuseIdentifier];
 		}
 		if (!cell) {
-			cell = [[DTAttributedTextCell alloc] initWithReuseIdentifier:AttributedTextCellReuseIdentifier];
+			cell = [[LFAttributedTextCell alloc] initWithReuseIdentifier:AttributedTextCellReuseIdentifier];
 		}
 		cell.accessoryType = UITableViewCellStyleDefault;
 		cell.hasFixedRowHeight = _useStaticRowHeight;
 
 		// cache it, if there is a cache
 		[_cellCache setObject:cell forKey:key];
+        
+        // DTAttributedTextCell specifics
+        cell.attributedTextContextView.shouldDrawImages = NO;
+        cell.attributedTextContextView.delegate = self;
 	}
 	
 	[self configureCell:cell forIndexPath:indexPath];
@@ -205,11 +210,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // To test image downloading:
 	//NSString *html = [NSString stringWithFormat:@"<div><img src=\"%@\"/></div><div style=\"font-family:Avenir\"><h3>%@</h3>%@</div>", avatarURL, authorName, bodyHTML];
     NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\"><h3>%@</h3>%@</div>", authorName, bodyHTML];
-    
-    cell.attributedTextContextView.shouldDrawImages = NO;
-    cell.attributedTextContextView.delegate = self;
-    cell.attributedTextContextView.layoutOffset = CGPointMake(100.0f, 0.0f);
-    
+
 	[cell setHTMLString:html];
 }
 
