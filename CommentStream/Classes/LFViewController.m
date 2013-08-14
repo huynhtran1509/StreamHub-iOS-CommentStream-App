@@ -8,7 +8,6 @@
 
 #import <LFClient/LFClient.h>
 #import "LFViewController.h"
-#import <DTCoreText/DTAttributedTextCell.h>
 #import <DTCoreText/DTLinkButton.h>
 #import <DTCoreText/DTImageTextAttachment.h>
 #import "DTLazyImageView+TextContentView.h"
