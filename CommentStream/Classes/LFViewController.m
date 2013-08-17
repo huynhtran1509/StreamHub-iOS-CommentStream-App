@@ -46,7 +46,6 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
                                   waitUntilDone:NO];
 }
 
-
 #pragma mark - Lifecycle
 - (void)viewDidLoad
 {

@@ -206,6 +206,11 @@
 				CLASSPREFIX = LF;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = Livefyre;
+				TargetAttributes = {
+					EF7BB6D717B2B718009E2E70 = {
+						DevelopmentTeam = 9697AX55KQ;
+					};
+				};
 			};
 			buildConfigurationList = EF7BB6D317B2B718009E2E70 /* Build configuration list for PBXProject "CommentStream" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -416,6 +421,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -426,6 +433,7 @@
 				INFOPLIST_FILE = "CommentStream/CommentStream-Info.plist";
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -436,6 +444,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CommentStream/CommentStream-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -446,6 +456,7 @@
 				INFOPLIST_FILE = "CommentStream/CommentStream-Info.plist";
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
