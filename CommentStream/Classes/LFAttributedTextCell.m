@@ -19,43 +19,6 @@ static const NSInteger kNoteWidth = 60;
     UILabel *_noteView;
 }
 
-/*
-- (id)initWithFrame:(CGRect)frame
-{
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code
-    }
-    return self;
-}
-
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-}
-*/
-
-- (UITableView *)_containingTableView
-{
-    // copy-and-paste from DTCoreText -- since the original DTAttributedTextCell
-    // class does not expose this method for public access
-	UIView *tableView = self.superview;
-	
-	while (tableView)
-	{
-		if ([tableView isKindOfClass:[UITableView class]])
-		{
-			return (UITableView *)tableView;
-		}
-		
-		tableView = tableView.superview;
-	}
-	
-	return nil;
-}
-
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
@@ -71,7 +34,12 @@ static const NSInteger kNoteWidth = 60;
 	}
 	else
 	{
-		CGFloat neededContentHeight = [self requiredRowHeightInTableView:[self _containingTableView]];
+        SEL _containingTableView = NSSelectorFromString(@"_containingTableView");
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        UITableView *parentTable = [self performSelector:_containingTableView];
+#pragma clang diagnostic pop
+		CGFloat neededContentHeight = [self requiredRowHeightInTableView:parentTable];
         
 		// after the first call here the content view size is correct
 		CGRect frame = CGRectMake(kLeftColumnWidth, kHeaderHeight, self.contentView.bounds.size.width - kLeftColumnWidth, neededContentHeight - kHeaderHeight);
