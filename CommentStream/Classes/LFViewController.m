@@ -7,12 +7,12 @@
 //
 
 #import <LFClient/LFClient.h>
-#import "LFViewController.h"
 #import <DTCoreText/DTLinkButton.h>
 #import <DTCoreText/DTImageTextAttachment.h>
-#import "DTLazyImageView+TextContentView.h"
 #import <AFNetworking/AFImageRequestOperation.h>
+#import "DTLazyImageView+TextContentView.h"
 #import "LFAttributedTextCell.h"
+#import "LFViewController.h"
 
 @interface LFViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
 @property (nonatomic, strong) NSDictionary *authors;
@@ -180,20 +180,6 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return (![self respondsToSelector:@selector(tableView:heightForRowAtIndexPath:)]);
 }
 
-- (BOOL)isToday:(NSDate*)date1
-{
-    NSDate        *date2 = [NSDate date];
-    NSCalendar* calendar = [NSCalendar currentCalendar]; //TODO: cache this
-    
-    unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
-    NSDateComponents* comp1 = [calendar components:unitFlags fromDate:date1];
-    NSDateComponents* comp2 = [calendar components:unitFlags fromDate:date2];
-    
-    return [comp1 day]   == [comp2 day] &&
-           [comp1 month] == [comp2 month] &&
-           [comp1 year]  == [comp2 year];
-}
-
 - (void)configureCell:(LFAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
@@ -201,16 +187,13 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     
     NSTimeInterval timeStamp = [[content objectForKey:@"createdAt"] doubleValue];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timeStamp];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init]; // TODO: cache this
-    [dateFormatter setDateFormat:([self isToday:date] ? @"HH:mm" : @"MMM dd")];
-    NSString *formattedDateString = [dateFormatter stringFromDate:date];
     
     NSString *authorName = [author objectForKey:@"displayName"];
     NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
 	
     cell.titleView.text = authorName;
-    cell.noteView.text = formattedDateString;
+    cell.noteView.text = [date relativePastTime];
     
     // load avatar images in a separate queue
     AFImageRequestOperation* operation = [AFImageRequestOperation
