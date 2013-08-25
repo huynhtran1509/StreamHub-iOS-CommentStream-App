@@ -26,5 +26,8 @@ LFConfig.plist
 # CocoaPods
 Pods
 
+#ctags
+tags
+
 #Vim
 *.swp
