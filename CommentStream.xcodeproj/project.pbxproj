@@ -19,7 +19,7 @@
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
 		EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
-		EFB7A02417C7EDF500694E71 /* libLFClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF9FD46117B448FC009FE59D /* libLFClient.a */; };
+		EFB8789E17CC3BCA006B0884 /* libLFClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF9FD46117B448FC009FE59D /* libLFClient.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,7 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6D65DBC239F84930AC53A99C /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B24C48529EA4C478A1414B0 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA268D01CA8446E4BA6D3FC3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		EF1179D017B5BE3F00D59E54 /* LFConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LFConfig.plist; sourceTree = "<group>"; };
 		EF200BCE17BBB63A007E5295 /* LFAttributedTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFAttributedTextCell.h; path = Classes/LFAttributedTextCell.h; sourceTree = "<group>"; };
@@ -76,7 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFB7A02417C7EDF500694E71 /* libLFClient.a in Frameworks */,
+				EFB8789E17CC3BCA006B0884 /* libLFClient.a in Frameworks */,
 				EF7BB6DE17B2B718009E2E70 /* CoreGraphics.framework in Frameworks */,
 				EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */,
 				EF7BB6DC17B2B718009E2E70 /* Foundation.framework in Frameworks */,
@@ -134,7 +134,7 @@
 				EF7BB6DB17B2B718009E2E70 /* Foundation.framework */,
 				EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */,
 				EF7BB6DF17B2B718009E2E70 /* UIKit.framework */,
-				6D65DBC239F84930AC53A99C /* libPods.a */,
+				0B24C48529EA4C478A1414B0 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
