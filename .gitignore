@@ -19,7 +19,7 @@ DerivedData
 doc/
 docs/
 
-LFConfig.plist
+LFSConfig.plist
 *.bak
 *.orig
 

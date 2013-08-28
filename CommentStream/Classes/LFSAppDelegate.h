@@ -1,5 +1,5 @@
 //
-//  LFViewController.h
+//  LFAppDelegate.h
 //  CommentStream
 //
 //  Created by Eugene Scherba on 8/7/13.
@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface LFViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface LFSAppDelegate : UIResponder <UIApplicationDelegate>
+
+@property (strong, nonatomic) UIWindow *window;
 
 @end

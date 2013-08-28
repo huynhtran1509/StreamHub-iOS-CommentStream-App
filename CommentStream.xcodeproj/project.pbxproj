@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EF1179D117B5BE3F00D59E54 /* LFConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF1179D017B5BE3F00D59E54 /* LFConfig.plist */; };
-		EF200BD017BBB63A007E5295 /* LFAttributedTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF200BCF17BBB63A007E5295 /* LFAttributedTextCell.m */; };
+		EF1179D117B5BE3F00D59E54 /* LFSConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF1179D017B5BE3F00D59E54 /* LFSConfig.plist */; };
+		EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */; };
 		EF6683D117BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */; };
-		EF6683E017BB97E2005F5FC3 /* LFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DC17BB97E2005F5FC3 /* LFAppDelegate.m */; };
-		EF6683E117BB97E2005F5FC3 /* LFViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DE17BB97E2005F5FC3 /* LFViewController.m */; };
+		EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DC17BB97E2005F5FC3 /* LFSAppDelegate.m */; };
+		EF6683E117BB97E2005F5FC3 /* LFSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DE17BB97E2005F5FC3 /* LFSViewController.m */; };
 		EF7BB6DC17B2B718009E2E70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DB17B2B718009E2E70 /* Foundation.framework */; };
 		EF7BB6DE17B2B718009E2E70 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */; };
 		EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DF17B2B718009E2E70 /* UIKit.framework */; };
@@ -19,45 +19,46 @@
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
 		EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
-		EFB8789E17CC3BCA006B0884 /* libLFClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF9FD46117B448FC009FE59D /* libLFClient.a */; };
+		EFB8789E17CC3BCA006B0884 /* libLFSClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF9FD46117B448FC009FE59D /* libLFSClient.a */; };
+		EFC9574E17CE968B0033C858 /* LFSConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC9574D17CE968B0033C858 /* LFSConfig.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		EF200BD217BBB63B007E5295 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
+			containerPortal = EF9FD45B17B448FC009FE59D /* LFSClient.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 1C4CC89216A48B3800C33DEC;
-			remoteInfo = LFClientTests;
+			remoteInfo = LFSClientTests;
 		};
 		EF9FD46017B448FC009FE59D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
+			containerPortal = EF9FD45B17B448FC009FE59D /* LFSClient.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 1C4CC88116A48B3800C33DEC;
-			remoteInfo = LFClient;
+			remoteInfo = LFSClient;
 		};
 		EF9FD46417B4491E009FE59D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
+			containerPortal = EF9FD45B17B448FC009FE59D /* LFSClient.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = 1C4CC88016A48B3800C33DEC;
-			remoteInfo = LFClient;
+			remoteInfo = LFSClient;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0B24C48529EA4C478A1414B0 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA268D01CA8446E4BA6D3FC3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
-		EF1179D017B5BE3F00D59E54 /* LFConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LFConfig.plist; sourceTree = "<group>"; };
-		EF200BCE17BBB63A007E5295 /* LFAttributedTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFAttributedTextCell.h; path = Classes/LFAttributedTextCell.h; sourceTree = "<group>"; };
-		EF200BCF17BBB63A007E5295 /* LFAttributedTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFAttributedTextCell.m; path = Classes/LFAttributedTextCell.m; sourceTree = "<group>"; };
+		EF1179D017B5BE3F00D59E54 /* LFSConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LFSConfig.plist; sourceTree = "<group>"; };
+		EF200BCE17BBB63A007E5295 /* LFSAttributedTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSAttributedTextCell.h; path = Classes/LFSAttributedTextCell.h; sourceTree = "<group>"; };
+		EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSAttributedTextCell.m; path = Classes/LFSAttributedTextCell.m; sourceTree = "<group>"; };
 		EF6683CF17BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "DTLazyImageView+TextContentView.h"; path = "CommentStream/Categories/DTLazyImageView+TextContentView.h"; sourceTree = "<group>"; };
 		EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "DTLazyImageView+TextContentView.m"; path = "CommentStream/Categories/DTLazyImageView+TextContentView.m"; sourceTree = "<group>"; };
-		EF6683DB17BB97E2005F5FC3 /* LFAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFAppDelegate.h; path = Classes/LFAppDelegate.h; sourceTree = "<group>"; };
-		EF6683DC17BB97E2005F5FC3 /* LFAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFAppDelegate.m; path = Classes/LFAppDelegate.m; sourceTree = "<group>"; };
-		EF6683DD17BB97E2005F5FC3 /* LFViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFViewController.h; path = Classes/LFViewController.h; sourceTree = "<group>"; };
-		EF6683DE17BB97E2005F5FC3 /* LFViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFViewController.m; path = Classes/LFViewController.m; sourceTree = "<group>"; };
+		EF6683DB17BB97E2005F5FC3 /* LFSAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSAppDelegate.h; path = Classes/LFSAppDelegate.h; sourceTree = "<group>"; };
+		EF6683DC17BB97E2005F5FC3 /* LFSAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSAppDelegate.m; path = Classes/LFSAppDelegate.m; sourceTree = "<group>"; };
+		EF6683DD17BB97E2005F5FC3 /* LFSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSViewController.h; path = Classes/LFSViewController.h; sourceTree = "<group>"; };
+		EF6683DE17BB97E2005F5FC3 /* LFSViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSViewController.m; path = Classes/LFSViewController.m; sourceTree = "<group>"; };
 		EF7BB6D817B2B718009E2E70 /* CommentStream.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CommentStream.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF7BB6DB17B2B718009E2E70 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -68,7 +69,9 @@
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LFClient.xcodeproj; path = ../../LFClient.xcodeproj; sourceTree = "<group>"; };
+		EF9FD45B17B448FC009FE59D /* LFSClient.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LFSClient.xcodeproj; path = ../../LFSClient.xcodeproj; sourceTree = "<group>"; };
+		EFC9574C17CE968B0033C858 /* LFSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSConfig.h; path = Classes/LFSConfig.h; sourceTree = "<group>"; };
+		EFC9574D17CE968B0033C858 /* LFSConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSConfig.m; path = Classes/LFSConfig.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,7 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFB8789E17CC3BCA006B0884 /* libLFClient.a in Frameworks */,
+				EFB8789E17CC3BCA006B0884 /* libLFSClient.a in Frameworks */,
 				EF7BB6DE17B2B718009E2E70 /* CoreGraphics.framework in Frameworks */,
 				EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */,
 				EF7BB6DC17B2B718009E2E70 /* Foundation.framework in Frameworks */,
@@ -99,12 +102,14 @@
 		EF6683D817BB9785005F5FC3 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				EF200BCE17BBB63A007E5295 /* LFAttributedTextCell.h */,
-				EF200BCF17BBB63A007E5295 /* LFAttributedTextCell.m */,
-				EF6683DB17BB97E2005F5FC3 /* LFAppDelegate.h */,
-				EF6683DC17BB97E2005F5FC3 /* LFAppDelegate.m */,
-				EF6683DD17BB97E2005F5FC3 /* LFViewController.h */,
-				EF6683DE17BB97E2005F5FC3 /* LFViewController.m */,
+				EFC9574C17CE968B0033C858 /* LFSConfig.h */,
+				EFC9574D17CE968B0033C858 /* LFSConfig.m */,
+				EF200BCE17BBB63A007E5295 /* LFSAttributedTextCell.h */,
+				EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */,
+				EF6683DB17BB97E2005F5FC3 /* LFSAppDelegate.h */,
+				EF6683DC17BB97E2005F5FC3 /* LFSAppDelegate.m */,
+				EF6683DD17BB97E2005F5FC3 /* LFSViewController.h */,
+				EF6683DE17BB97E2005F5FC3 /* LFSViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -112,7 +117,7 @@
 		EF7BB6CF17B2B718009E2E70 = {
 			isa = PBXGroup;
 			children = (
-				EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */,
+				EF9FD45B17B448FC009FE59D /* LFSClient.xcodeproj */,
 				EF7BB6E117B2B718009E2E70 /* CommentStream */,
 				EF7BB6DA17B2B718009E2E70 /* Frameworks */,
 				EF7BB6D917B2B718009E2E70 /* Products */,
@@ -154,7 +159,7 @@
 		EF7BB6E217B2B718009E2E70 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				EF1179D017B5BE3F00D59E54 /* LFConfig.plist */,
+				EF1179D017B5BE3F00D59E54 /* LFSConfig.plist */,
 				EF7BB6E317B2B718009E2E70 /* CommentStream-Info.plist */,
 				EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */,
 				EF7BB6E717B2B718009E2E70 /* main.m */,
@@ -166,8 +171,8 @@
 		EF9FD45C17B448FC009FE59D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EF9FD46117B448FC009FE59D /* libLFClient.a */,
-				EF200BD317BBB63B007E5295 /* LFClientTests.octest */,
+				EF9FD46117B448FC009FE59D /* libLFSClient.a */,
+				EF200BD317BBB63B007E5295 /* LFSClientTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -224,7 +229,7 @@
 			projectReferences = (
 				{
 					ProductGroup = EF9FD45C17B448FC009FE59D /* Products */;
-					ProjectRef = EF9FD45B17B448FC009FE59D /* LFClient.xcodeproj */;
+					ProjectRef = EF9FD45B17B448FC009FE59D /* LFSClient.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -235,17 +240,17 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		EF200BD317BBB63B007E5295 /* LFClientTests.octest */ = {
+		EF200BD317BBB63B007E5295 /* LFSClientTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = LFClientTests.octest;
+			path = LFSClientTests.octest;
 			remoteRef = EF200BD217BBB63B007E5295 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		EF9FD46117B448FC009FE59D /* libLFClient.a */ = {
+		EF9FD46117B448FC009FE59D /* libLFSClient.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libLFClient.a;
+			path = libLFSClient.a;
 			remoteRef = EF9FD46017B448FC009FE59D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -256,7 +261,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF1179D117B5BE3F00D59E54 /* LFConfig.plist in Resources */,
+				EF1179D117B5BE3F00D59E54 /* LFSConfig.plist in Resources */,
 				EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */,
 				EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */,
 				EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */,
@@ -303,11 +308,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF6683E017BB97E2005F5FC3 /* LFAppDelegate.m in Sources */,
-				EF200BD017BBB63A007E5295 /* LFAttributedTextCell.m in Sources */,
-				EF6683E117BB97E2005F5FC3 /* LFViewController.m in Sources */,
+				EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */,
+				EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */,
+				EF6683E117BB97E2005F5FC3 /* LFSViewController.m in Sources */,
 				EF7BB6E817B2B718009E2E70 /* main.m in Sources */,
 				EF6683D117BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m in Sources */,
+				EFC9574E17CE968B0033C858 /* LFSConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,7 +322,7 @@
 /* Begin PBXTargetDependency section */
 		EF9FD46517B4491E009FE59D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = LFClient;
+			name = LFSClient;
 			targetProxy = EF9FD46417B4491E009FE59D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */

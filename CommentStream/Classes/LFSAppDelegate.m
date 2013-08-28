@@ -6,9 +6,9 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import "LFAppDelegate.h"
+#import "LFSAppDelegate.h"
 
-@implementation LFAppDelegate
+@implementation LFSAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {

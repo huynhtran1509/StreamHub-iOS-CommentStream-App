@@ -8,7 +8,7 @@
 
 #import "DTAttributedTextCell.h"
 
-@interface LFAttributedTextCell : DTAttributedTextCell
+@interface LFSAttributedTextCell : DTAttributedTextCell
 
 @property (nonatomic, readonly) UILabel *titleView;
 @property (nonatomic, readonly) UILabel *noteView;

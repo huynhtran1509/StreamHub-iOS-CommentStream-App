@@ -6,15 +6,17 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import <LFClient/LFClient.h>
+#import <LFSClient/LFSClient.h>
 #import <DTCoreText/DTLinkButton.h>
 #import <DTCoreText/DTImageTextAttachment.h>
 #import <AFNetworking/AFImageRequestOperation.h>
-#import "DTLazyImageView+TextContentView.h"
-#import "LFAttributedTextCell.h"
-#import "LFViewController.h"
 
-@interface LFViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
+#import "LFSConfig.h"
+#import "DTLazyImageView+TextContentView.h"
+#import "LFSAttributedTextCell.h"
+#import "LFSViewController.h"
+
+@interface LFSViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
 @property (nonatomic, strong) NSDictionary *authors;
 @property (nonatomic, strong) NSArray *content;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
@@ -25,7 +27,7 @@
 // identifier for cell reuse
 NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
 
-@implementation LFViewController
+@implementation LFSViewController
 {
 	BOOL     _useStaticRowHeight;
     NSCache* _cellCache;
@@ -88,10 +90,10 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     [super viewWillAppear:animated];
     
-    [LFBootstrapClient getInitForArticle:[LFConfig objectForKey:@"article"]
-                                    site:[LFConfig objectForKey:@"site"]
-                                 network:[LFConfig objectForKey:@"domain"]
-                             environment:[LFConfig objectForKey:@"environment"]
+    [LFOldBootstrapClient getInitForArticle:[LFSConfig objectForKey:@"article"]
+                                    site:[LFSConfig objectForKey:@"site"]
+                                 network:[LFSConfig objectForKey:@"domain"]
+                             environment:[LFSConfig objectForKey:@"environment"]
                                onSuccess:^(NSDictionary *collection) {
                                    NSDictionary *headDocument = [collection objectForKey:@"headDocument"];
                                    [self setContent:[headDocument objectForKey:@"content"] authors:[headDocument objectForKey:@"authors"]];
@@ -127,7 +129,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 		return tableView.rowHeight;
 	}
 	
-	LFAttributedTextCell *cell = (LFAttributedTextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
+	LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
 	return [cell requiredRowHeightInTableView:tableView];
 }
 
@@ -142,14 +144,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 	// workaround for iOS 5 bug (TODO: remove this)
 	NSString *key = [NSString stringWithFormat:@"%d-%d", indexPath.section, indexPath.row];
 	
-	LFAttributedTextCell *cell = [_cellCache objectForKey:key];
+	LFSAttributedTextCell *cell = [_cellCache objectForKey:key];
     
 	if (!cell) {
 		if ([self canReuseCells]) {
-			cell = (LFAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:AttributedTextCellReuseIdentifier];
+			cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:AttributedTextCellReuseIdentifier];
 		}
 		if (!cell) {
-			cell = [[LFAttributedTextCell alloc] initWithReuseIdentifier:AttributedTextCellReuseIdentifier];
+			cell = [[LFSAttributedTextCell alloc] initWithReuseIdentifier:AttributedTextCellReuseIdentifier];
 		}
 		cell.accessoryType = UITableViewCellStyleDefault;
 		cell.hasFixedRowHeight = _useStaticRowHeight;
@@ -180,7 +182,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return (![self respondsToSelector:@selector(tableView:heightForRowAtIndexPath:)]);
 }
 
-- (void)configureCell:(LFAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
+- (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
     NSDictionary *author = [_authors objectForKey:[content objectForKey:@"authorId"]];

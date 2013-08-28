@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import "LFAttributedTextCell.h"
+#import "LFSAttributedTextCell.h"
 
 static const NSInteger kLeftColumnWidth = 50;
 static const NSInteger kTopInset = 8;
@@ -14,7 +14,7 @@ static const NSInteger kBottomInset = 5;
 static const NSInteger kHeaderHeight = 30;
 static const NSInteger kNoteWidth = 40;
 
-@implementation LFAttributedTextCell {
+@implementation LFSAttributedTextCell {
     UILabel *_titleView;
     UILabel *_noteView;
 }
