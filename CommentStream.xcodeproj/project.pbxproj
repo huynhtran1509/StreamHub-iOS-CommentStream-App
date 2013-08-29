@@ -47,7 +47,7 @@
 			<key>sourceTree</key>
 			<string>BUILT_PRODUCTS_DIR</string>
 		</dict>
-		<key>385F76C894BB46B781D2CE7D</key>
+		<key>938974CA84AA4DFDBBCCCD67</key>
 		<dict>
 			<key>fileRef</key>
 			<string>0B24C48529EA4C478A1414B0</string>
@@ -442,7 +442,7 @@ fi
 				<string>EF7BB6DE17B2B718009E2E70</string>
 				<string>EF7BB6E017B2B718009E2E70</string>
 				<string>EF7BB6DC17B2B718009E2E70</string>
-				<string>385F76C894BB46B781D2CE7D</string>
+				<string>938974CA84AA4DFDBBCCCD67</string>
 			</array>
 			<key>isa</key>
 			<string>PBXFrameworksBuildPhase</string>
