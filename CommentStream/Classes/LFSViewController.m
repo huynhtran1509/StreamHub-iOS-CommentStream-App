@@ -6,7 +6,8 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import <LFSClient/LFSClient.h>
+#import <StreamHub-iOS-SDK/LFSBoostrapClient.h>
+#import <StreamHub-iOS-SDK/NSDate+RelativePast.h>
 #import <DTCoreText/DTLinkButton.h>
 #import <DTCoreText/DTImageTextAttachment.h>
 #import <AFNetworking/AFImageRequestOperation.h>
@@ -20,6 +21,7 @@
 @property (nonatomic, strong) NSDictionary *authors;
 @property (nonatomic, strong) NSArray *content;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
+@property (strong, nonatomic, readonly) LFSBoostrapClient *boostrapClient;
 
 - (BOOL)canReuseCells;
 @end
@@ -36,17 +38,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 #pragma mark - properties
 @synthesize authors = _authors;
 @synthesize content = _content;
-
--(void)setContent:(NSArray *)content authors:(NSDictionary*)authors
-{
-    self.content = content;
-    self.authors = authors;
-    
-    // reload table on main thread
-    [self.tableView performSelectorOnMainThread:@selector(reloadData)
-                                     withObject:nil
-                                  waitUntilDone:NO];
-}
+@synthesize boostrapClient = _boostrapClient;
 
 #pragma mark - Lifecycle
 - (void)viewDidLoad
@@ -84,25 +76,27 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
+    
+    _boostrapClient = [LFSBoostrapClient
+                       clientWithEnvironment:[LFSConfig objectForKey:@"environment"]
+                       network:[LFSConfig objectForKey:@"domain"]];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
-    [LFOldBootstrapClient getInitForArticle:[LFSConfig objectForKey:@"article"]
-                                    site:[LFSConfig objectForKey:@"site"]
-                                 network:[LFSConfig objectForKey:@"domain"]
-                             environment:[LFSConfig objectForKey:@"environment"]
-                               onSuccess:^(NSDictionary *collection) {
-                                   NSDictionary *headDocument = [collection objectForKey:@"headDocument"];
-                                   [self setContent:[headDocument objectForKey:@"content"] authors:[headDocument objectForKey:@"authors"]];
-                               }
-                               onFailure:^(NSError *error) {
-                                   if (error) {
-                                       NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
-                                   }
-                               }];
+    [self.boostrapClient getInitForSite:[LFSConfig objectForKey:@"site"]
+                                article:[LFSConfig objectForKey:@"article"]
+                              onSuccess:^(NSOperation *operation, id responseObject) {
+                                  NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
+                                  self.content = [headDocument objectForKey:@"content"];
+                                  self.authors = [headDocument objectForKey:@"authors"];
+                                  [self.tableView reloadData];
+                              }
+                              onFailure:^(NSOperation *operation, NSError *error) {
+                                  NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
+                              }];
 }
 
 - (void)didReceiveMemoryWarning

@@ -12,11 +12,32 @@ PODS:
     - DTFoundation/Core
   - JWT (1.0.3):
     - Base64 (~> 1.0.1)
+  - NSString-Hashes (1.2.0)
+  - StreamHub-iOS-SDK (0.2.0):
+    - AFNetworking (~> 1.3.2)
+    - Base64 (~> 1.0.1)
+    - JWT (~> 1.0.3)
+    - NSString-Hashes (~> 1.2.0)
+    - StreamHub-iOS-SDK/arc
+    - StreamHub-iOS-SDK/no-arc
+  - StreamHub-iOS-SDK/arc (0.2.0):
+    - AFNetworking (~> 1.3.2)
+    - Base64 (~> 1.0.1)
+    - JWT (~> 1.0.3)
+    - NSString-Hashes (~> 1.2.0)
+  - StreamHub-iOS-SDK/no-arc (0.2.0):
+    - AFNetworking (~> 1.3.2)
+    - Base64 (~> 1.0.1)
+    - JWT (~> 1.0.3)
+    - NSString-Hashes (~> 1.2.0)
 
 DEPENDENCIES:
-  - AFNetworking (~> 1.3.2)
   - DTCoreText (~> 1.6.3)
-  - JWT (~> 1.0.3)
+  - StreamHub-iOS-SDK (from `../../`)
+
+EXTERNAL SOURCES:
+  StreamHub-iOS-SDK:
+    :path: ../../
 
 SPEC CHECKSUMS:
   AFNetworking: 7f9bcd7c287a75476cd5c61e82fd3380e93e4c54
@@ -24,5 +45,7 @@ SPEC CHECKSUMS:
   DTCoreText: a864bedf1a8ca3c1d6704567a94d03f65ad64a7c
   DTFoundation: 6138b5437df0217bbeba2b5cec89d5e95cf7f0e8
   JWT: 5bc7a20f8f8dad756f9b5c171dfeef84c1e2de87
+  NSString-Hashes: 77e62659072e6e93c39f19652e49e64442ec6efc
+  StreamHub-iOS-SDK: c1ee65abc3de745dcb7679a49b83fef6e41dcec2
 
 COCOAPODS: 0.23.0
