@@ -6,8 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import <StreamHub-iOS-SDK/LFSBoostrapClient.h>
-#import <StreamHub-iOS-SDK/NSDate+RelativePast.h>
+#import <StreamHub-iOS-SDK/LFSClient.h>
 #import <DTCoreText/DTLinkButton.h>
 #import <DTCoreText/DTImageTextAttachment.h>
 #import <AFNetworking/AFImageRequestOperation.h>
