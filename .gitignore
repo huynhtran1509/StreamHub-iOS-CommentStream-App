@@ -29,5 +29,14 @@ Pods
 #ctags
 tags
 
-#Vim
+# Vim
 *.swp
+
+# Vim plugins
+.build
+
+# Python
+*.pyc
+
+# Clang dependencies
+*.d
