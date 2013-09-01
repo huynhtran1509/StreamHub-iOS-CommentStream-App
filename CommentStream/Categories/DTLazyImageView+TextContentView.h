@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import "DTLazyImageView.h"
+#import <DTCoreText/DTLazyImageView.h>
 #import <DTCoreText/DTAttributedTextContentView.h>
 
 @interface DTLazyImageView (TextContentView)

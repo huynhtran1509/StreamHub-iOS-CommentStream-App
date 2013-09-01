@@ -46,6 +46,6 @@ SPEC CHECKSUMS:
   DTFoundation: 6138b5437df0217bbeba2b5cec89d5e95cf7f0e8
   JWT: 5bc7a20f8f8dad756f9b5c171dfeef84c1e2de87
   NSString-Hashes: 77e62659072e6e93c39f19652e49e64442ec6efc
-  StreamHub-iOS-SDK: c1ee65abc3de745dcb7679a49b83fef6e41dcec2
+  StreamHub-iOS-SDK: c6ae46a122b5af6cf107dde1d3cc4c8e057cb710
 
 COCOAPODS: 0.23.0

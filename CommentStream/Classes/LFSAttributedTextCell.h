@@ -6,7 +6,9 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import "DTAttributedTextCell.h"
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <DTCoreText/DTAttributedTextCell.h>
 
 @interface LFSAttributedTextCell : DTAttributedTextCell
 

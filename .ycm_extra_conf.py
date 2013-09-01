@@ -30,6 +30,7 @@
 
 import os
 import ycm_core
+import ConfigParser
 from clang_helpers import PrepareClangFlags
 
 # These are the compilation flags that will be used in case there's no
@@ -39,13 +40,23 @@ from clang_helpers import PrepareClangFlags
 flags = [
 '-x',
 'objective-c',
-'-arch i386',
-'-fmessage-length=0',
 '-std=gnu99',
-'-fobjc-arc',
-'-Wno-trigraphs',
-'-fpascal-strings',
+'-arch',
+'i386',
+'-g',
 '-Os',
+'-fmessage-length=0',
+'-fobjc-arc',
+'-fpascal-strings',
+'-fexceptions',
+'-fasm-blocks',
+'-fstrict-aliasing',
+'-fvisibility=hidden',
+'-fdiagnostics-show-note-include-stack'
+'-fmacro-backtrace-limit=0'
+'-fobjc-abi-version=2',
+'-fobjc-legacy-dispatch',
+'-Wno-trigraphs',
 '-Wno-missing-field-initializers',
 '-Wno-missing-prototypes',
 '-Wreturn-type',
@@ -68,8 +79,10 @@ flags = [
 '-Wno-four-char-constants',
 '-Wno-conversion',
 '-Wno-constant-conversion',
+'-Wno-bool-conversion',
 '-Wno-int-conversion',
 '-Wno-enum-conversion',
+'-Wno-sign-conversion',
 '-Wno-shorten-64-to-32',
 '-Wpointer-sign',
 '-Wno-newline-eof',
@@ -77,33 +90,30 @@ flags = [
 '-Wno-strict-selector-match',
 '-Wno-undeclared-selector',
 '-Wno-deprecated-implementations',
-'-isysroot',
-'/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk',
-'-fexceptions',
-'-fasm-blocks',
-'-fstrict-aliasing',
+'-Wno-arc-repeated-use-of-weak',
 '-Wprotocol',
 '-Wdeprecated-declarations',
-'-g',
-'-fvisibility=hidden',
-'-Wno-sign-conversion',
-'-fobjc-abi-version=2',
-'-fobjc-legacy-dispatch',
-'-mios-simulator-version-min=7.0',
+'-DCOCOAPODS=1',
+'-isysroot',
+'/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk',
+'-mios-simulator-version-min=6.0',
 '-iquote',
+'build/{target}.build/Release-iphonesimulator/{target}.build/{target}-generated-files.hmap',
+'-Ibuild/{target}.build/Release-iphonesimulator/{target}.build/{target}-own-target-headers.hmap',
+'-Ibuild/{target}.build/Release-iphonesimulator/{target}.build/{target}-all-target-headers.hmap',
+'-iquote',
+'build/{target}.build/Release-iphonesimulator/{target}.build/{target}-project-headers.hmap',
+'-Ibuild/Release-iphonesimulator/include',
+'-Ibuild/UninstalledProducts/include',
+'-Ibuild/Release-iphonesimulator/usr/local/lib/include',
 '-IPods/Headers',
-'-IPods/Headers/StreamHub-iOS-SDK/../../../../../LFSClient/**',
-'-IPods/AFHTTPRequestOperationLogger',
-'-IPods/AFNetworking',
-'-IPods/Base64',
-'-IPods/Expecta',
-'-IPods/JWT',
-'-IPods/NSString-Hashes',
-'-IPods/DTFoundation',
-'-IPods/DTCoreText',
+'-Ibuild/{target}.build/Release-iphonesimulator/{target}.build/DerivedSources/i386',
+'-Ibuild/{target}.build/Release-iphonesimulator/{target}.build/DerivedSources',
 '-I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/include',
-'-I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/System/Library/Frameworks/Foundation.framework/Headers',
-'-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include',
+#'-I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/usr/include',
+#'-I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/System/Library/Frameworks/Foundation.framework/Headers',
+#'-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include',
+'-Fbuild/Release-iphonesimulator',
 '-DNS_BLOCK_ASSERTIONS=1',
 '-MMD',
 '-MT',
@@ -131,16 +141,21 @@ def DirectoryOfThisScript():
 def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):
   if not working_directory:
     return flags
+
+  config = ConfigParser.ConfigParser()
+  config.read(os.path.join(working_directory, '.ycm_extra_conf.cfg'))
+  options = dict(config.items('Path Variables'))
+
   new_flags = []
   make_next_absolute = False
-  path_flags = [ '-isystem', '-I', '-F', '-iquote', '--sysroot=' ]
+  path_flags = [ '-isystem', '-I', '-F', '-iquote' ]
   for flag in flags:
     new_flag = flag
 
     if make_next_absolute:
       make_next_absolute = False
       if not flag.startswith( '/' ):
-        new_flag = os.path.join( working_directory, flag )
+        new_flag = os.path.join( working_directory, flag.format(**options) )
 
     for path_flag in path_flags:
       if flag == path_flag:
@@ -149,7 +164,7 @@ def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):
 
       if flag.startswith( path_flag ):
         path = flag[ len( path_flag ): ]
-        new_flag = path_flag + os.path.join( working_directory, path )
+        new_flag = path_flag + os.path.join( working_directory, path.format(**options) )
         break
 
     if new_flag:
