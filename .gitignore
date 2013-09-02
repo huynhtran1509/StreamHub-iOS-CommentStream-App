@@ -23,8 +23,9 @@ LFSConfig.plist
 *.bak
 *.orig
 
-# CocoaPods
-Pods
+#CocoaPods
+Pods/
+Podfile.lock
 
 #ctags
 tags
@@ -32,11 +33,11 @@ tags
 # Vim
 *.swp
 
-# Vim plugins
-.build
-
 # Python
 *.pyc
 
 # Clang dependencies
 *.d
+
+# Our custom build script intermediates
+DerivedData/
