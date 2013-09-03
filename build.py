@@ -26,7 +26,8 @@ def FilterOut(key, args):
 def main():
     # read config file
     section = 'xcodebuild'
-    derivedDataPath_option_key = 'derivedDataPath'
+    target_option = 'target'
+    derivedDataPath_option = 'derivedDataPath'
     script_dir = DirectoryOfThisScript()
 
     config_path = os.path.join(script_dir, '.ycm_extra_conf.cfg')
@@ -37,15 +38,17 @@ def main():
 
     # create a temporary directory for derived data if one
     # is not set already:
-    if (not config.has_option(section, derivedDataPath_option_key)):
-        config.set(section, derivedDataPath_option_key, tempfile.mkdtemp())
+    target = config.get(section, target_option)
+    if (not config.has_option(section, derivedDataPath_option)):
+        tmpdir = tempfile.mkdtemp(prefix=target + ".")
+        config.set(section, derivedDataPath_option, tmpdir)
 
     # save config file
     with open(config_path, 'w') as fp:
         config.write(fp)
 
     # perform build
-    param = ParamArray('-', FilterOut('target', config.items(section)))
+    param = ParamArray('-', FilterOut(target_option, config.items(section)))
     subprocess.call([section] + param)
 
 
