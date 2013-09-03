@@ -12,15 +12,16 @@ def DirectoryOfThisScript():
 
 def ParamArray(prefix, args):
     # given a list of tuples (parameters and their values), return
-    # a flattened array of items with prefix string prepended
+    # a flattened list generator of items with prefix string prepended
     # to the first element of each tuple
-    return [arg for t in args for arg in [prefix + t[0], t[1]]]
+    return (arg for t in args for arg in [prefix + t[0], t[1]])
 
 
 def FilterOut(key, args):
-    # take a list of tuples as second argument and return a list of
-    # tuples that has no tuples that have key as their first element
-    return [t for t in args if t[0] != key]
+    # take a list of tuples as second argument and return a list
+    # generator of tuples that has no tuples that have key as their
+    # first element
+    return (t for t in args if t[0] != key)
 
 
 def main():
@@ -38,8 +39,8 @@ def main():
 
     # create a temporary directory for derived data if one
     # is not set already:
-    target = config.get(section, target_option)
     if (not config.has_option(section, derivedDataPath_option)):
+        target = config.get(section, target_option)
         tmpdir = tempfile.mkdtemp(prefix=target + ".")
         config.set(section, derivedDataPath_option, tmpdir)
 
@@ -49,7 +50,7 @@ def main():
 
     # perform build
     param = ParamArray('-', FilterOut(target_option, config.items(section)))
-    subprocess.call([section] + param)
+    subprocess.call([section] + list(param))
 
 
 if __name__ == '__main__':
