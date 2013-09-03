@@ -95,8 +95,7 @@ flags = [
 '-Wdeprecated-declarations',
 '-DDEBUG=1',
 '-DCOCOAPODS=1',
-'-isysroot',
-'/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk',
+'-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk',
 '-mios-simulator-version-min=6.0',
 '-iquote {derivedDataPath}/Build/Intermediates/{target}.build/{configuration}-iphonesimulator/{target}.build/{target}-generated-files.hmap',
 '-I{derivedDataPath}/Build/Intermediates/{target}.build/{configuration}-iphonesimulator/{target}.build/{target}-own-target-headers.hmap',
@@ -109,7 +108,7 @@ flags = [
 '-I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/include',
 '-F{derivedDataPath}/Build/Products/{configuration}-iphonesimulator',
 '-DNS_BLOCK_ASSERTIONS=1',
-'-MMD',
+#'-MMD',
 '-MT',
 '-MF'
 ]
@@ -143,7 +142,7 @@ def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):
 
   new_flags = []
   make_next_absolute = False
-  path_flags = [ '-isystem', '-I', '-F', '-iquote' ]
+  path_flags = [ '-isystem', '-isysroot', '-I', '-F', '-iquote' ]
   for flag in flags:
     new_flag = flag
 
