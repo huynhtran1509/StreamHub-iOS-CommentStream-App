@@ -20,7 +20,7 @@
 @property (nonatomic, strong) NSDictionary *authors;
 @property (nonatomic, strong) NSArray *content;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
-@property (strong, nonatomic, readonly) LFSBoostrapClient *boostrapClient;
+@property (strong, nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 
 - (BOOL)canReuseCells;
 @end
@@ -37,7 +37,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 #pragma mark - properties
 @synthesize authors = _authors;
 @synthesize content = _content;
-@synthesize boostrapClient = _boostrapClient;
+@synthesize bootstrapClient = _bootstrapClient;
 
 #pragma mark - Lifecycle
 - (void)viewDidLoad
@@ -76,7 +76,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 	// set system cache for URL data to 5MB
 	[[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
 
-	_boostrapClient = [LFSBoostrapClient
+	_bootstrapClient = [LFSBootstrapClient
 		clientWithEnvironment:[LFSConfig objectForKey:@"environment"]
 					  network:[LFSConfig objectForKey:@"domain"]];
 }
@@ -85,7 +85,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
 	[super viewWillAppear:animated];
 
-	[self.boostrapClient getInitForSite:[LFSConfig objectForKey:@"site"]
+	[self.bootstrapClient getInitForSite:[LFSConfig objectForKey:@"site"]
 								article:[LFSConfig objectForKey:@"article"]
 							  onSuccess:^(NSOperation *operation, id responseObject) {
 								  NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
