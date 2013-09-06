@@ -47,8 +47,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     if (_bootstrapClient == nil) {
         _bootstrapClient = [LFSBootstrapClient
-                            clientWithEnvironment:[LFSConfig objectForKey:@"environment"]
-                            network:[LFSConfig objectForKey:@"domain"]];
+                            clientWithNetwork:[LFSConfig objectForKey:@"domain"]
+                            environment:[LFSConfig objectForKey:@"environment"] ];
     }
     return _bootstrapClient;
 }
@@ -57,8 +57,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     if (_streamClient == nil) {
         _streamClient = [LFSStreamClient
-                         clientWithEnvironment:[LFSConfig objectForKey:@"environment"]
-                         network:[LFSConfig objectForKey:@"domain"]];
+                         clientWithNetwork:[LFSConfig objectForKey:@"domain"]
+                         environment:[LFSConfig objectForKey:@"environment"]];
         
         __weak typeof(self) weakSelf = self;
         [self.streamClient setResultHandler:^(id responseObject) {
@@ -244,7 +244,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
     NSDictionary *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
     NSTimeInterval timeStamp = [[content objectForKey:@"createdAt"] doubleValue];
-
+    
     NSString *authorName = [author objectForKey:@"displayName"];
     NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
