@@ -19,6 +19,7 @@
 @interface LFSViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
+@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (strong, nonatomic, readonly) LFSStreamClient *streamClient;
@@ -40,6 +41,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 @synthesize content = _content;
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
+@synthesize dateFormatter = _dateFormatter;
 
 - (LFSBootstrapClient*)bootstrapClient
 {
@@ -134,6 +136,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
+    
+    self.dateFormatter = [[NSDateFormatter alloc] init];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -239,16 +243,16 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
     NSDictionary *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
-    
     NSTimeInterval timeStamp = [[content objectForKey:@"createdAt"] doubleValue];
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timeStamp];
-    
+
     NSString *authorName = [author objectForKey:@"displayName"];
     NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
     
     cell.titleView.text = authorName;
-    cell.noteView.text = [date relativePastTime];
+    cell.noteView.text = [self.dateFormatter
+                          relativeStringFromDate:
+                          [NSDate dateWithTimeIntervalSince1970:timeStamp]];
     
     // load avatar images in a separate queue
     AFImageRequestOperation* operation = [AFImageRequestOperation
