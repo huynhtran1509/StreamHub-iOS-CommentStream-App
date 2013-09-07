@@ -97,16 +97,18 @@ flags = [
 '-DCOCOAPODS=1',
 '-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk',
 '-mios-simulator-version-min=6.0',
-'-iquote {derivedDataPath}/Build/Intermediates/{target}.build/{configuration}-iphonesimulator/{target}.build/{target}-generated-files.hmap',
-'-I{derivedDataPath}/Build/Intermediates/{target}.build/{configuration}-iphonesimulator/{target}.build/{target}-own-target-headers.hmap',
-'-I{derivedDataPath}/Build/Intermediates/{target}.build/{configuration}-iphonesimulator/{target}.build/{target}-all-target-headers.hmap',
-'-iquote {derivedDataPath}/Build/Intermediates/{target}.build/{configuration}-iphonesimulator/{target}.build/{target}-project-headers.hmap',
+'-iquote {derivedDataPath}/Build/Intermediates/{project}.build/{configuration}-iphonesimulator/{target}.build/{product}-generated-files.hmap',
+'-I{derivedDataPath}/Build/Intermediates/{project}.build/{configuration}-iphonesimulator/{target}.build/{product}-own-target-headers.hmap',
+'-I{derivedDataPath}/Build/Intermediates/{project}.build/{configuration}-iphonesimulator/{target}.build/{product}-all-target-headers.hmap',
+'-iquote {derivedDataPath}/Build/Intermediates/{project}.build/{configuration}-iphonesimulator/{target}.build/{product}-project-headers.hmap',
 '-I{derivedDataPath}/Build/Products/{configuration}-iphonesimulator/include',
 '-IPods/Headers',
-'-I{derivedDataPath}/Build/Intermediates/{target}.build/{configuration}-iphonesimulator/{target}.build/DerivedSources/i386',
-'-I{derivedDataPath}/Build/Intermediates/{target}.build/{configuration}-iphonesimulator/{target}.build/DerivedSources',
+'-I{derivedDataPath}/Build/Intermediates/{project}.build/{configuration}-iphonesimulator/{target}.build/DerivedSources/i386',
+'-I{derivedDataPath}/Build/Intermediates/{project}.build/{configuration}-iphonesimulator/{target}.build/DerivedSources',
 '-I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/include',
 '-F{derivedDataPath}/Build/Products/{configuration}-iphonesimulator',
+'-F/Applications/Xcode.app/Contents/Developer/Library/Frameworks',
+'-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/System/Library/Frameworks',
 '-DNS_BLOCK_ASSERTIONS=1',
 #'-MMD',
 '-MT',
@@ -131,14 +133,17 @@ def DirectoryOfThisScript():
   return os.path.dirname( os.path.abspath( __file__ ) )
 
 
-def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):
+def MakeRelativePathsInFlagsAbsolute( flags, working_directory, scheme ):
   if not working_directory:
     return flags
 
+  scheme_option = 'scheme'
   config = ConfigParser.ConfigParser()
   config.optionxform = str  # do not convert to lower-case
   config.read(os.path.join(working_directory, '.ycm_extra_conf.cfg'))
-  options = dict(config.items('xcodebuild'))
+  options = dict(config.items(scheme))
+  if scheme_option not in options:
+    options[scheme_option] = scheme
 
   new_flags = []
   make_next_absolute = False
@@ -193,7 +198,14 @@ def FlagsForFile( filename ):
       pass
   else:
     relative_to = DirectoryOfThisScript()
-    final_flags = MakeRelativePathsInFlagsAbsolute( flags, relative_to )
+
+    # not handling double path delimiters...
+    if (filename.startswith(relative_to)):
+        subdir = filename[len(relative_to):].split('/')[1]
+    else:
+        subdir = None
+
+    final_flags = MakeRelativePathsInFlagsAbsolute( flags, relative_to, subdir )
 
   return {
     'flags': final_flags,
