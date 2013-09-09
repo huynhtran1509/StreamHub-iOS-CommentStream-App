@@ -72,8 +72,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 -(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
 {
-    // in this sample app, we update the model in the most simplistic way --
-    // only insert new comments that are not children of other comments
+    // This method is responsible for both adding content from Bootstrap and
+    // for streaming new updates.
     [self.authors addEntriesFromDictionary:authors];
     
     NSPredicate *p = [NSPredicate predicateWithFormat:@"content.parentId == ''"];
@@ -87,14 +87,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // also cause table to redraw
     if ([filteredContent count] == 1u) {
         // animate insertion
-        [self.tableView beginUpdates];
-        [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
-                                                [NSIndexPath indexPathForRow:0 inSection:0]]
-                              withRowAnimation:UITableViewRowAnimationNone];
-        [self.tableView endUpdates];
+        [_tableView beginUpdates];
+        [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
+                                            [NSIndexPath indexPathForRow:0 inSection:0]]
+                          withRowAnimation:UITableViewRowAnimationNone];
+        [_tableView endUpdates];
     }
     
-    [self.tableView reloadData];
+    [_tableView reloadData];
 }
 
 #pragma mark - Lifecycle
@@ -212,6 +212,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         }
         [cell setAccessoryType:UITableViewCellAccessoryNone];
         [cell.imageView setContentMode:UIViewContentModeScaleAspectFit];
+        [cell.noteView setTextAlignment:NSTextAlignmentRight];
         
         [cell setHasFixedRowHeight:_useStaticRowHeight];
         
@@ -290,8 +291,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
                           [NSDate dateWithTimeIntervalSince1970:timeStamp]];
     
     // load avatar images in a separate queue
-    NSURLRequest *request = 
-        [NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]];
+    NSURLRequest *request =
+    [NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]];
     AFImageRequestOperation* operation = [AFImageRequestOperation
                                           imageRequestOperationWithRequest:request
                                           imageProcessingBlock:nil

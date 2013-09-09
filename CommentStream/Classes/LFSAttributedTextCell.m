@@ -8,12 +8,12 @@
 
 #import "LFSAttributedTextCell.h"
 
-static const NSInteger kLeftColumnWidth = 55;
-static const NSInteger kBottomInset = 5;
-static const NSInteger kHeaderHeight = 30;
-static const NSInteger kNoteWidth = 80;
+static const CGFloat kLeftColumnWidth = 55;
+static const CGFloat kBottomInset = 5;
+static const CGFloat kHeaderHeight = 30;
+static const CGFloat kRightColumnWidth = 80;
 static const CGRect avatarFrame = { {15, 8}, {25, 25} }; // origin: x=15, y=8; size: 25x25
-
+static const CGFloat kNoteRightInset = 15;
 
 @implementation LFSAttributedTextCell {
     UILabel *_titleView;
@@ -51,11 +51,11 @@ static const CGRect avatarFrame = { {15, 8}, {25, 25} }; // origin: x=15, y=8; s
         
         _titleView.frame = CGRectMake(kLeftColumnWidth,
                                       0,
-                                      self.contentView.bounds.size.width - kLeftColumnWidth - kNoteWidth,
+                                      self.contentView.bounds.size.width - kLeftColumnWidth - kRightColumnWidth,
                                       kHeaderHeight);
-        _noteView.frame = CGRectMake(self.contentView.bounds.size.width - kNoteWidth,
+        _noteView.frame = CGRectMake(self.contentView.bounds.size.width - kRightColumnWidth,
                                      0,
-                                     kNoteWidth,
+                                     kRightColumnWidth - kNoteRightInset,
                                      kHeaderHeight);
         self.imageView.frame = avatarFrame;
 	}
