@@ -212,7 +212,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         }
         [cell setAccessoryType:UITableViewCellAccessoryNone];
         [cell.imageView setContentMode:UIViewContentModeScaleAspectFit];
-        cell.hasFixedRowHeight = _useStaticRowHeight;
+        
+        [cell setHasFixedRowHeight:_useStaticRowHeight];
         
         // cache it, if there is a cache
         [_cellCache setObject:cell forKey:key];
@@ -244,12 +245,12 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     // scale down image if we are not on a Retina device
     UIScreen *screen = [UIScreen mainScreen];
-    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2)
-    {
+    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2) {
         // we are on a Retina device
         cell.imageView.image = image;
         [cell setNeedsLayout];
-    } else {
+    }
+    else {
         // we are on a non-Retina device
         dispatch_queue_t queue =
         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -303,8 +304,9 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
                                           failure:nil];
     [operation start];
     
-    // To test image downloading:
-    //NSString *html = [NSString stringWithFormat:@"<img src=\"%@\"/><div style=\"font-family:Avenir\">%@</div>", avatarURL, bodyHTML];
+    // To test embedded images:
+    //NSString *html = [NSString stringWithFormat:@"<img src=\"%@\"/><div style=\"font-family:Avenir\">%@</div>",
+    // avatarURL, bodyHTML];
     NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\">%@</div>", bodyHTML];
     
     [cell setHTMLString:html];
@@ -334,14 +336,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return nil;
 }
 
+// allow display of images embedded in rich-text content
 -(void)lazyImageView:(DTLazyImageView *)lazyImageView didChangeImageSize:(CGSize)size
 {
     DTAttributedTextContentView *cv = lazyImageView.textContentView;
     NSURL *url = lazyImageView.url;
-    //CGSize imageSize = size;
     
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"contentURL == %@", url];
-    // update all attachments that matchin this URL (possibly multiple images with same size)
+    // update all attachments that match this URL (possibly multiple images with same size)
     for (DTTextAttachment *attachment in [cv.layoutFrame textAttachmentsWithPredicate:pred])
     {
         /*
@@ -357,7 +359,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // see https://github.com/Cocoanetics/DTCoreText/issues/307
     cv.layouter = nil;
     
-    // here we're layouting the entire string, might be more efficient to only relayout the paragraphs that contain these attachments
+    // laying out the entire string,
+    // might be more efficient to only layout the paragraphs that contain these attachments
     [cv relayoutText];
 }
 /*

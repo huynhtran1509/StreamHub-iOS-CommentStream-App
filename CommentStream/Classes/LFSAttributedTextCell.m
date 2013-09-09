@@ -9,10 +9,11 @@
 #import "LFSAttributedTextCell.h"
 
 static const NSInteger kLeftColumnWidth = 55;
-static const NSInteger kTopInset = 4;
 static const NSInteger kBottomInset = 5;
 static const NSInteger kHeaderHeight = 30;
-static const NSInteger kNoteWidth = 40;
+static const NSInteger kNoteWidth = 80;
+static const CGRect avatarFrame = { {15, 8}, {25, 25} }; // origin: x=15, y=8; size: 25x25
+
 
 @implementation LFSAttributedTextCell {
     UILabel *_titleView;
@@ -56,11 +57,7 @@ static const NSInteger kNoteWidth = 40;
                                      0,
                                      kNoteWidth,
                                      kHeaderHeight);
-        
-        CGRect imageFrame = self.imageView.frame;
-        imageFrame.origin = CGPointMake(imageFrame.origin.x, kTopInset);
-        imageFrame.size = CGSizeMake(25.0f, 25.0f);
-        self.imageView.frame = imageFrame;
+        self.imageView.frame = avatarFrame;
 	}
 }
 
