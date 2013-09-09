@@ -8,8 +8,8 @@
 
 #import "LFSAttributedTextCell.h"
 
-static const NSInteger kLeftColumnWidth = 50;
-static const NSInteger kTopInset = 8;
+static const NSInteger kLeftColumnWidth = 60;
+static const NSInteger kTopInset = 4;
 static const NSInteger kBottomInset = 5;
 static const NSInteger kHeaderHeight = 30;
 static const NSInteger kNoteWidth = 40;
@@ -49,7 +49,9 @@ static const NSInteger kNoteWidth = 40;
         _noteView.frame = CGRectMake(self.contentView.bounds.size.width - kNoteWidth, 0, kNoteWidth, kHeaderHeight);
         
         CGRect imageFrame = self.imageView.frame;
-        self.imageView.frame = CGRectMake(imageFrame.origin.x, kTopInset, imageFrame.size.width, imageFrame.size.height);
+        imageFrame.origin = CGPointMake(imageFrame.origin.x, kTopInset);
+        imageFrame.size = CGSizeMake(40.0f, 40.0f);
+        self.imageView.frame = imageFrame;
 	}
 }
 

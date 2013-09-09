@@ -239,6 +239,38 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return (![self respondsToSelector:@selector(tableView:heightForRowAtIndexPath:)]);
 }
 
+- (void)setImage:(UIImage*)image forCell:(LFSAttributedTextCell*)cell
+{
+    // scale image if we are on a Retina device
+    UIScreen *screen = [UIScreen mainScreen];
+    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2)
+    {
+        // we are on a Retina device
+        dispatch_queue_t queue = 
+            dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        dispatch_async(queue, ^{
+            
+            // scale image on a background thread
+            CGSize size = cell.imageView.frame.size;
+            UIGraphicsBeginImageContext(size);
+            [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
+            UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            // display image on the main thread
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                cell.imageView.image = scaledImage;
+                [cell setNeedsLayout];
+            });
+        });
+    } else {
+        // we are on a non-Retina device
+        cell.imageView.image = image;
+        [cell setNeedsLayout];
+    }
+}
+
+// called every time a cell is configured
 - (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
@@ -255,16 +287,16 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
                           [NSDate dateWithTimeIntervalSince1970:timeStamp]];
     
     // load avatar images in a separate queue
+    NSURLRequest *request = 
+        [NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]];
     AFImageRequestOperation* operation = [AFImageRequestOperation
-                                          imageRequestOperationWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]]
+                                          imageRequestOperationWithRequest:request
                                           imageProcessingBlock:nil
-                                          success: ^(NSURLRequest *request,
+                                          success: ^(NSURLRequest *req,
                                                      NSHTTPURLResponse *response,
                                                      UIImage *image)
                                           {
-                                              // display image (this block is on the main thread)
-                                              cell.imageView.image = image;
-                                              [cell setNeedsLayout];
+                                              [self setImage:image forCell:cell];
                                           }
                                           failure:nil];
     [operation start];
