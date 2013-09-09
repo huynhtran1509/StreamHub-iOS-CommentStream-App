@@ -8,7 +8,7 @@
 
 #import "LFSAttributedTextCell.h"
 
-static const NSInteger kLeftColumnWidth = 60;
+static const NSInteger kLeftColumnWidth = 55;
 static const NSInteger kTopInset = 4;
 static const NSInteger kBottomInset = 5;
 static const NSInteger kHeaderHeight = 30;
@@ -42,15 +42,24 @@ static const NSInteger kNoteWidth = 40;
 		CGFloat neededContentHeight = [self requiredRowHeightInTableView:parentTable];
         
 		// after the first call here the content view size is correct
-		CGRect frame = CGRectMake(kLeftColumnWidth, kHeaderHeight, self.contentView.bounds.size.width - kLeftColumnWidth, neededContentHeight - kHeaderHeight);
+		CGRect frame = CGRectMake(kLeftColumnWidth,
+                                  kHeaderHeight,
+                                  self.contentView.bounds.size.width - kLeftColumnWidth,
+                                  neededContentHeight - kHeaderHeight);
 		self.attributedTextContextView.frame = frame;
         
-        _titleView.frame = CGRectMake(kLeftColumnWidth, 0, self.contentView.bounds.size.width - kLeftColumnWidth - kNoteWidth, kHeaderHeight);
-        _noteView.frame = CGRectMake(self.contentView.bounds.size.width - kNoteWidth, 0, kNoteWidth, kHeaderHeight);
+        _titleView.frame = CGRectMake(kLeftColumnWidth,
+                                      0,
+                                      self.contentView.bounds.size.width - kLeftColumnWidth - kNoteWidth,
+                                      kHeaderHeight);
+        _noteView.frame = CGRectMake(self.contentView.bounds.size.width - kNoteWidth,
+                                     0,
+                                     kNoteWidth,
+                                     kHeaderHeight);
         
         CGRect imageFrame = self.imageView.frame;
         imageFrame.origin = CGPointMake(imageFrame.origin.x, kTopInset);
-        imageFrame.size = CGSizeMake(40.0f, 40.0f);
+        imageFrame.size = CGSizeMake(25.0f, 25.0f);
         self.imageView.frame = imageFrame;
 	}
 }
@@ -67,7 +76,7 @@ static const NSInteger kNoteWidth = 40;
 {
 	if (!_titleView) {
 		_titleView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _titleView.font = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f]; //[UIFont boldSystemFontOfSize:16.0f];
+        _titleView.font = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
 		[self.contentView addSubview:_titleView];
 	}
 	return _titleView;
@@ -88,7 +97,8 @@ static const NSInteger kNoteWidth = 40;
 {
 	if (self.hasFixedRowHeight)
 	{
-		NSLog(@"Warning: you are calling %s even though the cell is configured with fixed row height", (const char *)__PRETTY_FUNCTION__);
+		NSLog(@"Warning: you are calling %s even though the cell is configured with fixed row height",
+              (const char *)__PRETTY_FUNCTION__);
 	}
 	
 	CGFloat contentWidth = tableView.frame.size.width - kLeftColumnWidth;
@@ -106,7 +116,8 @@ static const NSInteger kNoteWidth = 40;
 		case UITableViewCellAccessoryNone:
 			break;
 		default:
-			NSLog(@"Warning: Sizing for UITableViewCellAccessoryDetailButton not implemented on %@", NSStringFromClass([self class]));
+			NSLog(@"Warning: Sizing for UITableViewCellAccessoryDetailButton not implemented on %@",
+                  NSStringFromClass([self class]));
 			break;
 	}
 	
@@ -117,10 +128,13 @@ static const NSInteger kNoteWidth = 40;
 		contentWidth -= 20;
 	}
 	
-	CGSize neededSize = [self.attributedTextContextView suggestedFrameSizeToFitEntireStringConstraintedToWidth:contentWidth];
+	CGSize neededSize = [self.attributedTextContextView
+                         suggestedFrameSizeToFitEntireStringConstraintedToWidth:contentWidth];
 	
 	// note: non-integer row heights caused trouble < iOS 5.0
-	return MAX(neededSize.height + kHeaderHeight, self.imageView.frame.size.height + self.imageView.frame.origin.y) + kBottomInset;
+	return MAX(neededSize.height + kHeaderHeight,
+               self.imageView.frame.size.height + self.imageView.frame.origin.y)
+    + kBottomInset;
 }
 
 @end

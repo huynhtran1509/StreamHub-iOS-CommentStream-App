@@ -210,7 +210,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc] initWithReuseIdentifier:AttributedTextCellReuseIdentifier];
         }
-        cell.accessoryType = UITableViewCellStyleDefault;
+        [cell setAccessoryType:UITableViewCellAccessoryNone];
+        [cell.imageView setContentMode:UIViewContentModeScaleAspectFit];
         cell.hasFixedRowHeight = _useStaticRowHeight;
         
         // cache it, if there is a cache
@@ -241,16 +242,21 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 - (void)setImage:(UIImage*)image forCell:(LFSAttributedTextCell*)cell
 {
-    // scale image if we are on a Retina device
+    // scale down image if we are not on a Retina device
     UIScreen *screen = [UIScreen mainScreen];
     if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2)
     {
         // we are on a Retina device
-        dispatch_queue_t queue = 
-            dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        cell.imageView.image = image;
+        [cell setNeedsLayout];
+    } else {
+        // we are on a non-Retina device
+        dispatch_queue_t queue =
+        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_async(queue, ^{
             
             // scale image on a background thread
+            // Note: to keep things simple, we do not worry about aspect ratio
             CGSize size = cell.imageView.frame.size;
             UIGraphicsBeginImageContext(size);
             [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
@@ -263,10 +269,6 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
                 [cell setNeedsLayout];
             });
         });
-    } else {
-        // we are on a non-Retina device
-        cell.imageView.image = image;
-        [cell setNeedsLayout];
     }
 }
 
