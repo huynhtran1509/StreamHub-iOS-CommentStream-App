@@ -36,7 +36,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     NSCache* _cellCache;
 }
 
-#pragma mark - properties
+#pragma mark - Properties
 @synthesize authors = _authors;
 @synthesize content = _content;
 @synthesize bootstrapClient = _bootstrapClient;
@@ -55,6 +55,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 - (LFSStreamClient*)streamClient
 {
+    // return StreamClient while also setting it's callback in case
+    // StreamClient needs to be initialized
     if (_streamClient == nil) {
         _streamClient = [LFSStreamClient
                          clientWithNetwork:[LFSConfig objectForKey:@"domain"]
@@ -62,6 +64,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         
         __weak typeof(self) weakSelf = self;
         [self.streamClient setResultHandler:^(id responseObject) {
+            //NSLog(@"%@", responseObject);
             [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
                              withAuthors:[responseObject objectForKey:@"authors"]];
             
@@ -70,13 +73,48 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return _streamClient;
 }
 
+#pragma mark - UIViewController 
+
+// Hide Status Bar
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+
+#pragma mark - Private methods
+
+- (void)getBootstrapInfo
+{
+    [self.bootstrapClient getInitForSite:[LFSConfig objectForKey:@"site"]
+                                 article:[LFSConfig objectForKey:@"article"]
+                               onSuccess:^(NSOperation *operation, id responseObject)
+     {
+         NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
+         [self addTopLevelContent:[headDocument objectForKey:@"content"]
+                      withAuthors:[headDocument objectForKey:@"authors"]];
+         NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
+         NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
+         NSNumber *eventId = [collectionSettings objectForKey:@"event"];
+         
+         //NSLog(@"%@", responseObject);
+         
+         // we are already on the main queue...
+         [self.streamClient setCollectionId:collectionId];
+         [self.streamClient startStreamWithEventId:eventId];
+     }
+                               onFailure:^(NSOperation *operation, NSError *error)
+     {
+         NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
+     }];
+}
+
 -(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
 {
     // This method is responsible for both adding content from Bootstrap and
     // for streaming new updates.
     [self.authors addEntriesFromDictionary:authors];
     
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"content.parentId == ''"];
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
     NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
     NSRange contentSpan;
     contentSpan.location = 0;
@@ -131,7 +169,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     } else {
         // iOS 6
-        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
+        [[UIApplication sharedApplication] setStatusBarHidden:YES
+                                                withAnimation:UIStatusBarAnimationSlide];
     }
     
     // set system cache for URL data to 5MB
@@ -143,23 +182,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self.bootstrapClient getInitForSite:[LFSConfig objectForKey:@"site"]
-                                 article:[LFSConfig objectForKey:@"article"]
-                               onSuccess:^(NSOperation *operation, id responseObject) {
-                                   NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
-                                   [self addTopLevelContent:[headDocument objectForKey:@"content"]
-                                                withAuthors:[headDocument objectForKey:@"authors"]];
-                                   NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
-                                   NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
-                                   NSNumber *eventId = [collectionSettings objectForKey:@"event"];
-                                   
-                                   // we are already on the main queue...
-                                   [self.streamClient setCollectionId:collectionId];
-                                   [self.streamClient startStreamWithEventId:eventId];
-                               }
-                               onFailure:^(NSOperation *operation, NSError *error) {
-                                   NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
-                               }];
+    [self getBootstrapInfo];
 }
 
 - (void)didReceiveMemoryWarning
@@ -186,7 +209,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         return tableView.rowHeight;
     }
     
-    LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
+    LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
+                                                     cellForRowAtIndexPath:indexPath];
     return [cell requiredRowHeightInTableView:tableView];
 }
 
@@ -198,11 +222,11 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // workaround for iOS 5 bug (TODO: remove this)
+    // uniquing of NSIndexPath objects was disabled in iOS5, so use a string
+    // key as a workaround
     NSString *key = [NSString stringWithFormat:@"%d-%d", indexPath.section, indexPath.row];
-    
     LFSAttributedTextCell *cell = [_cellCache objectForKey:key];
-    
+
     if (!cell) {
         if ([self canReuseCells]) {
             cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:AttributedTextCellReuseIdentifier];
@@ -228,13 +252,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return cell;
 }
 
-#pragma mark - Private methods
-
-// Hide Status Bar
-- (BOOL)prefersStatusBarHidden
-{
-    return YES;
-}
+#pragma mark - Table and cell helpers
 
 - (BOOL)canReuseCells
 {
@@ -286,9 +304,10 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
     
     cell.titleView.text = authorName;
-    cell.noteView.text = [self.dateFormatter
+    NSString *dateTime = [self.dateFormatter
                           relativeStringFromDate:
                           [NSDate dateWithTimeIntervalSince1970:timeStamp]];
+    cell.noteView.text = dateTime;
     
     // load avatar images in a separate queue
     NSURLRequest *request =
@@ -314,7 +333,10 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 }
 
 #pragma mark - DTAttributedTextContentViewDelegate
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView viewForLink:(NSURL *)url identifier:(NSString *)identifier frame:(CGRect)frame
+-(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
+                        viewForLink:(NSURL *)url
+                         identifier:(NSString *)identifier
+                              frame:(CGRect)frame
 {
     DTLinkButton *btn = [[DTLinkButton alloc] initWithFrame:frame];
     btn.URL = url;
@@ -322,7 +344,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return btn;
 }
 
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView viewForAttachment:(DTTextAttachment *)attachment frame:(CGRect)frame
+-(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
+                  viewForAttachment:(DTTextAttachment *)attachment frame:(CGRect)frame
 {
     if ([attachment isKindOfClass:[DTImageTextAttachment class]]) {
         
@@ -364,12 +387,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // might be more efficient to only layout the paragraphs that contain these attachments
     [cv relayoutText];
 }
+
 /*
- -(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView viewForAttributedString:(NSAttributedString *)string frame:(CGRect)frame
- {
- // initialize and return your view here
- }
- */
+-(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
+            viewForAttributedString:(NSAttributedString *)string frame:(CGRect)frame
+{
+    // initialize and return your view here
+}
+*/
 
 #pragma mark - Events
 
