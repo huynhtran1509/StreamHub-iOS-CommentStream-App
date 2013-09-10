@@ -246,6 +246,12 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         // LFAttributedTextCell specifics
         cell.attributedTextContextView.shouldDrawImages = NO;
         cell.attributedTextContextView.delegate = self;
+        
+        // iOS7-like selected background color
+        [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
+        UIView *selectionColor = [[UIView alloc] init];
+        selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0) green:(217/255.0) blue:(217/255.0) alpha:1];
+        cell.selectedBackgroundView = selectionColor;
     }
     
     [self configureCell:cell forIndexPath:indexPath];
