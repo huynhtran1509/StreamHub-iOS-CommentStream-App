@@ -96,7 +96,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
          NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
          NSNumber *eventId = [collectionSettings objectForKey:@"event"];
          
-         NSLog(@"%@", responseObject);
+         //NSLog(@"%@", responseObject);
          
          // we are already on the main queue...
          [self.streamClient setCollectionId:collectionId];
@@ -114,7 +114,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // for streaming new updates.
     [self.authors addEntriesFromDictionary:authors];
     
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"content.parentId == ''"];
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
     NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
     NSRange contentSpan;
     contentSpan.location = 0;
