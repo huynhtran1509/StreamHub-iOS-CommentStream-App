@@ -24,6 +24,7 @@
 @property (strong, nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (strong, nonatomic, readonly) LFSStreamClient *streamClient;
 
+@property (strong, nonatomic, readonly) NSDictionary *collectionInfo;
 - (BOOL)canReuseCells;
 @end
 
@@ -42,13 +43,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
 @synthesize dateFormatter = _dateFormatter;
+@synthesize collectionInfo = _collectionInfo;
 
 - (LFSBootstrapClient*)bootstrapClient
 {
     if (_bootstrapClient == nil) {
         _bootstrapClient = [LFSBootstrapClient
-                            clientWithNetwork:[LFSConfig objectForKey:@"domain"]
-                            environment:[LFSConfig objectForKey:@"environment"] ];
+                            clientWithNetwork:[_collectionInfo objectForKey:@"network"]
+                            environment:[_collectionInfo objectForKey:@"environment"] ];
     }
     return _bootstrapClient;
 }
@@ -59,8 +61,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // StreamClient needs to be initialized
     if (_streamClient == nil) {
         _streamClient = [LFSStreamClient
-                         clientWithNetwork:[LFSConfig objectForKey:@"domain"]
-                         environment:[LFSConfig objectForKey:@"environment"]];
+                         clientWithNetwork:[_collectionInfo objectForKey:@"network"]
+                         environment:[_collectionInfo objectForKey:@"environment"]];
         
         __weak typeof(self) weakSelf = self;
         [self.streamClient setResultHandler:^(id responseObject) {
@@ -73,73 +75,15 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return _streamClient;
 }
 
-#pragma mark - UIViewController 
-
-// Hide Status Bar
-- (BOOL)prefersStatusBarHidden
-{
-    return YES;
-}
-
-#pragma mark - Private methods
-
-- (void)getBootstrapInfo
-{
-    [self.bootstrapClient getInitForSite:[LFSConfig objectForKey:@"site"]
-                                 article:[LFSConfig objectForKey:@"article"]
-                               onSuccess:^(NSOperation *operation, id responseObject)
-     {
-         NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
-         [self addTopLevelContent:[headDocument objectForKey:@"content"]
-                      withAuthors:[headDocument objectForKey:@"authors"]];
-         NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
-         NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
-         NSNumber *eventId = [collectionSettings objectForKey:@"event"];
-         
-         //NSLog(@"%@", responseObject);
-         
-         // we are already on the main queue...
-         [self.streamClient setCollectionId:collectionId];
-         [self.streamClient startStreamWithEventId:eventId];
-     }
-                               onFailure:^(NSOperation *operation, NSError *error)
-     {
-         NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
-     }];
-}
-
--(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
-{
-    // This method is responsible for both adding content from Bootstrap and
-    // for streaming new updates.
-    [self.authors addEntriesFromDictionary:authors];
-    
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
-    NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
-    NSRange contentSpan;
-    contentSpan.location = 0;
-    contentSpan.length = [filteredContent count];
-    [self.content insertObjects:filteredContent
-                      atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
-    
-    // also cause table to redraw
-    if ([filteredContent count] == 1u) {
-        // animate insertion
-        [_tableView beginUpdates];
-        [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
-                                            [NSIndexPath indexPathForRow:0 inSection:0]]
-                          withRowAnimation:UITableViewRowAnimationNone];
-        [_tableView endUpdates];
-    }
-    
-    [_tableView reloadData];
-}
-
 #pragma mark - Lifecycle
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    
+    // set which collection to show content for...
+    LFSConfig *config = [[LFSConfig alloc] initWithPlist:@"LFSConfig"];
+    _collectionInfo = [[config collections] objectAtIndex:0u];
     
     _authors = [NSMutableDictionary dictionary];
     _content = [NSMutableArray array];
@@ -198,6 +142,69 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _authors = nil;
     _content = nil;
     _cellCache = nil;
+}
+
+
+#pragma mark - UIViewController
+
+// Hide Status Bar
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+
+#pragma mark - Private methods
+
+- (void)getBootstrapInfo
+{
+    [self.bootstrapClient getInitForSite:[_collectionInfo objectForKey:@"site"]
+                                 article:[_collectionInfo objectForKey:@"article"]
+                               onSuccess:^(NSOperation *operation, id responseObject)
+     {
+         NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
+         [self addTopLevelContent:[headDocument objectForKey:@"content"]
+                      withAuthors:[headDocument objectForKey:@"authors"]];
+         NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
+         NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
+         NSNumber *eventId = [collectionSettings objectForKey:@"event"];
+         
+         //NSLog(@"%@", responseObject);
+         
+         // we are already on the main queue...
+         [self.streamClient setCollectionId:collectionId];
+         [self.streamClient startStreamWithEventId:eventId];
+     }
+                               onFailure:^(NSOperation *operation, NSError *error)
+     {
+         NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
+     }];
+}
+
+-(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
+{
+    // This method is responsible for both adding content from Bootstrap and
+    // for streaming new updates.
+    [self.authors addEntriesFromDictionary:authors];
+    
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
+    NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
+    NSRange contentSpan;
+    contentSpan.location = 0;
+    contentSpan.length = [filteredContent count];
+    [self.content insertObjects:filteredContent
+                      atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
+    
+    // also cause table to redraw
+    if ([filteredContent count] == 1u) {
+        // animate insertion
+        [_tableView beginUpdates];
+        [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
+                                            [NSIndexPath indexPathForRow:0 inSection:0]]
+                          withRowAnimation:UITableViewRowAnimationNone];
+        [_tableView endUpdates];
+    }
+    
+    [_tableView reloadData];
 }
 
 #pragma mark - UITableViewControllerDelegate
