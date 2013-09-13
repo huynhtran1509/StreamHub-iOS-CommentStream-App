@@ -16,13 +16,24 @@
 #import "LFSAttributedTextCell.h"
 #import "LFSViewController.h"
 
+@interface LFSPostField : UITextField
+@property (nonatomic, assign) UIEdgeInsets textEdgeInsets;
+@end
+
+@implementation LFSPostField
+@synthesize textEdgeInsets = _textEdgeInsets;
+- (CGRect)textRectForBounds:(CGRect)bounds {
+	return UIEdgeInsetsInsetRect([super textRectForBounds:bounds], _textEdgeInsets);
+}
+@end
+
 @interface LFSViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (strong, nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (strong, nonatomic, readonly) LFSStreamClient *streamClient;
-@property (strong, nonatomic, readonly) UITextField *postCommentField;
+@property (strong, nonatomic, readonly) LFSPostField *postCommentField;
 
 - (BOOL)canReuseCells;
 @end
@@ -144,7 +155,30 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // }}}
     
     // {{{ Toolbar
-    _postCommentField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
+    
+    
+    CGRect rect = self.navigationController.navigationBar.frame;
+    CGFloat recommendedTextFieldWidth = rect.size.width - 62.0f;
+    
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIInterfaceOrientationLandscapeLeft ||
+        orientation == UIInterfaceOrientationLandscapeRight)
+    {
+        // landscape (toolbar height is 32)
+        _postCommentField = [[LFSPostField alloc] initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 18)];
+    }
+    else
+    {
+        // portrait (toolbar height is 44)
+        _postCommentField = [[LFSPostField alloc] initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 30)];
+    }
+    
+    [_postCommentField setPlaceholder:@"Write a comment..."];
+    [_postCommentField setFont:[UIFont systemFontOfSize:13.0f]];
+    [_postCommentField setTextEdgeInsets:UIEdgeInsetsMake(0, 5, 0, 0)];
+    [_postCommentField setAutoresizingMask:(UIViewAutoresizingFlexibleHeight |
+                                            UIViewAutoresizingFlexibleWidth)];
+    
     _postCommentField.layer.cornerRadius = 8.0f;
     _postCommentField.layer.masksToBounds = YES;
     _postCommentField.layer.borderColor = [[UIColor lightGrayColor] CGColor];
@@ -152,14 +186,16 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _postCommentField.layer.opacity = 0.0f;
     _postCommentField.backgroundColor = [UIColor clearColor];
     _postCommentField.layer.backgroundColor = [[UIColor clearColor] CGColor];
+
     
     [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
     
     UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc] initWithCustomView:_postCommentField];
     UIBarButtonItem *postCommentItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(postComment:)];
-
+    
     NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, postCommentItem, nil];
     self.toolbarItems = toolbarItems;
+    
     self.navigationController.toolbarHidden = NO;
     [self.navigationController.toolbar setBarStyle:UIBarStyleDefault];
     [self.navigationController.toolbar setTranslucent:YES];
