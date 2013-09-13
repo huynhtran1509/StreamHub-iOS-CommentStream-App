@@ -250,6 +250,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [self.navigationController setToolbarHidden:NO animated:animated];
 }
 
+-(void)viewWillDisappear:(BOOL)animated
+{
+    // hide the navigation controller here
+    [super viewWillDisappear:animated];
+    [self.navigationController setToolbarHidden:YES animated:animated];
+}
+
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
