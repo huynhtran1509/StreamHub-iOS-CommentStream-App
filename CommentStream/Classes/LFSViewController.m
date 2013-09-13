@@ -20,9 +20,9 @@
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
-@property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (strong, nonatomic, readonly) LFSStreamClient *streamClient;
+@property (strong, nonatomic, readonly) UITextField *postCommentField;
 
 - (BOOL)canReuseCells;
 @end
@@ -42,13 +42,15 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
 @synthesize dateFormatter = _dateFormatter;
+@synthesize postCommentField = _postCommentField;
+@synthesize collection = _collection;
 
 - (LFSBootstrapClient*)bootstrapClient
 {
     if (_bootstrapClient == nil) {
         _bootstrapClient = [LFSBootstrapClient
-                            clientWithNetwork:[LFSConfig objectForKey:@"domain"]
-                            environment:[LFSConfig objectForKey:@"environment"] ];
+                            clientWithNetwork:[_collection objectForKey:@"network"]
+                            environment:[_collection objectForKey:@"environment"] ];
     }
     return _bootstrapClient;
 }
@@ -59,12 +61,12 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // StreamClient needs to be initialized
     if (_streamClient == nil) {
         _streamClient = [LFSStreamClient
-                         clientWithNetwork:[LFSConfig objectForKey:@"domain"]
-                         environment:[LFSConfig objectForKey:@"environment"]];
+                         clientWithNetwork:[_collection objectForKey:@"network"]
+                         environment:[_collection objectForKey:@"environment"] ];
         
         __weak typeof(self) weakSelf = self;
         [self.streamClient setResultHandler:^(id responseObject) {
-            //NSLog(@"%@", responseObject);
+            NSLog(@"%@", responseObject);
             [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
                              withAuthors:[responseObject objectForKey:@"authors"]];
             
@@ -73,69 +75,11 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return _streamClient;
 }
 
-#pragma mark - UIViewController 
-
-// Hide Status Bar
-- (BOOL)prefersStatusBarHidden
-{
-    return YES;
-}
-
-#pragma mark - Private methods
-
-- (void)getBootstrapInfo
-{
-    [self.bootstrapClient getInitForSite:[LFSConfig objectForKey:@"site"]
-                                 article:[LFSConfig objectForKey:@"article"]
-                               onSuccess:^(NSOperation *operation, id responseObject)
-     {
-         NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
-         [self addTopLevelContent:[headDocument objectForKey:@"content"]
-                      withAuthors:[headDocument objectForKey:@"authors"]];
-         NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
-         NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
-         NSNumber *eventId = [collectionSettings objectForKey:@"event"];
-         
-         //NSLog(@"%@", responseObject);
-         
-         // we are already on the main queue...
-         [self.streamClient setCollectionId:collectionId];
-         [self.streamClient startStreamWithEventId:eventId];
-     }
-                               onFailure:^(NSOperation *operation, NSError *error)
-     {
-         NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
-     }];
-}
-
--(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
-{
-    // This method is responsible for both adding content from Bootstrap and
-    // for streaming new updates.
-    [self.authors addEntriesFromDictionary:authors];
-    
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
-    NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
-    NSRange contentSpan;
-    contentSpan.location = 0;
-    contentSpan.length = [filteredContent count];
-    [self.content insertObjects:filteredContent
-                      atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
-    
-    // also cause table to redraw
-    if ([filteredContent count] == 1u) {
-        // animate insertion
-        [_tableView beginUpdates];
-        [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
-                                            [NSIndexPath indexPathForRow:0 inSection:0]]
-                          withRowAnimation:UITableViewRowAnimationNone];
-        [_tableView endUpdates];
-    }
-    
-    [_tableView reloadData];
-}
-
 #pragma mark - Lifecycle
+-(IBAction)postComment:(id)sender
+{
+    //erere
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -145,6 +89,37 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _content = [NSMutableArray array];
     
     _useStaticRowHeight = NO;
+    
+    // {{{ Navigation bar
+    [self.navigationController.navigationBar setBarStyle:UIBarStyleDefault];
+    [self.navigationController.navigationBar setBackgroundColor:[UIColor clearColor]];
+    [self.navigationController.navigationBar setTranslucent:YES];
+    
+    // }}}
+    
+    // {{{ Toolbar
+    _postCommentField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
+    _postCommentField.layer.cornerRadius = 8.0f;
+    _postCommentField.layer.masksToBounds = YES;
+    _postCommentField.layer.borderColor = [[UIColor blueColor] CGColor];
+    _postCommentField.layer.borderWidth = 0.5f;
+    _postCommentField.layer.opacity = 0.0f;
+    _postCommentField.backgroundColor = [UIColor clearColor];
+    _postCommentField.layer.backgroundColor = [[UIColor clearColor] CGColor];
+    
+    [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
+    
+    UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc] initWithCustomView:_postCommentField];
+    UIBarButtonItem *postCommentItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                                                     target:self
+                                                                                     action:@selector(postComment:)];
+    NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, postCommentItem, nil];
+    self.toolbarItems = toolbarItems;
+    self.navigationController.toolbarHidden = NO;
+    [self.navigationController.toolbar setBarStyle:UIBarStyleDefault];
+    [self.navigationController.toolbar setTranslucent:YES];
+    
+    // }}}
     
     /*
      if you enable static row height in this demo then the cell height is determined from the tableView.rowHeight.
@@ -200,6 +175,68 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _cellCache = nil;
 }
 
+#pragma mark - UIViewController 
+
+// Hide Status Bar
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+
+#pragma mark - Private methods
+
+- (void)getBootstrapInfo
+{
+    [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"site"]
+                                 article:[self.collection objectForKey:@"article"]
+                               onSuccess:^(NSOperation *operation, id responseObject)
+     {
+         NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
+         [self addTopLevelContent:[headDocument objectForKey:@"content"]
+                      withAuthors:[headDocument objectForKey:@"authors"]];
+         NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
+         NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
+         NSNumber *eventId = [collectionSettings objectForKey:@"event"];
+         
+         //NSLog(@"%@", responseObject);
+         
+         // we are already on the main queue...
+         [self.streamClient setCollectionId:collectionId];
+         [self.streamClient startStreamWithEventId:eventId];
+     }
+                               onFailure:^(NSOperation *operation, NSError *error)
+     {
+         NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
+     }];
+}
+
+-(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
+{
+    // This method is responsible for both adding content from Bootstrap and
+    // for streaming new updates.
+    [self.authors addEntriesFromDictionary:authors];
+    
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
+    NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
+    NSRange contentSpan;
+    contentSpan.location = 0;
+    contentSpan.length = [filteredContent count];
+    [self.content insertObjects:filteredContent
+                      atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
+    
+    // also cause table to redraw
+    if ([filteredContent count] == 1u) {
+        // animate insertion
+        [self.tableView beginUpdates];
+        [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
+                                            [NSIndexPath indexPathForRow:0 inSection:0]]
+                          withRowAnimation:UITableViewRowAnimationNone];
+        [self.tableView endUpdates];
+    }
+    
+    [self.tableView reloadData];
+}
+
 #pragma mark - UITableViewControllerDelegate
 
 // disable this method to get static height = better performance
@@ -251,6 +288,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
         UIView *selectionColor = [[UIView alloc] init];
         selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0) green:(217/255.0) blue:(217/255.0) alpha:1];
+        //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
         cell.selectedBackgroundView = selectionColor;
     }
     

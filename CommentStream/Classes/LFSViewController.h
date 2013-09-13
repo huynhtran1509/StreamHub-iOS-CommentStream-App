@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface LFSViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface LFSViewController : UITableViewController
+
+@property (nonatomic, strong) NSDictionary *collection;
 
 @end
