@@ -32,7 +32,6 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 @implementation LFSViewController
 {
-    BOOL     _useStaticRowHeight;
     NSCache* _cellCache;
 }
 
@@ -88,13 +87,12 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _authors = [NSMutableDictionary dictionary];
     _content = [NSMutableArray array];
     
-    _useStaticRowHeight = NO;
+    self.title = [_collection objectForKey:@"name"];
     
     // {{{ Navigation bar
     [self.navigationController.navigationBar setBarStyle:UIBarStyleDefault];
     [self.navigationController.navigationBar setBackgroundColor:[UIColor clearColor]];
     [self.navigationController.navigationBar setTranslucent:YES];
-    
     // }}}
     
     // {{{ Toolbar
@@ -128,14 +126,11 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
      Reuse is not recommended since the cells are cached anyway.
      */
     
-    if (_useStaticRowHeight) {
-        self.tableView.rowHeight = 60.0f;
-    }
-    else {
-        // establish a cache for prepared cells because heightForRowAtIndexPath and cellForRowAtIndexPath
-        // both need the same cell for an index path
-        _cellCache = [[NSCache alloc] init];
-    }
+
+    // establish a cache for prepared cells because heightForRowAtIndexPath and cellForRowAtIndexPath
+    // both need the same cell for an index path
+    _cellCache = [[NSCache alloc] init];
+
     
     // Hide Status Bar
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)]) {
@@ -242,15 +237,10 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (_useStaticRowHeight) {
-        return tableView.rowHeight;
-    }
-    
     LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
                                                      cellForRowAtIndexPath:indexPath];
     return [cell requiredRowHeightInTableView:tableView];
 }
-
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -275,7 +265,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         [cell.imageView setContentMode:UIViewContentModeScaleAspectFit];
         [cell.noteView setTextAlignment:NSTextAlignmentRight];
         
-        [cell setHasFixedRowHeight:_useStaticRowHeight];
+        [cell setHasFixedRowHeight:NO];
         
         // cache it, if there is a cache
         [_cellCache setObject:cell forKey:key];
