@@ -33,6 +33,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 @implementation LFSViewController
 {
     NSCache* _cellCache;
+    UIActivityIndicatorView *_activityIndicator;
+    UIView *_container;
 }
 
 #pragma mark - Properties
@@ -74,11 +76,57 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     return _streamClient;
 }
 
-#pragma mark - Lifecycle
--(IBAction)postComment:(id)sender
+#pragma mark - UIActivityIndicator
+-(void)wheelContainerSetup
 {
-    //erere
+    _container = [[UIView alloc] initWithFrame:self.view.frame];
+    [_container setBackgroundColor:[UIColor whiteColor]]; // should be white by default...
+    
+    // set autoresizing to support landscape mode
+    [_container setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight)];
+    
+    // init actvity indicator
+    _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    _activityIndicator.hidesWhenStopped = YES; // we hide it manually anyway
+    
+    // center activity indicator
+    CGPoint center = self.view.center;
+    center.y -= 44.0f;
+    [_activityIndicator setCenter:center];
+    
+    // set autoresizing to support landscape mode
+    [_activityIndicator setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin |
+                                             UIViewAutoresizingFlexibleHeight |
+                                             UIViewAutoresizingFlexibleLeftMargin |
+                                             UIViewAutoresizingFlexibleRightMargin |
+                                             UIViewAutoresizingFlexibleTopMargin |
+                                             UIViewAutoresizingFlexibleWidth)];
+    
+    [_container addSubview:_activityIndicator];
+    [self.view addSubview:_container];
 }
+
+-(void)startSpinning
+{
+    _container.hidden = NO;
+    _activityIndicator.hidden = NO;
+    [_activityIndicator startAnimating];
+}
+
+-(void)stopSpinning {
+    _container.hidden = YES;
+    _activityIndicator.hidden = YES;
+    [_activityIndicator stopAnimating];
+}
+
+#pragma mark - Lifecycle
+
+-(void)loadView
+{
+    [super loadView];
+    [self wheelContainerSetup];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -99,7 +147,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _postCommentField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
     _postCommentField.layer.cornerRadius = 8.0f;
     _postCommentField.layer.masksToBounds = YES;
-    _postCommentField.layer.borderColor = [[UIColor blueColor] CGColor];
+    _postCommentField.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     _postCommentField.layer.borderWidth = 0.5f;
     _postCommentField.layer.opacity = 0.0f;
     _postCommentField.backgroundColor = [UIColor clearColor];
@@ -108,9 +156,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
     
     UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc] initWithCustomView:_postCommentField];
-    UIBarButtonItem *postCommentItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                                                                     target:self
-                                                                                     action:@selector(postComment:)];
+    UIBarButtonItem *postCommentItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(postComment:)];
+
     NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, postCommentItem, nil];
     self.toolbarItems = toolbarItems;
     self.navigationController.toolbarHidden = NO;
@@ -168,6 +215,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _authors = nil;
     _content = nil;
     _cellCache = nil;
+    _container = nil;
+    _activityIndicator = nil;
 }
 
 #pragma mark - UIViewController 
@@ -182,6 +231,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 - (void)getBootstrapInfo
 {
+    [self startSpinning];
     [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"site"]
                                  article:[self.collection objectForKey:@"article"]
                                onSuccess:^(NSOperation *operation, id responseObject)
@@ -198,10 +248,12 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
          // we are already on the main queue...
          [self.streamClient setCollectionId:collectionId];
          [self.streamClient startStreamWithEventId:eventId];
+         [self stopSpinning];
      }
                                onFailure:^(NSOperation *operation, NSError *error)
      {
          NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
+         [self stopSpinning];
      }];
 }
 
@@ -435,6 +487,11 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 - (IBAction)btnDidClick:(DTLinkButton*)sender
 {
     [[UIApplication sharedApplication] openURL:sender.URL];
+}
+
+-(IBAction)postComment:(id)sender
+{
+    //TODO: load post comment view here
 }
 
 @end
