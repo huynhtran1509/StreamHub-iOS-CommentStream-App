@@ -1,5 +1,5 @@
 //
-//  LFViewController.m
+//  LFSCollectionViewController.m
 //  CommentStream
 //
 //  Created by Eugene Scherba on 8/7/13.
@@ -14,9 +14,14 @@
 #import "LFSConfig.h"
 #import "DTLazyImageView+TextContentView.h"
 #import "LFSAttributedTextCell.h"
-#import "LFSViewController.h"
+#import "LFSCollectionViewController.h"
+
+#import "LFSDetailViewController.h"
+#import "LFSNewCommentViewController.h"
 
 @interface LFSPostField : UITextField
+// a subclass of UITextField that allows us to set custom
+// padding/edge insets.
 @property (nonatomic, assign) UIEdgeInsets textEdgeInsets;
 @end
 
@@ -27,7 +32,7 @@
 }
 @end
 
-@interface LFSViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
+@interface LFSCollectionViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
@@ -41,7 +46,7 @@
 // identifier for cell reuse
 NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
 
-@implementation LFSViewController
+@implementation LFSCollectionViewController
 {
     NSCache* _cellCache;
     UIActivityIndicatorView *_activityIndicator;
@@ -191,12 +196,11 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
     
     UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc] initWithCustomView:_postCommentField];
-    UIBarButtonItem *postCommentItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(postComment:)];
+    UIBarButtonItem *postCommentItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(createComment:)];
     
     NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, postCommentItem, nil];
     self.toolbarItems = toolbarItems;
     
-    self.navigationController.toolbarHidden = NO;
     [self.navigationController.toolbar setBarStyle:UIBarStyleDefault];
     [self.navigationController.toolbar setTranslucent:YES];
     
@@ -236,6 +240,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     [super viewWillAppear:animated];
     [self getBootstrapInfo];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    // add some pizzas by animating the toolbar from below (this serves
+    // as a live reminder to the user that he/she can post a comment)
+    [super viewDidAppear:animated];
+    [self.navigationController setToolbarHidden:NO animated:animated];
 }
 
 - (void)didReceiveMemoryWarning
@@ -525,9 +537,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [[UIApplication sharedApplication] openURL:sender.URL];
 }
 
--(IBAction)postComment:(id)sender
+-(IBAction)createComment:(id)sender
 {
-    //TODO: load post comment view here
+    UINavigationController *navigationController =
+    (UINavigationController *)[[[[UIApplication sharedApplication] delegate] window] rootViewController];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
+    LFSNewCommentViewController *controller =
+    (LFSNewCommentViewController*)[storyboard instantiateViewControllerWithIdentifier:@"commentNew"];
+    [navigationController pushViewController:controller animated:YES];
 }
 
 @end

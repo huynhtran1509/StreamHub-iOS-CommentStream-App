@@ -5,25 +5,25 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3734.1"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--View Controller - Comment-->
         <scene sceneID="Lbi-Nh-HHJ">
             <objects>
-                <viewController id="9jQ-b8-8PW" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="commentDetail" id="9jQ-b8-8PW" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="sbm-uS-oS0">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" id="lOt-mf-6Ob"/>
+                    <navigationItem key="navigationItem" title="Comment" id="lOt-mf-6Ob"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ISf-vh-rH3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1311" y="-2"/>
         </scene>
-        <!--View Controller-->
+        <!--Collection View Controller-->
         <scene sceneID="A48-WW-R3H">
             <objects>
-                <tableViewController id="wKK-ps-xgM" customClass="LFSViewController" sceneMemberID="viewController">
+                <tableViewController id="wKK-ps-xgM" customClass="LFSCollectionViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="iUD-ON-UxZ">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -50,7 +50,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0Tw-XB-9pa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="806" y="-2"/>
+            <point key="canvasLocation" x="820" y="-31"/>
         </scene>
         <!--Root View Controller - Collections-->
         <scene sceneID="Pi9-AQ-FSH">
@@ -98,6 +98,30 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wq4-Tc-u2B" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-171" y="-2"/>
+        </scene>
+        <!--View Controller - New Comment-->
+        <scene sceneID="f3f-s1-Nv9">
+            <objects>
+                <viewController storyboardIdentifier="commentNew" id="s0o-P6-Dkk" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="FTn-ZK-DMt">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Etiam porta sem malesuada magna mollis euismod. Praesent commodo cursus magna " id="QLq-PC-tD3">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="New Comment" id="zhQ-MG-dr8"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KV4-cx-MgF" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1126" y="291"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

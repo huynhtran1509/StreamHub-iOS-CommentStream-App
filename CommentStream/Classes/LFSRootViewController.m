@@ -8,7 +8,7 @@
 
 #import "LFSConfig.h"
 #import "LFSRootViewController.h"
-#import "LFSViewController.h"
+#import "LFSCollectionViewController.h"
 
 @interface LFSRootViewController ()
 @property (nonatomic, strong) NSArray *tableModel;
@@ -33,6 +33,12 @@
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.navigationController setToolbarHidden:YES animated:animated];
 }
 
 /*
@@ -90,10 +96,10 @@
     if ([[segue identifier] isEqualToString:CollectionSegueId])
     {
         // Get reference to the destination view controller
-        if ([segue.destinationViewController isKindOfClass:[LFSViewController class]]) {
+        if ([segue.destinationViewController isKindOfClass:[LFSCollectionViewController class]]) {
             if ([sender isKindOfClass:[UITableViewCell class]]) {
                 NSIndexPath *indexPath = [self.tableView indexPathForCell:sender];
-                LFSViewController *vc = segue.destinationViewController;
+                LFSCollectionViewController *vc = segue.destinationViewController;
                 
                 // assign model object
                 vc.collection = [self.tableModel objectAtIndex:indexPath.row];

@@ -1,5 +1,5 @@
 //
-//  LFViewController.h
+//  LFSCollectionViewController.h
 //  CommentStream
 //
 //  Created by Eugene Scherba on 8/7/13.
@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface LFSViewController : UITableViewController
+@interface LFSCollectionViewController : UITableViewController
 
 @property (nonatomic, strong) NSDictionary *collection;
 
