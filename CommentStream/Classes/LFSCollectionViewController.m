@@ -219,17 +219,6 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     _cellCache = [[NSCache alloc] init];
 
     
-    // Hide Status Bar
-    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)]) {
-        // iOS 7
-        [self prefersStatusBarHidden];
-        [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
-    } else {
-        // iOS 6
-        [[UIApplication sharedApplication] setStatusBarHidden:YES
-                                                withAnimation:UIStatusBarAnimationSlide];
-    }
-    
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
     
@@ -239,6 +228,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self hideStatusBar];
     [self getBootstrapInfo];
 }
 
@@ -284,6 +274,20 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 }
 
 #pragma mark - Private methods
+
+-(void)hideStatusBar
+{
+    // Hide Status Bar
+    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)]) {
+        // iOS 7
+        [self prefersStatusBarHidden];
+        [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
+    } else {
+        // iOS 6
+        [[UIApplication sharedApplication] setStatusBarHidden:YES
+                                                withAnimation:UIStatusBarAnimationSlide];
+    }
+}
 
 - (void)getBootstrapInfo
 {
@@ -547,12 +551,10 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 -(IBAction)createComment:(id)sender
 {
-    UINavigationController *navigationController =
-    (UINavigationController *)[[[[UIApplication sharedApplication] delegate] window] rootViewController];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
     LFSNewCommentViewController *controller =
     (LFSNewCommentViewController*)[storyboard instantiateViewControllerWithIdentifier:@"commentNew"];
-    [navigationController pushViewController:controller animated:YES];
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 @end

@@ -33,13 +33,12 @@
 	// Do any additional setup after loading the view.
 }
 
-/*
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self.navigationController setToolbarHidden:YES animated:animated];
+    [self hideStatusBar];
+    //[self.navigationController setToolbarHidden:YES animated:animated];
 }
-*/
 
 - (void)didReceiveMemoryWarning
 {
@@ -48,5 +47,20 @@
 }
 
 #pragma mark - Methods
+
+-(void)hideStatusBar
+{
+    // Hide Status Bar
+    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)]) {
+        // iOS 7
+        [self prefersStatusBarHidden];
+        [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
+    } else {
+        // iOS 6
+        [[UIApplication sharedApplication] setStatusBarHidden:YES
+                                                withAnimation:UIStatusBarAnimationSlide];
+    }
+}
+
 
 @end
