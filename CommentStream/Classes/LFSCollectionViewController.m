@@ -178,6 +178,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         _postCommentField = [[LFSPostField alloc] initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 30)];
     }
     
+    _postCommentField.delegate = self;
+    
     [_postCommentField setPlaceholder:@"Write a comment..."];
     [_postCommentField setFont:[UIFont systemFontOfSize:13.0f]];
     [_postCommentField setTextEdgeInsets:UIEdgeInsetsMake(0, 5, 0, 0)];
@@ -344,6 +346,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [self.tableView reloadData];
 }
 
+#pragma mark - UITextFieldDelegate
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    [self createComment:textField];
+    return NO;
+}
+
 #pragma mark - UITableViewControllerDelegate
 
 // disable this method to get static height = better performance
@@ -486,7 +496,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     DTLinkButton *btn = [[DTLinkButton alloc] initWithFrame:frame];
     btn.URL = url;
-    [btn addTarget:self action:@selector(btnDidClick:) forControlEvents:UIControlEventTouchUpInside];
+    [btn addTarget:self action:@selector(openURL:) forControlEvents:UIControlEventTouchUpInside];
     return btn;
 }
 
@@ -544,7 +554,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 #pragma mark - Events
 
-- (IBAction)btnDidClick:(DTLinkButton*)sender
+- (IBAction)openURL:(DTLinkButton*)sender
 {
     [[UIApplication sharedApplication] openURL:sender.URL];
 }

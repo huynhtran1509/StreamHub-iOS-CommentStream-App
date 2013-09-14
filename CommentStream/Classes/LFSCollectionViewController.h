@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface LFSCollectionViewController : UITableViewController
+@interface LFSCollectionViewController : UITableViewController <UITextFieldDelegate>
 
 @property (nonatomic, strong) NSDictionary *collection;
 
