@@ -41,6 +41,7 @@
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
+@property (nonatomic, strong) UIBarButtonItem *postCommentItem;
 - (BOOL)canReuseCells;
 @end
 
@@ -66,6 +67,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
+
+@synthesize postCommentItem = _postCommentItem;
 
 - (LFSBootstrapClient*)bootstrapClient
 {
@@ -104,10 +107,12 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [_container setBackgroundColor:[UIColor whiteColor]]; // should be white by default...
     
     // set autoresizing to support landscape mode
-    [_container setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight)];
+    [_container setAutoresizingMask:(UIViewAutoresizingFlexibleWidth |
+                                     UIViewAutoresizingFlexibleHeight)];
     
     // init actvity indicator
-    _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    _activityIndicator = [[UIActivityIndicatorView alloc]
+                          initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     _activityIndicator.hidesWhenStopped = YES; // we hide it manually anyway
     
     // center activity indicator
@@ -127,6 +132,12 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [self.view addSubview:_container];
 }
 
+-(void)wheelContainerTeardown
+{
+    _activityIndicator = nil;
+    _container = nil;
+}
+
 -(void)startSpinning
 {
     _container.hidden = NO;
@@ -141,13 +152,6 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 }
 
 #pragma mark - Lifecycle
-
--(void)loadView
-{
-    [super loadView];
-    [self wheelContainerSetup];
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -175,12 +179,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         orientation == UIInterfaceOrientationLandscapeRight)
     {
         // landscape (toolbar height is 32)
-        _postCommentField = [[LFSPostField alloc] initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 18)];
+        _postCommentField = [[LFSPostField alloc]
+                             initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 18)];
     }
     else
     {
         // portrait (toolbar height is 44)
-        _postCommentField = [[LFSPostField alloc] initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 30)];
+        _postCommentField = [[LFSPostField alloc]
+                             initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 30)];
     }
     
     _postCommentField.delegate = self;
@@ -202,10 +208,14 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     
     [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
     
-    UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc] initWithCustomView:_postCommentField];
-    UIBarButtonItem *postCommentItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(createComment:)];
+    UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
+                                         initWithCustomView:_postCommentField];
+    _postCommentItem = [[UIBarButtonItem alloc]
+                        initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
+                        target:self
+                        action:@selector(createComment:)];
     
-    NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, postCommentItem, nil];
+    NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, _postCommentItem, nil];
     self.toolbarItems = toolbarItems;
     
     [self.navigationController.toolbar setBarStyle:UIBarStyleDefault];
@@ -214,15 +224,15 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // }}}
     
     /*
-     if you enable static row height in this demo then the cell height is determined from the tableView.rowHeight.
-     Cells can be reused in this mode.
-     If you disable this then cells are prepared and cached to reused their internal layouter and layoutFrame.
-     Reuse is not recommended since the cells are cached anyway.
+     if you enable static row height in this demo then the cell height is determined 
+     from the tableView.rowHeight. Cells can be reused in this mode.
+     If you disable this then cells are prepared and cached to reused their internal 
+     layouter and layoutFrame. Reuse is not recommended since the cells are cached anyway.
      */
     
 
-    // establish a cache for prepared cells because heightForRowAtIndexPath and cellForRowAtIndexPath
-    // both need the same cell for an index path
+    // establish a cache for prepared cells because heightForRowAtIndexPath and
+    // cellForRowAtIndexPath both need the same cell for an index path
     _cellCache = [[NSCache alloc] init];
 
     
@@ -230,6 +240,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
     
     self.dateFormatter = [[NSDateFormatter alloc] init];
+    
+    [self wheelContainerSetup];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -251,6 +263,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 {
     // hide the navigation controller here
     [super viewWillDisappear:animated];
+    [self.streamClient stopStream];
     [self.navigationController setToolbarHidden:YES animated:animated];
 }
 
@@ -266,10 +279,17 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
 - (void) dealloc
 {
+    [self wheelContainerTeardown];
+    self.navigationController.delegate = nil;
+    self.tableView.delegate = nil;
+    self.tableView.dataSource = nil;
+    _postCommentField.delegate = nil;
+    _postCommentItem.target = nil;
+    
     [_cellCache removeAllObjects];
     _cellCache = nil;
-    
-    _postCommentField.delegate = nil;
+    _streamClient = nil;
+    _bootstrapClient = nil;
     
     _authors = nil;
     _content = nil;
@@ -357,8 +377,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         // animate insertion
         [self.tableView beginUpdates];
         [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
-                                            [NSIndexPath indexPathForRow:0 inSection:0]]
-                          withRowAnimation:UITableViewRowAnimationNone];
+                                                [NSIndexPath indexPathForRow:0 inSection:0]]
+                              withRowAnimation:UITableViewRowAnimationNone];
         [self.tableView endUpdates];
     }
     
@@ -412,7 +432,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
             cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:AttributedTextCellReuseIdentifier];
         }
         if (!cell) {
-            cell = [[LFSAttributedTextCell alloc] initWithReuseIdentifier:AttributedTextCellReuseIdentifier];
+            cell = [[LFSAttributedTextCell alloc]
+                    initWithReuseIdentifier:AttributedTextCellReuseIdentifier];
         }
         [cell setAccessoryType:UITableViewCellAccessoryNone];
         [cell.imageView setContentMode:UIViewContentModeScaleAspectFit];
@@ -430,7 +451,10 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
         // iOS7-like selected background color
         [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
         UIView *selectionColor = [[UIView alloc] init];
-        selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0) green:(217/255.0) blue:(217/255.0) alpha:1];
+        selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0)
+                                                         green:(217/255.0)
+                                                          blue:(217/255.0)
+                                                         alpha:1];
         //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
         cell.selectedBackgroundView = selectionColor;
     }
@@ -512,7 +536,8 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [operation start];
     
     // To test embedded images:
-    //NSString *html = [NSString stringWithFormat:@"<img src=\"%@\"/><div style=\"font-family:Avenir\">%@</div>",
+    //NSString *html =
+    //[NSString stringWithFormat:@"<img src=\"%@\"/><div style=\"font-family:Avenir\">%@</div>",
     // avatarURL, bodyHTML];
     NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\">%@</div>", bodyHTML];
     
@@ -563,11 +588,13 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
          attachment.displaySize = imageSize;
          }*/
         attachment.originalSize = size;
-        lazyImageView.bounds = CGRectMake(0, 0, attachment.displaySize.width, attachment.displaySize.height);
+        lazyImageView.bounds = CGRectMake(0, 0,
+                                          attachment.displaySize.width,
+                                          attachment.displaySize.height);
     }
     
-    // need to reset the layouter because otherwise we get the old framesetter or cached layout frames
-    // see https://github.com/Cocoanetics/DTCoreText/issues/307
+    // need to reset the layouter because otherwise we get the old framesetter or cached
+    // layout frames. See https://github.com/Cocoanetics/DTCoreText/issues/307
     cv.layouter = nil;
     
     // laying out the entire string,
