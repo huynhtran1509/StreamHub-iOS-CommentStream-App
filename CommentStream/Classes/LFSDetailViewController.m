@@ -10,13 +10,19 @@
 
 @interface LFSDetailViewController ()
 
+// render iOS7 status bar methods as writable properties
+@property (nonatomic, assign) BOOL prefersStatusBarHidden;
+@property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
+
 @end
 
 @implementation LFSDetailViewController
 
 #pragma mark - Properties
 
-
+// render iOS7 status bar methods as writable properties
+@synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
+@synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
 #pragma mark - UIViewController
 
@@ -36,7 +42,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self hideStatusBar];
+    [self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
     //[self.navigationController setToolbarHidden:YES animated:animated];
 }
 
@@ -46,19 +52,35 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Methods
+#pragma mark - Status bar
 
--(void)hideStatusBar
+-(void)setStatusBarHidden:(BOOL)hidden
+            withAnimation:(UIStatusBarAnimation)animation
 {
-    // Hide Status Bar
-    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)]) {
+    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
+    {
         // iOS 7
-        [self prefersStatusBarHidden];
+        _prefersStatusBarHidden = hidden;
+        _preferredStatusBarUpdateAnimation = animation;
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
-    } else {
+    }
+    else
+    {
         // iOS 6
-        [[UIApplication sharedApplication] setStatusBarHidden:YES
-                                                withAnimation:UIStatusBarAnimationSlide];
+        [[UIApplication sharedApplication] setStatusBarHidden:hidden
+                                                withAnimation:animation];
+        if (self.navigationController) {
+            UINavigationBar *navigationBar = self.navigationController.navigationBar;
+            if (hidden && navigationBar.frame.origin.y > 0.f) {
+                CGRect frame = navigationBar.frame;
+                frame.origin.y = 0;
+                navigationBar.frame = frame;
+            } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
+                CGRect frame = navigationBar.frame;
+                frame.origin.y = 20.f;
+                navigationBar.frame = frame;
+            }
+        }
     }
 }
 

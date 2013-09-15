@@ -12,12 +12,21 @@
 
 @interface LFSRootViewController ()
 @property (nonatomic, strong) NSArray *tableModel;
+
+// render iOS7 status bar methods as writable properties
+@property (nonatomic, assign) BOOL prefersStatusBarHidden;
+@property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
+
 @end
 
 @implementation LFSRootViewController
 
 #pragma mark - Properties
 @synthesize tableModel = _tableModel;
+
+// render iOS7 status bar methods as writable properties
+@synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
+@synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
 #pragma mark - Lifecycle
 - (void)viewDidLoad
@@ -38,6 +47,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
     [self.navigationController setToolbarHidden:YES animated:animated];
 }
 
@@ -51,6 +61,38 @@
 - (void)dealloc
 {
     _tableModel = nil;
+}
+
+#pragma mark - Status bar
+
+-(void)setStatusBarHidden:(BOOL)hidden
+            withAnimation:(UIStatusBarAnimation)animation
+{
+    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
+    {
+        // iOS 7
+        _prefersStatusBarHidden = hidden;
+        _preferredStatusBarUpdateAnimation = animation;
+        [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
+    }
+    else
+    {
+        // iOS 6
+        [[UIApplication sharedApplication] setStatusBarHidden:hidden
+                                                withAnimation:animation];
+        if (self.navigationController) {
+            UINavigationBar *navigationBar = self.navigationController.navigationBar;
+            if (hidden && navigationBar.frame.origin.y > 0.f) {
+                CGRect frame = navigationBar.frame;
+                frame.origin.y = 0;
+                navigationBar.frame = frame;
+            } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
+                CGRect frame = navigationBar.frame;
+                frame.origin.y = 20.f;
+                navigationBar.frame = frame;
+            }
+        }
+    }
 }
 
 #pragma mark - Table view data source

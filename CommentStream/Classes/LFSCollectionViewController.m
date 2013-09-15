@@ -16,9 +16,6 @@
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
 
-#import "LFSDetailViewController.h"
-#import "LFSNewCommentViewController.h"
-
 @interface LFSPostField : UITextField
 // a subclass of UITextField that allows us to set custom
 // padding/edge insets.
@@ -39,6 +36,10 @@
 @property (strong, nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (strong, nonatomic, readonly) LFSStreamClient *streamClient;
 @property (strong, nonatomic, readonly) LFSPostField *postCommentField;
+
+// render iOS7 status bar methods as writable properties
+@property (nonatomic, assign) BOOL prefersStatusBarHidden;
+@property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 - (BOOL)canReuseCells;
 @end
@@ -61,6 +62,10 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 @synthesize dateFormatter = _dateFormatter;
 @synthesize postCommentField = _postCommentField;
 @synthesize collection = _collection;
+
+// render iOS7 status bar methods as writable properties
+@synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
+@synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
 - (LFSBootstrapClient*)bootstrapClient
 {
@@ -230,7 +235,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self hideStatusBar];
+    [self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
     [self getBootstrapInfo];
 }
 
@@ -255,42 +260,56 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
     
+    [_cellCache removeAllObjects];
     _cellCache = nil;
 }
 
 - (void) dealloc
 {
+    [_cellCache removeAllObjects];
+    _cellCache = nil;
+    
+    _postCommentField.delegate = nil;
+    
     _authors = nil;
     _content = nil;
-    _cellCache = nil;
     _container = nil;
     _activityIndicator = nil;
 }
 
-#pragma mark - UIViewController 
+#pragma mark - Status bar
 
-// Hide Status Bar
-- (BOOL)prefersStatusBarHidden
+-(void)setStatusBarHidden:(BOOL)hidden
+            withAnimation:(UIStatusBarAnimation)animation
 {
-    return YES;
-}
-
-#pragma mark - Private methods
-
--(void)hideStatusBar
-{
-    // Hide Status Bar
-    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)]) {
+    if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
+    {
         // iOS 7
-        [self prefersStatusBarHidden];
+        _prefersStatusBarHidden = hidden;
+        _preferredStatusBarUpdateAnimation = animation;
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
-    } else {
+    }
+    else
+    {
         // iOS 6
-        [[UIApplication sharedApplication] setStatusBarHidden:YES
-                                                withAnimation:UIStatusBarAnimationSlide];
+        [[UIApplication sharedApplication] setStatusBarHidden:hidden
+                                                withAnimation:animation];
+        if (self.navigationController) {
+            UINavigationBar *navigationBar = self.navigationController.navigationBar;
+            if (hidden && navigationBar.frame.origin.y > 0.f) {
+                CGRect frame = navigationBar.frame;
+                frame.origin.y = 0;
+                navigationBar.frame = frame;
+            } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
+                CGRect frame = navigationBar.frame;
+                frame.origin.y = 20.f;
+                navigationBar.frame = frame;
+            }
+        }
     }
 }
 
+#pragma mark - Private methods
 - (void)getBootstrapInfo
 {
     [self startSpinning];
@@ -355,6 +374,18 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 }
 
 #pragma mark - UITableViewControllerDelegate
+
+-(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSUInteger row = indexPath.row;
+    if (row % 2) {
+        // even
+        NSLog(@"even");
+    } else {
+        // odd
+        NSLog(@"odd");
+    }
+}
 
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

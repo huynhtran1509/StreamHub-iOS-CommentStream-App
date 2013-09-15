@@ -20,6 +20,38 @@ static const CGFloat kNoteRightInset = 15;
     UILabel *_noteView;
 }
 
+#pragma mark - Properties
+
+- (UILabel *)titleView
+{
+	if (!_titleView) {
+		_titleView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
+        _titleView.font = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
+		[self.contentView addSubview:_titleView];
+	}
+	return _titleView;
+}
+
+- (UILabel *)noteView
+{
+	if (!_noteView) {
+		_noteView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
+        _noteView.font = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
+        _noteView.textColor = [UIColor grayColor];
+		[self.contentView addSubview:_noteView];
+	}
+	return _noteView;
+}
+
+- (DTAttributedTextContentView *)attributedTextContextView
+{
+    // adjust insets to x=0, y=0
+	DTAttributedTextContentView *_attributedTextContextView = [super attributedTextContextView];
+    _attributedTextContextView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
+    return _attributedTextContextView;
+}
+
+#pragma mark - Methods
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
@@ -59,35 +91,6 @@ static const CGFloat kNoteRightInset = 15;
                                      kHeaderHeight);
         self.imageView.frame = avatarFrame;
 	}
-}
-
-- (DTAttributedTextContentView *)attributedTextContextView
-{
-    // adjust insets to x=0, y=0
-	DTAttributedTextContentView *_attributedTextContextView = [super attributedTextContextView];
-    _attributedTextContextView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
-    return _attributedTextContextView;
-}
-
-- (UILabel *)titleView
-{
-	if (!_titleView) {
-		_titleView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _titleView.font = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
-		[self.contentView addSubview:_titleView];
-	}
-	return _titleView;
-}
-
-- (UILabel *)noteView
-{
-	if (!_noteView) {
-		_noteView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _noteView.font = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
-        _noteView.textColor = [UIColor grayColor];
-		[self.contentView addSubview:_noteView];
-	}
-	return _noteView;
 }
 
 - (CGFloat)requiredRowHeightInTableView:(UITableView *)tableView
