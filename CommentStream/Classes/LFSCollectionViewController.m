@@ -274,7 +274,6 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     // Dispose of any resources that can be recreated.
     
     [_cellCache removeAllObjects];
-    _cellCache = nil;
 }
 
 - (void) dealloc
@@ -283,6 +282,7 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
     self.navigationController.delegate = nil;
     self.tableView.delegate = nil;
     self.tableView.dataSource = nil;
+    
     _postCommentField.delegate = nil;
     _postCommentItem.target = nil;
     
