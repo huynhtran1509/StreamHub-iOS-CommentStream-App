@@ -46,7 +46,7 @@
 @end
 
 // identifier for cell reuse
-static const NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
+static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
 
 @implementation LFSCollectionViewController
 {
@@ -98,57 +98,6 @@ static const NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTe
         } success:nil failure:nil];
     }
     return _streamClient;
-}
-
-#pragma mark - UIActivityIndicator
--(void)wheelContainerSetup
-{
-    _container = [[UIView alloc] initWithFrame:self.view.frame];
-    [_container setBackgroundColor:[UIColor whiteColor]]; // should be white by default...
-    
-    // set autoresizing to support landscape mode
-    [_container setAutoresizingMask:(UIViewAutoresizingFlexibleWidth |
-                                     UIViewAutoresizingFlexibleHeight)];
-    
-    // init actvity indicator
-    _activityIndicator = [[UIActivityIndicatorView alloc]
-                          initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    _activityIndicator.hidesWhenStopped = YES; // we hide it manually anyway
-    
-    // center activity indicator
-    CGPoint center = self.view.center;
-    center.y -= 44.0f;
-    [_activityIndicator setCenter:center];
-    
-    // set autoresizing to support landscape mode
-    [_activityIndicator setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin |
-                                             UIViewAutoresizingFlexibleHeight |
-                                             UIViewAutoresizingFlexibleLeftMargin |
-                                             UIViewAutoresizingFlexibleRightMargin |
-                                             UIViewAutoresizingFlexibleTopMargin |
-                                             UIViewAutoresizingFlexibleWidth)];
-    
-    [_container addSubview:_activityIndicator];
-    [self.view addSubview:_container];
-}
-
--(void)wheelContainerTeardown
-{
-    _activityIndicator = nil;
-    _container = nil;
-}
-
--(void)startSpinning
-{
-    _container.hidden = NO;
-    _activityIndicator.hidden = NO;
-    [_activityIndicator startAnimating];
-}
-
--(void)stopSpinning {
-    _container.hidden = YES;
-    _activityIndicator.hidden = YES;
-    [_activityIndicator stopAnimating];
 }
 
 #pragma mark - Lifecycle
@@ -204,7 +153,7 @@ static const NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTe
     _postCommentField.layer.opacity = 0.0f;
     _postCommentField.backgroundColor = [UIColor clearColor];
     _postCommentField.layer.backgroundColor = [[UIColor clearColor] CGColor];
-
+    
     
     [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
     
@@ -224,22 +173,21 @@ static const NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTe
     // }}}
     
     /*
-     if you enable static row height in this demo then the cell height is determined 
+     if you enable static row height in this demo then the cell height is determined
      from the tableView.rowHeight. Cells can be reused in this mode.
-     If you disable this then cells are prepared and cached to reused their internal 
+     If you disable this then cells are prepared and cached to reused their internal
      layouter and layoutFrame. Reuse is not recommended since the cells are cached anyway.
      */
     
-
+    
     // establish a cache for prepared cells because heightForRowAtIndexPath and
     // cellForRowAtIndexPath both need the same cell for an index path
     _cellCache = [[NSCache alloc] init];
-
     
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
     
-    self.dateFormatter = [[NSDateFormatter alloc] init];
+    _dateFormatter = [[NSDateFormatter alloc] init];
     
     [self wheelContainerSetup];
 }
@@ -284,7 +232,10 @@ static const NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTe
     self.tableView.dataSource = nil;
     
     _postCommentField.delegate = nil;
+    _postCommentField = nil;
+    
     _postCommentItem.target = nil;
+    _postCommentItem = nil;
     
     [_cellCache removeAllObjects];
     _cellCache = nil;
@@ -295,6 +246,58 @@ static const NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTe
     _content = nil;
     _container = nil;
     _activityIndicator = nil;
+    _dateFormatter = nil;
+}
+
+#pragma mark - UIActivityIndicator
+-(void)wheelContainerSetup
+{
+    _container = [[UIView alloc] initWithFrame:self.view.frame];
+    [_container setBackgroundColor:[UIColor whiteColor]]; // should be white by default...
+    
+    // set autoresizing to support landscape mode
+    [_container setAutoresizingMask:(UIViewAutoresizingFlexibleWidth |
+                                     UIViewAutoresizingFlexibleHeight)];
+    
+    // init actvity indicator
+    _activityIndicator = [[UIActivityIndicatorView alloc]
+                          initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    _activityIndicator.hidesWhenStopped = YES; // we hide it manually anyway
+    
+    // center activity indicator
+    CGPoint center = self.view.center;
+    center.y -= 44.0f;
+    [_activityIndicator setCenter:center];
+    
+    // set autoresizing to support landscape mode
+    [_activityIndicator setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin |
+                                             UIViewAutoresizingFlexibleHeight |
+                                             UIViewAutoresizingFlexibleLeftMargin |
+                                             UIViewAutoresizingFlexibleRightMargin |
+                                             UIViewAutoresizingFlexibleTopMargin |
+                                             UIViewAutoresizingFlexibleWidth)];
+    
+    [_container addSubview:_activityIndicator];
+    [self.view addSubview:_container];
+}
+
+-(void)wheelContainerTeardown
+{
+    _activityIndicator = nil;
+    _container = nil;
+}
+
+-(void)startSpinning
+{
+    _container.hidden = NO;
+    _activityIndicator.hidden = NO;
+    [_activityIndicator startAnimating];
+}
+
+-(void)stopSpinning {
+    _container.hidden = YES;
+    _activityIndicator.hidden = YES;
+    [_activityIndicator stopAnimating];
 }
 
 #pragma mark - Status bar
