@@ -28,6 +28,6 @@
 #import <Foundation/Foundation.h>
 
 @interface LFSConfig : NSObject
-+ (id)objectForKey:(id)key;
-//@property (strong, nonatomic) NSCondition *condition;
+-(id)initWithPlist:(NSString*)resourcePath;
+@property (nonatomic, readonly) NSArray *collections;
 @end

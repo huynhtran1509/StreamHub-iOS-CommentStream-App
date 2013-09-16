@@ -15,11 +15,85 @@ static const CGFloat kRightColumnWidth = 80;
 static const CGRect avatarFrame = { {15, 8}, {25, 25} }; // origin: x=15, y=8; size: 25x25
 static const CGFloat kNoteRightInset = 15;
 
+NSString* const kSystemVersion70 = @"7.0";
+
 @implementation LFSAttributedTextCell {
     UILabel *_titleView;
     UILabel *_noteView;
 }
 
+#pragma mark - Properties
+
+- (UILabel *)titleView
+{
+	if (!_titleView) {
+		_titleView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
+        _titleView.font = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
+		[self.contentView addSubview:_titleView];
+	}
+	return _titleView;
+}
+
+- (UILabel *)noteView
+{
+	if (!_noteView) {
+		_noteView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
+        _noteView.font = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
+        _noteView.textColor = [UIColor grayColor];
+		[self.contentView addSubview:_noteView];
+	}
+	return _noteView;
+}
+
+- (DTAttributedTextContentView *)attributedTextContextView
+{
+    // adjust insets to x=0, y=0
+	DTAttributedTextContentView *_attributedTextContextView = [super attributedTextContextView];
+    _attributedTextContextView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
+    return _attributedTextContextView;
+}
+
+#pragma mark - Lifecycle
+-(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithReuseIdentifier:reuseIdentifier];
+    if (self)
+    {
+        _noteView = nil;
+        _titleView = nil;
+        
+        [self setAccessoryType:UITableViewCellAccessoryNone];
+        [self.imageView setContentMode:UIViewContentModeScaleAspectFit];
+        [self.noteView setTextAlignment:NSTextAlignmentRight];
+        [self setHasFixedRowHeight:NO];
+        
+        if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
+            // iOS7-like selected background color
+            [self setSelectionStyle:UITableViewCellSelectionStyleGray];
+            UIView *selectionColor = [[UIView alloc] init];
+            selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0)
+                                                             green:(217/255.0)
+                                                              blue:(217/255.0)
+                                                             alpha:1];
+            //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
+            self.selectedBackgroundView = selectionColor;
+        }
+    }
+    return self;
+}
+
+-(void)dealloc{
+    if (_titleView) {
+        _titleView.font = nil;
+        _titleView = nil;
+    }
+    if (_noteView) {
+        _noteView.font = nil;
+        _noteView = nil;
+    }
+}
+
+#pragma mark - Methods
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
@@ -59,35 +133,6 @@ static const CGFloat kNoteRightInset = 15;
                                      kHeaderHeight);
         self.imageView.frame = avatarFrame;
 	}
-}
-
-- (DTAttributedTextContentView *)attributedTextContextView
-{
-    // adjust insets to x=0, y=0
-	DTAttributedTextContentView *_attributedTextContextView = [super attributedTextContextView];
-    _attributedTextContextView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
-    return _attributedTextContextView;
-}
-
-- (UILabel *)titleView
-{
-	if (!_titleView) {
-		_titleView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _titleView.font = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
-		[self.contentView addSubview:_titleView];
-	}
-	return _titleView;
-}
-
-- (UILabel *)noteView
-{
-	if (!_noteView) {
-		_noteView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _noteView.font = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
-        _noteView.textColor = [UIColor grayColor];
-		[self.contentView addSubview:_noteView];
-	}
-	return _noteView;
 }
 
 - (CGFloat)requiredRowHeightInTableView:(UITableView *)tableView

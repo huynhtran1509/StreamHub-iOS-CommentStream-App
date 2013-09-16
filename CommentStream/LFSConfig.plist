@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>defaults</key>
+	<dict>
+		<key>network</key>
+		<string>livefyre.com</string>
+		<key>environment</key>
+		<string>t402.livefyre.com</string>
+	</dict>
+	<key>collections</key>
+	<array>
+		<dict>
+			<key>name</key>
+			<string>Example Collection</string>
+			<key>network</key>
+			<string>labs.fyre.co</string>
+			<key>site</key>
+			<string>315833</string>
+			<key>article</key>
+			<string>example</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Oranges!!!</string>
+			<key>network</key>
+			<string>livefyre.com</string>
+			<key>environment</key>
+			<string>t402.livefyre.com</string>
+			<key>site</key>
+			<string>303613</string>
+			<key>article</key>
+			<string>215</string>
+		</dict>
+	</array>
+</dict>
+</plist>

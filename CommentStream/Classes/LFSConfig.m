@@ -27,25 +27,55 @@
 
 #import "LFSConfig.h"
 
+@interface LFSConfig ()
+@property (nonatomic, readonly) NSDictionary *config;
+@end
+
 @implementation LFSConfig
-+ (NSDictionary *)ConfigDictionary {
-    static NSDictionary *configDictionary = nil;
-    if (!configDictionary) {
-        NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"LFSConfig" ofType:@"plist"];
-        configDictionary = [[NSDictionary alloc] initWithContentsOfFile:path];
-    }
-    return configDictionary;
-}
+@synthesize config = _config;
+@synthesize collections = _collections;
 
-+ (id)objectForKey:(id)key {
-    return [[self ConfigDictionary] objectForKey:key];
-}
-
-/*
-- (NSCondition *)condition
+#pragma mark - Lifecycle
+-(id)initWithPlist:(NSString*)resourcePath
 {
-    if (!self.condition)
-        self.condition = [NSCondition new];
-    return self.condition;
-}*/
+    self = [super init];
+    if (self) {
+        _collections = nil;
+        [self processConfig:resourcePath];
+    }
+    return self;
+}
+
+-(void)dealloc
+{
+    _config = nil;
+    _collections = nil;
+}
+
+#pragma mark - private methods
+- (void)processConfig:(NSString*)resourcePath
+{
+    NSString *path = [[NSBundle bundleForClass:[self class]]
+                      pathForResource:resourcePath ofType:@"plist"];
+    _config = [[NSDictionary alloc] initWithContentsOfFile:path];
+}
+
+#pragma mark - public methods
+-(NSArray*)collections
+{
+    if (_collections) {
+        return _collections;
+    }
+    NSDictionary *defaults = [self.config objectForKey:@"defaults"];
+    NSArray *collections = [self.config objectForKey:@"collections"];
+    NSMutableArray *temp = [NSMutableArray arrayWithCapacity:[collections count]];
+    for (NSDictionary *collection in collections) {
+        NSMutableDictionary *base = [defaults mutableCopy];
+        [base addEntriesFromDictionary:collection];
+        [temp addObject:base];
+    }
+    _collections = [temp copy];
+    return _collections;
+}
+
 @end
