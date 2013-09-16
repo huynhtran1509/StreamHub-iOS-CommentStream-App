@@ -16,12 +16,6 @@
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
 
-#define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
-#define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
-#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
-#define SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
-#define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
-
 @interface LFSPostField : UITextField
 // a subclass of UITextField that allows us to set custom
 // padding/edge insets.
@@ -55,13 +49,13 @@
 
 // identifier for cell reuse
 static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
-static NSString* const kSystemVersion70 = @"7.0";
 
 @implementation LFSCollectionViewController
 {
     NSCache* _cellCache;
     UIActivityIndicatorView *_activityIndicator;
     UIView *_container;
+    CGPoint _scrollOffset;
 }
 
 #pragma mark - Properties
@@ -121,21 +115,23 @@ static NSString* const kSystemVersion70 = @"7.0";
     if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
         // Under iOS 6, GSEventRunModal of GraphicsSerivces sends objc_release
         // to an already released (zombie) UITableView instance; the following
-        // line is a work-around to that problem. TODO: Investigate why this only
-        // happens when rendering table using DTCoreText attributed cells.
+        // line is a work-around to that problem. TODO: Investigate
+        // why this only happens when rendering table using DTCoreText attributed cells.
         _tableView = (__bridge id)CFBridgingRetain(self.tableView);
     }
     
     self.title = [_collection objectForKey:@"name"];
     
     // {{{ Navigation bar
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleDefault];
-    [self.navigationController.navigationBar setBackgroundColor:[UIColor clearColor]];
-    [self.navigationController.navigationBar setTranslucent:YES];
+    UINavigationBar *navigationBar = self.navigationController.navigationBar;
+    [navigationBar setBarStyle:UIBarStyleDefault];
+    [navigationBar setBackgroundColor:[UIColor clearColor]];
+    [navigationBar setTranslucent:YES];
     // }}}
     
     // {{{ Toolbar
     
+    _scrollOffset = CGPointMake(0.f, 0.f);
     
     CGRect rect = self.navigationController.navigationBar.frame;
     CGFloat recommendedTextFieldWidth = rect.size.width - 62.0f;
@@ -221,7 +217,6 @@ static NSString* const kSystemVersion70 = @"7.0";
     // add some pizzas by animating the toolbar from below (this serves
     // as a live reminder to the user that he/she can post a comment)
     [super viewDidAppear:animated];
-    [self.navigationController setToolbarHidden:NO animated:animated];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -349,6 +344,21 @@ static NSString* const kSystemVersion70 = @"7.0";
     }
 }
 
+#pragma mark - Toolbar behavior
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    if (scrollView.contentOffset.y <= _scrollOffset.y) {
+        [self.navigationController setToolbarHidden:YES animated:YES];
+    } else{
+        [self.navigationController setToolbarHidden:NO animated:YES];
+    }
+}
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    _scrollOffset = scrollView.contentOffset;
+}
+
 #pragma mark - Private methods
 - (void)getBootstrapInfo
 {
@@ -370,6 +380,7 @@ static NSString* const kSystemVersion70 = @"7.0";
          [self.streamClient setCollectionId:collectionId];
          [self.streamClient startStreamWithEventId:eventId];
          [self stopSpinning];
+         [self.navigationController setToolbarHidden:NO animated:YES];
      }
                                onFailure:^(NSOperation *operation, NSError *error)
      {
@@ -415,18 +426,6 @@ static NSString* const kSystemVersion70 = @"7.0";
 
 #pragma mark - UITableViewControllerDelegate
 
--(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    NSUInteger row = indexPath.row;
-    if (row % 2) {
-        // even
-        NSLog(@"even");
-    } else {
-        // odd
-        NSLog(@"odd");
-    }
-}
-
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -455,30 +454,12 @@ static NSString* const kSystemVersion70 = @"7.0";
             cell = [[LFSAttributedTextCell alloc]
                     initWithReuseIdentifier:kAttributedTextCellReuseIdentifier];
         }
-        [cell setAccessoryType:UITableViewCellAccessoryNone];
-        [cell.imageView setContentMode:UIViewContentModeScaleAspectFit];
-        [cell.noteView setTextAlignment:NSTextAlignmentRight];
-        
-        [cell setHasFixedRowHeight:NO];
-        
-        // cache it, if there is a cache
+        // cache the cell, if there is a cache
         [_cellCache setObject:cell forKey:key];
         
         // LFAttributedTextCell specifics
         cell.attributedTextContextView.shouldDrawImages = NO;
         cell.attributedTextContextView.delegate = self;
-        
-        if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
-            // iOS7-like selected background color
-            [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
-            UIView *selectionColor = [[UIView alloc] init];
-            selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0)
-                                                             green:(217/255.0)
-                                                              blue:(217/255.0)
-                                                             alpha:1];
-            //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
-            cell.selectedBackgroundView = selectionColor;
-        }
     }
     
     [self configureCell:cell forIndexPath:indexPath];
