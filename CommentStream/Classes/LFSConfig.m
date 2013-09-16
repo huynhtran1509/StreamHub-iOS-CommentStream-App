@@ -28,7 +28,7 @@
 #import "LFSConfig.h"
 
 @interface LFSConfig ()
-@property (nonatomic, readonly, strong) NSDictionary *config;
+@property (nonatomic, readonly) NSDictionary *config;
 @end
 
 @implementation LFSConfig
@@ -66,8 +66,8 @@
     if (_collections) {
         return _collections;
     }
-    NSDictionary *defaults = [_config objectForKey:@"defaults"];
-    NSArray *collections = [_config objectForKey:@"collections"];
+    NSDictionary *defaults = [self.config objectForKey:@"defaults"];
+    NSArray *collections = [self.config objectForKey:@"collections"];
     NSMutableArray *temp = [NSMutableArray arrayWithCapacity:[collections count]];
     for (NSDictionary *collection in collections) {
         NSMutableDictionary *base = [defaults mutableCopy];

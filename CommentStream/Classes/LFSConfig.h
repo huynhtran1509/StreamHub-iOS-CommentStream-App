@@ -29,5 +29,5 @@
 
 @interface LFSConfig : NSObject
 -(id)initWithPlist:(NSString*)resourcePath;
-@property (nonatomic, readonly, strong) NSArray *collections;
+@property (nonatomic, readonly) NSArray *collections;
 @end

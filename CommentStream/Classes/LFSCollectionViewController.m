@@ -33,9 +33,9 @@
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
-@property (strong, nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
-@property (strong, nonatomic, readonly) LFSStreamClient *streamClient;
-@property (strong, nonatomic, readonly) LFSPostField *postCommentField;
+@property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
+@property (nonatomic, readonly) LFSStreamClient *streamClient;
+@property (nonatomic, readonly) LFSPostField *postCommentField;
 
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
@@ -46,7 +46,7 @@
 @end
 
 // identifier for cell reuse
-NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
+static const NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
 
 @implementation LFSCollectionViewController
 {
@@ -429,11 +429,11 @@ NSString * const AttributedTextCellReuseIdentifier = @"AttributedTextCellReuseId
 
     if (!cell) {
         if ([self canReuseCells]) {
-            cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:AttributedTextCellReuseIdentifier];
+            cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:kAttributedTextCellReuseIdentifier];
         }
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc]
-                    initWithReuseIdentifier:AttributedTextCellReuseIdentifier];
+                    initWithReuseIdentifier:kAttributedTextCellReuseIdentifier];
         }
         [cell setAccessoryType:UITableViewCellAccessoryNone];
         [cell.imageView setContentMode:UIViewContentModeScaleAspectFit];
