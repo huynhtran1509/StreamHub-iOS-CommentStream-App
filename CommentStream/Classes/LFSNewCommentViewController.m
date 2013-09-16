@@ -13,6 +13,8 @@
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
+- (IBAction)cancelClicked:(UIBarButtonItem *)sender;
+- (IBAction)postClicked:(UIBarButtonItem *)sender;
 
 @end
 
@@ -44,7 +46,6 @@
 {
     [super viewWillAppear:animated];
     [self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
-    //[self.navigationController setToolbarHidden:YES animated:animated];
 }
 
 - (void)didReceiveMemoryWarning
@@ -83,6 +84,15 @@
             }
         }
     }
+}
+
+#pragma mark - Actions
+- (IBAction)cancelClicked:(UIBarButtonItem *)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (IBAction)postClicked:(UIBarButtonItem *)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

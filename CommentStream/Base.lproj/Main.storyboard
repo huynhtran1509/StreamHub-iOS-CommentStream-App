@@ -18,7 +18,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ISf-vh-rH3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1311" y="-2"/>
+            <point key="canvasLocation" x="1311" y="-31"/>
         </scene>
         <!--Collection View Controller-->
         <scene sceneID="A48-WW-R3H">
@@ -119,8 +119,16 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem title="New Comment" id="0Dz-Ue-kJw">
-                                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="DDY-BP-VH8"/>
-                                        <barButtonItem key="rightBarButtonItem" title="Post" style="done" id="PKZ-Jr-gVM"/>
+                                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="DDY-BP-VH8">
+                                            <connections>
+                                                <action selector="cancelClicked:" destination="s0o-P6-Dkk" id="t2m-6g-7RQ"/>
+                                            </connections>
+                                        </barButtonItem>
+                                        <barButtonItem key="rightBarButtonItem" title="Post" style="done" id="PKZ-Jr-gVM">
+                                            <connections>
+                                                <action selector="postClicked:" destination="s0o-P6-Dkk" id="vwx-qS-tfa"/>
+                                            </connections>
+                                        </barButtonItem>
                                     </navigationItem>
                                 </items>
                             </navigationBar>
@@ -131,7 +139,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KV4-cx-MgF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1265" y="440"/>
+            <point key="canvasLocation" x="1301" y="-718"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
