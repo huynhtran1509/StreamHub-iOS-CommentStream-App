@@ -16,6 +16,12 @@
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
 
+#define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
+#define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+#define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
+
 @interface LFSPostField : UITextField
 // a subclass of UITextField that allows us to set custom
 // padding/edge insets.
@@ -29,7 +35,9 @@
 }
 @end
 
-@interface LFSCollectionViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
+@interface LFSCollectionViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate> {
+    __weak UITableView* _tableView;
+}
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
@@ -47,6 +55,7 @@
 
 // identifier for cell reuse
 static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
+static NSString* const kSystemVersion70 = @"7.0";
 
 @implementation LFSCollectionViewController
 {
@@ -108,6 +117,14 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     
     _authors = [NSMutableDictionary dictionary];
     _content = [NSMutableArray array];
+    
+    if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
+        // Under iOS 6, GSEventRunModal of GraphicsSerivces sends objc_release
+        // to an already released (zombie) UITableView instance; the following
+        // line is a work-around to that problem. TODO: Investigate why this only
+        // happens when rendering table using DTCoreText attributed cells.
+        _tableView = (__bridge id)CFBridgingRetain(self.tableView);
+    }
     
     self.title = [_collection objectForKey:@"name"];
     
@@ -451,15 +468,17 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
         cell.attributedTextContextView.shouldDrawImages = NO;
         cell.attributedTextContextView.delegate = self;
         
-        // iOS7-like selected background color
-        [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
-        UIView *selectionColor = [[UIView alloc] init];
-        selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0)
-                                                         green:(217/255.0)
-                                                          blue:(217/255.0)
-                                                         alpha:1];
-        //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
-        cell.selectedBackgroundView = selectionColor;
+        if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
+            // iOS7-like selected background color
+            [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
+            UIView *selectionColor = [[UIView alloc] init];
+            selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0)
+                                                             green:(217/255.0)
+                                                              blue:(217/255.0)
+                                                             alpha:1];
+            //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
+            cell.selectedBackgroundView = selectionColor;
+        }
     }
     
     [self configureCell:cell forIndexPath:indexPath];
