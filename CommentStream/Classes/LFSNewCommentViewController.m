@@ -6,13 +6,20 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import "LFSNewCommentViewController.h"
+
+static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 
 @interface LFSNewCommentViewController ()
 
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
+
+@property (weak, nonatomic) IBOutlet UITextView *textView;
+@property (nonatomic, readonly) LFSWriteClient *writeClient;
+
 - (IBAction)cancelClicked:(UIBarButtonItem *)sender;
 - (IBAction)postClicked:(UIBarButtonItem *)sender;
 
@@ -25,6 +32,21 @@
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
+
+@synthesize writeClient = _writeClient;
+@synthesize collection = _collection;
+@synthesize collectionId = _collectionId;
+
+- (LFSWriteClient*)writeClient
+{
+    if (_writeClient == nil) {
+        _writeClient = [LFSWriteClient
+                        clientWithNetwork:[self.collection objectForKey:@"network"]
+                        environment:[self.collection objectForKey:@"environment"]];
+    }
+    return _writeClient;
+}
+
 
 #pragma mark - UIViewController
 
@@ -39,19 +61,30 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
+    _writeClient = nil;
 }
-
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    // ensure that status bar is hidden
     [self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+    
+    // show keyboard (doing this in viewDidAppear causes unnecessary lag)
+    [self.textView becomeFirstResponder];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)dealloc
+{
+    _writeClient = nil;
 }
 
 #pragma mark - Status bar
@@ -91,7 +124,31 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)postClicked:(UIBarButtonItem *)sender {
+- (IBAction)postClicked:(UIBarButtonItem *)sender
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"] ?: @"";
+    NSString *text = self.textView.text;
+    [self.writeClient postNewContent:self.textView.text
+                             forUser:userToken
+                       forCollection:self.collectionId
+                           inReplyTo:nil
+                           onSuccess:^(NSOperation *operation, id responseObject)
+     {
+         // do nothing
+         NSLog(@"Successfully posted: %@", text);
+     }
+                           onFailure:^(NSOperation *operation, NSError *error)
+     {
+         // show an error message
+         UIAlertView *alert = [[UIAlertView alloc]
+                               initWithTitle:kFailureMessageTitle
+                               message:[error localizedDescription]
+                               delegate:nil
+                               cancelButtonTitle:@"OK"
+                               otherButtonTitles:nil];
+         [alert show];
+         
+     }];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

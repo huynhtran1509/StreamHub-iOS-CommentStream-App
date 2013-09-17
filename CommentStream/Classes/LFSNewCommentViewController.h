@@ -11,4 +11,7 @@
 
 @interface LFSNewCommentViewController : UIViewController
 
+@property (nonatomic, strong) NSDictionary *collection;
+@property (nonatomic, strong) NSString *collectionId;
+
 @end

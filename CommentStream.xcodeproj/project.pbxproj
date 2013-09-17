@@ -110,10 +110,10 @@
 				EF6683DC17BB97E2005F5FC3 /* LFSAppDelegate.m */,
 				EFC4F61117DFC35C00E60F6F /* LFSRootViewController.h */,
 				EFC4F61217DFC35C00E60F6F /* LFSRootViewController.m */,
-				EF6683DD17BB97E2005F5FC3 /* LFSCollectionViewController.h */,
-				EF6683DE17BB97E2005F5FC3 /* LFSCollectionViewController.m */,
 				EF5AFED117E3C13000D5A7DF /* LFSDetailViewController.h */,
 				EF5AFED217E3C13000D5A7DF /* LFSDetailViewController.m */,
+				EF6683DD17BB97E2005F5FC3 /* LFSCollectionViewController.h */,
+				EF6683DE17BB97E2005F5FC3 /* LFSCollectionViewController.m */,
 				EF5AFED417E3C2B900D5A7DF /* LFSNewCommentViewController.h */,
 				EF5AFED517E3C2B900D5A7DF /* LFSNewCommentViewController.m */,
 			);

@@ -127,7 +127,7 @@
     }
     // Configure the cell...
     NSDictionary *collection = [self.tableModel objectAtIndex:indexPath.row];
-    cell.textLabel.text = [collection objectForKey:@"name"];
+    cell.textLabel.text = [collection objectForKey:@"_name"];
     return cell;
 }
 

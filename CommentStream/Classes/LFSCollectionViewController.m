@@ -31,6 +31,7 @@
 
 @interface LFSCollectionViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate> {
     __weak UITableView* _tableView;
+    LFSNewCommentViewController *_viewControllerNewComment;
 }
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
@@ -39,7 +40,7 @@
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
 @property (nonatomic, readonly) LFSPostField *postCommentField;
 
-// render iOS7 status bar methods as writable properties
+// render iOS7 status bar methods to be readwrite properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
@@ -66,6 +67,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 @synthesize dateFormatter = _dateFormatter;
 @synthesize postCommentField = _postCommentField;
 @synthesize collection = _collection;
+@synthesize collectionId = _collectionId;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -183,6 +185,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     [self.navigationController.toolbar setBarStyle:UIBarStyleDefault];
     [self.navigationController.toolbar setTranslucent:YES];
     
+    _viewControllerNewComment = nil;
     // }}}
     
     /*
@@ -363,8 +366,8 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 - (void)getBootstrapInfo
 {
     [self startSpinning];
-    [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"site"]
-                                 article:[self.collection objectForKey:@"article"]
+    [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
+                                 article:[self.collection objectForKey:@"articleId"]
                                onSuccess:^(NSOperation *operation, id responseObject)
      {
          NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
@@ -377,9 +380,12 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
          //NSLog(@"%@", responseObject);
          
          // we are already on the main queue...
+         [self setCollectionId:collectionId];
          [self.streamClient setCollectionId:collectionId];
          [self.streamClient startStreamWithEventId:eventId];
          [self stopSpinning];
+         
+         // show toolbar so that the user knows he/she can post to the stream
          [self.navigationController setToolbarHidden:NO animated:YES];
      }
                                onFailure:^(NSOperation *operation, NSError *error)
@@ -622,10 +628,14 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 
 -(IBAction)createComment:(id)sender
 {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
-    LFSNewCommentViewController *controller =
-    (LFSNewCommentViewController*)[storyboard instantiateViewControllerWithIdentifier:@"commentNew"];
-    [self presentViewController:controller animated:YES completion:nil];
+    if (_viewControllerNewComment == nil) {
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
+        _viewControllerNewComment =
+        (LFSNewCommentViewController*)[storyboard instantiateViewControllerWithIdentifier:@"commentNew"];
+        _viewControllerNewComment.collection = self.collection;
+        _viewControllerNewComment.collectionId = self.collectionId;
+    }
+    [self presentViewController:_viewControllerNewComment animated:YES completion:nil];
 }
 
 @end

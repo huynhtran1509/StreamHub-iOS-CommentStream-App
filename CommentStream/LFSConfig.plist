@@ -12,25 +12,35 @@
 	<key>collections</key>
 	<array>
 		<dict>
-			<key>name</key>
+			<key>_name</key>
+			<string>Sandbox</string>
+			<key>network</key>
+			<string>labs.fyre.co</string>
+			<key>siteId</key>
+			<string>320568</string>
+			<key>articleId</key>
+			<string>custom-1379372287037</string>
+			<key>lftoken</key>
+			<string>eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAibGFicy5meXJlLmNvIiwgImV4cGlyZXMiOiAxMzk0OTI3MDUzLjg3MjgxMiwgInVzZXJfaWQiOiAiY29tbWVudGVyXzAifQ.yTlPHtMLSPzNh0UJTSdM5zUf7XzAM2aA6mSnmR1UwxY</string>
+		</dict>
+		<dict>
+			<key>_name</key>
 			<string>Example Collection</string>
 			<key>network</key>
 			<string>labs.fyre.co</string>
-			<key>site</key>
+			<key>siteId</key>
 			<string>315833</string>
-			<key>article</key>
+			<key>articleId</key>
 			<string>example</string>
 		</dict>
 		<dict>
-			<key>name</key>
+			<key>_name</key>
 			<string>Oranges!!!</string>
 			<key>network</key>
 			<string>livefyre.com</string>
-			<key>environment</key>
-			<string>t402.livefyre.com</string>
-			<key>site</key>
+			<key>siteId</key>
 			<string>303613</string>
-			<key>article</key>
+			<key>articleId</key>
 			<string>215</string>
 		</dict>
 	</array>
