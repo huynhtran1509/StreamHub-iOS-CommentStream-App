@@ -10,6 +10,8 @@
 #import <UIKit/UIKit.h>
 #import <DTCoreText/DTAttributedTextCell.h>
 
+#import "DTLazyImageView+TextContentView.h"
+
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -18,9 +20,11 @@
 
 extern NSString* const kSystemVersion70;
 
-@interface LFSAttributedTextCell : DTAttributedTextCell
+@interface LFSAttributedTextCell : DTAttributedTextCell <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
 
 @property (nonatomic, readonly) UILabel *titleView;
 @property (nonatomic, readonly) UILabel *noteView;
+
+- (void)assignImage:(UIImage*)image;
 
 @end

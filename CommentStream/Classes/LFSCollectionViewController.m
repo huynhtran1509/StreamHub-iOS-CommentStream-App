@@ -7,12 +7,9 @@
 //
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
-#import <DTCoreText/DTImageTextAttachment.h>
-#import <DTCoreText/DTLinkButton.h>
 #import <AFNetworking/AFImageRequestOperation.h>
 
 #import "LFSConfig.h"
-#import "DTLazyImageView+TextContentView.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
 
@@ -29,7 +26,7 @@
 }
 @end
 
-@interface LFSCollectionViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate> {
+@interface LFSCollectionViewController () {
     __weak UITableView* _tableView;
     LFSNewCommentViewController *_viewControllerNewComment;
 }
@@ -217,9 +214,11 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 
 -(void)viewDidAppear:(BOOL)animated
 {
+    [super viewDidAppear:animated];
+    
     // add some pizzas by animating the toolbar from below (this serves
     // as a live reminder to the user that he/she can post a comment)
-    [super viewDidAppear:animated];
+    [self.navigationController setToolbarHidden:NO animated:animated];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -366,6 +365,11 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 - (void)getBootstrapInfo
 {
     [self startSpinning];
+    
+    // clear all previous data
+    [_authors removeAllObjects];
+    [_content removeAllObjects];
+    
     [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
                                  article:[self.collection objectForKey:@"articleId"]
                                onSuccess:^(NSOperation *operation, id responseObject)
@@ -384,9 +388,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
          [self.streamClient setCollectionId:collectionId];
          [self.streamClient startStreamWithEventId:eventId];
          [self stopSpinning];
-         
-         // show toolbar so that the user knows he/she can post to the stream
-         [self.navigationController setToolbarHidden:NO animated:YES];
      }
                                onFailure:^(NSOperation *operation, NSError *error)
      {
@@ -399,14 +400,14 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 {
     // This method is responsible for both adding content from Bootstrap and
     // for streaming new updates.
-    [self.authors addEntriesFromDictionary:authors];
+    [_authors addEntriesFromDictionary:authors];
     
     NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
     NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
     NSRange contentSpan;
     contentSpan.location = 0;
     contentSpan.length = [filteredContent count];
-    [self.content insertObjects:filteredContent
+    [_content insertObjects:filteredContent
                       atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
     
     // also cause table to redraw
@@ -442,7 +443,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.content count];
+    return [_content count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -465,7 +466,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
         
         // LFAttributedTextCell specifics
         cell.attributedTextContextView.shouldDrawImages = NO;
-        cell.attributedTextContextView.delegate = self;
     }
     
     [self configureCell:cell forIndexPath:indexPath];
@@ -478,38 +478,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 {
     // reuse does not work for variable height -- only reuse cells with fixed height
     return (![self respondsToSelector:@selector(tableView:heightForRowAtIndexPath:)]);
-}
-
-- (void)setImage:(UIImage*)image forCell:(LFSAttributedTextCell*)cell
-{
-    // scale down image if we are not on a Retina device
-    UIScreen *screen = [UIScreen mainScreen];
-    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2) {
-        // we are on a Retina device
-        cell.imageView.image = image;
-        [cell setNeedsLayout];
-    }
-    else {
-        // we are on a non-Retina device
-        dispatch_queue_t queue =
-        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(queue, ^{
-            
-            // scale image on a background thread
-            // Note: to keep things simple, we do not worry about aspect ratio
-            CGSize size = cell.imageView.frame.size;
-            UIGraphicsBeginImageContext(size);
-            [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-            UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            
-            // display image on the main thread
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                cell.imageView.image = scaledImage;
-                [cell setNeedsLayout];
-            });
-        });
-    }
 }
 
 // called every time a cell is configured
@@ -539,7 +507,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
                                                      NSHTTPURLResponse *response,
                                                      UIImage *image)
                                           {
-                                              [self setImage:image forCell:cell];
+                                              [cell assignImage:image];
                                           }
                                           failure:nil];
     [operation start];
@@ -553,79 +521,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     [cell setHTMLString:html];
 }
 
-#pragma mark - DTAttributedTextContentViewDelegate
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
-                        viewForLink:(NSURL *)url
-                         identifier:(NSString *)identifier
-                              frame:(CGRect)frame
-{
-    DTLinkButton *btn = [[DTLinkButton alloc] initWithFrame:frame];
-    btn.URL = url;
-    [btn addTarget:self action:@selector(openURL:) forControlEvents:UIControlEventTouchUpInside];
-    return btn;
-}
-
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
-                  viewForAttachment:(DTTextAttachment *)attachment frame:(CGRect)frame
-{
-    if ([attachment isKindOfClass:[DTImageTextAttachment class]]) {
-        
-        DTLazyImageView *imageView = [[DTLazyImageView alloc] initWithFrame:frame];
-        imageView.textContentView = attributedTextContentView;
-        imageView.delegate = self;
-        
-        // defer loading of image under given URL
-        imageView.url = attachment.contentURL;
-        return imageView;
-    }
-    return nil;
-}
-
-// allow display of images embedded in rich-text content
--(void)lazyImageView:(DTLazyImageView *)lazyImageView didChangeImageSize:(CGSize)size
-{
-    DTAttributedTextContentView *cv = lazyImageView.textContentView;
-    NSURL *url = lazyImageView.url;
-    
-    NSPredicate *pred = [NSPredicate predicateWithFormat:@"contentURL == %@", url];
-    // update all attachments that match this URL (possibly multiple images with same size)
-    for (DTTextAttachment *attachment in [cv.layoutFrame textAttachmentsWithPredicate:pred])
-    {
-        /*
-         attachment.originalSize = imageSize;
-         if (!CGSizeEqualToSize(imageSize, attachment.displaySize)) {
-         attachment.displaySize = imageSize;
-         }*/
-        attachment.originalSize = size;
-        lazyImageView.bounds = CGRectMake(0, 0,
-                                          attachment.displaySize.width,
-                                          attachment.displaySize.height);
-    }
-    
-    // need to reset the layouter because otherwise we get the old framesetter or cached
-    // layout frames. See https://github.com/Cocoanetics/DTCoreText/issues/307
-    cv.layouter = nil;
-    
-    // laying out the entire string,
-    // might be more efficient to only layout the paragraphs that contain these attachments
-    [cv relayoutText];
-}
-
-/*
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
-            viewForAttributedString:(NSAttributedString *)string frame:(CGRect)frame
-{
-    // initialize and return your view here
-}
-*/
-
 #pragma mark - Events
-
-- (IBAction)openURL:(DTLinkButton*)sender
-{
-    [[UIApplication sharedApplication] openURL:sender.URL];
-}
-
 -(IBAction)createComment:(id)sender
 {
     if (_viewControllerNewComment == nil) {

@@ -6,6 +6,9 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <DTCoreText/DTImageTextAttachment.h>
+#import <DTCoreText/DTLinkButton.h>
+
 #import "LFSAttributedTextCell.h"
 
 static const CGFloat kLeftColumnWidth = 55;
@@ -17,9 +20,27 @@ static const CGFloat kNoteRightInset = 15;
 
 NSString* const kSystemVersion70 = @"7.0";
 
+@interface LFSAttributedTextCell ()
+
+@end
+
 @implementation LFSAttributedTextCell {
     UILabel *_titleView;
     UILabel *_noteView;
+}
+
+#pragma mark - Class methods
+
+static UIFont *titleFont = nil;
+static UIFont *noteFont = nil;
+static UIColor *noteColor = nil;
+
++ (void)initialize {
+    if(self == [LFSAttributedTextCell class]) {
+        titleFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
+        noteFont = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
+        noteColor = [UIColor grayColor];
+    }
 }
 
 #pragma mark - Properties
@@ -27,8 +48,8 @@ NSString* const kSystemVersion70 = @"7.0";
 - (UILabel *)titleView
 {
 	if (!_titleView) {
-		_titleView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _titleView.font = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
+		_titleView = [[UILabel alloc] init];
+        [_titleView setFont:titleFont];
 		[self.contentView addSubview:_titleView];
 	}
 	return _titleView;
@@ -37,20 +58,13 @@ NSString* const kSystemVersion70 = @"7.0";
 - (UILabel *)noteView
 {
 	if (!_noteView) {
-		_noteView = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-        _noteView.font = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
-        _noteView.textColor = [UIColor grayColor];
+		_noteView = [[UILabel alloc] init];
+        [_noteView setFont:noteFont];
+        [_noteView setTextColor:noteColor];
+        [_noteView setTextAlignment:NSTextAlignmentRight];
 		[self.contentView addSubview:_noteView];
 	}
 	return _noteView;
-}
-
-- (DTAttributedTextContentView *)attributedTextContextView
-{
-    // adjust insets to x=0, y=0
-	DTAttributedTextContentView *_attributedTextContextView = [super attributedTextContextView];
-    _attributedTextContextView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
-    return _attributedTextContextView;
 }
 
 #pragma mark - Lifecycle
@@ -64,8 +78,9 @@ NSString* const kSystemVersion70 = @"7.0";
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
         [self.imageView setContentMode:UIViewContentModeScaleAspectFit];
-        [self.noteView setTextAlignment:NSTextAlignmentRight];
         [self setHasFixedRowHeight:NO];
+        self.attributedTextContextView.delegate = self;
+        self.attributedTextContextView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
         
         if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
             // iOS7-like selected background color
@@ -83,17 +98,13 @@ NSString* const kSystemVersion70 = @"7.0";
 }
 
 -(void)dealloc{
-    if (_titleView) {
-        _titleView.font = nil;
-        _titleView = nil;
-    }
-    if (_noteView) {
-        _noteView.font = nil;
-        _noteView = nil;
-    }
+    self.attributedTextContextView.delegate = nil;
+    self.attributedTextContextView.attributedString = nil;
+    _titleView = nil;
+    _noteView = nil;
 }
 
-#pragma mark - Methods
+#pragma mark - Private ethods
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
@@ -135,6 +146,42 @@ NSString* const kSystemVersion70 = @"7.0";
 	}
 }
 
+#pragma mark - Public methods
+
+
+- (void)assignImage:(UIImage*)image
+{
+    // scale down image if we are not on a Retina device
+    UIScreen *screen = [UIScreen mainScreen];
+    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2) {
+        // we are on a Retina device
+        self.imageView.image = image;
+        [self setNeedsLayout];
+    }
+    else {
+        // we are on a non-Retina device
+        CGSize size = self.imageView.frame.size;
+        dispatch_queue_t queue =
+        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        dispatch_async(queue, ^{
+            
+            // scale image on a background thread
+            // Note: to keep things simple, we do not worry about aspect ratio
+            UIGraphicsBeginImageContext(size);
+            [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
+            UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            // display image on the main thread
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                self.imageView.image = scaledImage;
+                [self setNeedsLayout];
+            });
+        });
+    }
+}
+
+// @Override DTAttributedTextCell method
 - (CGFloat)requiredRowHeightInTableView:(UITableView *)tableView
 {
 	if (self.hasFixedRowHeight)
@@ -177,6 +224,80 @@ NSString* const kSystemVersion70 = @"7.0";
 	return MAX(neededSize.height + kHeaderHeight,
                self.imageView.frame.size.height + self.imageView.frame.origin.y)
     + kBottomInset;
+}
+
+#pragma mark - DTAttributedTextContentViewDelegate
+-(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
+                        viewForLink:(NSURL *)url
+                         identifier:(NSString *)identifier
+                              frame:(CGRect)frame
+{
+    DTLinkButton *btn = [[DTLinkButton alloc] initWithFrame:frame];
+    btn.URL = url;
+    [btn addTarget:self action:@selector(openURL:) forControlEvents:UIControlEventTouchUpInside];
+    return btn;
+}
+
+-(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
+                  viewForAttachment:(DTTextAttachment *)attachment frame:(CGRect)frame
+{
+    if ([attachment isKindOfClass:[DTImageTextAttachment class]]) {
+        
+        DTLazyImageView *imageView = [[DTLazyImageView alloc] initWithFrame:frame];
+        imageView.textContentView = attributedTextContentView;
+        __weak typeof(self) weakSelf = self;
+        imageView.delegate = weakSelf;
+        
+        // defer loading of image under given URL
+        imageView.url = attachment.contentURL;
+        return imageView;
+    }
+    return nil;
+}
+
+// allow display of images embedded in rich-text content
+-(void)lazyImageView:(DTLazyImageView *)lazyImageView didChangeImageSize:(CGSize)size
+{
+    DTAttributedTextContentView *cv = lazyImageView.textContentView;
+    NSURL *url = lazyImageView.url;
+    
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"contentURL == %@", url];
+    // update all attachments that match this URL (possibly multiple images with same size)
+    for (DTTextAttachment *attachment in [cv.layoutFrame textAttachmentsWithPredicate:pred])
+    {
+        /*
+         attachment.originalSize = imageSize;
+         if (!CGSizeEqualToSize(imageSize, attachment.displaySize)) {
+         attachment.displaySize = imageSize;
+         }*/
+        attachment.originalSize = size;
+        lazyImageView.bounds = CGRectMake(0, 0,
+                                          attachment.displaySize.width,
+                                          attachment.displaySize.height);
+    }
+    
+    // need to reset the layouter because otherwise we get the old framesetter or cached
+    // layout frames. See https://github.com/Cocoanetics/DTCoreText/issues/307
+    cv.layouter = nil;
+    
+    // laying out the entire string,
+    // might be more efficient to only layout the paragraphs that contain these attachments
+    [cv relayoutText];
+}
+
+/*
+ -(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
+ viewForAttributedString:(NSAttributedString *)string frame:(CGRect)frame
+ {
+ // initialize and return your view here
+ }
+ */
+
+#pragma mark - Events
+
+- (IBAction)openURL:(DTLinkButton*)sender
+{
+    [[UIApplication sharedApplication] openURL:sender.URL];
 }
 
 @end
