@@ -41,7 +41,6 @@
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
-@property (nonatomic, strong) UIBarButtonItem *postCommentItem;
 - (BOOL)canReuseCells;
 @end
 
@@ -70,7 +69,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
-@synthesize postCommentItem = _postCommentItem;
 
 - (LFSBootstrapClient*)bootstrapClient
 {
@@ -119,7 +117,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
         _tableView = (__bridge id)CFBridgingRetain(self.tableView);
     }
     
-    self.title = [_collection objectForKey:@"name"];
+    self.title = [_collection objectForKey:@"_name"];
     
     // {{{ Navigation bar
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
@@ -136,22 +134,15 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     _scrollOffset = CGPointMake(0.f, 0.f);
     
     CGRect rect = self.navigationController.navigationBar.frame;
-    CGFloat recommendedTextFieldWidth = rect.size.width - 62.0f;
-    
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (orientation == UIInterfaceOrientationLandscapeLeft ||
-        orientation == UIInterfaceOrientationLandscapeRight)
-    {
-        // landscape (toolbar height is 32)
-        _postCommentField = [[LFSPostField alloc]
-                             initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 18)];
-    }
-    else
-    {
-        // portrait (toolbar height is 44)
-        _postCommentField = [[LFSPostField alloc]
-                             initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 30)];
-    }
+    CGFloat recommendedTextFieldWidth = rect.size.width - 32.f;
+
+    // in landscape mode, toolbar height is 32, in portrait, it is 44
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    CGFloat textFieldHeight = ((orientation == UIInterfaceOrientationLandscapeLeft ||
+                                orientation == UIInterfaceOrientationLandscapeRight)
+                               ? 18 : 30);
+    _postCommentField = [[LFSPostField alloc]
+                         initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, textFieldHeight)];
     
     [_postCommentField setDelegate:self];
     [_postCommentField setPlaceholder:@"Write a comment..."];
@@ -178,12 +169,8 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     
     UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
                                          initWithCustomView:_postCommentField];
-    _postCommentItem = [[UIBarButtonItem alloc]
-                        initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
-                        target:self
-                        action:@selector(createComment:)];
-    
-    NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, _postCommentItem, nil];
+
+    NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, nil];
     self.toolbarItems = toolbarItems;
     
     UIToolbar *toolbar = self.navigationController.toolbar;
@@ -258,9 +245,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     
     _postCommentField.delegate = nil;
     _postCommentField = nil;
-    
-    _postCommentItem.target = nil;
-    _postCommentItem = nil;
     
     [_cellCache removeAllObjects];
     _cellCache = nil;
