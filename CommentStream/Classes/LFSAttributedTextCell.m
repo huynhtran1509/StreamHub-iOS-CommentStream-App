@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <StreamHub-iOS-SDK/LFSConstants.h>
 #import <DTCoreText/DTImageTextAttachment.h>
 #import <DTCoreText/DTLinkButton.h>
 
@@ -17,8 +18,6 @@ static const CGFloat kHeaderHeight = 30;
 static const CGFloat kRightColumnWidth = 80;
 static const CGRect avatarFrame = { {15, 8}, {25, 25} }; // origin: x=15, y=8; size: 25x25
 static const CGFloat kNoteRightInset = 15;
-
-NSString* const kSystemVersion70 = @"7.0";
 
 @interface LFSAttributedTextCell ()
 
@@ -82,7 +81,7 @@ static UIColor *noteColor = nil;
         self.attributedTextContextView.delegate = self;
         self.attributedTextContextView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
         
-        if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
+        if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
             // iOS7-like selected background color
             [self setSelectionStyle:UITableViewCellSelectionStyleGray];
             UIView *selectionColor = [[UIView alloc] init];

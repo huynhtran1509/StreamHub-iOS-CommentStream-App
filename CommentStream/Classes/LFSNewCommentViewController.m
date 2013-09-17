@@ -69,8 +69,9 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 {
     [super viewWillAppear:animated];
     
-    // ensure that status bar is hidden
-    [self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+    // hide status bar for iOS7 and later
+    [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
+               withAnimation:UIStatusBarAnimationNone];
     
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
     [self.textView becomeFirstResponder];

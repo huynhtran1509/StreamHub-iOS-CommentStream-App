@@ -12,6 +12,7 @@
 		EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */; };
 		EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED217E3C13000D5A7DF /* LFSDetailViewController.m */; };
 		EF5AFED617E3C2B900D5A7DF /* LFSNewCommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED517E3C2B900D5A7DF /* LFSNewCommentViewController.m */; };
+		EF62178217E8F76900700808 /* LFSTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = EF62178117E8F76900700808 /* LFSTextField.m */; };
 		EF6683D117BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */; };
 		EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DC17BB97E2005F5FC3 /* LFSAppDelegate.m */; };
 		EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DE17BB97E2005F5FC3 /* LFSCollectionViewController.m */; };
@@ -36,6 +37,8 @@
 		EF5AFED217E3C13000D5A7DF /* LFSDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSDetailViewController.m; path = Classes/LFSDetailViewController.m; sourceTree = "<group>"; };
 		EF5AFED417E3C2B900D5A7DF /* LFSNewCommentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSNewCommentViewController.h; path = Classes/LFSNewCommentViewController.h; sourceTree = "<group>"; };
 		EF5AFED517E3C2B900D5A7DF /* LFSNewCommentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSNewCommentViewController.m; path = Classes/LFSNewCommentViewController.m; sourceTree = "<group>"; };
+		EF62178017E8F76900700808 /* LFSTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSTextField.h; path = Classes/LFSTextField.h; sourceTree = "<group>"; };
+		EF62178117E8F76900700808 /* LFSTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSTextField.m; path = Classes/LFSTextField.m; sourceTree = "<group>"; };
 		EF6683CF17BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "DTLazyImageView+TextContentView.h"; path = "CommentStream/Categories/DTLazyImageView+TextContentView.h"; sourceTree = "<group>"; };
 		EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "DTLazyImageView+TextContentView.m"; path = "CommentStream/Categories/DTLazyImageView+TextContentView.m"; sourceTree = "<group>"; };
 		EF6683DB17BB97E2005F5FC3 /* LFSAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSAppDelegate.h; path = Classes/LFSAppDelegate.h; sourceTree = "<group>"; };
@@ -87,6 +90,8 @@
 			children = (
 				EF200BCE17BBB63A007E5295 /* LFSAttributedTextCell.h */,
 				EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */,
+				EF62178017E8F76900700808 /* LFSTextField.h */,
+				EF62178117E8F76900700808 /* LFSTextField.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -287,6 +292,7 @@
 				EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */,
 				EFC4F61317DFC35C00E60F6F /* LFSRootViewController.m in Sources */,
 				EF7BB6E817B2B718009E2E70 /* main.m in Sources */,
+				EF62178217E8F76900700808 /* LFSTextField.m in Sources */,
 				EF6683D117BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m in Sources */,
 				EFC9574E17CE968B0033C858 /* LFSConfig.m in Sources */,
 			);

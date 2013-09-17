@@ -12,30 +12,19 @@
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
-
-@interface LFSPostField : UITextField
-// a subclass of UITextField that allows us to set custom
-// padding/edge insets.
-@property (nonatomic, assign) UIEdgeInsets textEdgeInsets;
-@end
-
-@implementation LFSPostField
-@synthesize textEdgeInsets = _textEdgeInsets;
-- (CGRect)textRectForBounds:(CGRect)bounds {
-	return UIEdgeInsetsInsetRect([super textRectForBounds:bounds], _textEdgeInsets);
-}
-@end
+#import "LFSTextField.h"
 
 @interface LFSCollectionViewController () {
     __weak UITableView* _tableView;
     LFSNewCommentViewController *_viewControllerNewComment;
 }
+
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
-@property (nonatomic, readonly) LFSPostField *postCommentField;
+@property (nonatomic, readonly) LFSTextField *postCommentField;
 
 // render iOS7 status bar methods to be readwrite properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
@@ -109,11 +98,10 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     _authors = [NSMutableDictionary dictionary];
     _content = [NSMutableArray array];
     
-    if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
+    if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
         // Under iOS 6, GSEventRunModal of GraphicsSerivces sends objc_release
         // to an already released (zombie) UITableView instance; the following
-        // line is a work-around to that problem. TODO: Investigate
-        // why this only happens when rendering table using DTCoreText attributed cells.
+        // line is a work-around to that problem.
         _tableView = (__bridge id)CFBridgingRetain(self.tableView);
     }
     
@@ -123,7 +111,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
     [navigationBar setBarStyle:UIBarStyleDefault];
     
-    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(kSystemVersion70)) {
+    if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
         [navigationBar setBackgroundColor:[UIColor clearColor]];
         [navigationBar setTranslucent:YES];
     }
@@ -133,61 +121,50 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     
     _scrollOffset = CGPointMake(0.f, 0.f);
     
-    CGRect rect = self.navigationController.navigationBar.frame;
-    CGFloat recommendedTextFieldWidth = rect.size.width - 32.f;
-
     // in landscape mode, toolbar height is 32, in portrait, it is 44
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    CGFloat textFieldHeight = ((orientation == UIInterfaceOrientationLandscapeLeft ||
-                                orientation == UIInterfaceOrientationLandscapeRight)
-                               ? 18 : 30);
-    _postCommentField = [[LFSPostField alloc]
-                         initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, textFieldHeight)];
+    CGFloat textFieldWidth =
+    self.navigationController.navigationBar.frame.size.width -
+    (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70) ? 32.f : 25.f);
     
+    BOOL isPortrait = UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication]
+                                                        statusBarOrientation]);
+    _postCommentField = [[LFSTextField alloc]
+                         initWithFrame:
+                         CGRectMake(0.f, 0.f, textFieldWidth, (isPortrait ? 30.f : 18.f))];
+
     [_postCommentField setDelegate:self];
     [_postCommentField setPlaceholder:@"Write a comment..."];
-    [_postCommentField setFont:[UIFont systemFontOfSize:13.0f]];
-    [_postCommentField setAutoresizingMask:(UIViewAutoresizingFlexibleHeight |
-                                            UIViewAutoresizingFlexibleWidth)];
-    
-    _postCommentField.layer.masksToBounds = YES;
-    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(kSystemVersion70)) {
-        [_postCommentField setTextEdgeInsets:UIEdgeInsetsMake(0, 5, 0, 0)];
-        _postCommentField.layer.cornerRadius = 6.0f;
-        _postCommentField.layer.borderColor = [[UIColor lightGrayColor] CGColor];
-        _postCommentField.layer.borderWidth = 0.5f;
-        _postCommentField.layer.opacity = 0.0f;
-        _postCommentField.layer.backgroundColor = [[UIColor whiteColor] CGColor];
-    } else {
-        [_postCommentField setTextEdgeInsets:UIEdgeInsetsMake(5, 8, 0, 0)];
-        _postCommentField.layer.cornerRadius = 15.0f;
-        _postCommentField.layer.opacity = 1.0f;
-        _postCommentField.layer.backgroundColor = [[UIColor whiteColor] CGColor];
-    }
-    
-    [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
-    
+
+
     UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
                                          initWithCustomView:_postCommentField];
-
-    NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, nil];
-    self.toolbarItems = toolbarItems;
+    [self setToolbarItems:
+     [NSArray arrayWithObjects:writeCommentItem, nil]];
     
     UIToolbar *toolbar = self.navigationController.toolbar;
+    [toolbar setBackgroundColor:[UIColor clearColor]];
     [toolbar setBarStyle:UIBarStyleDefault];
-    
-    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(kSystemVersion70)) {
+    if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70))
+    {
+        // iOS7
         [toolbar setBackgroundColor:[UIColor clearColor]];
         [toolbar setTranslucent:YES];
+    }
+    else
+    {
+        // iOS6
+        [toolbar setBarStyle:UIBarStyleDefault];
+        //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
     _viewControllerNewComment = nil;
     // }}}
     
     /*
-     if you enable static row height in this demo then the cell height is determined
-     from the tableView.rowHeight. Cells can be reused in this mode.
-     If you disable this then cells are prepared and cached to reused their internal
-     layouter and layoutFrame. Reuse is not recommended since the cells are cached anyway.
+     if you enable static row height in this demo then the cell height 
+     is determined from the tableView.rowHeight. Cells can be reused 
+     in this mode. If you disable this then cells are prepared and cached
+     to reused their internal layouter and layoutFrame. Reuse is not
+     recommended since the cells are cached anyway.
      */
     
     
@@ -206,7 +183,10 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+    
+        // hide status bar for iOS7 and later
+    [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
+               withAnimation:UIStatusBarAnimationNone];
     [self getBootstrapInfo];
 }
 
@@ -344,14 +324,13 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 #pragma mark - Toolbar behavior
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
-    if (scrollView.contentOffset.y <= _scrollOffset.y) {
-        [self.navigationController setToolbarHidden:YES animated:YES];
-    } else{
-        [self.navigationController setToolbarHidden:NO animated:YES];
-    }
+    [self.navigationController
+     setToolbarHidden:(scrollView.contentOffset.y <= _scrollOffset.y)
+     animated:YES];
 }
 
--(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView
+                 willDecelerate:(BOOL)decelerate
 {
     _scrollOffset = scrollView.contentOffset;
 }
@@ -450,7 +429,8 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 
     if (!cell) {
         if ([self canReuseCells]) {
-            cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:kAttributedTextCellReuseIdentifier];
+            cell = (LFSAttributedTextCell *)[tableView
+                                             dequeueReusableCellWithIdentifier:kAttributedTextCellReuseIdentifier];
         }
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc]
