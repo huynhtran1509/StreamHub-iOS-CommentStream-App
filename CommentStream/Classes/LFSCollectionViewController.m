@@ -124,8 +124,11 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     // {{{ Navigation bar
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
     [navigationBar setBarStyle:UIBarStyleDefault];
-    [navigationBar setBackgroundColor:[UIColor clearColor]];
-    [navigationBar setTranslucent:YES];
+    
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(kSystemVersion70)) {
+        [navigationBar setBackgroundColor:[UIColor clearColor]];
+        [navigationBar setTranslucent:YES];
+    }
     // }}}
     
     // {{{ Toolbar
@@ -150,22 +153,26 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
                              initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 30)];
     }
     
-    _postCommentField.delegate = self;
-    
+    [_postCommentField setDelegate:self];
     [_postCommentField setPlaceholder:@"Write a comment..."];
     [_postCommentField setFont:[UIFont systemFontOfSize:13.0f]];
-    [_postCommentField setTextEdgeInsets:UIEdgeInsetsMake(0, 5, 0, 0)];
     [_postCommentField setAutoresizingMask:(UIViewAutoresizingFlexibleHeight |
                                             UIViewAutoresizingFlexibleWidth)];
     
-    _postCommentField.layer.cornerRadius = 8.0f;
     _postCommentField.layer.masksToBounds = YES;
-    _postCommentField.layer.borderColor = [[UIColor lightGrayColor] CGColor];
-    _postCommentField.layer.borderWidth = 0.5f;
-    _postCommentField.layer.opacity = 0.0f;
-    _postCommentField.backgroundColor = [UIColor clearColor];
-    _postCommentField.layer.backgroundColor = [[UIColor clearColor] CGColor];
-    
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(kSystemVersion70)) {
+        [_postCommentField setTextEdgeInsets:UIEdgeInsetsMake(0, 5, 0, 0)];
+        _postCommentField.layer.cornerRadius = 6.0f;
+        _postCommentField.layer.borderColor = [[UIColor lightGrayColor] CGColor];
+        _postCommentField.layer.borderWidth = 0.5f;
+        _postCommentField.layer.opacity = 0.0f;
+        _postCommentField.layer.backgroundColor = [[UIColor whiteColor] CGColor];
+    } else {
+        [_postCommentField setTextEdgeInsets:UIEdgeInsetsMake(5, 8, 0, 0)];
+        _postCommentField.layer.cornerRadius = 15.0f;
+        _postCommentField.layer.opacity = 1.0f;
+        _postCommentField.layer.backgroundColor = [[UIColor whiteColor] CGColor];
+    }
     
     [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
     
@@ -179,9 +186,13 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, _postCommentItem, nil];
     self.toolbarItems = toolbarItems;
     
-    [self.navigationController.toolbar setBarStyle:UIBarStyleDefault];
-    [self.navigationController.toolbar setTranslucent:YES];
+    UIToolbar *toolbar = self.navigationController.toolbar;
+    [toolbar setBarStyle:UIBarStyleDefault];
     
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(kSystemVersion70)) {
+        [toolbar setBackgroundColor:[UIColor clearColor]];
+        [toolbar setTranslucent:YES];
+    }
     _viewControllerNewComment = nil;
     // }}}
     
