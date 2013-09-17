@@ -7,44 +7,29 @@
 //
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
-#import <DTCoreText/DTImageTextAttachment.h>
-#import <DTCoreText/DTLinkButton.h>
 #import <AFNetworking/AFImageRequestOperation.h>
 
 #import "LFSConfig.h"
-#import "DTLazyImageView+TextContentView.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
+#import "LFSTextField.h"
 
-@interface LFSPostField : UITextField
-// a subclass of UITextField that allows us to set custom
-// padding/edge insets.
-@property (nonatomic, assign) UIEdgeInsets textEdgeInsets;
-@end
-
-@implementation LFSPostField
-@synthesize textEdgeInsets = _textEdgeInsets;
-- (CGRect)textRectForBounds:(CGRect)bounds {
-	return UIEdgeInsetsInsetRect([super textRectForBounds:bounds], _textEdgeInsets);
-}
-@end
-
-@interface LFSCollectionViewController () <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate> {
+@interface LFSCollectionViewController () {
     __weak UITableView* _tableView;
     LFSNewCommentViewController *_viewControllerNewComment;
 }
+
 @property (nonatomic, strong) NSMutableDictionary *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
-@property (nonatomic, readonly) LFSPostField *postCommentField;
+@property (nonatomic, readonly) LFSTextField *postCommentField;
 
 // render iOS7 status bar methods to be readwrite properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
-@property (nonatomic, strong) UIBarButtonItem *postCommentItem;
 - (BOOL)canReuseCells;
 @end
 
@@ -73,7 +58,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
-@synthesize postCommentItem = _postCommentItem;
 
 - (LFSBootstrapClient*)bootstrapClient
 {
@@ -114,85 +98,73 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     _authors = [NSMutableDictionary dictionary];
     _content = [NSMutableArray array];
     
-    if (SYSTEM_VERSION_LESS_THAN(kSystemVersion70)) {
+    if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
         // Under iOS 6, GSEventRunModal of GraphicsSerivces sends objc_release
         // to an already released (zombie) UITableView instance; the following
-        // line is a work-around to that problem. TODO: Investigate
-        // why this only happens when rendering table using DTCoreText attributed cells.
+        // line is a work-around to that problem.
         _tableView = (__bridge id)CFBridgingRetain(self.tableView);
     }
     
-    self.title = [_collection objectForKey:@"name"];
+    self.title = [_collection objectForKey:@"_name"];
     
     // {{{ Navigation bar
     UINavigationBar *navigationBar = self.navigationController.navigationBar;
     [navigationBar setBarStyle:UIBarStyleDefault];
-    [navigationBar setBackgroundColor:[UIColor clearColor]];
-    [navigationBar setTranslucent:YES];
+    
+    if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
+        [navigationBar setBackgroundColor:[UIColor clearColor]];
+        [navigationBar setTranslucent:YES];
+    }
     // }}}
     
     // {{{ Toolbar
     
     _scrollOffset = CGPointMake(0.f, 0.f);
     
-    CGRect rect = self.navigationController.navigationBar.frame;
-    CGFloat recommendedTextFieldWidth = rect.size.width - 62.0f;
+    // in landscape mode, toolbar height is 32, in portrait, it is 44
+    CGFloat textFieldWidth =
+    self.navigationController.navigationBar.frame.size.width -
+    (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70) ? 32.f : 25.f);
     
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (orientation == UIInterfaceOrientationLandscapeLeft ||
-        orientation == UIInterfaceOrientationLandscapeRight)
+    BOOL isPortrait = UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication]
+                                                        statusBarOrientation]);
+    _postCommentField = [[LFSTextField alloc]
+                         initWithFrame:
+                         CGRectMake(0.f, 0.f, textFieldWidth, (isPortrait ? 30.f : 18.f))];
+
+    [_postCommentField setDelegate:self];
+    [_postCommentField setPlaceholder:@"Write a comment..."];
+
+
+    UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
+                                         initWithCustomView:_postCommentField];
+    [self setToolbarItems:
+     [NSArray arrayWithObjects:writeCommentItem, nil]];
+    
+    UIToolbar *toolbar = self.navigationController.toolbar;
+    [toolbar setBackgroundColor:[UIColor clearColor]];
+    [toolbar setBarStyle:UIBarStyleDefault];
+    if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70))
     {
-        // landscape (toolbar height is 32)
-        _postCommentField = [[LFSPostField alloc]
-                             initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 18)];
+        // iOS7
+        [toolbar setBackgroundColor:[UIColor clearColor]];
+        [toolbar setTranslucent:YES];
     }
     else
     {
-        // portrait (toolbar height is 44)
-        _postCommentField = [[LFSPostField alloc]
-                             initWithFrame:CGRectMake(0, 0, recommendedTextFieldWidth, 30)];
+        // iOS6
+        [toolbar setBarStyle:UIBarStyleDefault];
+        //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
-    
-    _postCommentField.delegate = self;
-    
-    [_postCommentField setPlaceholder:@"Write a comment..."];
-    [_postCommentField setFont:[UIFont systemFontOfSize:13.0f]];
-    [_postCommentField setTextEdgeInsets:UIEdgeInsetsMake(0, 5, 0, 0)];
-    [_postCommentField setAutoresizingMask:(UIViewAutoresizingFlexibleHeight |
-                                            UIViewAutoresizingFlexibleWidth)];
-    
-    _postCommentField.layer.cornerRadius = 8.0f;
-    _postCommentField.layer.masksToBounds = YES;
-    _postCommentField.layer.borderColor = [[UIColor lightGrayColor] CGColor];
-    _postCommentField.layer.borderWidth = 0.5f;
-    _postCommentField.layer.opacity = 0.0f;
-    _postCommentField.backgroundColor = [UIColor clearColor];
-    _postCommentField.layer.backgroundColor = [[UIColor clearColor] CGColor];
-    
-    
-    [self.navigationController.toolbar setBackgroundColor:[UIColor clearColor]];
-    
-    UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
-                                         initWithCustomView:_postCommentField];
-    _postCommentItem = [[UIBarButtonItem alloc]
-                        initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
-                        target:self
-                        action:@selector(createComment:)];
-    
-    NSArray* toolbarItems = [NSArray arrayWithObjects:writeCommentItem, _postCommentItem, nil];
-    self.toolbarItems = toolbarItems;
-    
-    [self.navigationController.toolbar setBarStyle:UIBarStyleDefault];
-    [self.navigationController.toolbar setTranslucent:YES];
-    
     _viewControllerNewComment = nil;
     // }}}
     
     /*
-     if you enable static row height in this demo then the cell height is determined
-     from the tableView.rowHeight. Cells can be reused in this mode.
-     If you disable this then cells are prepared and cached to reused their internal
-     layouter and layoutFrame. Reuse is not recommended since the cells are cached anyway.
+     if you enable static row height in this demo then the cell height 
+     is determined from the tableView.rowHeight. Cells can be reused 
+     in this mode. If you disable this then cells are prepared and cached
+     to reused their internal layouter and layoutFrame. Reuse is not
+     recommended since the cells are cached anyway.
      */
     
     
@@ -211,15 +183,20 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+    
+        // hide status bar for iOS7 and later
+    [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
+               withAnimation:UIStatusBarAnimationNone];
     [self getBootstrapInfo];
 }
 
 -(void)viewDidAppear:(BOOL)animated
 {
+    [super viewDidAppear:animated];
+    
     // add some pizzas by animating the toolbar from below (this serves
     // as a live reminder to the user that he/she can post a comment)
-    [super viewDidAppear:animated];
+    [self.navigationController setToolbarHidden:NO animated:animated];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -248,9 +225,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     
     _postCommentField.delegate = nil;
     _postCommentField = nil;
-    
-    _postCommentItem.target = nil;
-    _postCommentItem = nil;
     
     [_cellCache removeAllObjects];
     _cellCache = nil;
@@ -350,14 +324,13 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 #pragma mark - Toolbar behavior
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
-    if (scrollView.contentOffset.y <= _scrollOffset.y) {
-        [self.navigationController setToolbarHidden:YES animated:YES];
-    } else{
-        [self.navigationController setToolbarHidden:NO animated:YES];
-    }
+    [self.navigationController
+     setToolbarHidden:(scrollView.contentOffset.y <= _scrollOffset.y)
+     animated:YES];
 }
 
--(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView
+                 willDecelerate:(BOOL)decelerate
 {
     _scrollOffset = scrollView.contentOffset;
 }
@@ -366,6 +339,11 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 - (void)getBootstrapInfo
 {
     [self startSpinning];
+    
+    // clear all previous data
+    [_authors removeAllObjects];
+    [_content removeAllObjects];
+    
     [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
                                  article:[self.collection objectForKey:@"articleId"]
                                onSuccess:^(NSOperation *operation, id responseObject)
@@ -384,9 +362,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
          [self.streamClient setCollectionId:collectionId];
          [self.streamClient startStreamWithEventId:eventId];
          [self stopSpinning];
-         
-         // show toolbar so that the user knows he/she can post to the stream
-         [self.navigationController setToolbarHidden:NO animated:YES];
      }
                                onFailure:^(NSOperation *operation, NSError *error)
      {
@@ -399,14 +374,14 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 {
     // This method is responsible for both adding content from Bootstrap and
     // for streaming new updates.
-    [self.authors addEntriesFromDictionary:authors];
+    [_authors addEntriesFromDictionary:authors];
     
     NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
     NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
     NSRange contentSpan;
     contentSpan.location = 0;
     contentSpan.length = [filteredContent count];
-    [self.content insertObjects:filteredContent
+    [_content insertObjects:filteredContent
                       atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
     
     // also cause table to redraw
@@ -442,7 +417,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.content count];
+    return [_content count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -454,7 +429,8 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 
     if (!cell) {
         if ([self canReuseCells]) {
-            cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:kAttributedTextCellReuseIdentifier];
+            cell = (LFSAttributedTextCell *)[tableView
+                                             dequeueReusableCellWithIdentifier:kAttributedTextCellReuseIdentifier];
         }
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc]
@@ -465,7 +441,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
         
         // LFAttributedTextCell specifics
         cell.attributedTextContextView.shouldDrawImages = NO;
-        cell.attributedTextContextView.delegate = self;
     }
     
     [self configureCell:cell forIndexPath:indexPath];
@@ -478,38 +453,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 {
     // reuse does not work for variable height -- only reuse cells with fixed height
     return (![self respondsToSelector:@selector(tableView:heightForRowAtIndexPath:)]);
-}
-
-- (void)setImage:(UIImage*)image forCell:(LFSAttributedTextCell*)cell
-{
-    // scale down image if we are not on a Retina device
-    UIScreen *screen = [UIScreen mainScreen];
-    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2) {
-        // we are on a Retina device
-        cell.imageView.image = image;
-        [cell setNeedsLayout];
-    }
-    else {
-        // we are on a non-Retina device
-        dispatch_queue_t queue =
-        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(queue, ^{
-            
-            // scale image on a background thread
-            // Note: to keep things simple, we do not worry about aspect ratio
-            CGSize size = cell.imageView.frame.size;
-            UIGraphicsBeginImageContext(size);
-            [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-            UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            
-            // display image on the main thread
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                cell.imageView.image = scaledImage;
-                [cell setNeedsLayout];
-            });
-        });
-    }
 }
 
 // called every time a cell is configured
@@ -539,7 +482,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
                                                      NSHTTPURLResponse *response,
                                                      UIImage *image)
                                           {
-                                              [self setImage:image forCell:cell];
+                                              [cell assignImage:image];
                                           }
                                           failure:nil];
     [operation start];
@@ -553,79 +496,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     [cell setHTMLString:html];
 }
 
-#pragma mark - DTAttributedTextContentViewDelegate
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
-                        viewForLink:(NSURL *)url
-                         identifier:(NSString *)identifier
-                              frame:(CGRect)frame
-{
-    DTLinkButton *btn = [[DTLinkButton alloc] initWithFrame:frame];
-    btn.URL = url;
-    [btn addTarget:self action:@selector(openURL:) forControlEvents:UIControlEventTouchUpInside];
-    return btn;
-}
-
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
-                  viewForAttachment:(DTTextAttachment *)attachment frame:(CGRect)frame
-{
-    if ([attachment isKindOfClass:[DTImageTextAttachment class]]) {
-        
-        DTLazyImageView *imageView = [[DTLazyImageView alloc] initWithFrame:frame];
-        imageView.textContentView = attributedTextContentView;
-        imageView.delegate = self;
-        
-        // defer loading of image under given URL
-        imageView.url = attachment.contentURL;
-        return imageView;
-    }
-    return nil;
-}
-
-// allow display of images embedded in rich-text content
--(void)lazyImageView:(DTLazyImageView *)lazyImageView didChangeImageSize:(CGSize)size
-{
-    DTAttributedTextContentView *cv = lazyImageView.textContentView;
-    NSURL *url = lazyImageView.url;
-    
-    NSPredicate *pred = [NSPredicate predicateWithFormat:@"contentURL == %@", url];
-    // update all attachments that match this URL (possibly multiple images with same size)
-    for (DTTextAttachment *attachment in [cv.layoutFrame textAttachmentsWithPredicate:pred])
-    {
-        /*
-         attachment.originalSize = imageSize;
-         if (!CGSizeEqualToSize(imageSize, attachment.displaySize)) {
-         attachment.displaySize = imageSize;
-         }*/
-        attachment.originalSize = size;
-        lazyImageView.bounds = CGRectMake(0, 0,
-                                          attachment.displaySize.width,
-                                          attachment.displaySize.height);
-    }
-    
-    // need to reset the layouter because otherwise we get the old framesetter or cached
-    // layout frames. See https://github.com/Cocoanetics/DTCoreText/issues/307
-    cv.layouter = nil;
-    
-    // laying out the entire string,
-    // might be more efficient to only layout the paragraphs that contain these attachments
-    [cv relayoutText];
-}
-
-/*
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
-            viewForAttributedString:(NSAttributedString *)string frame:(CGRect)frame
-{
-    // initialize and return your view here
-}
-*/
-
 #pragma mark - Events
-
-- (IBAction)openURL:(DTLinkButton*)sender
-{
-    [[UIApplication sharedApplication] openURL:sender.URL];
-}
-
 -(IBAction)createComment:(id)sender
 {
     if (_viewControllerNewComment == nil) {
