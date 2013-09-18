@@ -107,11 +107,14 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
                                                 withAnimation:animation];
         if (self.navigationController) {
             UINavigationBar *navigationBar = self.navigationController.navigationBar;
-            if (hidden && navigationBar.frame.origin.y > 0.f) {
+            if (hidden && navigationBar.frame.origin.y > 0.f)
+            {
                 CGRect frame = navigationBar.frame;
                 frame.origin.y = 0;
                 navigationBar.frame = frame;
-            } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
+            }
+            else if (!hidden && navigationBar.frame.origin.y < 20.f)
+            {
                 CGRect frame = navigationBar.frame;
                 frame.origin.y = 20.f;
                 navigationBar.frame = frame;
@@ -127,16 +130,15 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 
 - (IBAction)postClicked:(UIBarButtonItem *)sender
 {
-    NSString *userToken = [self.collection objectForKey:@"lftoken"] ?: @"";
     NSString *text = self.textView.text;
-    [self.writeClient postNewContent:self.textView.text
-                             forUser:userToken
+    [self.writeClient postNewContent:text
+                             forUser:[self.collection objectForKey:@"lftoken"]
                        forCollection:self.collectionId
                            inReplyTo:nil
                            onSuccess:^(NSOperation *operation, id responseObject)
      {
          // do nothing
-         NSLog(@"Successfully posted: %@", text);
+         //NSLog(@"Success posting: %@", text);
      }
                            onFailure:^(NSOperation *operation, NSError *error)
      {
