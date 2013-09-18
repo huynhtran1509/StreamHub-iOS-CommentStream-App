@@ -149,12 +149,12 @@ static UIColor *noteColor = nil;
             ([UIScreen mainScreen].scale == 2.0f))
         {
             // Retina display, okay to use half-points
-            self.imageView.frame = CGRectMake( 12.f, 8.f, 37.5f, 37.5f );
+            self.imageView.frame = CGRectMake( 12.f, 7.f, 37.5f, 37.5f );
         }
         else
         {
             // non-Retina display
-            self.imageView.frame = CGRectMake( 12.f, 8.f, 37.f, 37.f );
+            self.imageView.frame = CGRectMake( 12.f, 7.f, 37.f, 37.f );
         }
 	}
 }

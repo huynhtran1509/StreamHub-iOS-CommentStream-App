@@ -11,4 +11,10 @@
 
 @interface LFSDetailViewController : UIViewController
 
+@property (nonatomic, strong) NSDictionary *collection;
+@property (nonatomic, strong) NSString *collectionId;
+
+@property (nonatomic, strong) NSDictionary *authorItem;
+@property (nonatomic, strong) NSDictionary *contentItem;
+
 @end

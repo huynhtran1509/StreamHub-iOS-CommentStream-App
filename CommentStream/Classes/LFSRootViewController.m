@@ -19,6 +19,10 @@
 
 @end
 
+// some module-level constants
+static NSString* const kCellReuseIdentifier = @"Cell";
+static NSString* const kCellSelectSegue = @"collectionView";
+
 @implementation LFSRootViewController
 
 #pragma mark - Properties
@@ -116,13 +120,12 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView
          cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellReuseIdentifier
                                                             forIndexPath:indexPath];
     
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                      reuseIdentifier:CellIdentifier];
+                                      reuseIdentifier:kCellReuseIdentifier];
         
     }
     // Configure the cell...
@@ -134,8 +137,7 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     // Make sure your segue name in storyboard is the same as this line
-    static NSString *CollectionSegueId = @"collectionView";
-    if ([[segue identifier] isEqualToString:CollectionSegueId])
+    if ([[segue identifier] isEqualToString:kCellSelectSegue])
     {
         // Get reference to the destination view controller
         if ([segue.destinationViewController isKindOfClass:[LFSCollectionViewController class]]) {

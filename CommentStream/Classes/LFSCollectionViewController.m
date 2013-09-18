@@ -12,6 +12,7 @@
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
+#import "LFSDetailViewController.h"
 #import "LFSTextField.h"
 
 @interface LFSCollectionViewController () {
@@ -33,8 +34,9 @@
 - (BOOL)canReuseCells;
 @end
 
-// identifier for cell reuse
-static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
+// some module-level constants
+static NSString* const kCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
+static NSString* const kCellSelectSegue = @"detailView";
 
 @implementation LFSCollectionViewController
 {
@@ -456,6 +458,12 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 
 #pragma mark - UITableViewControllerDelegate
 
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
+}
+
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -479,11 +487,11 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     if (!cell) {
         if ([self canReuseCells]) {
             cell = (LFSAttributedTextCell *)[tableView
-                                             dequeueReusableCellWithIdentifier:kAttributedTextCellReuseIdentifier];
+                                             dequeueReusableCellWithIdentifier:kCellReuseIdentifier];
         }
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc]
-                    initWithReuseIdentifier:kAttributedTextCellReuseIdentifier];
+                    initWithReuseIdentifier:kCellReuseIdentifier];
         }
         // cache the cell, if there is a cache
         [_cellCache setObject:cell forKey:key];
@@ -553,6 +561,28 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\">%@</div>", bodyHTML];
     
     [cell setHTMLString:html];
+}
+
+#pragma mark - Navigation
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    // Make sure your segue name in storyboard is the same as this line
+    if ([[segue identifier] isEqualToString:kCellSelectSegue])
+    {
+        // Get reference to the destination view controller
+        if ([segue.destinationViewController isKindOfClass:[LFSDetailViewController class]]) {
+            if ([sender isKindOfClass:[UITableViewCell class]]) {
+                NSIndexPath *indexPath = [self.tableView indexPathForCell:sender];
+                LFSDetailViewController *vc = segue.destinationViewController;
+                
+                // assign model object(s)
+                NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
+                vc.contentItem = content;
+                vc.authorItem = [_authors objectForKey:[content objectForKey:@"authorId"]];
+            }
+        }
+    }
 }
 
 #pragma mark - Events
