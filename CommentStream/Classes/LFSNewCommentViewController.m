@@ -131,6 +131,7 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 - (IBAction)postClicked:(UIBarButtonItem *)sender
 {
     NSString *text = self.textView.text;
+    [self.textView setText:@""];
     [self.writeClient postNewContent:text
                              forUser:[self.collection objectForKey:@"lftoken"]
                        forCollection:self.collectionId
