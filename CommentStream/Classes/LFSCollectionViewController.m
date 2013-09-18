@@ -99,9 +99,12 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     _content = [NSMutableArray array];
     
     if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
-        // Under iOS 6, GSEventRunModal of GraphicsSerivces sends objc_release
-        // to an already released (zombie) UITableView instance; the following
-        // line is a work-around to that problem.
+        // A strong reference to UITableView in DTAttributedTextCell causes overrelease.
+        // The following line is a work-around to that problem. This ought to be replaced
+        // when the following fix by Cocoanetics is merged to master:
+        // https://github.com/Cocoanetics/DTCoreText/issues/599
+        // Note: this is an iOS6 issue only.
+        //
         _tableView = (__bridge id)CFBridgingRetain(self.tableView);
     }
     
@@ -473,6 +476,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     cell.noteView.text = dateTime;
     
     // load avatar images in a separate queue
+    // TODO: load 75x75px avatars whenever possible
     NSURLRequest *request =
     [NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]];
     AFImageRequestOperation* operation = [AFImageRequestOperation
