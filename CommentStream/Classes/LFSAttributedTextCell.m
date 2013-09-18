@@ -12,12 +12,13 @@
 
 #import "LFSAttributedTextCell.h"
 
-static const CGFloat kLeftColumnWidth = 55;
+// TODO: turn some of these consts into properties for easier customization
+static const CGFloat kLeftColumnWidth = 60;
 static const CGFloat kBottomInset = 5;
 static const CGFloat kHeaderHeight = 30;
 static const CGFloat kRightColumnWidth = 80;
-static const CGRect avatarFrame = { {15, 8}, {25, 25} }; // origin: x=15, y=8; size: 25x25
-static const CGFloat kNoteRightInset = 15;
+static const CGFloat avatarCornerRadius = 4;
+static const CGFloat kNoteRightInset = 12;
 
 @interface LFSAttributedTextCell ()
 
@@ -92,6 +93,8 @@ static UIColor *noteColor = nil;
             //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
             self.selectedBackgroundView = selectionColor;
         }
+        self.imageView.layer.cornerRadius = avatarCornerRadius;
+        self.imageView.layer.masksToBounds = YES;
     }
     return self;
 }
@@ -141,7 +144,18 @@ static UIColor *noteColor = nil;
                                      0,
                                      kRightColumnWidth - kNoteRightInset,
                                      kHeaderHeight);
-        self.imageView.frame = avatarFrame;
+        
+        if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+            ([UIScreen mainScreen].scale == 2.0f))
+        {
+            // Retina display, okay to use half-points
+            self.imageView.frame = CGRectMake( 12.f, 8.f, 37.5f, 37.5f );
+        }
+        else
+        {
+            // non-Retina display
+            self.imageView.frame = CGRectMake( 12.f, 8.f, 37.f, 37.f );
+        }
 	}
 }
 
@@ -165,7 +179,7 @@ static UIColor *noteColor = nil;
         dispatch_async(queue, ^{
             
             // scale image on a background thread
-            // Note: to keep things simple, we do not worry about aspect ratio
+            // Note: this will not preserve aspect ratio
             UIGraphicsBeginImageContext(size);
             [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
             UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -244,8 +258,7 @@ static UIColor *noteColor = nil;
         
         DTLazyImageView *imageView = [[DTLazyImageView alloc] initWithFrame:frame];
         imageView.textContentView = attributedTextContentView;
-        __weak typeof(self) weakSelf = self;
-        imageView.delegate = weakSelf;
+        imageView.delegate = self;
         
         // defer loading of image under given URL
         imageView.url = attachment.contentURL;
