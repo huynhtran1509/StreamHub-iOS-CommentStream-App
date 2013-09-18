@@ -99,9 +99,12 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     _content = [NSMutableArray array];
     
     if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
-        // Under iOS 6, GSEventRunModal of GraphicsSerivces sends objc_release
-        // to an already released (zombie) UITableView instance; the following
-        // line is a work-around to that problem.
+        // A strong reference to UITableView in DTAttributedTextCell causes overrelease.
+        // The following line is a work-around to that problem. This ought to be replaced
+        // when the following fix by Cocoanetics is merged to master:
+        // https://github.com/Cocoanetics/DTCoreText/issues/599
+        // Note: this is an iOS6 issue only.
+        //
         _tableView = (__bridge id)CFBridgingRetain(self.tableView);
     }
     
@@ -184,18 +187,19 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 {
     [super viewWillAppear:animated];
     
-        // hide status bar for iOS7 and later
+    // hide status bar for iOS7 and later
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
-    [self getBootstrapInfo];
+    [self startStreamWithBoostrap];
 }
 
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     
-    // add some pizzas by animating the toolbar from below (this serves
-    // as a live reminder to the user that he/she can post a comment)
+    // add some pizzas by animating the toolbar from below (we want
+    // to encourage users to post comments and this feature serves as
+    // almost a call to action)
     [self.navigationController setToolbarHidden:NO animated:animated];
 }
 
@@ -336,38 +340,46 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 }
 
 #pragma mark - Private methods
-- (void)getBootstrapInfo
+- (void)startStreamWithBoostrap
 {
-    [self startSpinning];
+    // If we have some data, do not clear it and do not run bootstrap.
+    // Instead, grab the latest event ID and start streaming from there
     
-    // clear all previous data
-    [_authors removeAllObjects];
-    [_content removeAllObjects];
-    
-    [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
-                                 article:[self.collection objectForKey:@"articleId"]
-                               onSuccess:^(NSOperation *operation, id responseObject)
-     {
-         NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
-         [self addTopLevelContent:[headDocument objectForKey:@"content"]
-                      withAuthors:[headDocument objectForKey:@"authors"]];
-         NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
-         NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
-         NSNumber *eventId = [collectionSettings objectForKey:@"event"];
-         
-         //NSLog(@"%@", responseObject);
-         
-         // we are already on the main queue...
-         [self setCollectionId:collectionId];
-         [self.streamClient setCollectionId:collectionId];
-         [self.streamClient startStreamWithEventId:eventId];
-         [self stopSpinning];
-     }
-                               onFailure:^(NSOperation *operation, NSError *error)
-     {
-         NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
-         [self stopSpinning];
-     }];
+    if (_content.count == 0) {
+        [_authors removeAllObjects];
+        [_content removeAllObjects];
+        
+        [self startSpinning];
+        [self.bootstrapClient getInitForSite:[self.collection objectForKey:@"siteId"]
+                                     article:[self.collection objectForKey:@"articleId"]
+                                   onSuccess:^(NSOperation *operation, id responseObject)
+         {
+             NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
+             [self addTopLevelContent:[headDocument objectForKey:@"content"]
+                          withAuthors:[headDocument objectForKey:@"authors"]];
+             NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
+             NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
+             NSNumber *eventId = [collectionSettings objectForKey:@"event"];
+             
+             //NSLog(@"%@", responseObject);
+             
+             // we are already on the main queue...
+             [self setCollectionId:collectionId];
+             [self.streamClient setCollectionId:collectionId];
+             [self.streamClient startStreamWithEventId:eventId];
+             [self stopSpinning];
+         }
+                                   onFailure:^(NSOperation *operation, NSError *error)
+         {
+             NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
+             [self stopSpinning];
+         }];
+    }
+    else {
+        NSNumber *eventId = [[_content objectAtIndex:0u] objectForKey:@"event"];
+        [self.streamClient setCollectionId:self.collectionId];
+        [self.streamClient startStreamWithEventId:eventId];
+    }
 }
 
 -(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
@@ -473,6 +485,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     cell.noteView.text = dateTime;
     
     // load avatar images in a separate queue
+    // TODO: load 75x75px avatars instead of 50x50
     NSURLRequest *request =
     [NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]];
     AFImageRequestOperation* operation = [AFImageRequestOperation

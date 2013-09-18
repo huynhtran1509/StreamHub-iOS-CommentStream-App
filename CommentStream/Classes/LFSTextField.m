@@ -50,10 +50,11 @@
             
             [_shadowLayer setShadowColor:[[UIColor blackColor] CGColor]];
             [_shadowLayer setShadowOffset:CGSizeMake(0.5f, 0.5f)];
-            [_shadowLayer setShadowOpacity:1.0f];
+            [_shadowLayer setShadowOpacity:0.95f];
             [_shadowLayer setShadowRadius:2.0f];
             [_shadowLayer setFillRule:kCAFillRuleEvenOdd];
             [_shadowLayer setMask:_maskLayer];
+            [_shadowLayer setMasksToBounds:YES];
             [self.layer addSublayer:_shadowLayer];
         }
         [self.layer setBackgroundColor:
