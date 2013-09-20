@@ -15,7 +15,7 @@ static const CGFloat kLeftColumnWidth = 60;
 static const CGFloat kBottomInset = 5;
 static const CGFloat kHeaderHeight = 30;
 static const CGFloat kRightColumnWidth = 80;
-static const CGFloat avatarCornerRadius = 4;
+static const CGFloat kAvatarCornerRadius = 4;
 static const CGFloat kNoteRightInset = 12;
 
 @interface LFSAttributedTextCell ()
@@ -28,9 +28,8 @@ static const CGFloat kNoteRightInset = 12;
 	NSUInteger _htmlHash; // preserved hash to avoid relayouting for same HTML
 }
 
+#pragma mark - Properties
 @synthesize textContentView = _textContentView;
-
-#pragma mark - basics
 
 - (void)setHTMLString:(NSString *)html
 {
@@ -50,6 +49,43 @@ static const CGFloat kNoteRightInset = 12;
 	[self.textContentView setHTMLString:html];
 	
 	[self setNeedsLayout];
+}
+
+- (UIImage*)avatarImage
+{
+    return self.imageView.image;
+}
+
+- (void)setAvatarImage:(UIImage*)image
+{
+    // scale down image if we are not on a Retina device
+    UIScreen *screen = [UIScreen mainScreen];
+    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2) {
+        // we are on a Retina device
+        self.imageView.image = image;
+        [self setNeedsLayout];
+    }
+    else {
+        // we are on a non-Retina device
+        CGSize size = self.imageView.frame.size;
+        dispatch_queue_t queue =
+        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        dispatch_async(queue, ^{
+            
+            // scale image on a background thread
+            // Note: this will not preserve aspect ratio
+            UIGraphicsBeginImageContext(size);
+            [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
+            UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            // display image on the main thread
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                self.imageView.image = scaledImage;
+                [self setNeedsLayout];
+            });
+        });
+    }
 }
 
 #pragma mark - Class methods
@@ -133,7 +169,7 @@ static UIColor *noteColor = nil;
             //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
             self.selectedBackgroundView = selectionColor;
         }
-        self.imageView.layer.cornerRadius = avatarCornerRadius;
+        self.imageView.layer.cornerRadius = kAvatarCornerRadius;
         self.imageView.layer.masksToBounds = YES;
     }
     return self;
@@ -190,40 +226,6 @@ static UIColor *noteColor = nil;
 }
 
 #pragma mark - Public methods
-
-
-- (void)assignImage:(UIImage*)image
-{
-    // scale down image if we are not on a Retina device
-    UIScreen *screen = [UIScreen mainScreen];
-    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2) {
-        // we are on a Retina device
-        self.imageView.image = image;
-        [self setNeedsLayout];
-    }
-    else {
-        // we are on a non-Retina device
-        CGSize size = self.imageView.frame.size;
-        dispatch_queue_t queue =
-        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(queue, ^{
-            
-            // scale image on a background thread
-            // Note: this will not preserve aspect ratio
-            UIGraphicsBeginImageContext(size);
-            [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-            UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            
-            // display image on the main thread
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                self.imageView.image = scaledImage;
-                [self setNeedsLayout];
-            });
-        });
-    }
-}
-
 - (CGFloat)requiredRowHeight
 {
     CGSize maxSize = self.textContentView.frame.size;

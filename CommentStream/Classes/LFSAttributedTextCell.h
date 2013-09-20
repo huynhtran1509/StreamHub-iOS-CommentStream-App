@@ -15,8 +15,7 @@
 @property (nonatomic, readonly) UILabel *titleView;
 @property (nonatomic, readonly) UILabel *noteView;
 @property (nonatomic, strong) LFSBasicHTMLLabel *textContentView;
-
-- (void)assignImage:(UIImage*)image;
+@property (nonatomic, strong) UIImage *avatarImage;
 
 #pragma mark - basics
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;

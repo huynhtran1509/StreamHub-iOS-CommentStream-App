@@ -509,11 +509,11 @@ static NSString* const kCellSelectSegue = @"detailView";
     NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
     
-    cell.titleView.text = authorName;
+    [cell.titleView setText:authorName];
     NSString *dateTime = [self.dateFormatter
                           relativeStringFromDate:
                           [NSDate dateWithTimeIntervalSince1970:timeStamp]];
-    cell.noteView.text = dateTime;
+    [cell.noteView setText:dateTime];
     
 
     // create 75px avatar url
@@ -535,7 +535,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                                                      NSHTTPURLResponse *response,
                                                      UIImage *image)
                                           {
-                                              [cell assignImage:image];
+                                              [cell setAvatarImage:image];
                                           }
                                           failure:nil];
     [operation start];
@@ -553,13 +553,15 @@ static NSString* const kCellSelectSegue = @"detailView";
         // Get reference to the destination view controller
         if ([segue.destinationViewController isKindOfClass:[LFSDetailViewController class]]) {
             if ([sender isKindOfClass:[UITableViewCell class]]) {
-                NSIndexPath *indexPath = [self.tableView indexPathForCell:sender];
+                LFSAttributedTextCell *cell = (LFSAttributedTextCell *)sender;
+                NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
                 LFSDetailViewController *vc = segue.destinationViewController;
                 
                 // assign model object(s)
                 NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
-                vc.contentItem = content;
-                vc.authorItem = [_authors objectForKey:[content objectForKey:@"authorId"]];
+                [vc setContentItem:content];
+                [vc setAuthorItem:[_authors objectForKey:[content objectForKey:@"authorId"]]];
+                [vc setAvatarImage:cell.avatarImage];
             }
         }
     }

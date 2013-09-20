@@ -18,4 +18,6 @@
 @property (nonatomic, strong) NSDictionary *authorItem;
 @property (nonatomic, strong) NSDictionary *contentItem;
 
+-(void)setAvatarImage:(UIImage*)image;
+
 @end

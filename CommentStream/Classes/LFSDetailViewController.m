@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSDetailViewController.h"
 
 @interface LFSDetailViewController ()
@@ -13,20 +14,51 @@
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
-@property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *basicHTMLLabel;
+
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+
+@property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *basicHTMLLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *avatarView;
+@property (weak, nonatomic) IBOutlet UILabel *authorLabel;
+@property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 
 @end
 
-@implementation LFSDetailViewController
+static const CGFloat kAvatarCornerRadius = 4;
+
+@implementation LFSDetailViewController {
+    UIImage *_avatarImage;
+}
+
+#pragma mark - Class methods
+static UIFont *titleFont = nil;
+static UIFont *noteFont = nil;
+static UIColor *noteColor = nil;
+
++ (void)initialize {
+    if(self == [LFSDetailViewController class]) {
+        titleFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
+        noteFont = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
+        noteColor = [UIColor grayColor];
+    }
+}
 
 #pragma mark - Properties
 
 @synthesize basicHTMLLabel = _basicHTMLLabel;
 
+@synthesize avatarView = _avatarView;
+@synthesize authorLabel = _authorLabel;
+@synthesize dateLabel = _dateLabel;
+
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
+
+-(void)setAvatarImage:(UIImage*)image
+{
+    _avatarImage = image;
+}
 
 #pragma mark - UIViewController
 
@@ -42,8 +74,52 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
+    // set main content label
     [self.basicHTMLLabel setDelegate:self];
     [self.basicHTMLLabel setHTMLString:[self.contentItem objectForKey:@"bodyHtml"]];
+    CGRect oldContentFrame = self.basicHTMLLabel.frame;
+    CGSize maxSize = oldContentFrame.size;
+    maxSize.height = 1000.f;
+    CGSize neededSize = [self.basicHTMLLabel sizeThatFits:maxSize];
+    CGFloat offset = neededSize.height - oldContentFrame.size.height;
+    [self.basicHTMLLabel setFrame:CGRectMake(oldContentFrame.origin.x,
+                                             oldContentFrame.origin.y,
+                                             neededSize.width,
+                                             neededSize.height)];
+    
+    
+    // format author name label
+    [_authorLabel setFont:titleFont];
+    
+    // format date label
+    [_dateLabel setFont:noteFont];
+    [_dateLabel setTextColor:noteColor];
+    CGPoint newDateCenter = _dateLabel.center;
+    newDateCenter.y += offset;
+    [_dateLabel setCenter:newDateCenter];
+    
+    // format avatar image view
+    _avatarView.layer.cornerRadius = kAvatarCornerRadius;
+    _avatarView.layer.masksToBounds = YES;
+    
+    // set author name
+    NSString *authorName = [self.authorItem objectForKey:@"displayName"];
+    [_authorLabel setText:authorName];
+    
+    // set date
+    NSTimeInterval timeStamp = [[self.contentItem objectForKey:@"createdAt"] doubleValue];
+    NSString *dateTime = [[[NSDateFormatter alloc] init]
+                          extendedRelativeStringFromDate:
+                          [NSDate dateWithTimeIntervalSince1970:timeStamp]];
+    [_dateLabel setText:dateTime];
+    
+    // set avatar image
+    _avatarView.image = _avatarImage;
+    
+    // calculate content size
+    CGFloat contentHeight = _dateLabel.frame.origin.y + _dateLabel.frame.size.height + 20.f;
+    CGSize contentSize = CGSizeMake(self.scrollView.frame.size.width, contentHeight);
+    [self.scrollView setContentSize:contentSize];
 }
 
 - (void)viewWillAppear:(BOOL)animated
