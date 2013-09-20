@@ -11,12 +11,14 @@
 #import "LFSAttributedTextCell.h"
 
 // TODO: turn some of these consts into properties for easier customization
-static const CGFloat kLeftColumnWidth = 60;
-static const CGFloat kBottomInset = 5;
+static const CGFloat kLeftColumnWidth = 50;
+static const CGFloat kBottomInset = 18;
 static const CGFloat kHeaderHeight = 30;
 static const CGFloat kRightColumnWidth = 80;
 static const CGFloat kAvatarCornerRadius = 4;
 static const CGFloat kNoteRightInset = 12;
+static const CGSize kAvatarDisplaySize = { 25.f, 25.f };
+static const CGPoint kAvatarDisplayOrigin = { 15.f, 7.f };
 
 @interface LFSAttributedTextCell ()
 
@@ -30,75 +32,79 @@ static const CGFloat kNoteRightInset = 12;
 
 #pragma mark - Properties
 @synthesize textContentView = _textContentView;
+@synthesize avatarImage = _avatarImage;
 
 - (void)setHTMLString:(NSString *)html
 {
-	// we don't preserve the html but compare it's hash
+	// store hash isntead of html text
 	NSUInteger newHash = [html hash];
 
-	if (newHash == _htmlHash)
-	{
+	if (newHash == _htmlHash) {
 		return;
 	}
 	
 	_htmlHash = newHash;
-	
-    // Example 1: parse HTML in attributed string
-	//NSData *data = [html dataUsingEncoding:NSUTF8StringEncoding];
-	//NSAttributedString *string = [[NSAttributedString alloc] initWithHTMLData:data documentAttributes:NULL];
 	[self.textContentView setHTMLString:html];
-	
 	[self setNeedsLayout];
 }
 
 - (UIImage*)avatarImage
 {
-    return self.imageView.image;
+    return _avatarImage;
 }
 
 - (void)setAvatarImage:(UIImage*)image
 {
-    // scale down image if we are not on a Retina device
+    // store original-size image
+    _avatarImage = image;
+    
+    // we are on a non-Retina device
     UIScreen *screen = [UIScreen mainScreen];
-    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2) {
-        // we are on a Retina device
-        self.imageView.image = image;
-        [self setNeedsLayout];
+    CGSize size;
+    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2.f)
+    {
+        // Retina: scale to 2x frame size
+        size = CGSizeMake(kAvatarDisplaySize.width * 2,
+                          kAvatarDisplaySize.height * 2);
     }
-    else {
-        // we are on a non-Retina device
-        CGSize size = self.imageView.frame.size;
-        dispatch_queue_t queue =
-        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(queue, ^{
-            
-            // scale image on a background thread
-            // Note: this will not preserve aspect ratio
-            UIGraphicsBeginImageContext(size);
-            [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-            UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            
-            // display image on the main thread
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                self.imageView.image = scaledImage;
-                [self setNeedsLayout];
-            });
+    else
+    {
+        // non-Retina
+        size = kAvatarDisplaySize;
+    }
+    CGRect targetRect = CGRectMake(0, 0, size.width, size.height);
+    dispatch_queue_t queue =
+    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        
+        // scale image on a background thread
+        // Note: this will not preserve aspect ratio
+        UIGraphicsBeginImageContext(size);
+        [image drawInRect:targetRect];
+        UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        // display image on the main thread
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            self.imageView.image = scaledImage;
+            [self setNeedsLayout];
         });
-    }
+    });
 }
 
 #pragma mark - Class methods
 
 static UIFont *titleFont = nil;
-static UIFont *noteFont = nil;
-static UIColor *noteColor = nil;
+static UIFont *bodyFont = nil;
+static UIFont *dateFont = nil;
+static UIColor *dateColor = nil;
 
 + (void)initialize {
     if(self == [LFSAttributedTextCell class]) {
-        titleFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
-        noteFont = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
-        noteColor = [UIColor grayColor];
+        titleFont = [UIFont boldSystemFontOfSize:12.f];
+        bodyFont = [UIFont fontWithName:@"Georgia" size:13.f];
+        dateFont = [UIFont systemFontOfSize:11.f];
+        dateColor = [UIColor lightGrayColor];
     }
 }
 
@@ -114,7 +120,8 @@ static UIColor *noteColor = nil;
                                   self.contentView.bounds.size.height - kHeaderHeight);
         
 		_textContentView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
-        //[_textContentView setFont:titleFont];
+        [_textContentView setFont:bodyFont];
+        [_textContentView setLineSpacing:6.5f];
         [_textContentView setDelegate:self];
 		[self.contentView addSubview:_textContentView];
 	}
@@ -135,8 +142,8 @@ static UIColor *noteColor = nil;
 {
 	if (!_noteView) {
 		_noteView = [[UILabel alloc] init];
-        [_noteView setFont:noteFont];
-        [_noteView setTextColor:noteColor];
+        [_noteView setFont:dateFont];
+        [_noteView setTextColor:dateColor];
         [_noteView setTextAlignment:NSTextAlignmentRight];
 		[self.contentView addSubview:_noteView];
 	}
@@ -153,12 +160,11 @@ static UIColor *noteColor = nil;
         _titleView = nil;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
-        [self.imageView setContentMode:UIViewContentModeScaleAspectFit];
-        //[self setHasFixedRowHeight:NO];
+        [self.imageView setContentMode:UIViewContentModeScaleToFill];
         self.textContentView.delegate = self;
-        //self.textContentView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
         
-        if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
+        if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
+        {
             // iOS7-like selected background color
             [self setSelectionStyle:UITableViewCellSelectionStyleGray];
             UIView *selectionColor = [[UIView alloc] init];
@@ -166,7 +172,6 @@ static UIColor *noteColor = nil;
                                                              green:(217/255.0)
                                                               blue:(217/255.0)
                                                              alpha:1];
-            //selectionColor.backgroundColor = [UIColor blackColor]; // for testing translucency
             self.selectedBackgroundView = selectionColor;
         }
         self.imageView.layer.cornerRadius = kAvatarCornerRadius;
@@ -177,9 +182,10 @@ static UIColor *noteColor = nil;
 
 -(void)dealloc{
     _textContentView.delegate = nil;
-    //self.textContentView.attributedString = nil;
+    _textContentView = nil;
     _titleView = nil;
     _noteView = nil;
+    _avatarImage = nil;
 }
 
 #pragma mark - Private methods
@@ -211,18 +217,10 @@ static UIColor *noteColor = nil;
                                  kRightColumnWidth - kNoteRightInset,
                                  kHeaderHeight);
     
-    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
-        ([UIScreen mainScreen].scale == 2.0f))
-    {
-        // Retina display, okay to use half-points
-        self.imageView.frame = CGRectMake( 12.f, 7.f, 37.5f, 37.5f );
-    }
-    else
-    {
-        // non-Retina display
-        self.imageView.frame = CGRectMake( 12.f, 7.f, 37.f, 37.f );
-    }
-    
+    CGRect imageViewFrame;
+    imageViewFrame.origin = kAvatarDisplayOrigin;
+    imageViewFrame.size = kAvatarDisplaySize;
+    self.imageView.frame = imageViewFrame;
 }
 
 #pragma mark - Public methods

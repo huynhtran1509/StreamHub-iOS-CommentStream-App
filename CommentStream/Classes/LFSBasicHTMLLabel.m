@@ -9,7 +9,10 @@
 #import "LFSBasicHTMLLabel.h"
 #import "LFSBasicHTMLParser.h"
 
-@implementation LFSBasicHTMLLabel
+
+@implementation LFSBasicHTMLLabel {
+    BOOL _customLineSpacing;
+}
 
 @synthesize font = _font;
 
@@ -18,6 +21,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         _font = nil;
+        _customLineSpacing = NO;
     }
     return self;
 }
@@ -27,6 +31,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         _font = nil;
+        _customLineSpacing = NO;
     }
     return self;
 }
@@ -49,7 +54,19 @@
         [attributedText setFont:_font];
     }
     
+    if (_customLineSpacing) {
+        NSMutableParagraphStyle *paragrahStyle = [[NSMutableParagraphStyle alloc] init];
+        [paragrahStyle setLineSpacing:_lineSpacing];
+        [attributedText addAttribute:NSParagraphStyleAttributeName value:paragrahStyle range:NSMakeRange(0, [attributedText length])];
+    }
+    
     [self setAttributedText:attributedText];
+}
+
+-(void)setLineSpacing:(CGFloat)points
+{
+    _customLineSpacing = YES;
+    _lineSpacing = points;
 }
 
 @end

@@ -12,5 +12,6 @@
 
 - (void)setHTMLString:(NSString *)html;
 @property (nonatomic, strong) UIFont *font;
+@property (nonatomic, assign) CGFloat lineSpacing;
 
 @end

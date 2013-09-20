@@ -88,7 +88,7 @@ static NSString* const kCellSelectSegue = @"detailView";
         
         __weak typeof(self) weakSelf = self;
         [self.streamClient setResultHandler:^(id responseObject) {
-            NSLog(@"%@", responseObject);
+            //NSLog(@"%@", responseObject);
             [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
                              withAuthors:[responseObject objectForKey:@"authors"]];
             

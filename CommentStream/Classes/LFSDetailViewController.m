@@ -32,16 +32,16 @@ static const CGFloat kAvatarCornerRadius = 4;
 
 #pragma mark - Class methods
 static UIFont *titleFont = nil;
-static UIFont *noteFont = nil;
-static UIColor *noteColor = nil;
 static UIFont *bodyFont = nil;
+static UIFont *dateFont = nil;
+static UIColor *dateColor = nil;
 
 + (void)initialize {
     if(self == [LFSDetailViewController class]) {
-        titleFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
-        bodyFont = [UIFont fontWithName:@"Georgia" size:16.0f];
-        noteFont = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
-        noteColor = [UIColor grayColor];
+        titleFont = [UIFont boldSystemFontOfSize:16.f];
+        bodyFont = [UIFont fontWithName:@"Georgia" size:17.0f];
+        dateFont = [UIFont systemFontOfSize:13.f];
+        dateColor = [UIColor lightGrayColor];
     }
 }
 
@@ -79,12 +79,14 @@ static UIFont *bodyFont = nil;
     // set main content label
     [self.basicHTMLLabel setDelegate:self];
     [self.basicHTMLLabel setFont:bodyFont];
+    [self.basicHTMLLabel setLineSpacing:8.5f];
+    
     [self.basicHTMLLabel setHTMLString:[self.contentItem objectForKey:@"bodyHtml"]];
     CGRect oldContentFrame = self.basicHTMLLabel.frame;
     CGSize maxSize = oldContentFrame.size;
     maxSize.height = 1000.f;
     CGSize neededSize = [self.basicHTMLLabel sizeThatFits:maxSize];
-    CGFloat offset = neededSize.height - oldContentFrame.size.height;
+    CGFloat bottom = neededSize.height + oldContentFrame.origin.y;
     [self.basicHTMLLabel setFrame:CGRectMake(oldContentFrame.origin.x,
                                              oldContentFrame.origin.y,
                                              neededSize.width,
@@ -95,13 +97,28 @@ static UIFont *bodyFont = nil;
     [_authorLabel setFont:titleFont];
     
     // format date label
-    [_dateLabel setFont:noteFont];
-    [_dateLabel setTextColor:noteColor];
-    CGPoint newDateCenter = _dateLabel.center;
-    newDateCenter.y += offset;
-    [_dateLabel setCenter:newDateCenter];
-    
+    [_dateLabel setFont:dateFont];
+    [_dateLabel setTextColor:dateColor];
+    CGRect dateFrame = _dateLabel.frame;
+    dateFrame.origin = CGPointMake(dateFrame.origin.x, bottom + 12.f);
+    [_dateLabel setFrame:dateFrame];
+
     // format avatar image view
+    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+        ([UIScreen mainScreen].scale == 2.0f))
+    {
+        // Retina display, okay to use half-points
+        CGRect avatarFrame = _avatarView.frame;
+        avatarFrame.size = CGSizeMake(37.5f, 37.5f);
+        [_avatarView setFrame:avatarFrame];
+    }
+    else
+    {
+        // non-Retina display, do not use half-points
+        CGRect avatarFrame = _avatarView.frame;
+        avatarFrame.size = CGSizeMake(37.f, 37.f);
+        [_avatarView setFrame:avatarFrame];
+    }
     _avatarView.layer.cornerRadius = kAvatarCornerRadius;
     _avatarView.layer.masksToBounds = YES;
     

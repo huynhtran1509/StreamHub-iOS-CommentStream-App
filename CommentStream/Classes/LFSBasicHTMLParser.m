@@ -22,6 +22,18 @@
 {
     return [NSDictionary dictionaryWithObjectsAndKeys:
             
+            // &
+            ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
+            {
+                NSRange textRange = [match rangeAtIndex:1];
+                if (textRange.length>0)
+                {
+                    return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@"&"]);
+                } else {
+                    return nil;
+                }
+            }, @"(&amp;)",
+            
             // <
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
