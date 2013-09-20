@@ -4,8 +4,10 @@
 <dict>
 	<key>defaults</key>
 	<dict>
+		<key>siteId</key>
+		<string>303827</string>
 		<key>network</key>
-		<string>livefyre.com</string>
+		<string>labs-t402.fyre.co</string>
 		<key>environment</key>
 		<string>t402.livefyre.com</string>
 	</dict>
@@ -13,7 +15,45 @@
 	<array>
 		<dict>
 			<key>_name</key>
-			<string>Sandbox</string>
+			<string>Xbox</string>
+			<key>articleId</key>
+			<string>xbox-0</string>
+		</dict>
+		<dict>
+			<key>_name</key>
+			<string>Social Soccer 2</string>
+			<key>articleId</key>
+			<string>labs_demo_soccer_2</string>
+		</dict>
+		<dict>
+			<key>_name</key>
+			<string>Social Basketball 2</string>
+			<key>articleId</key>
+			<string>labs_demo_basketball_2</string>
+		</dict>
+		<dict>
+			<key>_name</key>
+			<string>Social Football 2</string>
+			<key>articleId</key>
+			<string>labs_demo_football_2</string>
+		</dict>
+		<dict>
+			<key>_name</key>
+			<string>JavaScript tweets</string>
+			<key>environment</key>
+			<string>t402.livefyre.com</string>
+			<key>network</key>
+			<string>labs.fyre.co</string>
+			<key>siteId</key>
+			<string>315833</string>
+			<key>articleId</key>
+			<string>example</string>
+		</dict>
+		<dict>
+			<key>_name</key>
+			<string>~Writable</string>
+			<key>environment</key>
+			<string>livefyre.com</string>
 			<key>network</key>
 			<string>labs.fyre.co</string>
 			<key>siteId</key>
@@ -25,17 +65,9 @@
 		</dict>
 		<dict>
 			<key>_name</key>
-			<string>Example Collection</string>
-			<key>network</key>
-			<string>labs.fyre.co</string>
-			<key>siteId</key>
-			<string>315833</string>
-			<key>articleId</key>
-			<string>example</string>
-		</dict>
-		<dict>
-			<key>_name</key>
-			<string>Oranges!!!</string>
+			<string>Oranges Are Great</string>
+			<key>environment</key>
+			<string>t402.livefyre.com</string>
 			<key>network</key>
 			<string>livefyre.com</string>
 			<key>siteId</key>

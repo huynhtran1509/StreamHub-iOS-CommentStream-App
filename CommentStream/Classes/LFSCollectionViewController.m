@@ -12,10 +12,10 @@
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
+#import "LFSDetailViewController.h"
 #import "LFSTextField.h"
 
 @interface LFSCollectionViewController () {
-    __weak UITableView* _tableView;
     LFSNewCommentViewController *_viewControllerNewComment;
 }
 
@@ -33,8 +33,9 @@
 - (BOOL)canReuseCells;
 @end
 
-// identifier for cell reuse
-static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
+// some module-level constants
+static NSString* const kCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
+static NSString* const kCellSelectSegue = @"detailView";
 
 @implementation LFSCollectionViewController
 {
@@ -42,6 +43,13 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     UIActivityIndicatorView *_activityIndicator;
     UIView *_container;
     CGPoint _scrollOffset;
+    
+    // regular expression stuff (to replace 50px images with 75px)
+    // TODO: move this to a separate class?
+    NSRegularExpression *_regex1;
+    NSRegularExpression *_regex2;
+    NSString *_regexTemplate1;
+    NSString *_regexTemplate2;
 }
 
 #pragma mark - Properties
@@ -80,7 +88,7 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
         
         __weak typeof(self) weakSelf = self;
         [self.streamClient setResultHandler:^(id responseObject) {
-            NSLog(@"%@", responseObject);
+            //NSLog(@"%@", responseObject);
             [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
                              withAuthors:[responseObject objectForKey:@"authors"]];
             
@@ -97,16 +105,6 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     
     _authors = [NSMutableDictionary dictionary];
     _content = [NSMutableArray array];
-    
-    if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
-        // A strong reference to UITableView in DTAttributedTextCell causes overrelease.
-        // The following line is a work-around to that problem. This ought to be replaced
-        // when the following fix by Cocoanetics is merged to master:
-        // https://github.com/Cocoanetics/DTCoreText/issues/599
-        // Note: this is an iOS6 issue only.
-        //
-        _tableView = (__bridge id)CFBridgingRetain(self.tableView);
-    }
     
     self.title = [_collection objectForKey:@"_name"];
     
@@ -180,6 +178,31 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     
     _dateFormatter = [[NSDateFormatter alloc] init];
     
+    
+    // {{{ Regex stuff
+    //
+    // We will handle two types of avatar URLs:
+    // http://gravatar.com/avatar/c228ecbc43be06cc999c08cf020f9fde/?s=50&d=http://avatars-staging.fyre.co/a/anon/50.jpg
+    // http://avatars.fyre.co/a/26/6dbce19ef7452f69164e857d55d173ae/50.jpg?v=1375324889"
+    //
+    NSError *regexError1 = nil;
+    _regex1 = [NSRegularExpression
+                      regularExpressionWithPattern:@"([?&])s=50(&?)"
+                      options:NSRegularExpressionCaseInsensitive
+                      error:&regexError1];
+    NSAssert(regexError1 == nil, @"Error creating regex: %@", regexError1.description);
+    
+    _regexTemplate1 = @"$1s=75$2";
+    
+    NSError *_regexError2 = nil;
+    _regex2 = [NSRegularExpression
+                      regularExpressionWithPattern:@"/50.([a-zA-Z]+)\\b"
+                      options:NSRegularExpressionCaseInsensitive
+                      error:&_regexError2];
+    NSAssert(regexError1 == nil, @"Error creating regex: %@", regexError1.description);
+    _regexTemplate2 = @"/75.$1";
+    // }}}
+    
     [self wheelContainerSetup];
 }
 
@@ -226,6 +249,11 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     self.navigationController.delegate = nil;
     self.tableView.delegate = nil;
     self.tableView.dataSource = nil;
+    
+    _regex1 = nil;
+    _regex2 = nil;
+    _regexTemplate1 = nil;
+    _regexTemplate2 = nil;
     
     _postCommentField.delegate = nil;
     _postCommentField = nil;
@@ -419,12 +447,18 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
 
 #pragma mark - UITableViewControllerDelegate
 
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
+}
+
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
                                                      cellForRowAtIndexPath:indexPath];
-    return [cell requiredRowHeightInTableView:tableView];
+    return [cell requiredRowHeight];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -442,17 +476,14 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     if (!cell) {
         if ([self canReuseCells]) {
             cell = (LFSAttributedTextCell *)[tableView
-                                             dequeueReusableCellWithIdentifier:kAttributedTextCellReuseIdentifier];
+                                             dequeueReusableCellWithIdentifier:kCellReuseIdentifier];
         }
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc]
-                    initWithReuseIdentifier:kAttributedTextCellReuseIdentifier];
+                    initWithReuseIdentifier:kCellReuseIdentifier];
         }
         // cache the cell, if there is a cache
         [_cellCache setObject:cell forKey:key];
-        
-        // LFAttributedTextCell specifics
-        cell.attributedTextContextView.shouldDrawImages = NO;
     }
     
     [self configureCell:cell forIndexPath:indexPath];
@@ -478,16 +509,25 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
     NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
     
-    cell.titleView.text = authorName;
+    [cell.titleView setText:authorName];
     NSString *dateTime = [self.dateFormatter
                           relativeStringFromDate:
                           [NSDate dateWithTimeIntervalSince1970:timeStamp]];
-    cell.noteView.text = dateTime;
+    [cell.noteView setText:dateTime];
     
+
+    // create 75px avatar url
+    NSString *avatarURL1 = [_regex1 stringByReplacingMatchesInString:avatarURL
+                                                               options:0
+                                                                 range:NSMakeRange(0, [avatarURL length])
+                                                          withTemplate:_regexTemplate1];
+    NSString *avatarURL2 = [_regex2 stringByReplacingMatchesInString:avatarURL1
+                                                           options:0
+                                                             range:NSMakeRange(0, [avatarURL1 length])
+                                                      withTemplate:_regexTemplate2];
     // load avatar images in a separate queue
-    // TODO: load 75x75px avatars instead of 50x50
     NSURLRequest *request =
-    [NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL]];
+    [NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL2]];
     AFImageRequestOperation* operation = [AFImageRequestOperation
                                           imageRequestOperationWithRequest:request
                                           imageProcessingBlock:nil
@@ -495,18 +535,37 @@ static NSString* const kAttributedTextCellReuseIdentifier = @"AttributedTextCell
                                                      NSHTTPURLResponse *response,
                                                      UIImage *image)
                                           {
-                                              [cell assignImage:image];
+                                              [cell setAvatarImage:image];
                                           }
                                           failure:nil];
     [operation start];
-    
-    // To test embedded images:
-    //NSString *html =
-    //[NSString stringWithFormat:@"<img src=\"%@\"/><div style=\"font-family:Avenir\">%@</div>",
-    // avatarURL, bodyHTML];
-    NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\">%@</div>", bodyHTML];
-    
-    [cell setHTMLString:html];
+
+    [cell setHTMLString:bodyHTML];
+}
+
+#pragma mark - Navigation
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    // Make sure your segue name in storyboard is the same as this line
+    if ([[segue identifier] isEqualToString:kCellSelectSegue])
+    {
+        // Get reference to the destination view controller
+        if ([segue.destinationViewController isKindOfClass:[LFSDetailViewController class]]) {
+            if ([sender isKindOfClass:[UITableViewCell class]]) {
+                LFSAttributedTextCell *cell = (LFSAttributedTextCell *)sender;
+                NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+                LFSDetailViewController *vc = segue.destinationViewController;
+                
+                // assign model object(s)
+                NSDictionary *content = [_content objectAtIndex:indexPath.row];
+                NSDictionary *contentItem = [content objectForKey:@"content"];
+                [vc setContentItem:contentItem];
+                [vc setAuthorItem:[_authors objectForKey:[contentItem objectForKey:@"authorId"]]];
+                [vc setAvatarImage:cell.avatarImage];
+            }
+        }
+    }
 }
 
 #pragma mark - Events

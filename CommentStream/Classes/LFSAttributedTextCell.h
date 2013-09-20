@@ -8,15 +8,18 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <DTCoreText/DTAttributedTextCell.h>
+#import "LFSBasicHTMLLabel.h"
 
-#import "DTLazyImageView+TextContentView.h"
-
-@interface LFSAttributedTextCell : DTAttributedTextCell <DTAttributedTextContentViewDelegate, DTLazyImageViewDelegate>
+@interface LFSAttributedTextCell : UITableViewCell <OHAttributedLabelDelegate>
 
 @property (nonatomic, readonly) UILabel *titleView;
 @property (nonatomic, readonly) UILabel *noteView;
+@property (nonatomic, strong) LFSBasicHTMLLabel *textContentView;
+@property (nonatomic, strong) UIImage *avatarImage;
 
-- (void)assignImage:(UIImage*)image;
+#pragma mark - basics
+- (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
+- (CGFloat)requiredRowHeight;
+- (void)setHTMLString:(NSString *)html;
 
 @end
