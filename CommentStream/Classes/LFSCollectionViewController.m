@@ -16,7 +16,6 @@
 #import "LFSTextField.h"
 
 @interface LFSCollectionViewController () {
-    __weak UITableView* _tableView;
     LFSNewCommentViewController *_viewControllerNewComment;
 }
 
@@ -106,16 +105,6 @@ static NSString* const kCellSelectSegue = @"detailView";
     
     _authors = [NSMutableDictionary dictionary];
     _content = [NSMutableArray array];
-    
-    if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
-        // A strong reference to UITableView in DTAttributedTextCell causes overrelease.
-        // The following line is a work-around to that problem. This ought to be replaced
-        // when the following fix by Cocoanetics is merged to master:
-        // https://github.com/Cocoanetics/DTCoreText/issues/599
-        // Note: this is an iOS6 issue only.
-        //
-        _tableView = (__bridge id)CFBridgingRetain(self.tableView);
-    }
     
     self.title = [_collection objectForKey:@"_name"];
     
@@ -469,7 +458,7 @@ static NSString* const kCellSelectSegue = @"detailView";
 {
     LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
                                                      cellForRowAtIndexPath:indexPath];
-    return [cell requiredRowHeightInTableView:tableView];
+    return [cell requiredRowHeight];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -495,9 +484,6 @@ static NSString* const kCellSelectSegue = @"detailView";
         }
         // cache the cell, if there is a cache
         [_cellCache setObject:cell forKey:key];
-        
-        // LFAttributedTextCell specifics
-        cell.attributedTextContextView.shouldDrawImages = NO;
     }
     
     [self configureCell:cell forIndexPath:indexPath];
@@ -553,14 +539,8 @@ static NSString* const kCellSelectSegue = @"detailView";
                                           }
                                           failure:nil];
     [operation start];
-    
-    // To test embedded images:
-    //NSString *html =
-    //[NSString stringWithFormat:@"<img src=\"%@\"/><div style=\"font-family:Avenir\">%@</div>",
-    // avatarURL, bodyHTML];
-    NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir\">%@</div>", bodyHTML];
-    
-    [cell setHTMLString:html];
+
+    [cell setHTMLString:bodyHTML];
 }
 
 #pragma mark - Navigation

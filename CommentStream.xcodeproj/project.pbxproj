@@ -13,8 +13,6 @@
 		EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED217E3C13000D5A7DF /* LFSDetailViewController.m */; };
 		EF5AFED617E3C2B900D5A7DF /* LFSNewCommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED517E3C2B900D5A7DF /* LFSNewCommentViewController.m */; };
 		EF62178217E8F76900700808 /* LFSTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = EF62178117E8F76900700808 /* LFSTextField.m */; };
-		EF62178E17EA5E1E00700808 /* LFSAttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF62178D17EA5E1E00700808 /* LFSAttributedTextView.m */; };
-		EF6683D117BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */; };
 		EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DC17BB97E2005F5FC3 /* LFSAppDelegate.m */; };
 		EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DE17BB97E2005F5FC3 /* LFSCollectionViewController.m */; };
 		EF7BB6DC17B2B718009E2E70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DB17B2B718009E2E70 /* Foundation.framework */; };
@@ -26,6 +24,8 @@
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
 		EFC4F61317DFC35C00E60F6F /* LFSRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC4F61217DFC35C00E60F6F /* LFSRootViewController.m */; };
 		EFC9574E17CE968B0033C858 /* LFSConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC9574D17CE968B0033C858 /* LFSConfig.m */; };
+		EFCB9F8C17EBED3B00797BCE /* LFSBasicHTMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EFCB9F8B17EBED3B00797BCE /* LFSBasicHTMLParser.m */; };
+		EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = EFD5BFD517EC604500C28880 /* LFSBasicHTMLLabel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,10 +40,6 @@
 		EF5AFED517E3C2B900D5A7DF /* LFSNewCommentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSNewCommentViewController.m; path = Classes/LFSNewCommentViewController.m; sourceTree = "<group>"; };
 		EF62178017E8F76900700808 /* LFSTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSTextField.h; path = Classes/LFSTextField.h; sourceTree = "<group>"; };
 		EF62178117E8F76900700808 /* LFSTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSTextField.m; path = Classes/LFSTextField.m; sourceTree = "<group>"; };
-		EF62178C17EA5E1E00700808 /* LFSAttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSAttributedTextView.h; path = Classes/LFSAttributedTextView.h; sourceTree = "<group>"; };
-		EF62178D17EA5E1E00700808 /* LFSAttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSAttributedTextView.m; path = Classes/LFSAttributedTextView.m; sourceTree = "<group>"; };
-		EF6683CF17BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "DTLazyImageView+TextContentView.h"; path = "CommentStream/Categories/DTLazyImageView+TextContentView.h"; sourceTree = "<group>"; };
-		EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "DTLazyImageView+TextContentView.m"; path = "CommentStream/Categories/DTLazyImageView+TextContentView.m"; sourceTree = "<group>"; };
 		EF6683DB17BB97E2005F5FC3 /* LFSAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSAppDelegate.h; path = Classes/LFSAppDelegate.h; sourceTree = "<group>"; };
 		EF6683DC17BB97E2005F5FC3 /* LFSAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSAppDelegate.m; path = Classes/LFSAppDelegate.m; sourceTree = "<group>"; };
 		EF6683DD17BB97E2005F5FC3 /* LFSCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSCollectionViewController.h; path = Classes/LFSCollectionViewController.h; sourceTree = "<group>"; };
@@ -62,6 +58,10 @@
 		EFC4F61217DFC35C00E60F6F /* LFSRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSRootViewController.m; path = Classes/LFSRootViewController.m; sourceTree = "<group>"; };
 		EFC9574C17CE968B0033C858 /* LFSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSConfig.h; path = Classes/LFSConfig.h; sourceTree = "<group>"; };
 		EFC9574D17CE968B0033C858 /* LFSConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSConfig.m; path = Classes/LFSConfig.m; sourceTree = "<group>"; };
+		EFCB9F8A17EBED3B00797BCE /* LFSBasicHTMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSBasicHTMLParser.h; path = Classes/LFSBasicHTMLParser.h; sourceTree = "<group>"; };
+		EFCB9F8B17EBED3B00797BCE /* LFSBasicHTMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSBasicHTMLParser.m; path = Classes/LFSBasicHTMLParser.m; sourceTree = "<group>"; };
+		EFD5BFD417EC604500C28880 /* LFSBasicHTMLLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSBasicHTMLLabel.h; path = Classes/LFSBasicHTMLLabel.h; sourceTree = "<group>"; };
+		EFD5BFD517EC604500C28880 /* LFSBasicHTMLLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSBasicHTMLLabel.m; path = Classes/LFSBasicHTMLLabel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,7 +82,6 @@
 		EF5AFECF17E3BD3700D5A7DF /* LFSToolkit */ = {
 			isa = PBXGroup;
 			children = (
-				EF6683D217BAEC03005F5FC3 /* Categories */,
 				EF5AFED017E3BDE300D5A7DF /* Classes */,
 			);
 			name = LFSToolkit;
@@ -91,24 +90,16 @@
 		EF5AFED017E3BDE300D5A7DF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EFCB9F8A17EBED3B00797BCE /* LFSBasicHTMLParser.h */,
+				EFCB9F8B17EBED3B00797BCE /* LFSBasicHTMLParser.m */,
+				EFD5BFD417EC604500C28880 /* LFSBasicHTMLLabel.h */,
+				EFD5BFD517EC604500C28880 /* LFSBasicHTMLLabel.m */,
 				EF200BCE17BBB63A007E5295 /* LFSAttributedTextCell.h */,
 				EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */,
 				EF62178017E8F76900700808 /* LFSTextField.h */,
 				EF62178117E8F76900700808 /* LFSTextField.m */,
-				EF62178C17EA5E1E00700808 /* LFSAttributedTextView.h */,
-				EF62178D17EA5E1E00700808 /* LFSAttributedTextView.m */,
 			);
 			name = Classes;
-			sourceTree = "<group>";
-		};
-		EF6683D217BAEC03005F5FC3 /* Categories */ = {
-			isa = PBXGroup;
-			children = (
-				EF6683CF17BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.h */,
-				EF6683D017BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m */,
-			);
-			name = Categories;
-			path = ..;
 			sourceTree = "<group>";
 		};
 		EF6683D817BB9785005F5FC3 /* Classes */ = {
@@ -292,14 +283,14 @@
 			files = (
 				EF5AFED617E3C2B900D5A7DF /* LFSNewCommentViewController.m in Sources */,
 				EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */,
+				EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */,
+				EFCB9F8C17EBED3B00797BCE /* LFSBasicHTMLParser.m in Sources */,
 				EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */,
-				EF62178E17EA5E1E00700808 /* LFSAttributedTextView.m in Sources */,
 				EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */,
 				EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */,
 				EFC4F61317DFC35C00E60F6F /* LFSRootViewController.m in Sources */,
 				EF7BB6E817B2B718009E2E70 /* main.m in Sources */,
 				EF62178217E8F76900700808 /* LFSTextField.m in Sources */,
-				EF6683D117BAEBF6005F5FC3 /* DTLazyImageView+TextContentView.m in Sources */,
 				EFC9574E17CE968B0033C858 /* LFSConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

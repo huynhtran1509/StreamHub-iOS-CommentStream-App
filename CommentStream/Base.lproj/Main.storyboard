@@ -9,31 +9,24 @@
         <scene sceneID="Lbi-Nh-HHJ">
             <objects>
                 <viewController storyboardIdentifier="commentDetail" id="9jQ-b8-8PW" customClass="LFSDetailViewController" sceneMemberID="viewController">
-                    <scrollView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="X4L-Qy-OGx" customClass="LFSAttributedTextView">
+                    <scrollView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="X4L-Qy-OGx">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="I6G-L6-Wu8">
-                                <rect key="frame" x="0.0" y="524" width="320" height="44"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <items>
-                                    <barButtonItem systemItem="flexibleSpace" id="pCf-qV-NBh"/>
-                                    <barButtonItem systemItem="action" id="B6a-e8-tL6"/>
-                                    <barButtonItem systemItem="flexibleSpace" id="YIO-0W-Ypf"/>
-                                    <barButtonItem style="plain" systemItem="reply" id="Vb4-BG-LKQ">
-                                        <connections>
-                                            <segue destination="s0o-P6-Dkk" kind="push" id="Ccs-DG-2mq"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem systemItem="flexibleSpace" id="GTj-sV-sDw"/>
-                                </items>
-                            </toolbar>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0og-kZ-JhE" customClass="LFSBasicHTMLLabel">
+                                <rect key="frame" x="33" y="165" width="251" height="153"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </scrollView>
                     <navigationItem key="navigationItem" title="Comment" id="lOt-mf-6Ob"/>
                     <connections>
-                        <outlet property="attributedTextView" destination="X4L-Qy-OGx" id="2Fl-xX-DVx"/>
+                        <outlet property="basicHTMLLabel" destination="0og-kZ-JhE" id="Kpb-N7-B2s"/>
+                        <outlet property="scrollView" destination="X4L-Qy-OGx" id="BNI-cD-gnR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ISf-vh-rH3" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -127,7 +120,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="QLq-PC-tD3">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="3fr-q0-jrj">
                                 <rect key="frame" x="0.0" y="44" width="320" height="524"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -157,7 +150,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="New Comment" id="zhQ-MG-dr8"/>
                     <connections>
-                        <outlet property="textView" destination="QLq-PC-tD3" id="bhW-VZ-Ow5"/>
+                        <outlet property="textView" destination="3fr-q0-jrj" id="e64-5e-ZSs"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KV4-cx-MgF" userLabel="First Responder" sceneMemberID="firstResponder"/>

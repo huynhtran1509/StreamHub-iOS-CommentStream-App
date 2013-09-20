@@ -7,9 +7,7 @@
 //
 
 #import <StreamHub-iOS-SDK/LFSConstants.h>
-#import <DTCoreText/DTImageTextAttachment.h>
-#import <DTCoreText/DTLinkButton.h>
-
+#import "LFSBasicHTMLParser.h"
 #import "LFSAttributedTextCell.h"
 
 // TODO: turn some of these consts into properties for easier customization
@@ -27,6 +25,31 @@ static const CGFloat kNoteRightInset = 12;
 @implementation LFSAttributedTextCell {
     UILabel *_titleView;
     UILabel *_noteView;
+	NSUInteger _htmlHash; // preserved hash to avoid relayouting for same HTML
+}
+
+@synthesize textContentView = _textContentView;
+
+#pragma mark - basics
+
+- (void)setHTMLString:(NSString *)html
+{
+	// we don't preserve the html but compare it's hash
+	NSUInteger newHash = [html hash];
+
+	if (newHash == _htmlHash)
+	{
+		return;
+	}
+	
+	_htmlHash = newHash;
+	
+    // Example 1: parse HTML in attributed string
+	//NSData *data = [html dataUsingEncoding:NSUTF8StringEncoding];
+	//NSAttributedString *string = [[NSAttributedString alloc] initWithHTMLData:data documentAttributes:NULL];
+	[self.textContentView setHTMLString:html];
+	
+	[self setNeedsLayout];
 }
 
 #pragma mark - Class methods
@@ -44,6 +67,23 @@ static UIColor *noteColor = nil;
 }
 
 #pragma mark - Properties
+
+-(LFSBasicHTMLLabel*)textContentView
+{
+	if (!_textContentView) {
+        // after the first call here the content view size is correct
+        CGRect frame = CGRectMake(kLeftColumnWidth,
+                                  kHeaderHeight,
+                                  self.contentView.bounds.size.width - kLeftColumnWidth,
+                                  self.contentView.bounds.size.height - kHeaderHeight);
+        
+		_textContentView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        //[_textContentView setFont:titleFont];
+        [_textContentView setDelegate:self];
+		[self.contentView addSubview:_textContentView];
+	}
+	return _textContentView;
+}
 
 - (UILabel *)titleView
 {
@@ -70,7 +110,7 @@ static UIColor *noteColor = nil;
 #pragma mark - Lifecycle
 -(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
 {
-    self = [super initWithReuseIdentifier:reuseIdentifier];
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
     if (self)
     {
         _noteView = nil;
@@ -78,9 +118,9 @@ static UIColor *noteColor = nil;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
         [self.imageView setContentMode:UIViewContentModeScaleAspectFit];
-        [self setHasFixedRowHeight:NO];
-        self.attributedTextContextView.delegate = self;
-        self.attributedTextContextView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
+        //[self setHasFixedRowHeight:NO];
+        self.textContentView.delegate = self;
+        //self.textContentView.edgeInsets = UIEdgeInsetsMake(0, 0, 5, 5);
         
         if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
             // iOS7-like selected background color
@@ -100,13 +140,14 @@ static UIColor *noteColor = nil;
 }
 
 -(void)dealloc{
-    self.attributedTextContextView.delegate = nil;
-    self.attributedTextContextView.attributedString = nil;
+    _textContentView.delegate = nil;
+    //self.textContentView.attributedString = nil;
     _titleView = nil;
     _noteView = nil;
 }
 
-#pragma mark - Private ethods
+#pragma mark - Private methods
+
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
@@ -116,47 +157,36 @@ static UIColor *noteColor = nil;
 		return;
 	}
     
-	if (self.hasFixedRowHeight)
-	{
-		self.attributedTextContextView.frame = self.contentView.bounds;
-	}
-	else
-	{
-        SEL _containingTableView = NSSelectorFromString(@"_containingTableView");
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        UITableView *parentTable = [self performSelector:_containingTableView];
-#pragma clang diagnostic pop
-		CGFloat neededContentHeight = [self requiredRowHeightInTableView:parentTable];
-        
-		// after the first call here the content view size is correct
-		CGRect frame = CGRectMake(kLeftColumnWidth,
-                                  kHeaderHeight,
-                                  self.contentView.bounds.size.width - kLeftColumnWidth,
-                                  neededContentHeight - kHeaderHeight);
-		self.attributedTextContextView.frame = frame;
-        
-        _titleView.frame = CGRectMake(kLeftColumnWidth,
-                                      0,
-                                      self.contentView.bounds.size.width - kLeftColumnWidth - kRightColumnWidth,
-                                      kHeaderHeight);
-        _noteView.frame = CGRectMake(self.contentView.bounds.size.width - kRightColumnWidth,
-                                     0,
-                                     kRightColumnWidth - kNoteRightInset,
-                                     kHeaderHeight);
-        
-        if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
-            ([UIScreen mainScreen].scale == 2.0f))
-        {
-            // Retina display, okay to use half-points
-            self.imageView.frame = CGRectMake( 12.f, 7.f, 37.5f, 37.5f );
-        }
-        else
-        {
-            // non-Retina display
-            self.imageView.frame = CGRectMake( 12.f, 7.f, 37.f, 37.f );
-        }
-	}
+    CGFloat neededContentHeight = [self requiredRowHeight];
+    
+    // after the first call here the content view size is correct
+    CGRect frame = CGRectMake(kLeftColumnWidth,
+                              kHeaderHeight,
+                              self.contentView.bounds.size.width - kLeftColumnWidth,
+                              neededContentHeight - kHeaderHeight);
+    self.textContentView.frame = frame;
+    
+    _titleView.frame = CGRectMake(kLeftColumnWidth,
+                                  0,
+                                  self.contentView.bounds.size.width - kLeftColumnWidth - kRightColumnWidth,
+                                  kHeaderHeight);
+    _noteView.frame = CGRectMake(self.contentView.bounds.size.width - kRightColumnWidth,
+                                 0,
+                                 kRightColumnWidth - kNoteRightInset,
+                                 kHeaderHeight);
+    
+    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+        ([UIScreen mainScreen].scale == 2.0f))
+    {
+        // Retina display, okay to use half-points
+        self.imageView.frame = CGRectMake( 12.f, 7.f, 37.5f, 37.5f );
+    }
+    else
+    {
+        // non-Retina display
+        self.imageView.frame = CGRectMake( 12.f, 7.f, 37.f, 37.f );
+    }
+    
 }
 
 #pragma mark - Public methods
@@ -194,122 +224,30 @@ static UIColor *noteColor = nil;
     }
 }
 
-// @Override DTAttributedTextCell method
-- (CGFloat)requiredRowHeightInTableView:(UITableView *)tableView
+- (CGFloat)requiredRowHeight
 {
-	if (self.hasFixedRowHeight)
-	{
-		NSLog(@"Warning: you are calling %s even though the cell is configured with fixed row height",
-              (const char *)__PRETTY_FUNCTION__);
-	}
-	
-	CGFloat contentWidth = tableView.frame.size.width - kLeftColumnWidth;
-	
-	// reduce width for accessories
-	switch (self.accessoryType)
-	{
-		case UITableViewCellAccessoryDisclosureIndicator:
-		case UITableViewCellAccessoryCheckmark:
-			contentWidth -= 20.0f;
-			break;
-		case UITableViewCellAccessoryDetailDisclosureButton:
-			contentWidth -= 33.0f;
-			break;
-		case UITableViewCellAccessoryNone:
-			break;
-		default:
-			NSLog(@"Warning: Sizing for UITableViewCellAccessoryDetailButton not implemented on %@",
-                  NSStringFromClass([self class]));
-			break;
-	}
-	
-	// reduce width for grouped table views
-	if (tableView.style == UITableViewStyleGrouped)
-	{
-		// left and right 10 px margins on grouped table views
-		contentWidth -= 20;
-	}
-	
-	CGSize neededSize = [self.attributedTextContextView
-                         suggestedFrameSizeToFitEntireStringConstraintedToWidth:contentWidth];
-	
+    CGSize maxSize = self.textContentView.frame.size;
+    maxSize.height = 1000.f;
+    CGSize neededSize = [self.textContentView sizeThatFits:maxSize];
+
 	// note: non-integer row heights caused trouble < iOS 5.0
 	return MAX(neededSize.height + kHeaderHeight,
                self.imageView.frame.size.height + self.imageView.frame.origin.y)
     + kBottomInset;
 }
 
-#pragma mark - DTAttributedTextContentViewDelegate
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
-                        viewForLink:(NSURL *)url
-                         identifier:(NSString *)identifier
-                              frame:(CGRect)frame
+#pragma mark - OHAttributedLabelDelegate
+-(BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel
+      shouldFollowLink:(NSTextCheckingResult*)linkInfo
 {
-    DTLinkButton *btn = [[DTLinkButton alloc] initWithFrame:frame];
-    btn.URL = url;
-    [btn addTarget:self action:@selector(openURL:) forControlEvents:UIControlEventTouchUpInside];
-    return btn;
+    return YES;
 }
 
--(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
-                  viewForAttachment:(DTTextAttachment *)attachment frame:(CGRect)frame
+-(UIColor*)attributedLabel:(OHAttributedLabel*)attributedLabel
+              colorForLink:(NSTextCheckingResult*)linkInfo
+            underlineStyle:(int32_t*)underlineStyle
 {
-    if ([attachment isKindOfClass:[DTImageTextAttachment class]]) {
-        
-        DTLazyImageView *imageView = [[DTLazyImageView alloc] initWithFrame:frame];
-        imageView.textContentView = attributedTextContentView;
-        imageView.delegate = self;
-        
-        // defer loading of image under given URL
-        imageView.url = attachment.contentURL;
-        return imageView;
-    }
-    return nil;
-}
-
-// allow display of images embedded in rich-text content
--(void)lazyImageView:(DTLazyImageView *)lazyImageView didChangeImageSize:(CGSize)size
-{
-    DTAttributedTextContentView *cv = lazyImageView.textContentView;
-    NSURL *url = lazyImageView.url;
-    
-    NSPredicate *pred = [NSPredicate predicateWithFormat:@"contentURL == %@", url];
-    // update all attachments that match this URL (possibly multiple images with same size)
-    for (DTTextAttachment *attachment in [cv.layoutFrame textAttachmentsWithPredicate:pred])
-    {
-        /*
-         attachment.originalSize = imageSize;
-         if (!CGSizeEqualToSize(imageSize, attachment.displaySize)) {
-         attachment.displaySize = imageSize;
-         }*/
-        attachment.originalSize = size;
-        lazyImageView.bounds = CGRectMake(0, 0,
-                                          attachment.displaySize.width,
-                                          attachment.displaySize.height);
-    }
-    
-    // need to reset the layouter because otherwise we get the old framesetter or cached
-    // layout frames. See https://github.com/Cocoanetics/DTCoreText/issues/307
-    cv.layouter = nil;
-    
-    // laying out the entire string,
-    // might be more efficient to only layout the paragraphs that contain these attachments
-    [cv relayoutText];
-}
-
-/*
- -(UIView*)attributedTextContentView:(DTAttributedTextContentView *)attributedTextContentView
- viewForAttributedString:(NSAttributedString *)string frame:(CGRect)frame
- {
- // initialize and return your view here
- }
- */
-
-#pragma mark - Events
-
-- (IBAction)openURL:(DTLinkButton*)sender
-{
-    [[UIApplication sharedApplication] openURL:sender.URL];
+    return [UIColor blueColor];
 }
 
 @end

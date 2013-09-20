@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "LFSBasicHTMLLabel.h"
 
-@interface LFSDetailViewController : UIViewController
+@interface LFSDetailViewController : UIViewController <OHAttributedLabelDelegate>
 
 @property (nonatomic, strong) NSDictionary *collection;
 @property (nonatomic, strong) NSString *collectionId;

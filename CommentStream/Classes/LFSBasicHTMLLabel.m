@@ -1,15 +1,17 @@
 //
-//  LFSAttributedTextView.m
+//  LFSBasicHTMLLabel.m
 //  CommentStream
 //
-//  Created by Eugene Scherba on 9/18/13.
+//  Created by Eugene Scherba on 9/20/13.
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import "LFSAttributedTextView.h"
+#import "LFSBasicHTMLLabel.h"
+#import "LFSBasicHTMLParser.h"
 
-@implementation LFSAttributedTextView
+@implementation LFSBasicHTMLLabel
 
+/*
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -19,7 +21,6 @@
     return self;
 }
 
-/*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
@@ -27,5 +28,12 @@
     // Drawing code
 }
 */
+
+- (void)setHTMLString:(NSString *)html
+{
+    NSAttributedString *attributedText = [LFSBasicHTMLParser
+                                          attributedStringByProcessingMarkupInString:html];
+    [self setAttributedText:attributedText];
+}
 
 @end

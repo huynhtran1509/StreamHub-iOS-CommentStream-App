@@ -1,5 +1,5 @@
 platform :ios, '6.0'
 xcodeproj 'CommentStream.xcodeproj'
 
-pod 'DTCoreText', '~> 1.6.3'
+pod 'OHAttributedLabel', '~> 3.4.2'
 pod 'StreamHub-iOS-SDK', :path => '../../'

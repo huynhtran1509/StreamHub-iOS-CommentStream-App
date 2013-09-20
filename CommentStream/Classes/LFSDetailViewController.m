@@ -6,25 +6,23 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import <DTCoreText/DTCoreText.h>
 #import "LFSDetailViewController.h"
-#import "LFSAttributedTextView.h"
 
 @interface LFSDetailViewController ()
 
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
-@property (weak, nonatomic) IBOutlet LFSAttributedTextView *attributedTextView;
+@property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *basicHTMLLabel;
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+
 @end
 
-@implementation LFSDetailViewController {
-    NSUInteger _htmlHash; // preserved hash to avoid relayouting for same HTML
-}
+@implementation LFSDetailViewController
 
 #pragma mark - Properties
 
-@synthesize attributedTextView = _attributedTextView;
+@synthesize basicHTMLLabel = _basicHTMLLabel;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -44,16 +42,14 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
-    //[self.contentView setAttributedString:@"reere"];
-    NSString *bodyHTML = [self.contentItem objectForKey:@"bodyHtml"];
-    NSString *html = [NSString stringWithFormat:@"<div style=\"font-family:Avenir; font-size:18pt;\">%@</div>", bodyHTML];
-    [self setHTMLString:html];
+    [self.basicHTMLLabel setDelegate:self];
+    [self.basicHTMLLabel setHTMLString:[self.contentItem objectForKey:@"bodyHtml"]];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+    //[self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
     //[self.navigationController setToolbarHidden:YES animated:animated];
 }
 
@@ -62,40 +58,6 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-#pragma mark - Methods
-- (void)setHTMLString:(NSString *)html
-{
-	// we don't preserve the html but compare it's hash
-	NSUInteger newHash = [html hash];
-	
-	if (newHash == _htmlHash)
-	{
-		return;
-	}
-	
-	_htmlHash = newHash;
-	
-	NSData *data = [html dataUsingEncoding:NSUTF8StringEncoding];
-	NSAttributedString *string = [[NSAttributedString alloc] initWithHTMLData:data documentAttributes:NULL];
-	self.attributedString = string;
-	
-	//[self setNeedsLayout];
-}
-
-
-- (void)setAttributedString:(NSAttributedString *)attributedString
-{
-	// passthrough
-	self.attributedTextView.attributedString = attributedString;
-}
-
-- (NSAttributedString *)attributedString
-{
-	// passthrough
-	return _attributedTextView.attributedString;
-}
-
 
 #pragma mark - Status bar
 
@@ -129,5 +91,18 @@
     }
 }
 
+#pragma mark - OHAttributedLabelDelegate
+-(BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel
+      shouldFollowLink:(NSTextCheckingResult*)linkInfo
+{
+    return YES;
+}
+
+-(UIColor*)attributedLabel:(OHAttributedLabel*)attributedLabel
+              colorForLink:(NSTextCheckingResult*)linkInfo
+            underlineStyle:(int32_t*)underlineStyle
+{
+    return [UIColor blueColor];
+}
 
 @end
