@@ -558,9 +558,10 @@ static NSString* const kCellSelectSegue = @"detailView";
                 LFSDetailViewController *vc = segue.destinationViewController;
                 
                 // assign model object(s)
-                NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
-                [vc setContentItem:content];
-                [vc setAuthorItem:[_authors objectForKey:[content objectForKey:@"authorId"]]];
+                NSDictionary *content = [_content objectAtIndex:indexPath.row];
+                NSDictionary *contentItem = [content objectForKey:@"content"];
+                [vc setContentItem:contentItem];
+                [vc setAuthorItem:[_authors objectForKey:[contentItem objectForKey:@"authorId"]]];
                 [vc setAvatarImage:cell.avatarImage];
             }
         }

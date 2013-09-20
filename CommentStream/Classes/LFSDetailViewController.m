@@ -34,10 +34,12 @@ static const CGFloat kAvatarCornerRadius = 4;
 static UIFont *titleFont = nil;
 static UIFont *noteFont = nil;
 static UIColor *noteColor = nil;
+static UIFont *bodyFont = nil;
 
 + (void)initialize {
     if(self == [LFSDetailViewController class]) {
         titleFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:16.0f];
+        bodyFont = [UIFont fontWithName:@"Georgia" size:16.0f];
         noteFont = [UIFont fontWithName:@"Futura-MediumItalic" size:12.0f];
         noteColor = [UIColor grayColor];
     }
@@ -76,6 +78,7 @@ static UIColor *noteColor = nil;
     
     // set main content label
     [self.basicHTMLLabel setDelegate:self];
+    [self.basicHTMLLabel setFont:bodyFont];
     [self.basicHTMLLabel setHTMLString:[self.contentItem objectForKey:@"bodyHtml"]];
     CGRect oldContentFrame = self.basicHTMLLabel.frame;
     CGSize maxSize = oldContentFrame.size;
