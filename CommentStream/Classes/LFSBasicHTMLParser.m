@@ -25,40 +25,28 @@
             // &
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
-                NSRange textRange = [match rangeAtIndex:1];
-                if (textRange.length>0)
-                {
-                    return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@"&"]);
-                } else {
-                    return nil;
-                }
-            }, @"(&amp;)",
+                return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@"&"]);
+            }, @"&amp;",
             
             // <
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
-                NSRange textRange = [match rangeAtIndex:1];
-                if (textRange.length>0)
-                {
-                    return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@"<"]);
-                } else {
-                    return nil;
-                }
-            }, @"(&lt;)",
+                return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@"<"]);
+            }, @"&lt;",
             
-            // <
+            // >
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
-                NSRange textRange = [match rangeAtIndex:1];
-                if (textRange.length>0)
-                {
-                    return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@">"]);
-                } else {
-                    return nil;
-                }
-            }, @"(&gt;)",
+                return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@">"]);
+            }, @"&gt;",
             
-            // Ignoring these tags
+            // new line
+            ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
+            {
+                return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@"\n"]);
+            }, @"<br/?>",
+            
+            // Ignoring <p></p>
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
                 NSRange innerRange = [match rangeAtIndex:2];
@@ -68,7 +56,19 @@
                 } else {
                     return nil;
                 }
-            }, @"<(p|span)\\b[^>]*>(.*?)</\\1>",
+            }, @"<(p)\\b[^>]*>(.*?)</\\1>",
+            
+            // Ignoring <span></span>
+            ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
+            {
+                NSRange innerRange = [match rangeAtIndex:2];
+                if (innerRange.length>0)
+                {
+                    return MRC_AUTORELEASE([str attributedSubstringFromRange:innerRange]);
+                } else {
+                    return nil;
+                }
+            }, @"<(span)\\b[^>]*>(.*?)</\\1>",
             
             // Hyperlinks
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)

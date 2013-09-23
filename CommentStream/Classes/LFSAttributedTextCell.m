@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import <StreamHub-iOS-SDK/LFSConstants.h>
 #import "LFSBasicHTMLParser.h"
 #import "LFSAttributedTextCell.h"

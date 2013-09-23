@@ -8,6 +8,7 @@
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
+#import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
 
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
@@ -213,6 +214,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     // hide status bar for iOS7 and later
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
+    
+    [[AFHTTPRequestOperationLogger sharedLogger] startLogging];
+    
     [self startStreamWithBoostrap];
 }
 
@@ -231,6 +235,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     // hide the navigation controller here
     [super viewWillDisappear:animated];
     [self.streamClient stopStream];
+    
+    [[AFHTTPRequestOperationLogger sharedLogger] stopLogging];
+    
     [self.navigationController setToolbarHidden:YES animated:animated];
 }
 
