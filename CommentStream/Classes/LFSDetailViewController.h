@@ -17,7 +17,6 @@
 @property (nonatomic, strong) NSDictionary *collection;
 @property (nonatomic, strong) NSString *collectionId;
 
-@property (nonatomic, strong) LFSAuthor *authorItem;
 @property (nonatomic, strong) LFSContent *contentItem;
 
 -(void)setAvatarImage:(UIImage*)image;

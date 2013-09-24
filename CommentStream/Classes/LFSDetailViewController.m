@@ -132,7 +132,7 @@ static UIColor *dateColor = nil;
     _avatarView.layer.masksToBounds = YES;
     
     // set author name
-    NSString *authorName = self.authorItem.displayName;
+    NSString *authorName = self.contentItem.author.displayName;
     [_authorLabel setText:authorName];
 
     
@@ -144,7 +144,7 @@ static UIColor *dateColor = nil;
     
     // set profile link
     NSString *profileLink = [NSString stringWithFormat:@"<a href=\"%@\">view on Twitter</a>",
-                             self.authorItem.profileUrlStringNoHashBang];
+                             self.contentItem.author.profileUrlStringNoHashBang];
     [_remoteUrlLabel setHTMLString:profileLink];
     
     // set avatar image

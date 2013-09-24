@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <StreamHub-iOS-SDK/LFSConstants.h>
 
+#import "LFSAuthorCollection.h"
 #import "LFSContentCollection.h"
 
 @class LFSContentCollection;
@@ -51,5 +52,9 @@
 @property (nonatomic, strong) NSDate *contentUpdatedAt;
 @property (nonatomic, strong) NSDate *contentCreatedAt;
 @property (nonatomic, strong) NSString *contentId;
+
+@property (nonatomic, strong) LFSAuthor *author;
+
+-(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;
 
 @end

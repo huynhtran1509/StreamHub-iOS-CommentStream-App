@@ -8,10 +8,41 @@
 
 
 #import "LFSContentCollection.h"
+#import "LFSAuthorCollection.h"
 
 @implementation LFSContentCollection {
     NSMutableArray *_array;
 }
+
+
+#pragma mark - Properties
+
+@synthesize authors = _authors;
+
+-(LFSAuthorCollection*)authors
+{
+    if (_authors == nil) {
+        _authors = [[LFSAuthorCollection alloc] init];
+    }
+    return _authors;
+}
+
+-(void)setAuthors:(id)authors
+{
+    if ([authors isKindOfClass:[LFSAuthorCollection class]]) {
+        // everything is clear
+        _authors = authors;
+    } else {
+        _authors = [[LFSAuthorCollection alloc] initWithDictionary:authors];
+    }
+}
+
+-(void)addAuthorsCollection:(id)collection
+{
+    [self.authors addEntriesFromDictionary:collection];
+}
+
+#pragma mark - Other/Lifecycle
 
 - (id)init
 {
@@ -33,6 +64,7 @@
     return [[self alloc] init];
 }
 
+
 #pragma mark - NSMutableArray primitives
 
 -(id)initWithCapacity:(NSUInteger)numItems
@@ -40,6 +72,7 @@
     self = [super init];
 	if (self != nil)
 	{
+        _authors = nil;
         _array = [[NSMutableArray alloc] initWithCapacity:numItems];
 	}
 	return self;
@@ -85,6 +118,7 @@
     }
 }
 
+
 #pragma mark - NSArray primitives
 
 -(NSUInteger)count
@@ -94,6 +128,10 @@
 
 -(id)objectAtIndex:(NSUInteger)index
 {
+    LFSContent *content = [_array objectAtIndex:index];
+    if (content.author == nil && _authors != nil) {
+        [content setAuthorWithCollection:_authors];
+    }
     return [_array objectAtIndex:index];
 }
 
@@ -103,6 +141,7 @@
     self = [super init];
     if (self != nil) {
         // initialize stuff here
+        _authors = nil;
         
         // create an NSArray from a C array of object pointers
         // and a C array of key pointers

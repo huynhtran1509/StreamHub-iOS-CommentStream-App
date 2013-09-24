@@ -16,14 +16,12 @@
 #import "LFSDetailViewController.h"
 #import "LFSTextField.h"
 
-#import "LFSAuthorCollection.h"
 #import "LFSContentCollection.h"
 
 @interface LFSCollectionViewController () {
     LFSNewCommentViewController *_viewControllerNewComment;
 }
 
-@property (nonatomic, strong) LFSAuthorCollection *authors;
 @property (nonatomic, strong) LFSContentCollection *content;
 
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
@@ -51,7 +49,6 @@ static NSString* const kCellSelectSegue = @"detailView";
 }
 
 #pragma mark - Properties
-@synthesize authors = _authors;
 @synthesize content = _content;
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
@@ -101,7 +98,6 @@ static NSString* const kCellSelectSegue = @"detailView";
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    _authors = [LFSAuthorCollection dictionary];
     _content = [LFSContentCollection array];
     
     self.title = [_collection objectForKey:@"_name"];
@@ -237,7 +233,6 @@ static NSString* const kCellSelectSegue = @"detailView";
     _streamClient = nil;
     _bootstrapClient = nil;
     
-    _authors = nil;
     _content = nil;
     _container = nil;
     _activityIndicator = nil;
@@ -348,7 +343,6 @@ static NSString* const kCellSelectSegue = @"detailView";
     // Instead, grab the latest event ID and start streaming from there
     
     if (_content.count == 0) {
-        [_authors removeAllObjects];
         [_content removeAllObjects];
         
         [self startSpinning];
@@ -388,8 +382,8 @@ static NSString* const kCellSelectSegue = @"detailView";
 {
     // This method is responsible for both adding content from Bootstrap and
     // for streaming new updates.
-    [_authors addEntriesFromDictionary:authors];
-    
+    [_content addAuthorsCollection:authors];
+
     // TODO: move filtering to model/collection object?
     NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
     NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
@@ -477,17 +471,16 @@ static NSString* const kCellSelectSegue = @"detailView";
 - (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    LFSAuthor *author = [_authors objectForKey:[content contentAuthorId]];
     NSDate *createdAt = [content contentCreatedAt];
     NSString *bodyHTML = [content contentBodyHtml];
     
-    [cell.titleView setText:author.displayName];
+    [cell.titleView setText:content.author.displayName];
     NSString *dateTime = [self.dateFormatter relativeStringFromDate:createdAt];
     [cell.noteView setText:dateTime];
     
     // load avatar images in a separate queue
     NSURLRequest *request =
-    [NSURLRequest requestWithURL:[NSURL URLWithString:author.avatarUrlString75]];
+    [NSURLRequest requestWithURL:[NSURL URLWithString:content.author.avatarUrlString75]];
     AFImageRequestOperation* operation = [AFImageRequestOperation
                                           imageRequestOperationWithRequest:request
                                           imageProcessingBlock:nil
@@ -520,8 +513,6 @@ static NSString* const kCellSelectSegue = @"detailView";
                 // assign model object(s)
                 LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
                 [vc setContentItem:contentItem];
-                LFSAuthor *author = [_authors objectForKey:[contentItem contentAuthorId]];
-                [vc setAuthorItem:author];
                 [vc setAvatarImage:cell.avatarImage];
             }
         }

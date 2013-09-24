@@ -51,6 +51,8 @@
 @synthesize contentUpdatedAt = _contentUpdatedAt;
 @synthesize contentId = _contentId;
 
+@synthesize author = _author;
+
 /*
  @property (nonatomic, strong) NSString *contentParentId;
  @property (nonatomic, strong) NSString *contentBodyHTML;
@@ -186,17 +188,38 @@
     return _contentSource;
 }
 
+-(void)setAuthorWithCollection:(LFSAuthorCollection *)authorCollection
+{
+    self.author = [authorCollection objectForKey:self.contentAuthorId];
+}
 
 #pragma mark - Lifecycle
+
+// designated initializer
 -(id)initWithObject:(id)object
 {
     self = [super init];
     if (self ) {
         // initialization stuff here
         _object = object;
+        
+        _author = nil;
+        
         _visibilityIsSet = NO;
         _contentTypeIsSet = NO;
         _contentSourceIsSet = NO;
+        
+        _content = nil;
+        _eventId = nil;
+        _childContent = nil;
+        
+        _contentParentId = nil;
+        _contentBodyHtml = nil;
+        _contentAnnotations = nil;
+        _contentAuthorId = nil;
+        _contentCreatedAt = nil;
+        _contentUpdatedAt = nil;
+        _contentId = nil;
     }
     return self;
 }
@@ -205,15 +228,26 @@
 {
     // simply call designated initializer
     self = [self initWithObject:nil];
-    if (self) {
-        // initialize stuff here
-    }
     return self;
 }
 
 -(void)dealloc
 {
     _object = nil;
+    
+    _author = nil;
+    
+    _content = nil;
+    _eventId = nil;
+    _childContent = nil;
+    
+    _contentParentId = nil;
+    _contentBodyHtml = nil;
+    _contentAnnotations = nil;
+    _contentAuthorId = nil;
+    _contentCreatedAt = nil;
+    _contentUpdatedAt = nil;
+    _contentId = nil;
 }
 
 @end

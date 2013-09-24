@@ -11,4 +11,7 @@
 
 @interface LFSContentCollection : NSMutableArray
 
+@property (nonatomic, strong) id authors;
+-(void)addAuthorsCollection:(id)collection;
+
 @end
