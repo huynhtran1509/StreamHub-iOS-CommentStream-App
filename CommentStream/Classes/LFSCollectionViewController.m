@@ -8,18 +8,20 @@
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
+#import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
 
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
 #import "LFSDetailViewController.h"
 #import "LFSTextField.h"
+#import "LFSAuthorCollection.h"
 
 @interface LFSCollectionViewController () {
     LFSNewCommentViewController *_viewControllerNewComment;
 }
 
-@property (nonatomic, strong) NSMutableDictionary *authors;
+@property (nonatomic, strong) LFSAuthorCollection *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
@@ -43,13 +45,6 @@ static NSString* const kCellSelectSegue = @"detailView";
     UIActivityIndicatorView *_activityIndicator;
     UIView *_container;
     CGPoint _scrollOffset;
-    
-    // regular expression stuff (to replace 50px images with 75px)
-    // TODO: move this to a separate class?
-    NSRegularExpression *_regex1;
-    NSRegularExpression *_regex2;
-    NSString *_regexTemplate1;
-    NSString *_regexTemplate2;
 }
 
 #pragma mark - Properties
@@ -103,7 +98,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    _authors = [NSMutableDictionary dictionary];
+    _authors = [LFSAuthorCollection dictionary];
     _content = [NSMutableArray array];
     
     self.title = [_collection objectForKey:@"_name"];
@@ -178,31 +173,6 @@ static NSString* const kCellSelectSegue = @"detailView";
     
     _dateFormatter = [[NSDateFormatter alloc] init];
     
-    
-    // {{{ Regex stuff
-    //
-    // We will handle two types of avatar URLs:
-    // http://gravatar.com/avatar/c228ecbc43be06cc999c08cf020f9fde/?s=50&d=http://avatars-staging.fyre.co/a/anon/50.jpg
-    // http://avatars.fyre.co/a/26/6dbce19ef7452f69164e857d55d173ae/50.jpg?v=1375324889"
-    //
-    NSError *regexError1 = nil;
-    _regex1 = [NSRegularExpression
-                      regularExpressionWithPattern:@"([?&])s=50(&?)"
-                      options:NSRegularExpressionCaseInsensitive
-                      error:&regexError1];
-    NSAssert(regexError1 == nil, @"Error creating regex: %@", regexError1.description);
-    
-    _regexTemplate1 = @"$1s=75$2";
-    
-    NSError *_regexError2 = nil;
-    _regex2 = [NSRegularExpression
-                      regularExpressionWithPattern:@"/50.([a-zA-Z]+)\\b"
-                      options:NSRegularExpressionCaseInsensitive
-                      error:&_regexError2];
-    NSAssert(regexError1 == nil, @"Error creating regex: %@", regexError1.description);
-    _regexTemplate2 = @"/75.$1";
-    // }}}
-    
     [self wheelContainerSetup];
 }
 
@@ -213,6 +183,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     // hide status bar for iOS7 and later
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
+    
+    [[AFHTTPRequestOperationLogger sharedLogger] startLogging];
+    
     [self startStreamWithBoostrap];
 }
 
@@ -231,6 +204,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     // hide the navigation controller here
     [super viewWillDisappear:animated];
     [self.streamClient stopStream];
+    
+    [[AFHTTPRequestOperationLogger sharedLogger] stopLogging];
+    
     [self.navigationController setToolbarHidden:YES animated:animated];
 }
 
@@ -249,12 +225,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     self.navigationController.delegate = nil;
     self.tableView.delegate = nil;
     self.tableView.dataSource = nil;
-    
-    _regex1 = nil;
-    _regex2 = nil;
-    _regexTemplate1 = nil;
-    _regexTemplate2 = nil;
-    
+
     _postCommentField.delegate = nil;
     _postCommentField = nil;
     
@@ -502,32 +473,19 @@ static NSString* const kCellSelectSegue = @"detailView";
 - (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
-    NSDictionary *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
+    LFSAuthor *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
     NSTimeInterval timeStamp = [[content objectForKey:@"createdAt"] doubleValue];
-    
-    NSString *authorName = [author objectForKey:@"displayName"];
-    NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
     
-    [cell.titleView setText:authorName];
+    [cell.titleView setText:author.displayName];
     NSString *dateTime = [self.dateFormatter
                           relativeStringFromDate:
                           [NSDate dateWithTimeIntervalSince1970:timeStamp]];
     [cell.noteView setText:dateTime];
     
-
-    // create 75px avatar url
-    NSString *avatarURL1 = [_regex1 stringByReplacingMatchesInString:avatarURL
-                                                               options:0
-                                                                 range:NSMakeRange(0, [avatarURL length])
-                                                          withTemplate:_regexTemplate1];
-    NSString *avatarURL2 = [_regex2 stringByReplacingMatchesInString:avatarURL1
-                                                           options:0
-                                                             range:NSMakeRange(0, [avatarURL1 length])
-                                                      withTemplate:_regexTemplate2];
     // load avatar images in a separate queue
     NSURLRequest *request =
-    [NSURLRequest requestWithURL:[NSURL URLWithString:avatarURL2]];
+    [NSURLRequest requestWithURL:[NSURL URLWithString:author.avatarUrlString75]];
     AFImageRequestOperation* operation = [AFImageRequestOperation
                                           imageRequestOperationWithRequest:request
                                           imageProcessingBlock:nil
@@ -561,7 +519,8 @@ static NSString* const kCellSelectSegue = @"detailView";
                 NSDictionary *content = [_content objectAtIndex:indexPath.row];
                 NSDictionary *contentItem = [content objectForKey:@"content"];
                 [vc setContentItem:contentItem];
-                [vc setAuthorItem:[_authors objectForKey:[contentItem objectForKey:@"authorId"]]];
+                LFSAuthor *author = [_authors objectForKey:[contentItem objectForKey:@"authorId"]];
+                [vc setAuthorItem:author];
                 [vc setAvatarImage:cell.avatarImage];
             }
         }

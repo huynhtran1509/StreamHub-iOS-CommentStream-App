@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSDetailViewController.h"
 
@@ -123,7 +124,7 @@ static UIColor *dateColor = nil;
     _avatarView.layer.masksToBounds = YES;
     
     // set author name
-    NSString *authorName = [self.authorItem objectForKey:@"displayName"];
+    NSString *authorName = self.authorItem.displayName;
     [_authorLabel setText:authorName];
     
     // set date
