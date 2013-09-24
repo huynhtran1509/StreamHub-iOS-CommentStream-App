@@ -14,9 +14,9 @@ https://github.com/Livefyre/StreamHub-iOS-SDK
 
 You will need to clone StreamHub-iOS-SDK first:
 
-    git clone git@github.com:Livefyre/StreamHub-iOS-SDK.git
+    git clone https://github.com/Livefyre/StreamHub-iOS-SDK.git
     cd StreamHub-iOS-SDK/examples/
-    git clone git@github.com:Livefyre/StreamHub-iOS-Example-App.git CommentStream
+    git  clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git CommentStream
     cd CommentStream
     pod install
     open CommentStream.xcworkspace
