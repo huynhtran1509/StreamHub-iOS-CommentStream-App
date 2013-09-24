@@ -15,12 +15,13 @@
 #import "LFSCollectionViewController.h"
 #import "LFSDetailViewController.h"
 #import "LFSTextField.h"
+#import "LFSAuthorCollection.h"
 
 @interface LFSCollectionViewController () {
     LFSNewCommentViewController *_viewControllerNewComment;
 }
 
-@property (nonatomic, strong) NSMutableDictionary *authors;
+@property (nonatomic, strong) LFSAuthorCollection *authors;
 @property (nonatomic, strong) NSMutableArray *content;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
@@ -104,7 +105,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    _authors = [NSMutableDictionary dictionary];
+    _authors = [LFSAuthorCollection dictionary];
     _content = [NSMutableArray array];
     
     self.title = [_collection objectForKey:@"_name"];
@@ -509,14 +510,11 @@ static NSString* const kCellSelectSegue = @"detailView";
 - (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
-    NSDictionary *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
+    LFSAuthor *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
     NSTimeInterval timeStamp = [[content objectForKey:@"createdAt"] doubleValue];
-    
-    NSString *authorName = [author objectForKey:@"displayName"];
-    NSString *avatarURL = [author objectForKey:@"avatar"];
     NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
     
-    [cell.titleView setText:authorName];
+    [cell.titleView setText:author.displayName];
     NSString *dateTime = [self.dateFormatter
                           relativeStringFromDate:
                           [NSDate dateWithTimeIntervalSince1970:timeStamp]];
@@ -524,9 +522,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     
 
     // create 75px avatar url
-    NSString *avatarURL1 = [_regex1 stringByReplacingMatchesInString:avatarURL
+    NSString *avatarURL1 = [_regex1 stringByReplacingMatchesInString:author.avatarUrl
                                                                options:0
-                                                                 range:NSMakeRange(0, [avatarURL length])
+                                                                 range:NSMakeRange(0, [author.avatarUrl length])
                                                           withTemplate:_regexTemplate1];
     NSString *avatarURL2 = [_regex2 stringByReplacingMatchesInString:avatarURL1
                                                            options:0
