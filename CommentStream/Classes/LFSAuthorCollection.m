@@ -34,6 +34,16 @@
 
 #pragma mark - NSMutableDictionary primitives
 
+-(id)initWithCapacity:(NSUInteger)numItems
+{
+    self = [super init];
+	if (self != nil)
+	{
+        _dictionary = [[NSMutableDictionary alloc] initWithCapacity:numItems];
+	}
+	return self;
+}
+
 -(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey
 {
     if ([anObject isKindOfClass:[LFSAuthor class]]) {
@@ -49,17 +59,12 @@
     [_dictionary removeObjectForKey:aKey];
 }
 
--(id)initWithCapacity:(NSUInteger)numItems
-{
-    self = [super init];
-	if (self != nil)
-	{
-        _dictionary = [[NSMutableDictionary alloc] initWithCapacity:numItems];
-	}
-	return self;
-}
-
 #pragma mark - NSDictionary primitives
+
+-(NSUInteger)count
+{
+    return [_dictionary count];
+}
 
 // designated initializer
 -(id)initWithObjects:(const id [])objects
@@ -88,11 +93,6 @@
     }
     
     return self;
-}
-
--(NSUInteger)count
-{
-    return [_dictionary count];
 }
 
 -(id)objectForKey:(id)aKey

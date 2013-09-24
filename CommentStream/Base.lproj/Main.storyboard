@@ -32,9 +32,16 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="nnp-22-8Tw">
-                                <rect key="frame" x="20" y="348" width="172" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <rect key="frame" x="20" y="348" width="136" height="21"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="bHf-4t-aGi" customClass="LFSBasicHTMLLabel">
+                                <rect key="frame" x="164" y="348" width="136" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
@@ -46,6 +53,7 @@
                         <outlet property="avatarView" destination="t34-bA-Fog" id="Y8Z-hh-37G"/>
                         <outlet property="basicHTMLLabel" destination="0og-kZ-JhE" id="Kpb-N7-B2s"/>
                         <outlet property="dateLabel" destination="nnp-22-8Tw" id="G0w-eJ-3Wk"/>
+                        <outlet property="remoteUrlLabel" destination="bHf-4t-aGi" id="kvZ-51-xyM"/>
                         <outlet property="scrollView" destination="X4L-Qy-OGx" id="BNI-cD-gnR"/>
                     </connections>
                 </viewController>
