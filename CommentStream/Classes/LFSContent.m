@@ -36,6 +36,9 @@
 
 #pragma mark - Properties
 
+@synthesize contentTwitterId = _contentTwitterId;
+@synthesize contentTwitterUrlString = _contentTwitterUrlString;
+
 @synthesize content = _content;
 @synthesize eventId = _eventId;
 @synthesize visibility = _visibility;
@@ -64,6 +67,48 @@
 
  */
 
+
+-(NSString*)contentTwitterId
+{
+    // try to extract twitter id from contentId --
+    // if we fail, return nil
+    static NSRegularExpression *regex = nil;
+    if (_contentTwitterId == nil) {
+        if (regex == nil) {
+            NSError *regexError = nil;
+            regex = [NSRegularExpression
+                     regularExpressionWithPattern:@"^tweet-(\\d+)@twitter.com$"
+                     options:0
+                     error:&regexError];
+            NSAssert(regexError == nil,
+                     @"Error creating regex: %@",
+                     regexError.localizedDescription);
+        }
+        NSTextCheckingResult *match =
+        [regex firstMatchInString:self.contentId
+                          options:0
+                            range:NSMakeRange(0, [self.contentId length])];
+        if (match != nil) {
+            _contentTwitterId = [self.contentId substringWithRange:[match rangeAtIndex:1u]];
+        }
+    }
+    return _contentTwitterId;
+}
+
+-(NSString*)contentTwitterUrlString
+{
+    if (_contentTwitterUrlString == nil) {
+        NSString *twitterId = self.contentTwitterId;
+        NSString *twitterHandle = self.author.twitterHandle;
+        if (twitterId != nil && twitterHandle != nil)
+        {
+            _contentTwitterUrlString = [NSString
+                                        stringWithFormat:@"https://twitter.com/%@/status/%@",
+                                        twitterHandle, twitterId];
+        }
+    }
+    return _contentTwitterUrlString;
+}
 
 -(NSDictionary*)content
 {
@@ -202,6 +247,9 @@
     if (self ) {
         // initialization stuff here
         _object = object;
+
+        _contentTwitterId = nil;
+        _contentTwitterUrlString = nil;
         
         _author = nil;
         
@@ -234,6 +282,9 @@
 -(void)dealloc
 {
     _object = nil;
+    
+    _contentTwitterId = nil;
+    _contentTwitterUrlString = nil;
     
     _author = nil;
     

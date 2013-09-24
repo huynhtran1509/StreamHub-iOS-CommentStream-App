@@ -164,7 +164,7 @@
 -(NSString*)twitterHandle
 {
     static NSString* const twitterHost = @"twitter.com";
-    NSURL *url = [NSURL URLWithString:self.profileUrlString];
+    NSURL *url = [NSURL URLWithString:self.profileUrlStringNoHashBang];
     if ([[url host] isEqualToString:twitterHost]) {
         NSString *handle = [[url pathComponents] lastObject];
         return handle;

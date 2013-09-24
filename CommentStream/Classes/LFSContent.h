@@ -37,6 +37,9 @@
 
 -(id)initWithObject:(id)object;
 
+@property (nonatomic, readonly) NSString *contentTwitterId;
+@property (nonatomic, readonly) NSString *contentTwitterUrlString;
+
 @property (nonatomic, strong) NSDictionary *content;
 @property (nonatomic, strong) LFSContentCollection *childContent;
 
