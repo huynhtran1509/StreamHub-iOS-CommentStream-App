@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "LFSBasicHTMLLabel.h"
 #import "LFSAuthor.h"
+#import "LFSContent.h"
 
 @interface LFSDetailViewController : UIViewController <OHAttributedLabelDelegate>
 
@@ -17,7 +18,7 @@
 @property (nonatomic, strong) NSString *collectionId;
 
 @property (nonatomic, strong) LFSAuthor *authorItem;
-@property (nonatomic, strong) NSDictionary *contentItem;
+@property (nonatomic, strong) LFSContent *contentItem;
 
 -(void)setAvatarImage:(UIImage*)image;
 

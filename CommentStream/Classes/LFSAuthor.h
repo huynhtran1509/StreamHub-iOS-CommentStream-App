@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface LFSAuthor : NSMutableDictionary
+@interface LFSAuthor : NSObject
 
 /*
  * Sample JSON object:
@@ -28,10 +28,11 @@
 @property (nonatomic, strong) NSString *displayName;
 @property (nonatomic, strong) NSString *profileUrlString;
 @property (nonatomic, strong) NSString *avatarUrlString;
-@property (nonatomic, strong) NSString *avatarUrlString75;
+@property (nonatomic, readonly) NSString *avatarUrlString75;
 @property (nonatomic, strong) NSArray *userTags;
 @property (nonatomic, strong) NSNumber *userType;
 @property (nonatomic, strong) NSString *userId;
 @property (nonatomic, readonly) NSString *twitterHandle;
+@property (nonatomic, readonly) NSString *profileUrlStringNoHashBang;
 
 @end

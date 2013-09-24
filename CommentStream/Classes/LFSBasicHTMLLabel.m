@@ -9,19 +9,68 @@
 #import "LFSBasicHTMLLabel.h"
 #import "LFSBasicHTMLParser.h"
 
+@interface LFSBasicHTMLLabel ()
+@property (nonatomic, strong) NSMutableParagraphStyle *paragraphStyle;
+@end
 
-@implementation LFSBasicHTMLLabel {
-    BOOL _customLineSpacing;
+@implementation LFSBasicHTMLLabel
+
+#pragma mark - Properties
+@synthesize font = _font;
+@synthesize paragraphStyle = _paragraphStyle;
+
+-(CGFloat)lineSpacing
+{
+    return [self.paragraphStyle lineSpacing];
 }
 
-@synthesize font = _font;
+-(void)setLineSpacing:(CGFloat)points
+{
+    [self.paragraphStyle setLineSpacing:points];
+}
 
+-(NSTextAlignment)textAlignment
+{
+    return [self.paragraphStyle alignment];
+}
+
+-(void)setTextAlignment:(NSTextAlignment)textAlignment
+{
+    [self.paragraphStyle setAlignment:textAlignment];
+}
+
+- (void)setHTMLString:(NSString *)html
+{
+    NSMutableAttributedString *attributedText =
+    [LFSBasicHTMLParser attributedStringByProcessingMarkupInString:html];
+    
+    if (self.font) {
+        [attributedText setFont:self.font];
+    }
+    
+    if (self.paragraphStyle) {
+        [attributedText addAttribute:NSParagraphStyleAttributeName
+                               value:self.paragraphStyle
+                               range:NSMakeRange(0, [attributedText length])];
+    }
+    
+    [self setAttributedText:attributedText];
+}
+
+-(NSMutableParagraphStyle*)paragraphStyle {
+    if (_paragraphStyle == nil) {
+        _paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    }
+    return _paragraphStyle;
+}
+
+#pragma mark - Lifestyle
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
         _font = nil;
-        _customLineSpacing = NO;
+        _paragraphStyle = nil;
     }
     return self;
 }
@@ -31,42 +80,15 @@
     self = [super initWithFrame:frame];
     if (self) {
         _font = nil;
-        _customLineSpacing = NO;
+        _paragraphStyle = nil;
     }
     return self;
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
+-(void)dealloc
 {
-    // Drawing code
-}
-*/
-
-- (void)setHTMLString:(NSString *)html
-{
-    NSMutableAttributedString *attributedText =
-    [LFSBasicHTMLParser attributedStringByProcessingMarkupInString:html];
-    
-    if (_font) {
-        [attributedText setFont:_font];
-    }
-    
-    if (_customLineSpacing) {
-        NSMutableParagraphStyle *paragrahStyle = [[NSMutableParagraphStyle alloc] init];
-        [paragrahStyle setLineSpacing:_lineSpacing];
-        [attributedText addAttribute:NSParagraphStyleAttributeName value:paragrahStyle range:NSMakeRange(0, [attributedText length])];
-    }
-    
-    [self setAttributedText:attributedText];
-}
-
--(void)setLineSpacing:(CGFloat)points
-{
-    _customLineSpacing = YES;
-    _lineSpacing = points;
+    //_font = nil;
+    _paragraphStyle = nil;
 }
 
 @end

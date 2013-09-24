@@ -33,7 +33,7 @@
 @synthesize userType = _userType;
 @synthesize userId = _userId;
 @synthesize twitterHandle = _twitterHandle;
-
+@synthesize profileUrlStringNoHashBang = _profileUrlStringNoHashBang;
 
 -(NSString*)displayName
 {
@@ -61,6 +61,30 @@
         _profileUrlString = [_object objectForKey:key];
     }
     return _profileUrlString;
+}
+
+-(NSString*)profileUrlStringNoHashBang
+{
+    static NSRegularExpression *regex1 = nil;
+    static NSString* const regexTemplate1 = @"/";
+    if (_profileUrlStringNoHashBang == nil) {
+        if (regex1 == nil) {
+            NSError *regexError1 = nil;
+            regex1 = [NSRegularExpression
+                      regularExpressionWithPattern:@"/#!/"
+                      options:0
+                      error:&regexError1];
+            NSAssert(regexError1 == nil,
+                     @"Error creating regex: %@",
+                     regexError1.localizedDescription);
+        }
+        _profileUrlStringNoHashBang =
+        [regex1 stringByReplacingMatchesInString:self.profileUrlString
+                                         options:0
+                                           range:NSMakeRange(0, [self.profileUrlString length])
+                                    withTemplate:regexTemplate1];
+    }
+    return _profileUrlStringNoHashBang;
 }
 
 -(NSString*)avatarUrlString
@@ -163,6 +187,16 @@
         _userType = nil;
         _userId = nil;
         _twitterHandle = nil;
+    }
+    return self;
+}
+
+-(id)init
+{
+    // simply call designated initializer
+    self = [self initWithObject:nil];
+    if (self) {
+        // initialize stuff here
     }
     return self;
 }

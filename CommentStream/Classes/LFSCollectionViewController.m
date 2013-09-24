@@ -15,14 +15,17 @@
 #import "LFSCollectionViewController.h"
 #import "LFSDetailViewController.h"
 #import "LFSTextField.h"
+
 #import "LFSAuthorCollection.h"
+#import "LFSContentCollection.h"
 
 @interface LFSCollectionViewController () {
     LFSNewCommentViewController *_viewControllerNewComment;
 }
 
 @property (nonatomic, strong) LFSAuthorCollection *authors;
-@property (nonatomic, strong) NSMutableArray *content;
+@property (nonatomic, strong) LFSContentCollection *content;
+
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
@@ -99,7 +102,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     // Do any additional setup after loading the view, typically from a nib.
     
     _authors = [LFSAuthorCollection dictionary];
-    _content = [NSMutableArray array];
+    _content = [LFSContentCollection array];
     
     self.title = [_collection objectForKey:@"_name"];
     
@@ -375,7 +378,7 @@ static NSString* const kCellSelectSegue = @"detailView";
          }];
     }
     else {
-        NSNumber *eventId = [[_content objectAtIndex:0u] objectForKey:@"event"];
+        NSNumber *eventId = [[_content objectAtIndex:0u] eventId];
         [self.streamClient setCollectionId:self.collectionId];
         [self.streamClient startStreamWithEventId:eventId];
     }
@@ -387,13 +390,14 @@ static NSString* const kCellSelectSegue = @"detailView";
     // for streaming new updates.
     [_authors addEntriesFromDictionary:authors];
     
+    // TODO: move filtering to model/collection object?
     NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
     NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
     NSRange contentSpan;
     contentSpan.location = 0;
     contentSpan.length = [filteredContent count];
     [_content insertObjects:filteredContent
-                      atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
+                  atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
     
     // also cause table to redraw
     if ([filteredContent count] == 1u) {
@@ -472,15 +476,13 @@ static NSString* const kCellSelectSegue = @"detailView";
 // called every time a cell is configured
 - (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
-    NSDictionary *content = [[_content objectAtIndex:indexPath.row] objectForKey:@"content"];
-    LFSAuthor *author = [_authors objectForKey:[content objectForKey:@"authorId"]];
-    NSTimeInterval timeStamp = [[content objectForKey:@"createdAt"] doubleValue];
-    NSString *bodyHTML = [content objectForKey:@"bodyHtml"];
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    LFSAuthor *author = [_authors objectForKey:[content contentAuthorId]];
+    NSDate *createdAt = [content contentCreatedAt];
+    NSString *bodyHTML = [content contentBodyHtml];
     
     [cell.titleView setText:author.displayName];
-    NSString *dateTime = [self.dateFormatter
-                          relativeStringFromDate:
-                          [NSDate dateWithTimeIntervalSince1970:timeStamp]];
+    NSString *dateTime = [self.dateFormatter relativeStringFromDate:createdAt];
     [cell.noteView setText:dateTime];
     
     // load avatar images in a separate queue
@@ -516,10 +518,9 @@ static NSString* const kCellSelectSegue = @"detailView";
                 LFSDetailViewController *vc = segue.destinationViewController;
                 
                 // assign model object(s)
-                NSDictionary *content = [_content objectAtIndex:indexPath.row];
-                NSDictionary *contentItem = [content objectForKey:@"content"];
+                LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
                 [vc setContentItem:contentItem];
-                LFSAuthor *author = [_authors objectForKey:[contentItem objectForKey:@"authorId"]];
+                LFSAuthor *author = [_authors objectForKey:[contentItem contentAuthorId]];
                 [vc setAuthorItem:author];
                 [vc setAvatarImage:cell.avatarImage];
             }
@@ -530,10 +531,16 @@ static NSString* const kCellSelectSegue = @"detailView";
 #pragma mark - Events
 -(IBAction)createComment:(id)sender
 {
+    static NSString* const kLFSMainStoryboardId = @"Main";
+    static NSString* const kLFSNewCommentViewResourceId = @"commentNew";
+    
     if (_viewControllerNewComment == nil) {
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
+        UIStoryboard *storyboard = [UIStoryboard
+                                    storyboardWithName:kLFSMainStoryboardId
+                                    bundle:nil];
         _viewControllerNewComment =
-        (LFSNewCommentViewController*)[storyboard instantiateViewControllerWithIdentifier:@"commentNew"];
+        (LFSNewCommentViewController*)[storyboard
+                                       instantiateViewControllerWithIdentifier:kLFSNewCommentViewResourceId];
         _viewControllerNewComment.collection = self.collection;
         _viewControllerNewComment.collectionId = self.collectionId;
     }

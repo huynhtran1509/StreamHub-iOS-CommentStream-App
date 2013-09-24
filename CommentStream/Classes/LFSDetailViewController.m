@@ -22,6 +22,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *avatarView;
 @property (weak, nonatomic) IBOutlet UILabel *authorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
+@property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *remoteUrlLabel;
 
 @end
 
@@ -53,6 +54,7 @@ static UIColor *dateColor = nil;
 @synthesize avatarView = _avatarView;
 @synthesize authorLabel = _authorLabel;
 @synthesize dateLabel = _dateLabel;
+@synthesize remoteUrlLabel = _remoteUrlLabel;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -82,7 +84,7 @@ static UIColor *dateColor = nil;
     [self.basicHTMLLabel setFont:bodyFont];
     [self.basicHTMLLabel setLineSpacing:8.5f];
     
-    [self.basicHTMLLabel setHTMLString:[self.contentItem objectForKey:@"bodyHtml"]];
+    [self.basicHTMLLabel setHTMLString:[self.contentItem contentBodyHtml]];
     CGRect oldContentFrame = self.basicHTMLLabel.frame;
     CGSize maxSize = oldContentFrame.size;
     maxSize.height = 1000.f;
@@ -104,6 +106,12 @@ static UIColor *dateColor = nil;
     dateFrame.origin = CGPointMake(dateFrame.origin.x, bottom + 12.f);
     [_dateLabel setFrame:dateFrame];
 
+    // format url link
+    CGRect profileFrame = _remoteUrlLabel.frame;
+    profileFrame.origin = CGPointMake(profileFrame.origin.x, bottom + 12.f);
+    [_remoteUrlLabel setFrame:profileFrame];
+    [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
+    
     // format avatar image view
     if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
         ([UIScreen mainScreen].scale == 2.0f))
@@ -126,13 +134,18 @@ static UIColor *dateColor = nil;
     // set author name
     NSString *authorName = self.authorItem.displayName;
     [_authorLabel setText:authorName];
+
     
     // set date
-    NSTimeInterval timeStamp = [[self.contentItem objectForKey:@"createdAt"] doubleValue];
     NSString *dateTime = [[[NSDateFormatter alloc] init]
                           extendedRelativeStringFromDate:
-                          [NSDate dateWithTimeIntervalSince1970:timeStamp]];
+                          [self.contentItem contentCreatedAt]];
     [_dateLabel setText:dateTime];
+    
+    // set profile link
+    NSString *profileLink = [NSString stringWithFormat:@"<a href=\"%@\">view on Twitter</a>",
+                             self.authorItem.profileUrlStringNoHashBang];
+    [_remoteUrlLabel setHTMLString:profileLink];
     
     // set avatar image
     _avatarView.image = _avatarImage;
