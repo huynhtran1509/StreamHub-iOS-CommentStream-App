@@ -26,8 +26,9 @@
 
 // Note: use lazy instantiation here
 @property (nonatomic, strong) NSString *displayName;
-@property (nonatomic, strong) NSString *profileUrl;
-@property (nonatomic, strong) NSString *avatarUrl;
+@property (nonatomic, strong) NSString *profileUrlString;
+@property (nonatomic, strong) NSString *avatarUrlString;
+@property (nonatomic, strong) NSString *avatarUrlString75;
 @property (nonatomic, strong) NSArray *userTags;
 @property (nonatomic, strong) NSNumber *userType;
 @property (nonatomic, strong) NSString *userId;
