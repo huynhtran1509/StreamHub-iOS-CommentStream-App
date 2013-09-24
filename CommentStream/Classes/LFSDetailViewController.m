@@ -23,6 +23,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *authorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *remoteUrlLabel;
+@property (weak, nonatomic) IBOutlet UIButton *sourceButton;
+- (IBAction)didSelectSource:(id)sender;
 
 @end
 
@@ -95,6 +97,19 @@ static UIColor *dateColor = nil;
                                              neededSize.width,
                                              neededSize.height)];
     
+    // set source icon
+    if (self.contentItem.author.twitterHandle) {
+        UIImage *sourceImage = [UIImage imageNamed:@"SourceTwitter"];
+
+        CGRect iconFrame = self.sourceButton.frame;
+        iconFrame.origin = CGPointMake(self.view.frame.size.width - 40.f, self.view.frame.origin.y + 20.f);
+        [self.sourceButton setFrame:iconFrame];
+        [self.sourceButton setImage:sourceImage forState:UIControlStateNormal];
+    }
+    else {
+        //self.sourceButton.imageView.image = nil;
+        [self.sourceButton setImage:nil forState:UIControlStateNormal];
+    }
     
     // format author name label
     [_authorLabel setFont:titleFont];
@@ -216,6 +231,15 @@ static UIColor *dateColor = nil;
             underlineStyle:(int32_t*)underlineStyle
 {
     return [UIColor blueColor];
+}
+
+- (IBAction)didSelectSource:(id)sender
+{
+    NSString *urlString = self.contentItem.author.profileUrlStringNoHashBang;
+    if (urlString != nil) {
+        NSURL *url = [NSURL URLWithString:self.contentItem.author.profileUrlStringNoHashBang];
+        [[UIApplication sharedApplication] openURL:url];
+    }
 }
 
 @end
