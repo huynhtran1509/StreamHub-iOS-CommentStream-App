@@ -143,9 +143,12 @@ static UIColor *dateColor = nil;
     [_dateLabel setText:dateTime];
     
     // set profile link
-    NSString *profileLink = [NSString stringWithFormat:@"<a href=\"%@\">view on Twitter</a>",
-                             [self.contentItem contentTwitterUrlString]];
-    [_remoteUrlLabel setHTMLString:profileLink];
+    NSString *twitterURLString = [self.contentItem contentTwitterUrlString];
+    if (twitterURLString != nil) {
+        [_remoteUrlLabel setHTMLString:
+         [NSString stringWithFormat:@"<a href=\"%@\">view on Twitter</a>",
+          twitterURLString]];
+    }
     
     // set avatar image
     _avatarView.image = _avatarImage;
