@@ -81,7 +81,7 @@
                     NSAttributedString* innerText = [str attributedSubstringFromRange:innerRange];
                     NSMutableAttributedString* innerTextMutable = [innerText mutableCopy];
                     [innerTextMutable setLink:[NSURL URLWithString:href] range:NSMakeRange(0,innerRange.length)];
-                    return MRC_AUTORELEASE(innerText);
+                    return MRC_AUTORELEASE(innerTextMutable);
                 } else {
                     return nil;
                 }
