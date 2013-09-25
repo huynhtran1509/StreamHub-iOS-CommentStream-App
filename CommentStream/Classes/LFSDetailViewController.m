@@ -161,7 +161,7 @@ static UIColor *dateColor = nil;
     NSString *twitterURLString = [self.contentItem contentTwitterUrlString];
     if (twitterURLString != nil) {
         [_remoteUrlLabel setHTMLString:
-         [NSString stringWithFormat:@"<a href=\"%@\">view on Twitter</a>",
+         [NSString stringWithFormat:@"<a href=\"%@\">View on Twitter ></a>",
           twitterURLString]];
     }
     
@@ -230,9 +230,20 @@ static UIColor *dateColor = nil;
               colorForLink:(NSTextCheckingResult*)linkInfo
             underlineStyle:(int32_t*)underlineStyle
 {
-    return [UIColor blueColor];
+    NSString *linkString = [linkInfo.URL absoluteString];
+    if ([linkString hasPrefix:@"https://twitter.com/#!/search/realtime/"])
+    {
+        // Twitter hashtag
+        return [UIColor grayColor];
+    }
+    else
+    {
+        // regular link
+        return [UIColor blueColor];
+    }
 }
 
+#pragma mark - Events
 - (IBAction)didSelectSource:(id)sender
 {
     NSString *urlString = self.contentItem.author.profileUrlStringNoHashBang;
