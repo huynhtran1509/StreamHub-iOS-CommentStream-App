@@ -134,10 +134,6 @@ static UIColor *dateColor = nil;
     CGRect toolbarFrame = self.contentToolbar.frame;
     toolbarFrame.origin.y = dateFrame.origin.y + dateFrame.size.height + 12.f;
     self.contentToolbar.frame = toolbarFrame;
-    // render toolbar transparent
-    [self.contentToolbar setBackgroundImage:[UIImage new] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-    self.contentToolbar.backgroundColor = [UIColor clearColor];
-    
     
     // format avatar image view
     if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&

@@ -55,7 +55,7 @@
                                     <action selector="didSelectSource:" destination="9jQ-b8-8PW" eventType="touchUpInside" id="TyS-0x-ruJ"/>
                                 </connections>
                             </button>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="Btj-dl-QT7">
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="Btj-dl-QT7" customClass="LFSContentToolbar">
                                 <rect key="frame" x="0.0" y="524" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <items>

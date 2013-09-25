@@ -11,6 +11,4 @@
 
 @interface LFSAuthorCollection : NSMutableDictionary
 
-@property (nonatomic, strong) Class class;
-
 @end
