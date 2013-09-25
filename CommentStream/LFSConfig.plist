@@ -65,7 +65,7 @@
 		</dict>
 		<dict>
 			<key>_name</key>
-			<string>Oranges Are Great</string>
+			<string>UAT / ModQ test</string>
 			<key>environment</key>
 			<string>t402.livefyre.com</string>
 			<key>network</key>
@@ -74,6 +74,18 @@
 			<string>303613</string>
 			<key>articleId</key>
 			<string>215</string>
+		</dict>
+		<dict>
+			<key>_name</key>
+			<string>UAT / Prickle</string>
+			<key>environment</key>
+			<string>t402.livefyre.com</string>
+			<key>network</key>
+			<string>livefyre.com</string>
+			<key>siteId</key>
+			<string>303613</string>
+			<key>articleId</key>
+			<string>225</string>
 		</dict>
 	</array>
 </dict>

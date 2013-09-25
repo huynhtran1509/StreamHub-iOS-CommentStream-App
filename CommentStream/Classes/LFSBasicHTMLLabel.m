@@ -41,6 +41,10 @@
 
 - (void)setHTMLString:(NSString *)html
 {
+    if (html == nil) {
+        return;
+    }
+    
     NSMutableAttributedString *attributedText =
     [LFSBasicHTMLParser attributedStringByProcessingMarkupInString:html];
     
