@@ -44,6 +44,17 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="axq-Y5-z2E">
+                                <rect key="frame" x="280" y="66" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <state key="normal">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="didSelectSource:" destination="9jQ-b8-8PW" eventType="touchUpInside" id="TyS-0x-ruJ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </scrollView>
@@ -55,6 +66,7 @@
                         <outlet property="dateLabel" destination="nnp-22-8Tw" id="G0w-eJ-3Wk"/>
                         <outlet property="remoteUrlLabel" destination="bHf-4t-aGi" id="kvZ-51-xyM"/>
                         <outlet property="scrollView" destination="X4L-Qy-OGx" id="BNI-cD-gnR"/>
+                        <outlet property="sourceButton" destination="axq-Y5-z2E" id="iQo-y6-qgg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ISf-vh-rH3" userLabel="First Responder" sceneMemberID="firstResponder"/>
