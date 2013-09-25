@@ -255,7 +255,17 @@ static UIColor *dateColor = nil;
               colorForLink:(NSTextCheckingResult*)linkInfo
             underlineStyle:(int32_t*)underlineStyle
 {
-    return [UIColor blueColor];
+    NSString *linkString = [linkInfo.URL absoluteString];
+    if ([linkString hasPrefix:@"https://twitter.com/#!/search/realtime/"])
+    {
+        // Twitter hashtag
+        return [UIColor grayColor];
+    }
+    else
+    {
+        // regular link
+        return [UIColor blueColor];
+    }
 }
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "LFSAppDelegate.h"
+#import <OHAttributedLabel/OHAttributedLabel.h>
 
 @implementation LFSAppDelegate
 
@@ -15,6 +16,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    [[OHAttributedLabel appearance] setLinkColor:[UIColor grayColor]];
+    [[OHAttributedLabel appearance] setLinkUnderlineStyle:kCTUnderlineStyleNone];
     return YES;
 }
 							
