@@ -36,6 +36,7 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 @synthesize writeClient = _writeClient;
 @synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
+@synthesize replyToContent = _replyToContent;
 
 - (LFSWriteClient*)writeClient
 {
@@ -57,12 +58,26 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 }
 
 #pragma mark - Lifecycle
+
+-(id)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        // initialization code here
+        
+        _writeClient = nil;
+        _collection = nil;
+        _collectionId = nil;
+        _replyToContent = nil;
+        
+    }
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    
-    _writeClient = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -86,6 +101,9 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 -(void)dealloc
 {
     _writeClient = nil;
+    _collection = nil;
+    _collectionId = nil;
+    _replyToContent = nil;
 }
 
 #pragma mark - Status bar
@@ -135,7 +153,7 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
     [self.writeClient postNewContent:text
                              forUser:[self.collection objectForKey:@"lftoken"]
                        forCollection:self.collectionId
-                           inReplyTo:nil
+                           inReplyTo:self.replyToContent.contentId
                            onSuccess:^(NSOperation *operation, id responseObject)
      {
          // do nothing
