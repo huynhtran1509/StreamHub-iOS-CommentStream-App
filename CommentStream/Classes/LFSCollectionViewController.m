@@ -268,7 +268,6 @@ static NSString* const kCellSelectSegue = @"detailView";
                                              UIViewAutoresizingFlexibleWidth)];
     
     [_container addSubview:_activityIndicator];
-    [self.view addSubview:_container];
 }
 
 -(void)wheelContainerTeardown
@@ -279,15 +278,17 @@ static NSString* const kCellSelectSegue = @"detailView";
 
 -(void)startSpinning
 {
+    [self.view addSubview:_container];
     _container.hidden = NO;
     _activityIndicator.hidden = NO;
     [_activityIndicator startAnimating];
 }
 
 -(void)stopSpinning {
-    _container.hidden = YES;
-    _activityIndicator.hidden = YES;
     [_activityIndicator stopAnimating];
+    _activityIndicator.hidden = YES;
+    _container.hidden = YES;
+    [_container removeFromSuperview];
 }
 
 #pragma mark - Status bar
@@ -425,8 +426,7 @@ static NSString* const kCellSelectSegue = @"detailView";
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
-                                                     cellForRowAtIndexPath:indexPath];
+    LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
     return [cell requiredRowHeight];
 }
 

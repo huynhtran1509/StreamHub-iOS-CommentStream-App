@@ -195,25 +195,25 @@ static UIColor *dateColor = nil;
 {
 	[super layoutSubviews];
 	
-	if (!self.superview)
-	{
+	if (!self.superview) {
 		return;
 	}
     
     CGFloat neededContentHeight = [self requiredRowHeight];
     
     // after the first call here the content view size is correct
+    CGFloat contentViewWidth = self.contentView.bounds.size.width;
     CGRect frame = CGRectMake(kLeftColumnWidth,
                               kHeaderHeight,
-                              self.contentView.bounds.size.width - kLeftColumnWidth,
+                              contentViewWidth - kLeftColumnWidth,
                               neededContentHeight - kHeaderHeight);
     self.textContentView.frame = frame;
     
     _titleView.frame = CGRectMake(kLeftColumnWidth,
                                   0,
-                                  self.contentView.bounds.size.width - kLeftColumnWidth - kRightColumnWidth,
+                                  contentViewWidth - kLeftColumnWidth - kRightColumnWidth,
                                   kHeaderHeight);
-    _noteView.frame = CGRectMake(self.contentView.bounds.size.width - kRightColumnWidth,
+    _noteView.frame = CGRectMake(contentViewWidth - kRightColumnWidth,
                                  0,
                                  kRightColumnWidth - kNoteRightInset,
                                  kHeaderHeight);
@@ -222,6 +222,12 @@ static UIColor *dateColor = nil;
     imageViewFrame.origin = kAvatarDisplayOrigin;
     imageViewFrame.size = kAvatarDisplaySize;
     self.imageView.frame = imageViewFrame;
+    
+    // on iOS6, textContentView height sometimes overshoots
+    // cell height. The code below remediates this
+    CGRect textContentFrame = _textContentView.frame;
+    textContentFrame.size.height = self.frame.size.height - kHeaderHeight;
+    [_textContentView setFrame:textContentFrame];
 }
 
 #pragma mark - Public methods
@@ -230,11 +236,12 @@ static UIColor *dateColor = nil;
     CGSize maxSize = self.textContentView.frame.size;
     maxSize.height = 1000.f;
     CGSize neededSize = [self.textContentView sizeThatFits:maxSize];
-
+    
 	// note: non-integer row heights caused trouble < iOS 5.0
-	return MAX(neededSize.height + kHeaderHeight,
-               self.imageView.frame.size.height + self.imageView.frame.origin.y)
-    + kBottomInset;
+    CGRect imageViewFrame = self.imageView.frame;
+	return kBottomInset + MAX(neededSize.height + kHeaderHeight,
+                              imageViewFrame.size.height +
+                              imageViewFrame.origin.y);
 }
 
 #pragma mark - OHAttributedLabelDelegate

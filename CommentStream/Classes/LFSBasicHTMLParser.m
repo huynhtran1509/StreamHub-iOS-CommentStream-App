@@ -78,9 +78,10 @@
                 if (hrefRange.length > 0 && innerRange.length > 0)
                 {
                     NSString* href = [str attributedSubstringFromRange:hrefRange].string;
-                    NSMutableAttributedString* innerText = [[str attributedSubstringFromRange:innerRange] mutableCopy];
-                    [innerText setLink:[NSURL URLWithString:href] range:NSMakeRange(0,innerRange.length)];
-                    return MRC_AUTORELEASE(innerText);
+                    NSAttributedString* innerText = [str attributedSubstringFromRange:innerRange];
+                    NSMutableAttributedString* innerTextMutable = [innerText mutableCopy];
+                    [innerTextMutable setLink:[NSURL URLWithString:href] range:NSMakeRange(0,innerRange.length)];
+                    return MRC_AUTORELEASE(innerTextMutable);
                 } else {
                     return nil;
                 }
