@@ -9,9 +9,12 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+#import "LFSContent.h"
+
 @interface LFSNewCommentViewController : UIViewController
 
 @property (nonatomic, strong) NSDictionary *collection;
 @property (nonatomic, strong) NSString *collectionId;
+@property (nonatomic, strong) LFSContent *replyToContent;
 
 @end

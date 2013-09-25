@@ -9,6 +9,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSDetailViewController.h"
+#import "LFSNewCommentViewController.h"
 
 @interface LFSDetailViewController ()
 
@@ -24,11 +25,14 @@
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *remoteUrlLabel;
 @property (weak, nonatomic) IBOutlet UIButton *sourceButton;
+@property (weak, nonatomic) IBOutlet UIToolbar *contentToolbar;
 - (IBAction)didSelectSource:(id)sender;
 
 @end
 
 static const CGFloat kAvatarCornerRadius = 4;
+
+static NSString* const kReplySegue = @"replyTo";
 
 @implementation LFSDetailViewController {
     UIImage *_avatarImage;
@@ -107,7 +111,6 @@ static UIColor *dateColor = nil;
         [self.sourceButton setImage:sourceImage forState:UIControlStateNormal];
     }
     else {
-        //self.sourceButton.imageView.image = nil;
         [self.sourceButton setImage:nil forState:UIControlStateNormal];
     }
     
@@ -126,6 +129,15 @@ static UIColor *dateColor = nil;
     profileFrame.origin = CGPointMake(profileFrame.origin.x, bottom + 12.f);
     [_remoteUrlLabel setFrame:profileFrame];
     [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
+    
+    // set toolbar frame
+    CGRect toolbarFrame = self.contentToolbar.frame;
+    toolbarFrame.origin.y = dateFrame.origin.y + dateFrame.size.height + 12.f;
+    self.contentToolbar.frame = toolbarFrame;
+    // render toolbar transparent
+    [self.contentToolbar setBackgroundImage:[UIImage new] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+    self.contentToolbar.backgroundColor = [UIColor clearColor];
+    
     
     // format avatar image view
     if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
@@ -241,6 +253,26 @@ static UIColor *dateColor = nil;
     {
         // regular link
         return [UIColor blueColor];
+    }
+}
+
+#pragma mark - Navigation
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    // Make sure your segue name in storyboard is the same as this line
+    if ([[segue identifier] isEqualToString:kReplySegue])
+    {
+        // Get reference to the destination view controller
+        if ([segue.destinationViewController isKindOfClass:[LFSNewCommentViewController class]])
+        {
+            // as there is only one piece of content in Detail View,
+            // no need to check sender type here
+            LFSNewCommentViewController *vc = segue.destinationViewController;
+            [vc setCollection:self.collection];
+            [vc setCollectionId:self.collectionId];
+            [vc setReplyToContent:self.contentItem];
+        }
     }
 }
 

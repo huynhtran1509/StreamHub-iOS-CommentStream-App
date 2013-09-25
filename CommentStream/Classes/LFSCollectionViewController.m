@@ -514,6 +514,8 @@ static NSString* const kCellSelectSegue = @"detailView";
                 LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
                 [vc setContentItem:contentItem];
                 [vc setAvatarImage:cell.avatarImage];
+                [vc setCollection:self.collection];
+                [vc setCollectionId:self.collectionId];
             }
         }
     }
