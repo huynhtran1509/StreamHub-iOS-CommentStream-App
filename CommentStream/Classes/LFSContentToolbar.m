@@ -12,7 +12,7 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    [[UIColor lightGrayColor] setStroke];
+    [[UIColor colorWithRed:(200.f/255.f) green:(199.f/255.f) blue:(204.f/255.f) alpha:1.f] setStroke];
     
     // top 1px line
     UIBezierPath *horLineTop = [[UIBezierPath alloc] init];
