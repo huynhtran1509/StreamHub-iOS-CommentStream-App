@@ -103,15 +103,12 @@ static UIColor *dateColor = nil;
     
     // set source icon
     if (self.contentItem.author.twitterHandle) {
-        UIImage *sourceImage = [UIImage imageNamed:@"SourceTwitter"];
-
-        CGRect iconFrame = self.sourceButton.frame;
-        iconFrame.origin = CGPointMake(self.view.frame.size.width - 40.f, self.view.frame.origin.y + 20.f);
-        [self.sourceButton setFrame:iconFrame];
-        [self.sourceButton setImage:sourceImage forState:UIControlStateNormal];
+        [self.sourceButton setImage:[UIImage imageNamed:@"SourceTwitter"]
+                           forState:UIControlStateNormal];
     }
     else {
-        [self.sourceButton setImage:nil forState:UIControlStateNormal];
+        [self.sourceButton setImage:nil
+                           forState:UIControlStateNormal];
     }
     
     // format author name label
@@ -132,7 +129,7 @@ static UIColor *dateColor = nil;
     
     // set toolbar frame
     CGRect toolbarFrame = self.contentToolbar.frame;
-    toolbarFrame.origin.y = dateFrame.origin.y + dateFrame.size.height + 12.f;
+    toolbarFrame.origin.y = dateFrame.origin.y + dateFrame.size.height + 12.f + 20.f;
     self.contentToolbar.frame = toolbarFrame;
     
     // format avatar image view
