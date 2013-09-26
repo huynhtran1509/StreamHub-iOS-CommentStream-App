@@ -20,6 +20,6 @@
 @property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, assign) BOOL hideStatusBar;
 
--(void)setAvatarImage:(UIImage*)image;
+@property (strong, nonatomic) UIImage *avatarImage;
 
 @end

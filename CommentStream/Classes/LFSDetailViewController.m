@@ -23,10 +23,10 @@
 @property (strong, nonatomic) LFSBasicHTMLLabel *contentBodyLabel;
 @property (strong, nonatomic) LFSBasicHTMLLabel *remoteUrlLabel;
 @property (strong, nonatomic) UIButton *authorProfileButton;
+@property (strong, nonatomic) UIImageView *avatarView;
 
-@property (weak, nonatomic) IBOutlet UIImageView *avatarView;
 @property (weak, nonatomic) IBOutlet UILabel *authorLabel;
-@property (weak, nonatomic) IBOutlet UILabel *dateLabel;
+@property (strong, nonatomic) UILabel *dateLabel;
 
 
 @property (strong, nonatomic) LFSContentToolbar *contentToolbar;
@@ -46,21 +46,14 @@ static const CGFloat kAvatarCornerRadius = 4;
 
 static NSString* const kReplySegue = @"replyTo";
 
-@implementation LFSDetailViewController {
-    UIImage *_avatarImage;
-}
+@implementation LFSDetailViewController
 
 #pragma mark - Class methods
 static UIFont *titleFont = nil;
 
-static UIFont *dateFont = nil;
-static UIColor *dateColor = nil;
-
 + (void)initialize {
     if(self == [LFSDetailViewController class]) {
         titleFont = [UIFont boldSystemFontOfSize:16.f];
-        dateFont = [UIFont systemFontOfSize:13.f];
-        dateColor = [UIColor lightGrayColor];
     }
 }
 
@@ -82,6 +75,8 @@ static UIColor *dateColor = nil;
 @synthesize likeButton = _likeButton;
 @synthesize replyButton = _replyButton;
 
+@synthesize avatarImage = _avatarImage;
+
 @synthesize liked = _liked;
 
 // render iOS7 status bar methods as writable properties
@@ -89,11 +84,6 @@ static UIColor *dateColor = nil;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
 @synthesize postCommentViewController = _postCommentViewController;
-
--(void)setAvatarImage:(UIImage*)image
-{
-    _avatarImage = image;
-}
 
 -(LFSPostViewController*)postCommentViewController
 {
@@ -206,6 +196,50 @@ static UIColor *dateColor = nil;
     return _authorProfileButton;
 }
 
+-(UIImageView*)avatarView
+{
+    if (_avatarView == nil) {
+        // initialize
+        CGRect frame;
+        if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+            ([UIScreen mainScreen].scale == 2.0f))
+        {
+            // Retina display, okay to use half-points
+            frame = CGRectMake(20.f, 20.f, 37.5f, 37.5f);
+        }
+        else
+        {
+            // non-Retina display, do not use half-points
+            frame = CGRectMake(20.f, 20.f, 37.f, 37.f);
+        }
+        _avatarView = [[UIImageView alloc] initWithFrame:frame];
+        [self.scrollView addSubview:_avatarView];
+        
+        // configure
+        _avatarView.layer.cornerRadius = kAvatarCornerRadius;
+        _avatarView.layer.masksToBounds = YES;
+    }
+    return _avatarView;
+}
+
+-(UILabel*)dateLabel
+{
+    if (_dateLabel == nil) {
+        // initialize
+        CGRect frame = CGRectMake(21.f,
+                                  0.f, // this could vary
+                                  (self.scrollView.bounds.size.width - 40.f) / 2.f,
+                                  21.f);
+        _dateLabel = [[UILabel alloc] initWithFrame:frame];
+        [self.scrollView addSubview:_dateLabel];
+        
+        // configure
+        [_dateLabel setFont:[UIFont systemFontOfSize:13.f]];
+        [_dateLabel setTextColor:[UIColor lightGrayColor]];
+    }
+    return _dateLabel;
+}
+
 #pragma mark - Lifecycle
 
 -(id)initWithCoder:(NSCoder *)aDecoder
@@ -219,6 +253,11 @@ static UIColor *dateColor = nil;
         _likeButton = nil;
         _replyButton = nil;
         _contentBodyLabel = nil;
+        _remoteUrlLabel = nil;
+        _authorProfileButton = nil;
+        _avatarImage = nil;
+        _avatarView = nil;
+        _dateLabel = nil;
     }
     return self;
 }
@@ -234,6 +273,11 @@ static UIColor *dateColor = nil;
         _likeButton = nil;
         _replyButton = nil;
         _contentBodyLabel = nil;
+        _remoteUrlLabel = nil;
+        _authorProfileButton = nil;
+        _avatarImage = nil;
+        _avatarView = nil;
+        _dateLabel = nil;
     }
     return self;
 }
@@ -244,12 +288,16 @@ static UIColor *dateColor = nil;
     _likeButton = nil;
     _replyButton = nil;
     _contentBodyLabel = nil;
+    _remoteUrlLabel = nil;
+    _authorProfileButton = nil;
+    _avatarImage = nil;
+    _avatarView = nil;
+    _dateLabel = nil;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
     
     // set and format main content label
     [self.contentBodyLabel setHTMLString:[self.contentItem contentBodyHtml]];
@@ -266,12 +314,11 @@ static UIColor *dateColor = nil;
         [self.remoteUrlLabel setHTMLString:
          [NSString stringWithFormat:@"<a href=\"%@\">View on Twitter ></a>",
           twitterURLString]];
+        CGRect remoteUrlFrame = self.remoteUrlLabel.frame;
+        remoteUrlFrame.origin.y = bottom + 12.f;
+        [self.remoteUrlLabel setFrame:remoteUrlFrame];
     }
-    CGRect remoteUrlFrame = self.remoteUrlLabel.frame;
-    remoteUrlFrame.origin.y = bottom + 12.f;
-    [self.remoteUrlLabel setFrame:remoteUrlFrame];
-    
-    
+
     // set source icon
     if (self.contentItem.author.twitterHandle) {
         [self.authorProfileButton setImage:[UIImage imageNamed:@"SourceTwitter"]
@@ -282,11 +329,9 @@ static UIColor *dateColor = nil;
     [_authorLabel setFont:titleFont];
     
     // format date label
-    [_dateLabel setFont:dateFont];
-    [_dateLabel setTextColor:dateColor];
-    CGRect dateFrame = _dateLabel.frame;
+    CGRect dateFrame = self.dateLabel.frame;
     dateFrame.origin.y = bottom + 12.f;
-    [_dateLabel setFrame:dateFrame];
+    [self.dateLabel setFrame:dateFrame];
     
     // set toolbar frame
     CGRect toolbarFrame;
@@ -304,38 +349,20 @@ static UIColor *dateColor = nil;
      ];
     [self.scrollView addSubview:_contentToolbar];
     
-    // format avatar image view
-    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
-        ([UIScreen mainScreen].scale == 2.0f))
-    {
-        // Retina display, okay to use half-points
-        CGRect avatarFrame = _avatarView.frame;
-        avatarFrame.size = CGSizeMake(37.5f, 37.5f);
-        [_avatarView setFrame:avatarFrame];
-    }
-    else
-    {
-        // non-Retina display, do not use half-points
-        CGRect avatarFrame = _avatarView.frame;
-        avatarFrame.size = CGSizeMake(37.f, 37.f);
-        [_avatarView setFrame:avatarFrame];
-    }
-    _avatarView.layer.cornerRadius = kAvatarCornerRadius;
-    _avatarView.layer.masksToBounds = YES;
+    
+    [self.avatarView setImage:self.avatarImage];
+
     
     // set author name
     NSString *authorName = self.contentItem.author.displayName;
     [_authorLabel setText:authorName];
-
     
     // set date
     NSString *dateTime = [[[NSDateFormatter alloc] init]
                           extendedRelativeStringFromDate:
                           [self.contentItem contentCreatedAt]];
     [_dateLabel setText:dateTime];
-    
-    // set avatar image
-    _avatarView.image = _avatarImage;
+
     
     // calculate content size
     [_scrollView setContentSize:CGSizeMake(_scrollView.frame.size.width,
