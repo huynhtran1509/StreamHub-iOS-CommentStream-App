@@ -25,7 +25,7 @@
 @property (strong, nonatomic) UIButton *authorProfileButton;
 @property (strong, nonatomic) UIImageView *avatarView;
 
-@property (weak, nonatomic) IBOutlet UILabel *authorLabel;
+@property (strong, nonatomic) UILabel *authorLabel;
 @property (strong, nonatomic) UILabel *dateLabel;
 
 
@@ -42,20 +42,7 @@
 @property (assign, nonatomic) BOOL liked;
 @end
 
-static const CGFloat kAvatarCornerRadius = 4;
-
-static NSString* const kReplySegue = @"replyTo";
-
 @implementation LFSDetailViewController
-
-#pragma mark - Class methods
-static UIFont *titleFont = nil;
-
-+ (void)initialize {
-    if(self == [LFSDetailViewController class]) {
-        titleFont = [UIFont boldSystemFontOfSize:16.f];
-    }
-}
 
 #pragma mark - Properties
 
@@ -198,6 +185,8 @@ static UIFont *titleFont = nil;
 
 -(UIImageView*)avatarView
 {
+    static const CGFloat kAvatarCornerRadius = 4;
+
     if (_avatarView == nil) {
         // initialize
         CGRect frame;
@@ -240,6 +229,47 @@ static UIFont *titleFont = nil;
     return _dateLabel;
 }
 
+- (UILabel*)authorLabel
+{
+    if (_authorLabel == nil) {
+        // initialize
+        CGFloat leftColumn = 66.f;
+        CGRect frame = CGRectMake(leftColumn,
+                                  20.f,
+                                  self.scrollView.bounds.size.width - leftColumn - 20.f,
+                                  38.f);
+        _authorLabel = [[UILabel alloc] initWithFrame:frame];
+        [self.scrollView addSubview:_authorLabel];
+        
+        // configure
+        [_authorLabel setFont:[UIFont boldSystemFontOfSize:16.f]];
+    }
+    return _authorLabel;
+}
+
+-(LFSContentToolbar*)contentToolbar
+{
+    if (_contentToolbar == nil) {
+        // initialize
+        CGRect frame = CGRectZero;
+        frame.size = CGSizeMake(self.scrollView.bounds.size.width, 44.f);
+        _contentToolbar = [[LFSContentToolbar alloc] initWithFrame:frame];
+        [_contentToolbar setItems:
+         @[
+           [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil],
+           [[UIBarButtonItem alloc] initWithCustomView:self.likeButton],
+           [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil],
+           [[UIBarButtonItem alloc] initWithCustomView:self.replyButton],
+           [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil]
+           ]
+         ];
+        [self.scrollView addSubview:_contentToolbar];
+        
+        // configure
+    }
+    return _contentToolbar;
+}
+
 #pragma mark - Lifecycle
 
 -(id)initWithCoder:(NSCoder *)aDecoder
@@ -258,6 +288,7 @@ static UIFont *titleFont = nil;
         _avatarImage = nil;
         _avatarView = nil;
         _dateLabel = nil;
+        _authorLabel = nil;
     }
     return self;
 }
@@ -278,6 +309,7 @@ static UIFont *titleFont = nil;
         _avatarImage = nil;
         _avatarView = nil;
         _dateLabel = nil;
+        _authorLabel = nil;
     }
     return self;
 }
@@ -293,6 +325,7 @@ static UIFont *titleFont = nil;
     _avatarImage = nil;
     _avatarView = nil;
     _dateLabel = nil;
+    _authorLabel = nil;
 }
 
 - (void)viewDidLoad
@@ -302,8 +335,9 @@ static UIFont *titleFont = nil;
     // set and format main content label
     [self.contentBodyLabel setHTMLString:[self.contentItem contentBodyHtml]];
     CGRect basicHTMLLabelFrame = self.contentBodyLabel.frame;
+    CGFloat contentWidth = basicHTMLLabelFrame.size.width;
     basicHTMLLabelFrame.size = [self.contentBodyLabel
-                                sizeThatFits:CGSizeMake(basicHTMLLabelFrame.size.width, 1000.f)];
+                                sizeThatFits:CGSizeMake(contentWidth, 10000.f)];
     [self.contentBodyLabel setFrame:basicHTMLLabelFrame];
     
     CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
@@ -326,45 +360,27 @@ static UIFont *titleFont = nil;
     }
     
     // format author name label
-    [_authorLabel setFont:titleFont];
+    if (self.contentItem.author.displayName) {
+        [self.authorLabel setText:self.contentItem.author.displayName];
+    }
     
     // format date label
     CGRect dateFrame = self.dateLabel.frame;
     dateFrame.origin.y = bottom + 12.f;
     [self.dateLabel setFrame:dateFrame];
+    [self.dateLabel setText:[[[NSDateFormatter alloc] init]
+                             extendedRelativeStringFromDate:
+                             [self.contentItem contentCreatedAt]]];
     
-    // set toolbar frame
-    CGRect toolbarFrame;
-    toolbarFrame.size = CGSizeMake(self.scrollView.bounds.size.width, 44.f);
-    toolbarFrame.origin = CGPointMake(0.f, dateFrame.origin.y + dateFrame.size.height + 12.f);
-    _contentToolbar = [[LFSContentToolbar alloc] initWithFrame:toolbarFrame];
-    [_contentToolbar setItems:
-     @[
-       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil],
-       [[UIBarButtonItem alloc] initWithCustomView:self.likeButton],
-       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil],
-       [[UIBarButtonItem alloc] initWithCustomView:self.replyButton],
-       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil]
-       ]
-     ];
-    [self.scrollView addSubview:_contentToolbar];
-    
-    
+    // set avatar view
     [self.avatarView setImage:self.avatarImage];
 
-    
-    // set author name
-    NSString *authorName = self.contentItem.author.displayName;
-    [_authorLabel setText:authorName];
-    
-    // set date
-    NSString *dateTime = [[[NSDateFormatter alloc] init]
-                          extendedRelativeStringFromDate:
-                          [self.contentItem contentCreatedAt]];
-    [_dateLabel setText:dateTime];
+    // set toolbar frame
+    CGRect toolbarFrame = self.contentToolbar.frame;
+    toolbarFrame.origin = CGPointMake(0.f, dateFrame.origin.y + dateFrame.size.height + 12.f);
+    [self.contentToolbar setFrame:toolbarFrame];
 
-    
-    // calculate content size
+    // calculate content size for scrolling
     [_scrollView setContentSize:CGSizeMake(_scrollView.frame.size.width,
                                            _contentToolbar.frame.origin.y +
                                            _contentToolbar.frame.size.height + 20.f)];
@@ -438,26 +454,6 @@ static UIFont *titleFont = nil;
     {
         // regular link
         return [UIColor blueColor];
-    }
-}
-
-#pragma mark - Navigation
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Make sure your segue name in storyboard is the same as this line
-    if ([[segue identifier] isEqualToString:kReplySegue])
-    {
-        // Get reference to the destination view controller
-        if ([segue.destinationViewController isKindOfClass:[LFSPostViewController class]])
-        {
-            // as there is only one piece of content in Detail View,
-            // no need to check sender type here
-            LFSPostViewController *vc = segue.destinationViewController;
-            [vc setCollection:self.collection];
-            [vc setCollectionId:self.collectionId];
-            [vc setReplyToContent:self.contentItem];
-        }
     }
 }
 
