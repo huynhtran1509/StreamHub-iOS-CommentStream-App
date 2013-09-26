@@ -226,18 +226,9 @@ static UIColor *dateColor = nil;
     [_remoteUrlLabel setFrame:profileFrame];
     
     // set toolbar frame
-    CGFloat extraOffsetForToolbar = 12.f;
-    if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
-        extraOffsetForToolbar += 14.f;
-        if (!self.hideStatusBar) {
-            // status bar visible
-            extraOffsetForToolbar += 12.f;
-        }
-    }
-    
     CGRect toolbarFrame;
     toolbarFrame.size = CGSizeMake(self.scrollView.bounds.size.width, 44.f);
-    toolbarFrame.origin = CGPointMake(0.f, dateFrame.origin.y + dateFrame.size.height + extraOffsetForToolbar);
+    toolbarFrame.origin = CGPointMake(0.f, dateFrame.origin.y + dateFrame.size.height + 12.f);
     _contentToolbar = [[LFSContentToolbar alloc] initWithFrame:toolbarFrame];
     [_contentToolbar setItems:
      @[
@@ -249,7 +240,6 @@ static UIColor *dateColor = nil;
        ]
      ];
     [self.scrollView addSubview:_contentToolbar];
-
     
     // format avatar image view
     if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
