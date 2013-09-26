@@ -18,6 +18,7 @@
 @property (nonatomic, strong) NSString *collectionId;
 
 @property (nonatomic, strong) LFSContent *contentItem;
+@property (nonatomic, assign) BOOL hideStatusBar;
 
 -(void)setAvatarImage:(UIImage*)image;
 

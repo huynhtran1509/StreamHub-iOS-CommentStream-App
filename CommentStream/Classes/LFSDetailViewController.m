@@ -55,12 +55,18 @@ static UIColor *dateColor = nil;
 
 #pragma mark - Properties
 
+@synthesize scrollView = _scrollView;
+
 @synthesize basicHTMLLabel = _basicHTMLLabel;
 
 @synthesize avatarView = _avatarView;
 @synthesize authorLabel = _authorLabel;
 @synthesize dateLabel = _dateLabel;
 @synthesize remoteUrlLabel = _remoteUrlLabel;
+@synthesize contentToolbar = _contentToolbar;
+@synthesize sourceButton = _sourceButton;
+
+@synthesize hideStatusBar = _hideStatusBar;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -71,44 +77,53 @@ static UIColor *dateColor = nil;
     _avatarImage = image;
 }
 
-#pragma mark - UIViewController
+#pragma mark - Lifecycle
 
-// Hide Status Bar
-- (BOOL)prefersStatusBarHidden
+-(id)initWithCoder:(NSCoder *)aDecoder
 {
-    return YES;
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        _hideStatusBar = NO;
+    }
+    return self;
 }
 
-#pragma mark - Lifecycle
+-(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        _hideStatusBar = NO;
+    }
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
-    // set main content label
-    [self.basicHTMLLabel setDelegate:self];
-    [self.basicHTMLLabel setFont:bodyFont];
-    [self.basicHTMLLabel setLineSpacing:8.5f];
+    // set and format main content label
+    [_basicHTMLLabel setDelegate:self];
+    [_basicHTMLLabel setFont:bodyFont];
+    [_basicHTMLLabel setLineSpacing:8.5f];
     
-    [self.basicHTMLLabel setHTMLString:[self.contentItem contentBodyHtml]];
-    CGRect oldContentFrame = self.basicHTMLLabel.frame;
-    CGSize maxSize = oldContentFrame.size;
+    [_basicHTMLLabel setHTMLString:[self.contentItem contentBodyHtml]];
+    CGRect mainLabelFrame = _basicHTMLLabel.frame;
+    CGSize maxSize = mainLabelFrame.size;
     maxSize.height = 1000.f;
-    CGSize neededSize = [self.basicHTMLLabel sizeThatFits:maxSize];
-    CGFloat bottom = neededSize.height + oldContentFrame.origin.y;
-    [self.basicHTMLLabel setFrame:CGRectMake(oldContentFrame.origin.x,
-                                             oldContentFrame.origin.y,
-                                             neededSize.width,
-                                             neededSize.height)];
+    mainLabelFrame.size = [_basicHTMLLabel sizeThatFits:maxSize];
+    [_basicHTMLLabel setFrame:mainLabelFrame];
+    
+    CGFloat bottom = mainLabelFrame.size.height + mainLabelFrame.origin.y;
     
     // set source icon
     if (self.contentItem.author.twitterHandle) {
-        [self.sourceButton setImage:[UIImage imageNamed:@"SourceTwitter"]
-                           forState:UIControlStateNormal];
+        [_sourceButton setImage:[UIImage imageNamed:@"SourceTwitter"]
+                       forState:UIControlStateNormal];
     }
     else {
-        [self.sourceButton setImage:nil
-                           forState:UIControlStateNormal];
+        [_sourceButton setImage:nil
+                       forState:UIControlStateNormal];
     }
     
     // format author name label
@@ -118,20 +133,37 @@ static UIColor *dateColor = nil;
     [_dateLabel setFont:dateFont];
     [_dateLabel setTextColor:dateColor];
     CGRect dateFrame = _dateLabel.frame;
-    dateFrame.origin = CGPointMake(dateFrame.origin.x, bottom + 12.f);
+    dateFrame.origin.y = bottom + 12.f;
     [_dateLabel setFrame:dateFrame];
 
-    // format url link
-    CGRect profileFrame = _remoteUrlLabel.frame;
-    profileFrame.origin = CGPointMake(profileFrame.origin.x, bottom + 12.f);
-    [_remoteUrlLabel setFrame:profileFrame];
+    
+    // set and format url link
     [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
+    [_remoteUrlLabel setCenterVertically:YES]; // necessary for iOS6
+    
+    NSString *twitterURLString = [self.contentItem contentTwitterUrlString];
+    if (twitterURLString != nil) {
+        [_remoteUrlLabel setHTMLString:
+         [NSString stringWithFormat:@"<a href=\"%@\">View on Twitter ></a>",
+          twitterURLString]];
+    }
+    CGRect profileFrame = _remoteUrlLabel.frame;
+    profileFrame.origin.y = bottom + 12.f;
+    [_remoteUrlLabel setFrame:profileFrame];
     
     // set toolbar frame
-    CGRect toolbarFrame = self.contentToolbar.frame;
-    toolbarFrame.origin.y = dateFrame.origin.y + dateFrame.size.height + 12.f + 20.f;
-    self.contentToolbar.frame = toolbarFrame;
-    
+    CGFloat extraOffsetForToolbar = 12.f;
+    if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
+        extraOffsetForToolbar += 14.f;
+        if (!self.hideStatusBar) {
+            // status bar visible
+            extraOffsetForToolbar += 12.f;
+        }
+    }
+    CGRect toolbarFrame = _contentToolbar.frame;
+    toolbarFrame.origin.y = dateFrame.origin.y + dateFrame.size.height + extraOffsetForToolbar;
+    _contentToolbar.frame = toolbarFrame;
+
     // format avatar image view
     if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
         ([UIScreen mainScreen].scale == 2.0f))
@@ -162,27 +194,19 @@ static UIColor *dateColor = nil;
                           [self.contentItem contentCreatedAt]];
     [_dateLabel setText:dateTime];
     
-    // set profile link
-    NSString *twitterURLString = [self.contentItem contentTwitterUrlString];
-    if (twitterURLString != nil) {
-        [_remoteUrlLabel setHTMLString:
-         [NSString stringWithFormat:@"<a href=\"%@\">View on Twitter ></a>",
-          twitterURLString]];
-    }
-    
     // set avatar image
     _avatarView.image = _avatarImage;
     
     // calculate content size
-    CGFloat contentHeight = _dateLabel.frame.origin.y + _dateLabel.frame.size.height + 20.f;
-    CGSize contentSize = CGSizeMake(self.scrollView.frame.size.width, contentHeight);
-    [self.scrollView setContentSize:contentSize];
+    [_scrollView setContentSize:CGSizeMake(_scrollView.frame.size.width,
+                                           _contentToolbar.frame.origin.y +
+                                           _contentToolbar.frame.size.height + 20.f)];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    //[self setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+    [self setStatusBarHidden:self.hideStatusBar withAnimation:UIStatusBarAnimationNone];
     //[self.navigationController setToolbarHidden:YES animated:animated];
 }
 
@@ -197,11 +221,12 @@ static UIColor *dateColor = nil;
 -(void)setStatusBarHidden:(BOOL)hidden
             withAnimation:(UIStatusBarAnimation)animation
 {
+    _prefersStatusBarHidden = hidden;
+    _preferredStatusBarUpdateAnimation = animation;
+    
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
     {
         // iOS 7
-        _prefersStatusBarHidden = hidden;
-        _preferredStatusBarUpdateAnimation = animation;
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     }
     else

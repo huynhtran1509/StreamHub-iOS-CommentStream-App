@@ -117,11 +117,12 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 -(void)setStatusBarHidden:(BOOL)hidden
             withAnimation:(UIStatusBarAnimation)animation
 {
+    _prefersStatusBarHidden = hidden;
+    _preferredStatusBarUpdateAnimation = animation;
+    
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
     {
         // iOS 7
-        _prefersStatusBarHidden = hidden;
-        _preferredStatusBarUpdateAnimation = animation;
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     }
     else
