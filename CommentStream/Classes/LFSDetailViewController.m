@@ -10,6 +10,7 @@
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSDetailViewController.h"
 #import "LFSPostViewController.h"
+#import "LFSContentToolbar.h"
 
 @interface LFSDetailViewController ()
 
@@ -25,9 +26,17 @@
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *remoteUrlLabel;
 @property (weak, nonatomic) IBOutlet UIButton *sourceButton;
-@property (weak, nonatomic) IBOutlet UIToolbar *contentToolbar;
-- (IBAction)didSelectSource:(id)sender;
+@property (strong, nonatomic) LFSContentToolbar *contentToolbar;
+@property (strong, nonatomic) LFSPostViewController *postCommentViewController;
 
+- (IBAction)didSelectSource:(id)sender;
+- (IBAction)didSelectReply:(id)sender;
+- (IBAction)didSelectLike:(id)sender;
+
+@property (strong, nonatomic) UIButton *likeButton;
+@property (strong, nonatomic) UIButton *replyButton;
+
+@property (assign, nonatomic) BOOL liked;
 @end
 
 static const CGFloat kAvatarCornerRadius = 4;
@@ -68,13 +77,70 @@ static UIColor *dateColor = nil;
 
 @synthesize hideStatusBar = _hideStatusBar;
 
+@synthesize likeButton = _likeButton;
+@synthesize replyButton = _replyButton;
+
+@synthesize liked = _liked;
+
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
+@synthesize postCommentViewController = _postCommentViewController;
+
 -(void)setAvatarImage:(UIImage*)image
 {
     _avatarImage = image;
+}
+
+-(LFSPostViewController*)postCommentViewController
+{
+    // lazy-instantiate LFSPostViewController
+    static NSString* const kLFSMainStoryboardId = @"Main";
+    static NSString* const kLFSPostCommentViewControllerId = @"postComment";
+    
+    if (_postCommentViewController == nil) {
+        UIStoryboard *storyboard = [UIStoryboard
+                                    storyboardWithName:kLFSMainStoryboardId
+                                    bundle:nil];
+        _postCommentViewController =
+        (LFSPostViewController*)[storyboard
+                                 instantiateViewControllerWithIdentifier:kLFSPostCommentViewControllerId];
+    }
+    return _postCommentViewController;
+}
+
+- (UIButton*)likeButton
+{
+    if (_likeButton == nil) {
+        UIImage *img = [self imageForLikedState:self.liked];
+        _likeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.f, 0.f, img.size.width, img.size.height)];
+        [_likeButton setImage:img forState:UIControlStateNormal];
+        [_likeButton addTarget:self action:@selector(didSelectLike:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _likeButton;
+}
+
+- (UIButton*)replyButton
+{
+    if (_replyButton == nil) {
+        UIImage *img = [UIImage imageNamed:@"ActionReply"];
+        _replyButton = [[UIButton alloc] initWithFrame:CGRectMake(0.f, 0.f, img.size.width, img.size.height)];
+        [_replyButton setImage:img forState:UIControlStateNormal];
+        [_replyButton addTarget:self action:@selector(didSelectReply:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _replyButton;
+}
+
+- (UIImage*)imageForLikedState:(BOOL)liked
+{
+    return [UIImage imageNamed:(liked ? @"StateLiked" : @"StateNotLiked")];
+}
+
+- (void)setLiked:(BOOL)liked
+{
+    _liked = liked;
+    [_likeButton setImage:[self imageForLikedState:self.liked] forState:UIControlStateNormal];
 }
 
 #pragma mark - Lifecycle
@@ -84,6 +150,10 @@ static UIColor *dateColor = nil;
     self = [super initWithCoder:aDecoder];
     if (self) {
         _hideStatusBar = NO;
+        _liked = NO;
+        _postCommentViewController = nil;
+        _likeButton = nil;
+        _replyButton = nil;
     }
     return self;
 }
@@ -93,6 +163,10 @@ static UIColor *dateColor = nil;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _hideStatusBar = NO;
+        _liked = NO;
+        _postCommentViewController = nil;
+        _likeButton = nil;
+        _replyButton = nil;
     }
     return self;
 }
@@ -152,18 +226,21 @@ static UIColor *dateColor = nil;
     [_remoteUrlLabel setFrame:profileFrame];
     
     // set toolbar frame
-    CGFloat extraOffsetForToolbar = 12.f;
-    if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70)) {
-        extraOffsetForToolbar += 14.f;
-        if (!self.hideStatusBar) {
-            // status bar visible
-            extraOffsetForToolbar += 12.f;
-        }
-    }
-    CGRect toolbarFrame = _contentToolbar.frame;
-    toolbarFrame.origin.y = dateFrame.origin.y + dateFrame.size.height + extraOffsetForToolbar;
-    _contentToolbar.frame = toolbarFrame;
-
+    CGRect toolbarFrame;
+    toolbarFrame.size = CGSizeMake(self.scrollView.bounds.size.width, 44.f);
+    toolbarFrame.origin = CGPointMake(0.f, dateFrame.origin.y + dateFrame.size.height + 12.f);
+    _contentToolbar = [[LFSContentToolbar alloc] initWithFrame:toolbarFrame];
+    [_contentToolbar setItems:
+     @[
+       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil],
+       [[UIBarButtonItem alloc] initWithCustomView:self.likeButton],
+       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil],
+       [[UIBarButtonItem alloc] initWithCustomView:self.replyButton],
+       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil]
+       ]
+     ];
+    [self.scrollView addSubview:_contentToolbar];
+    
     // format avatar image view
     if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
         ([UIScreen mainScreen].scale == 2.0f))
@@ -214,6 +291,13 @@ static UIColor *dateColor = nil;
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc
+{
+    _postCommentViewController = nil;
+    _likeButton = nil;
+    _replyButton = nil;
 }
 
 #pragma mark - Status bar
@@ -295,6 +379,23 @@ static UIColor *dateColor = nil;
 }
 
 #pragma mark - Events
+
+- (IBAction)didSelectLike:(id)sender
+{
+    // toggle liked state
+    [self setLiked:!self.liked];
+}
+
+- (IBAction)didSelectReply:(id)sender
+{
+    // configure destination controller
+    [self.postCommentViewController setCollection:self.collection];
+    [self.postCommentViewController setCollectionId:self.collectionId];
+    [self.postCommentViewController setReplyToContent:self.contentItem];
+    
+    [self presentViewController:self.postCommentViewController animated:YES completion:nil];
+}
+
 - (IBAction)didSelectSource:(id)sender
 {
     NSString *urlString = self.contentItem.author.profileUrlStringNoHashBang;

@@ -18,10 +18,7 @@
 
 #import "LFSContentCollection.h"
 
-@interface LFSCollectionViewController () {
-    LFSPostViewController *_viewControllerNewComment;
-}
-
+@interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSContentCollection *content;
 
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
@@ -32,6 +29,8 @@
 // render iOS7 status bar methods to be readwrite properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
+
+@property (nonatomic, strong) LFSPostViewController *postCommentViewController;
 
 - (BOOL)canReuseCells;
 @end
@@ -61,6 +60,7 @@ static NSString* const kCellSelectSegue = @"detailView";
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
+@synthesize postCommentViewController = _postCommentViewController;
 
 - (LFSBootstrapClient*)bootstrapClient
 {
@@ -90,6 +90,23 @@ static NSString* const kCellSelectSegue = @"detailView";
         } success:nil failure:nil];
     }
     return _streamClient;
+}
+
+-(LFSPostViewController*)postCommentViewController
+{
+    // lazy-instantiate LFSPostViewController
+    static NSString* const kLFSMainStoryboardId = @"Main";
+    static NSString* const kLFSPostCommentViewControllerId = @"postComment";
+    
+    if (_postCommentViewController == nil) {
+        UIStoryboard *storyboard = [UIStoryboard
+                                    storyboardWithName:kLFSMainStoryboardId
+                                    bundle:nil];
+        _postCommentViewController =
+        (LFSPostViewController*)[storyboard
+                                 instantiateViewControllerWithIdentifier:kLFSPostCommentViewControllerId];
+    }
+    return _postCommentViewController;
 }
 
 #pragma mark - Lifecycle
@@ -151,7 +168,7 @@ static NSString* const kCellSelectSegue = @"detailView";
         [toolbar setBarStyle:UIBarStyleDefault];
         //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
-    _viewControllerNewComment = nil;
+    _postCommentViewController = nil;
     // }}}
     
     /*
@@ -524,22 +541,14 @@ static NSString* const kCellSelectSegue = @"detailView";
 }
 
 #pragma mark - Events
+
 -(IBAction)createComment:(id)sender
 {
-    static NSString* const kLFSMainStoryboardId = @"Main";
-    static NSString* const kLFSNewCommentViewResourceId = @"commentNew";
+    // configure destination controller
+    [self.postCommentViewController setCollection:self.collection];
+    [self.postCommentViewController setCollectionId:self.collectionId];
     
-    if (_viewControllerNewComment == nil) {
-        UIStoryboard *storyboard = [UIStoryboard
-                                    storyboardWithName:kLFSMainStoryboardId
-                                    bundle:nil];
-        _viewControllerNewComment =
-        (LFSPostViewController*)[storyboard
-                                       instantiateViewControllerWithIdentifier:kLFSNewCommentViewResourceId];
-        _viewControllerNewComment.collection = self.collection;
-        _viewControllerNewComment.collectionId = self.collectionId;
-    }
-    [self presentViewController:_viewControllerNewComment animated:YES completion:nil];
+    [self presentViewController:self.postCommentViewController animated:YES completion:nil];
 }
 
 @end
