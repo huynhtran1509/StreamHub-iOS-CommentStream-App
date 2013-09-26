@@ -296,11 +296,12 @@ static NSString* const kCellSelectSegue = @"detailView";
 -(void)setStatusBarHidden:(BOOL)hidden
             withAnimation:(UIStatusBarAnimation)animation
 {
+    _prefersStatusBarHidden = hidden;
+    _preferredStatusBarUpdateAnimation = animation;
+    
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
     {
         // iOS 7
-        _prefersStatusBarHidden = hidden;
-        _preferredStatusBarUpdateAnimation = animation;
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     }
     else
@@ -516,6 +517,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                 [vc setAvatarImage:cell.avatarImage];
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
+                [vc setHideStatusBar:self.prefersStatusBarHidden];
             }
         }
     }

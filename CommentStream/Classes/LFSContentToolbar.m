@@ -40,17 +40,33 @@
 }
 
 #pragma mark - Lifecycle
-- (id) init
+- (id)init
 {
     self = [super init];
-    [self applyTranslucentBackground];
+    if (self) {
+        [self applyTranslucentBackground];
+    }
     return self;
 }
 
 - (id)initWithFrame:(CGRect) frame
 {
     self = [super initWithFrame:frame];
-    [self applyTranslucentBackground];
+    if (self) {
+        // Initialization code
+        [self applyTranslucentBackground];
+    }
+    return self;
+}
+
+// for loading from storyboard or Xib
+-(id)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        // Initialization code
+        [self applyTranslucentBackground];
+    }
     return self;
 }
 
