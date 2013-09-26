@@ -20,12 +20,13 @@
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 
-@property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *basicHTMLLabel;
+@property (strong, nonatomic) LFSBasicHTMLLabel *basicHTMLLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *avatarView;
 @property (weak, nonatomic) IBOutlet UILabel *authorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *remoteUrlLabel;
 @property (weak, nonatomic) IBOutlet UIButton *sourceButton;
+
 @property (strong, nonatomic) LFSContentToolbar *contentToolbar;
 @property (strong, nonatomic) LFSPostViewController *postCommentViewController;
 
@@ -49,14 +50,13 @@ static NSString* const kReplySegue = @"replyTo";
 
 #pragma mark - Class methods
 static UIFont *titleFont = nil;
-static UIFont *bodyFont = nil;
+
 static UIFont *dateFont = nil;
 static UIColor *dateColor = nil;
 
 + (void)initialize {
     if(self == [LFSDetailViewController class]) {
         titleFont = [UIFont boldSystemFontOfSize:16.f];
-        bodyFont = [UIFont fontWithName:@"Georgia" size:17.0f];
         dateFont = [UIFont systemFontOfSize:13.f];
         dateColor = [UIColor lightGrayColor];
     }
@@ -143,6 +143,29 @@ static UIColor *dateColor = nil;
     [_likeButton setImage:[self imageForLikedState:self.liked] forState:UIControlStateNormal];
 }
 
+- (LFSBasicHTMLLabel*)basicHTMLLabel
+{
+    static UIFont *bodyFont = nil;
+    if (_basicHTMLLabel == nil) {
+        // initialize
+        CGRect frame = CGRectMake(20.f,
+                                  66.f,
+                                  self.scrollView.bounds.size.width - 40.f,
+                                  10.f);
+        _basicHTMLLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        [self.scrollView addSubview:_basicHTMLLabel];
+        
+        // configure
+        if (bodyFont == nil) {
+            bodyFont = [UIFont fontWithName:@"Georgia" size:17.0f];
+        }
+        [_basicHTMLLabel setDelegate:self];
+        [_basicHTMLLabel setFont:bodyFont];
+        [_basicHTMLLabel setLineSpacing:8.5f];
+    }
+    return _basicHTMLLabel;
+}
+
 #pragma mark - Lifecycle
 
 -(id)initWithCoder:(NSCoder *)aDecoder
@@ -151,9 +174,11 @@ static UIColor *dateColor = nil;
     if (self) {
         _hideStatusBar = NO;
         _liked = NO;
+        
         _postCommentViewController = nil;
         _likeButton = nil;
         _replyButton = nil;
+        _basicHTMLLabel = nil;
     }
     return self;
 }
@@ -164,11 +189,21 @@ static UIColor *dateColor = nil;
     if (self) {
         _hideStatusBar = NO;
         _liked = NO;
+        
         _postCommentViewController = nil;
         _likeButton = nil;
         _replyButton = nil;
+        _basicHTMLLabel = nil;
     }
     return self;
+}
+
+- (void)dealloc
+{
+    _postCommentViewController = nil;
+    _likeButton = nil;
+    _replyButton = nil;
+    _basicHTMLLabel = nil;
 }
 
 - (void)viewDidLoad
@@ -177,18 +212,13 @@ static UIColor *dateColor = nil;
 	// Do any additional setup after loading the view.
     
     // set and format main content label
-    [_basicHTMLLabel setDelegate:self];
-    [_basicHTMLLabel setFont:bodyFont];
-    [_basicHTMLLabel setLineSpacing:8.5f];
+    [self.basicHTMLLabel setHTMLString:[self.contentItem contentBodyHtml]];
+    CGRect basicHTMLLabelFrame = self.basicHTMLLabel.frame;
+    basicHTMLLabelFrame.size = [self.basicHTMLLabel
+                                sizeThatFits:CGSizeMake(basicHTMLLabelFrame.size.width, 1000.f)];
+    [self.basicHTMLLabel setFrame:basicHTMLLabelFrame];
     
-    [_basicHTMLLabel setHTMLString:[self.contentItem contentBodyHtml]];
-    CGRect mainLabelFrame = _basicHTMLLabel.frame;
-    CGSize maxSize = mainLabelFrame.size;
-    maxSize.height = 1000.f;
-    mainLabelFrame.size = [_basicHTMLLabel sizeThatFits:maxSize];
-    [_basicHTMLLabel setFrame:mainLabelFrame];
-    
-    CGFloat bottom = mainLabelFrame.size.height + mainLabelFrame.origin.y;
+    CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
     
     // set source icon
     if (self.contentItem.author.twitterHandle) {
@@ -291,13 +321,6 @@ static UIColor *dateColor = nil;
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-- (void)dealloc
-{
-    _postCommentViewController = nil;
-    _likeButton = nil;
-    _replyButton = nil;
 }
 
 #pragma mark - Status bar
