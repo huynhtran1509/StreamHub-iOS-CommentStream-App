@@ -14,7 +14,7 @@
 		EF2251E717F21CF4006482BD /* LFSContentCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = EF2251E617F21CF4006482BD /* LFSContentCollection.m */; };
 		EF529E3B17F39ECF00836ACE /* LFSContentToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */; };
 		EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED217E3C13000D5A7DF /* LFSDetailViewController.m */; };
-		EF5AFED617E3C2B900D5A7DF /* LFSNewCommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED517E3C2B900D5A7DF /* LFSNewCommentViewController.m */; };
+		EF5AFED617E3C2B900D5A7DF /* LFSPostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED517E3C2B900D5A7DF /* LFSPostViewController.m */; };
 		EF62178217E8F76900700808 /* LFSTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = EF62178117E8F76900700808 /* LFSTextField.m */; };
 		EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DC17BB97E2005F5FC3 /* LFSAppDelegate.m */; };
 		EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6683DE17BB97E2005F5FC3 /* LFSCollectionViewController.m */; };
@@ -48,8 +48,8 @@
 		EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSContentToolbar.m; path = Classes/LFSContentToolbar.m; sourceTree = "<group>"; };
 		EF5AFED117E3C13000D5A7DF /* LFSDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDetailViewController.h; path = Classes/LFSDetailViewController.h; sourceTree = "<group>"; };
 		EF5AFED217E3C13000D5A7DF /* LFSDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSDetailViewController.m; path = Classes/LFSDetailViewController.m; sourceTree = "<group>"; };
-		EF5AFED417E3C2B900D5A7DF /* LFSNewCommentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSNewCommentViewController.h; path = Classes/LFSNewCommentViewController.h; sourceTree = "<group>"; };
-		EF5AFED517E3C2B900D5A7DF /* LFSNewCommentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSNewCommentViewController.m; path = Classes/LFSNewCommentViewController.m; sourceTree = "<group>"; };
+		EF5AFED417E3C2B900D5A7DF /* LFSPostViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSPostViewController.h; path = Classes/LFSPostViewController.h; sourceTree = "<group>"; };
+		EF5AFED517E3C2B900D5A7DF /* LFSPostViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSPostViewController.m; path = Classes/LFSPostViewController.m; sourceTree = "<group>"; };
 		EF62178017E8F76900700808 /* LFSTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSTextField.h; path = Classes/LFSTextField.h; sourceTree = "<group>"; };
 		EF62178117E8F76900700808 /* LFSTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSTextField.m; path = Classes/LFSTextField.m; sourceTree = "<group>"; };
 		EF6683DB17BB97E2005F5FC3 /* LFSAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSAppDelegate.h; path = Classes/LFSAppDelegate.h; sourceTree = "<group>"; };
@@ -129,8 +129,8 @@
 				EF5AFED217E3C13000D5A7DF /* LFSDetailViewController.m */,
 				EF529E3917F39ECF00836ACE /* LFSContentToolbar.h */,
 				EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */,
-				EF5AFED417E3C2B900D5A7DF /* LFSNewCommentViewController.h */,
-				EF5AFED517E3C2B900D5A7DF /* LFSNewCommentViewController.m */,
+				EF5AFED417E3C2B900D5A7DF /* LFSPostViewController.h */,
+				EF5AFED517E3C2B900D5A7DF /* LFSPostViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -326,7 +326,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF5AFED617E3C2B900D5A7DF /* LFSNewCommentViewController.m in Sources */,
+				EF5AFED617E3C2B900D5A7DF /* LFSPostViewController.m in Sources */,
 				EF529E3B17F39ECF00836ACE /* LFSContentToolbar.m in Sources */,
 				EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */,
 				EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */,

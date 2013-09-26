@@ -7,15 +7,17 @@
 //
 
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
-#import "LFSNewCommentViewController.h"
+#import "LFSPostViewController.h"
 
 static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 
-@interface LFSNewCommentViewController ()
+@interface LFSPostViewController ()
 
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
+
+@property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
 
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
@@ -25,7 +27,7 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 
 @end
 
-@implementation LFSNewCommentViewController
+@implementation LFSPostViewController
 
 #pragma mark - Properties
 
@@ -90,6 +92,10 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
     
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
     [self.textView becomeFirstResponder];
+    
+    if (self.replyToContent != nil) {
+        [self.postNavbar.topItem setTitle:@"Reply"];
+    }
 }
 
 - (void)didReceiveMemoryWarning

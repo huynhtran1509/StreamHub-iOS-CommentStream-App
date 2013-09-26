@@ -11,7 +11,7 @@
 
 #import "LFSContent.h"
 
-@interface LFSNewCommentViewController : UIViewController
+@interface LFSPostViewController : UIViewController
 
 @property (nonatomic, strong) NSDictionary *collection;
 @property (nonatomic, strong) NSString *collectionId;

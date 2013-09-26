@@ -171,10 +171,10 @@
             </objects>
             <point key="canvasLocation" x="-171" y="-2"/>
         </scene>
-        <!--New Comment View Controller - New Comment-->
+        <!--Post View Controller - New Comment-->
         <scene sceneID="f3f-s1-Nv9">
             <objects>
-                <viewController storyboardIdentifier="commentNew" id="s0o-P6-Dkk" customClass="LFSNewCommentViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="commentNew" id="s0o-P6-Dkk" customClass="LFSPostViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="FTn-ZK-DMt">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -209,6 +209,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="New Comment" id="zhQ-MG-dr8"/>
                     <connections>
+                        <outlet property="postNavbar" destination="j6e-ZQ-bLg" id="ctM-9c-cuI"/>
                         <outlet property="textView" destination="3fr-q0-jrj" id="e64-5e-ZSs"/>
                     </connections>
                 </viewController>

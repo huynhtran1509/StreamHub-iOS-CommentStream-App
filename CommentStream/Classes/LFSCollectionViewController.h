@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 
 #import "LFSDetailViewController.h"
-#import "LFSNewCommentViewController.h"
+#import "LFSPostViewController.h"
 
 @interface LFSCollectionViewController : UITableViewController <UITextFieldDelegate>
 

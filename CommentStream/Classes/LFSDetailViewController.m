@@ -9,7 +9,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSDetailViewController.h"
-#import "LFSNewCommentViewController.h"
+#import "LFSPostViewController.h"
 
 @interface LFSDetailViewController ()
 
@@ -260,11 +260,11 @@ static UIColor *dateColor = nil;
     if ([[segue identifier] isEqualToString:kReplySegue])
     {
         // Get reference to the destination view controller
-        if ([segue.destinationViewController isKindOfClass:[LFSNewCommentViewController class]])
+        if ([segue.destinationViewController isKindOfClass:[LFSPostViewController class]])
         {
             // as there is only one piece of content in Detail View,
             // no need to check sender type here
-            LFSNewCommentViewController *vc = segue.destinationViewController;
+            LFSPostViewController *vc = segue.destinationViewController;
             [vc setCollection:self.collection];
             [vc setCollectionId:self.collectionId];
             [vc setReplyToContent:self.contentItem];

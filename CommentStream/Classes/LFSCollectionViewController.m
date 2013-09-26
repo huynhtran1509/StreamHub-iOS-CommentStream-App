@@ -19,7 +19,7 @@
 #import "LFSContentCollection.h"
 
 @interface LFSCollectionViewController () {
-    LFSNewCommentViewController *_viewControllerNewComment;
+    LFSPostViewController *_viewControllerNewComment;
 }
 
 @property (nonatomic, strong) LFSContentCollection *content;
@@ -532,7 +532,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                                     storyboardWithName:kLFSMainStoryboardId
                                     bundle:nil];
         _viewControllerNewComment =
-        (LFSNewCommentViewController*)[storyboard
+        (LFSPostViewController*)[storyboard
                                        instantiateViewControllerWithIdentifier:kLFSNewCommentViewResourceId];
         _viewControllerNewComment.collection = self.collection;
         _viewControllerNewComment.collectionId = self.collectionId;
