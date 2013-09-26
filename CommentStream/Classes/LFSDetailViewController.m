@@ -20,11 +20,13 @@
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 
-@property (strong, nonatomic) LFSBasicHTMLLabel *basicHTMLLabel;
+@property (strong, nonatomic) LFSBasicHTMLLabel *contentBodyLabel;
+@property (strong, nonatomic) LFSBasicHTMLLabel *remoteUrlLabel;
+
 @property (weak, nonatomic) IBOutlet UIImageView *avatarView;
 @property (weak, nonatomic) IBOutlet UILabel *authorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
-@property (weak, nonatomic) IBOutlet LFSBasicHTMLLabel *remoteUrlLabel;
+
 @property (weak, nonatomic) IBOutlet UIButton *sourceButton;
 
 @property (strong, nonatomic) LFSContentToolbar *contentToolbar;
@@ -66,7 +68,7 @@ static UIColor *dateColor = nil;
 
 @synthesize scrollView = _scrollView;
 
-@synthesize basicHTMLLabel = _basicHTMLLabel;
+@synthesize contentBodyLabel = _contentBodyLabel;
 
 @synthesize avatarView = _avatarView;
 @synthesize authorLabel = _authorLabel;
@@ -143,27 +145,48 @@ static UIColor *dateColor = nil;
     [_likeButton setImage:[self imageForLikedState:self.liked] forState:UIControlStateNormal];
 }
 
-- (LFSBasicHTMLLabel*)basicHTMLLabel
+- (LFSBasicHTMLLabel*)contentBodyLabel
 {
-    static UIFont *bodyFont = nil;
-    if (_basicHTMLLabel == nil) {
+    if (_contentBodyLabel == nil) {
         // initialize
         CGRect frame = CGRectMake(20.f,
                                   66.f,
                                   self.scrollView.bounds.size.width - 40.f,
-                                  10.f);
-        _basicHTMLLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
-        [self.scrollView addSubview:_basicHTMLLabel];
+                                  10.f); // this one can vary
+        _contentBodyLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        [self.scrollView addSubview:_contentBodyLabel];
         
         // configure
-        if (bodyFont == nil) {
-            bodyFont = [UIFont fontWithName:@"Georgia" size:17.0f];
-        }
-        [_basicHTMLLabel setDelegate:self];
-        [_basicHTMLLabel setFont:bodyFont];
-        [_basicHTMLLabel setLineSpacing:8.5f];
+        [_contentBodyLabel setDelegate:self];
+        [_contentBodyLabel setFont:[UIFont fontWithName:@"Georgia" size:17.0f]];
+        [_contentBodyLabel setLineSpacing:8.5f];
+        [_contentBodyLabel setLineBreakMode:NSLineBreakByWordWrapping];
+        [_contentBodyLabel setTextAlignment:NSTextAlignmentLeft];
     }
-    return _basicHTMLLabel;
+    return _contentBodyLabel;
+}
+
+- (LFSBasicHTMLLabel*)remoteUrlLabel
+{
+    if (_remoteUrlLabel == nil) {
+        // initialize
+        CGRect frame = CGRectMake(self.scrollView.bounds.size.width / 2.f,
+                                  76.f, // this one can vary
+                                  (self.scrollView.bounds.size.width - 40.f) / 2.f,
+                                  21);
+        _remoteUrlLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        [self.scrollView addSubview:_remoteUrlLabel];
+        
+        // configure
+        [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
+        [_remoteUrlLabel setCenterVertically:YES]; // necessary for iOS6
+        
+        //[_remoteUrlLabel setDelegate:self];
+        [_remoteUrlLabel setFont:[UIFont systemFontOfSize:13.f]];
+        [_remoteUrlLabel setLineBreakMode:NSLineBreakByWordWrapping];
+        [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
+    }
+    return _remoteUrlLabel;
 }
 
 #pragma mark - Lifecycle
@@ -178,7 +201,7 @@ static UIColor *dateColor = nil;
         _postCommentViewController = nil;
         _likeButton = nil;
         _replyButton = nil;
-        _basicHTMLLabel = nil;
+        _contentBodyLabel = nil;
     }
     return self;
 }
@@ -193,7 +216,7 @@ static UIColor *dateColor = nil;
         _postCommentViewController = nil;
         _likeButton = nil;
         _replyButton = nil;
-        _basicHTMLLabel = nil;
+        _contentBodyLabel = nil;
     }
     return self;
 }
@@ -203,7 +226,7 @@ static UIColor *dateColor = nil;
     _postCommentViewController = nil;
     _likeButton = nil;
     _replyButton = nil;
-    _basicHTMLLabel = nil;
+    _contentBodyLabel = nil;
 }
 
 - (void)viewDidLoad
@@ -212,13 +235,29 @@ static UIColor *dateColor = nil;
 	// Do any additional setup after loading the view.
     
     // set and format main content label
-    [self.basicHTMLLabel setHTMLString:[self.contentItem contentBodyHtml]];
-    CGRect basicHTMLLabelFrame = self.basicHTMLLabel.frame;
-    basicHTMLLabelFrame.size = [self.basicHTMLLabel
+    [self.contentBodyLabel setHTMLString:[self.contentItem contentBodyHtml]];
+    CGRect basicHTMLLabelFrame = self.contentBodyLabel.frame;
+    basicHTMLLabelFrame.size = [self.contentBodyLabel
                                 sizeThatFits:CGSizeMake(basicHTMLLabelFrame.size.width, 1000.f)];
-    [self.basicHTMLLabel setFrame:basicHTMLLabelFrame];
+    [self.contentBodyLabel setFrame:basicHTMLLabelFrame];
     
     CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
+    
+    // set and format url link
+    NSString *twitterURLString = [self.contentItem contentTwitterUrlString];
+    if (twitterURLString != nil) {
+        [self.remoteUrlLabel setHTMLString:
+         [NSString stringWithFormat:@"<a href=\"%@\">View on Twitter ></a>",
+          twitterURLString]];
+    }
+    CGRect remoteUrlFrame = self.remoteUrlLabel.frame;
+    remoteUrlFrame.origin.y = bottom + 12.f;
+    [self.remoteUrlLabel setFrame:remoteUrlFrame];
+    
+    
+    
+    
+    
     
     // set source icon
     if (self.contentItem.author.twitterHandle) {
@@ -239,21 +278,6 @@ static UIColor *dateColor = nil;
     CGRect dateFrame = _dateLabel.frame;
     dateFrame.origin.y = bottom + 12.f;
     [_dateLabel setFrame:dateFrame];
-
-    
-    // set and format url link
-    [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
-    [_remoteUrlLabel setCenterVertically:YES]; // necessary for iOS6
-    
-    NSString *twitterURLString = [self.contentItem contentTwitterUrlString];
-    if (twitterURLString != nil) {
-        [_remoteUrlLabel setHTMLString:
-         [NSString stringWithFormat:@"<a href=\"%@\">View on Twitter ></a>",
-          twitterURLString]];
-    }
-    CGRect profileFrame = _remoteUrlLabel.frame;
-    profileFrame.origin.y = bottom + 12.f;
-    [_remoteUrlLabel setFrame:profileFrame];
     
     // set toolbar frame
     CGRect toolbarFrame;
