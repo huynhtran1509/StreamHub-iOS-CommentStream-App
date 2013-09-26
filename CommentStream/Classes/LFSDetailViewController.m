@@ -22,17 +22,17 @@
 
 @property (strong, nonatomic) LFSBasicHTMLLabel *contentBodyLabel;
 @property (strong, nonatomic) LFSBasicHTMLLabel *remoteUrlLabel;
+@property (strong, nonatomic) UIButton *authorProfileButton;
 
 @property (weak, nonatomic) IBOutlet UIImageView *avatarView;
 @property (weak, nonatomic) IBOutlet UILabel *authorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 
-@property (weak, nonatomic) IBOutlet UIButton *sourceButton;
 
 @property (strong, nonatomic) LFSContentToolbar *contentToolbar;
 @property (strong, nonatomic) LFSPostViewController *postCommentViewController;
 
-- (IBAction)didSelectSource:(id)sender;
+- (IBAction)didSelectProfile:(id)sender;
 - (IBAction)didSelectReply:(id)sender;
 - (IBAction)didSelectLike:(id)sender;
 
@@ -75,7 +75,7 @@ static UIColor *dateColor = nil;
 @synthesize dateLabel = _dateLabel;
 @synthesize remoteUrlLabel = _remoteUrlLabel;
 @synthesize contentToolbar = _contentToolbar;
-@synthesize sourceButton = _sourceButton;
+@synthesize authorProfileButton = _authorProfileButton;
 
 @synthesize hideStatusBar = _hideStatusBar;
 
@@ -118,7 +118,8 @@ static UIColor *dateColor = nil;
         UIImage *img = [self imageForLikedState:self.liked];
         _likeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.f, 0.f, img.size.width, img.size.height)];
         [_likeButton setImage:img forState:UIControlStateNormal];
-        [_likeButton addTarget:self action:@selector(didSelectLike:) forControlEvents:UIControlEventTouchUpInside];
+        [_likeButton addTarget:self action:@selector(didSelectLike:)
+              forControlEvents:UIControlEventTouchUpInside];
     }
     return _likeButton;
 }
@@ -129,7 +130,8 @@ static UIColor *dateColor = nil;
         UIImage *img = [UIImage imageNamed:@"ActionReply"];
         _replyButton = [[UIButton alloc] initWithFrame:CGRectMake(0.f, 0.f, img.size.width, img.size.height)];
         [_replyButton setImage:img forState:UIControlStateNormal];
-        [_replyButton addTarget:self action:@selector(didSelectReply:) forControlEvents:UIControlEventTouchUpInside];
+        [_replyButton addTarget:self action:@selector(didSelectReply:)
+               forControlEvents:UIControlEventTouchUpInside];
     }
     return _replyButton;
 }
@@ -187,6 +189,21 @@ static UIColor *dateColor = nil;
         [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
     }
     return _remoteUrlLabel;
+}
+
+-(UIButton*)authorProfileButton
+{
+    if (_authorProfileButton == nil) {
+        // initialize
+        CGRect frame = CGRectMake(self.scrollView.bounds.size.width - 40.f, 20.f, 20.f, 20.f);
+        _authorProfileButton = [[UIButton alloc] initWithFrame:frame];
+        [_authorProfileButton addTarget:self action:@selector(didSelectProfile:)
+              forControlEvents:UIControlEventTouchUpInside];
+        [self.scrollView addSubview:_authorProfileButton];
+        
+        // configure
+    }
+    return _authorProfileButton;
 }
 
 #pragma mark - Lifecycle
@@ -255,18 +272,10 @@ static UIColor *dateColor = nil;
     [self.remoteUrlLabel setFrame:remoteUrlFrame];
     
     
-    
-    
-    
-    
     // set source icon
     if (self.contentItem.author.twitterHandle) {
-        [_sourceButton setImage:[UIImage imageNamed:@"SourceTwitter"]
-                       forState:UIControlStateNormal];
-    }
-    else {
-        [_sourceButton setImage:nil
-                       forState:UIControlStateNormal];
+        [self.authorProfileButton setImage:[UIImage imageNamed:@"SourceTwitter"]
+                                  forState:UIControlStateNormal];
     }
     
     // format author name label
@@ -443,7 +452,7 @@ static UIColor *dateColor = nil;
     [self presentViewController:self.postCommentViewController animated:YES completion:nil];
 }
 
-- (IBAction)didSelectSource:(id)sender
+- (IBAction)didSelectProfile:(id)sender
 {
     NSString *urlString = self.contentItem.author.profileUrlStringNoHashBang;
     if (urlString != nil) {

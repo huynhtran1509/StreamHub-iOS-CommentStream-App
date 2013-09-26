@@ -37,9 +37,6 @@
                                 <state key="normal">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <connections>
-                                    <action selector="didSelectSource:" destination="9jQ-b8-8PW" eventType="touchUpInside" id="TyS-0x-ruJ"/>
-                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -50,7 +47,6 @@
                         <outlet property="avatarView" destination="t34-bA-Fog" id="Y8Z-hh-37G"/>
                         <outlet property="dateLabel" destination="nnp-22-8Tw" id="G0w-eJ-3Wk"/>
                         <outlet property="scrollView" destination="X4L-Qy-OGx" id="BNI-cD-gnR"/>
-                        <outlet property="sourceButton" destination="axq-Y5-z2E" id="iQo-y6-qgg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ISf-vh-rH3" userLabel="First Responder" sceneMemberID="firstResponder"/>
