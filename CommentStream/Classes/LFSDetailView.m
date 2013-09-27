@@ -146,7 +146,7 @@
         // initialize
         CGRect frame = CGRectMake(20.f,
                                   20.f + 38.f + 12.f,
-                                  self.bounds.size.width - 40.f,
+                                  self.bounds.size.width - 20.f - 12.f,
                                   10.f); // this one can vary
         _contentBodyLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         [_contentBodyLabel setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
@@ -309,7 +309,7 @@
 {
     // layout main content label
     CGRect basicHTMLLabelFrame = self.contentBodyLabel.frame;
-    CGFloat contentWidth = self.bounds.size.width - 40.f;
+    CGFloat contentWidth = self.bounds.size.width - 20.f - 12.f;
     basicHTMLLabelFrame.size = [self contentSizeThatFits:
                                 CGSizeMake(contentWidth, CGFLOAT_MAX)];
     [self.contentBodyLabel setFrame:basicHTMLLabelFrame];
