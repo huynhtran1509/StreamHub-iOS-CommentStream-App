@@ -193,7 +193,8 @@
             frame = CGRectMake(20.f, 20.f, 37.f, 37.f);
         }
         _avatarView = [[UIImageView alloc] initWithFrame:frame];
-        [_avatarView setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
+        [_avatarView setAutoresizingMask:(UIViewAutoresizingFlexibleRightMargin
+                                          | UIViewAutoresizingFlexibleBottomMargin)];
         [self addSubview:_avatarView];
         
         // configure
@@ -229,10 +230,11 @@
         CGFloat leftColumn = 66.f;
         CGRect frame = CGRectMake(leftColumn,
                                   20.f,
-                                  self.bounds.size.width - leftColumn - 20.f,
+                                  self.bounds.size.width - leftColumn - 40.f,
                                   38.f);
         _authorLabel = [[UILabel alloc] initWithFrame:frame];
-        _authorLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        _authorLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
+                                         | UIViewAutoresizingFlexibleBottomMargin);
         [self addSubview:_authorLabel];
         
         // configure
