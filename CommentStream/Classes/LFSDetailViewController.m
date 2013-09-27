@@ -143,6 +143,7 @@
 
 -(LFSTriple*)contentRemote
 {
+    // only return an object if we have a remote (Twitter) url
     NSString *twitterUrlString = self.contentItem.contentTwitterUrlString;
     return (twitterUrlString != nil
             ? [[LFSTriple alloc]
@@ -154,6 +155,7 @@
 
 -(LFSTriple*)profileRemote
 {
+    // only return an object if we have a twitter handle
     LFSAuthor *author = self.contentItem.author;
     return (author.twitterHandle
             ? [[LFSTriple alloc]
@@ -165,16 +167,15 @@
 
 -(LFSHeader*)profileLocal
 {
+    // always return an object
     LFSAuthor *author = self.contentItem.author;
     NSNumber *moderator = [self.contentItem.contentAnnotations objectForKey:@"moderator"];
     BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
-    return (author.twitterHandle
-            ? [[LFSHeader alloc]
-               initWithDetailString:author.twitterHandle
-               attributeString:(hasModerator ? @"Moderator" : nil)
-               mainString:author.displayName
-               iconImage:self.avatarImage]
-            : nil);
+    return [[LFSHeader alloc]
+            initWithDetailString:author.twitterHandle
+            attributeString:(hasModerator ? @"Moderator" : nil)
+            mainString:author.displayName
+            iconImage:self.avatarImage];
 }
 
 #pragma mark - Status bar

@@ -154,7 +154,7 @@
         
         // configure
         [_contentBodyLabel setFont:[UIFont fontWithName:@"Georgia" size:16.0f]];
-        [_contentBodyLabel setLineSpacing:8.5f];
+        [_contentBodyLabel setLineSpacing:8.f];
         [_contentBodyLabel setLineBreakMode:NSLineBreakByWordWrapping];
         [_contentBodyLabel setTextAlignment:NSTextAlignmentLeft];
     }
