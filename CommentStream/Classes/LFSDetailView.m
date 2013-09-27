@@ -7,36 +7,64 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-#import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
 #import "LFSBasicHTMLLabel.h"
 
-@implementation LFSRemote
-@synthesize urlString = _urlString;
+@implementation LFSTriple
+@synthesize detailString = _detailString;
 @synthesize iconImage = _iconImage;
-@synthesize displayString = _displayString;
+@synthesize mainString = _mainString;
 
--(id)initWithURLString:(NSString*)urlString
-         displayString:(NSString*)displayString
-             iconImage:(UIImage*)iconImage
+-(id)initWithDetailString:(NSString*)detailString
+               mainString:(NSString*)mainString
+                iconImage:(UIImage*)iconImage;
 {
     self = [super init];
     if (self) {
-        _urlString = urlString;
+        _detailString = detailString;
         _iconImage = iconImage;
-        _displayString = displayString;
+        _mainString = mainString;
     }
     return self;
 }
 
 -(id)init
 {
-    self = [self initWithURLString:nil displayString:nil iconImage:nil];
+    self = [self initWithDetailString:nil mainString:nil iconImage:nil];
     return self;
 }
 
+@end
+
+@implementation LFSHeader
+
+@synthesize attributeString = _attributeString;
+@synthesize detailString = _detailString;
+@synthesize iconImage = _iconImage;
+@synthesize mainString = _mainString;
+
+-(id)initWithDetailString:(NSString*)detailString
+          attributeString:(NSString*)attributeString
+               mainString:(NSString*)mainString
+                iconImage:(UIImage*)iconImage;
+{
+    self = [super init];
+    if (self) {
+        _detailString = detailString;
+        _attributeString = attributeString;
+        _iconImage = iconImage;
+        _mainString = mainString;
+    }
+    return self;
+}
+
+-(id)init
+{
+    self = [self initWithDetailString:nil attributeString:nil mainString:nil iconImage:nil];
+    return self;
+}
 @end
 
 #pragma mark -
@@ -289,27 +317,32 @@
     CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
     
     // layout url link
-    LFSRemote *contentRemote = [self.delegate contentRemote];
+    LFSTriple *contentRemote = [self.delegate contentRemote];
     if (contentRemote != nil) {
         [self.remoteUrlLabel setHTMLString:
-         [NSString stringWithFormat:@"<a href=\"%@\">%@ ></a>",
-          [contentRemote urlString],
-          [contentRemote displayString]]];
+         [NSString stringWithFormat:@"<a href=\"%@\">%@</a>",
+          [contentRemote detailString],
+          [contentRemote mainString]]];
         CGRect remoteUrlFrame = self.remoteUrlLabel.frame;
         remoteUrlFrame.origin.y = bottom + 12.f;
         [self.remoteUrlLabel setFrame:remoteUrlFrame];
     }
     
     // layout source icon
-    LFSRemote *profileRemote = [self.delegate profileRemote];
+    LFSTriple *profileRemote = [self.delegate profileRemote];
     if (profileRemote != nil) {
         [self.authorProfileButton setImage:[profileRemote iconImage]
                                   forState:UIControlStateNormal];
-        _profileRemoteURL = [NSURL URLWithString:[profileRemote urlString]];
+        _profileRemoteURL = [NSURL URLWithString:[profileRemote detailString]];
     }
     
     // layout author name label
-    NSString *authorDisplayName = [self.delegate authorDisplayName];
+    //
+    // Note: preciese layout depends on whether we have detail field
+    // (i.e. twitter handle)
+    
+    LFSHeader *profileLocal = [self.delegate profileLocal];
+    NSString *authorDisplayName = profileLocal.mainString;
     if (authorDisplayName) {
         [self.authorLabel setText:authorDisplayName];
     }
@@ -318,16 +351,15 @@
     CGRect dateFrame = self.dateLabel.frame;
     dateFrame.origin.y = bottom + 12.f;
     [self.dateLabel setFrame:dateFrame];
-    [self.dateLabel setText:[[[NSDateFormatter alloc] init]
-                             extendedRelativeStringFromDate:
-                             [self.delegate contentCreationDate]]];
+    [self.dateLabel setText:[self.delegate contentDetail]];
     
     // layout avatar view
-    [self.avatarView setImage:[self.delegate avatarImage]];
+    [self.avatarView setImage:profileLocal.iconImage];
     
     // layout toolbar frame
     CGRect toolbarFrame = self.contentToolbar.frame;
-    toolbarFrame.origin = CGPointMake(0.f, dateFrame.origin.y + dateFrame.size.height + 12.f);
+    toolbarFrame.origin = CGPointMake(0.f,
+                                      dateFrame.origin.y + dateFrame.size.height + 12.f);
     [self.contentToolbar setFrame:toolbarFrame];
 }
 

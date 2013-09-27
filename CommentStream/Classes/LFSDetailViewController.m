@@ -135,36 +135,46 @@
     return self.contentItem.contentBodyHtml;
 }
 
--(LFSRemote*)contentRemote
+-(NSString*)contentDetail
+{
+    return [[[NSDateFormatter alloc] init]
+            extendedRelativeStringFromDate:self.contentItem.contentCreatedAt];
+}
+
+-(LFSTriple*)contentRemote
 {
     NSString *twitterUrlString = self.contentItem.contentTwitterUrlString;
     return (twitterUrlString != nil
-            ? [[LFSRemote alloc]
-               initWithURLString:twitterUrlString
-               displayString:@"View on Twitter"
+            ? [[LFSTriple alloc]
+               initWithDetailString:twitterUrlString
+               mainString:@"View on Twitter >"
                iconImage:nil]
             : nil);
 }
 
--(LFSRemote*)profileRemote
+-(LFSTriple*)profileRemote
 {
     LFSAuthor *author = self.contentItem.author;
     return (author.twitterHandle
-            ? [[LFSRemote alloc]
-               initWithURLString:author.profileUrlStringNoHashBang
-               displayString:nil
+            ? [[LFSTriple alloc]
+               initWithDetailString:author.profileUrlStringNoHashBang
+               mainString:nil
                iconImage:[UIImage imageNamed:@"SourceTwitter"]]
             : nil);
 }
 
--(NSString*)authorDisplayName
+-(LFSHeader*)profileLocal
 {
-    return self.contentItem.author.displayName;
-}
-
--(NSDate*)contentCreationDate
-{
-    return self.contentItem.contentCreatedAt;
+    LFSAuthor *author = self.contentItem.author;
+    NSNumber *moderator = [self.contentItem.contentAnnotations objectForKey:@"moderator"];
+    BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
+    return (author.twitterHandle
+            ? [[LFSHeader alloc]
+               initWithDetailString:author.twitterHandle
+               attributeString:(hasModerator ? @"Moderator" : nil)
+               mainString:author.displayName
+               iconImage:self.avatarImage]
+            : nil);
 }
 
 #pragma mark - Status bar
