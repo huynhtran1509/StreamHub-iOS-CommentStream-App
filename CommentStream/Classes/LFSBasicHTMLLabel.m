@@ -75,6 +75,8 @@
     if (self) {
         _font = nil;
         _paragraphStyle = nil;
+        
+        self.delegate = self;
     }
     return self;
 }
@@ -85,6 +87,8 @@
     if (self) {
         _font = nil;
         _paragraphStyle = nil;
+        
+        self.delegate = self;
     }
     return self;
 }
@@ -93,6 +97,31 @@
 {
     //_font = nil;
     _paragraphStyle = nil;
+}
+
+#pragma mark - OHAttributedLabelDelegate
+-(BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel
+      shouldFollowLink:(NSTextCheckingResult*)linkInfo
+{
+    return YES;
+}
+
+-(UIColor*)attributedLabel:(OHAttributedLabel*)attributedLabel
+              colorForLink:(NSTextCheckingResult*)linkInfo
+            underlineStyle:(int32_t*)underlineStyle
+{
+    static NSString* const kTwitterSearchPrefix = @"https://twitter.com/#!/search/realtime/";
+    NSString *linkString = [linkInfo.URL absoluteString];
+    if ([linkString hasPrefix:kTwitterSearchPrefix])
+    {
+        // Twitter hashtag
+        return [UIColor grayColor];
+    }
+    else
+    {
+        // regular link
+        return [UIColor blueColor];
+    }
 }
 
 @end

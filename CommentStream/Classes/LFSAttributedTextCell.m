@@ -113,17 +113,16 @@ static UIColor *dateColor = nil;
 
 -(LFSBasicHTMLLabel*)textContentView
 {
-	if (!_textContentView) {
+	if (_textContentView == nil) {
         // after the first call here the content view size is correct
         CGRect frame = CGRectMake(kLeftColumnWidth,
                                   kHeaderHeight,
-                                  self.contentView.bounds.size.width - kLeftColumnWidth,
-                                  self.contentView.bounds.size.height - kHeaderHeight);
+                                  self.bounds.size.width - kLeftColumnWidth,
+                                  self.bounds.size.height - kHeaderHeight);
         
 		_textContentView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         [_textContentView setFont:bodyFont];
         [_textContentView setLineSpacing:6.5f];
-        [_textContentView setDelegate:self];
 		[self.contentView addSubview:_textContentView];
 	}
 	return _textContentView;
@@ -131,7 +130,7 @@ static UIColor *dateColor = nil;
 
 - (UILabel *)titleView
 {
-	if (!_titleView) {
+	if (_titleView == nil) {
 		_titleView = [[UILabel alloc] init];
         [_titleView setFont:titleFont];
 		[self.contentView addSubview:_titleView];
@@ -141,7 +140,7 @@ static UIColor *dateColor = nil;
 
 - (UILabel *)noteView
 {
-	if (!_noteView) {
+	if (_noteView == nil) {
 		_noteView = [[UILabel alloc] init];
         [_noteView setFont:dateFont];
         [_noteView setTextColor:dateColor];
@@ -162,7 +161,6 @@ static UIColor *dateColor = nil;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
         [self.imageView setContentMode:UIViewContentModeScaleToFill];
-        self.textContentView.delegate = self;
         
         if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
         {
@@ -198,16 +196,16 @@ static UIColor *dateColor = nil;
 	if (!self.superview) {
 		return;
 	}
-    
-    CGFloat neededContentHeight = [self requiredRowHeight];
-    
+
+	CGFloat neededContentHeight = [self requiredRowHeightWithFrameWidth:self.bounds.size.width];
+
     // after the first call here the content view size is correct
-    CGFloat contentViewWidth = self.contentView.bounds.size.width;
+    CGFloat contentViewWidth = self.bounds.size.width;
     CGRect frame = CGRectMake(kLeftColumnWidth,
                               kHeaderHeight,
                               contentViewWidth - kLeftColumnWidth,
                               neededContentHeight - kHeaderHeight);
-    self.textContentView.frame = frame;
+    [_textContentView setFrame:frame];
     
     _titleView.frame = CGRectMake(kLeftColumnWidth,
                                   0,
@@ -231,42 +229,16 @@ static UIColor *dateColor = nil;
 }
 
 #pragma mark - Public methods
-- (CGFloat)requiredRowHeight
+- (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width
 {
-    CGSize maxSize = self.textContentView.frame.size;
-    maxSize.height = 1000.f;
-    CGSize neededSize = [self.textContentView sizeThatFits:maxSize];
+    CGSize neededSize = [self.textContentView
+                         sizeThatFits:CGSizeMake(width - kLeftColumnWidth, 3000.f)];
     
-	// note: non-integer row heights caused trouble < iOS 5.0
     CGRect imageViewFrame = self.imageView.frame;
-	return kBottomInset + MAX(neededSize.height + kHeaderHeight,
+	CGFloat result = kBottomInset + MAX(neededSize.height + kHeaderHeight,
                               imageViewFrame.size.height +
                               imageViewFrame.origin.y);
-}
-
-#pragma mark - OHAttributedLabelDelegate
--(BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel
-      shouldFollowLink:(NSTextCheckingResult*)linkInfo
-{
-    return YES;
-}
-
--(UIColor*)attributedLabel:(OHAttributedLabel*)attributedLabel
-              colorForLink:(NSTextCheckingResult*)linkInfo
-            underlineStyle:(int32_t*)underlineStyle
-{
-    static NSString* const kTwitterSearchPrefix = @"https://twitter.com/#!/search/realtime/";
-    NSString *linkString = [linkInfo.URL absoluteString];
-    if ([linkString hasPrefix:kTwitterSearchPrefix])
-    {
-        // Twitter hashtag
-        return [UIColor grayColor];
-    }
-    else
-    {
-        // regular link
-        return [UIColor blueColor];
-    }
+    return result;
 }
 
 @end

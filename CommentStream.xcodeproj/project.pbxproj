@@ -25,6 +25,7 @@
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
 		EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
+		EFACF83717F4EC19003B3FF6 /* LFSDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */; };
 		EFB27A9C17EE3FFA008AD723 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB27A9B17EE3FFA008AD723 /* QuartzCore.framework */; };
 		EFC4F61317DFC35C00E60F6F /* LFSRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC4F61217DFC35C00E60F6F /* LFSRootViewController.m */; };
 		EFC9574E17CE968B0033C858 /* LFSConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC9574D17CE968B0033C858 /* LFSConfig.m */; };
@@ -66,6 +67,8 @@
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		EFACF83517F4EC19003B3FF6 /* LFSDetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDetailView.h; path = Classes/LFSDetailView.h; sourceTree = "<group>"; };
+		EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSDetailView.m; path = Classes/LFSDetailView.m; sourceTree = "<group>"; };
 		EFB27A9B17EE3FFA008AD723 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		EFC4F61117DFC35C00E60F6F /* LFSRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSRootViewController.h; path = Classes/LFSRootViewController.h; sourceTree = "<group>"; };
 		EFC4F61217DFC35C00E60F6F /* LFSRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSRootViewController.m; path = Classes/LFSRootViewController.m; sourceTree = "<group>"; };
@@ -215,6 +218,8 @@
 				EF62178117E8F76900700808 /* LFSTextField.m */,
 				EF529E3917F39ECF00836ACE /* LFSContentToolbar.h */,
 				EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */,
+				EFACF83517F4EC19003B3FF6 /* LFSDetailView.h */,
+				EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -335,6 +340,7 @@
 				EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */,
 				EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */,
 				EF2251E717F21CF4006482BD /* LFSContentCollection.m in Sources */,
+				EFACF83717F4EC19003B3FF6 /* LFSDetailView.m in Sources */,
 				EFCB940817F1119600FB9384 /* LFSAuthorCollection.m in Sources */,
 				EFCB940B17F141E500FB9384 /* LFSAuthor.m in Sources */,
 				EFC4F61317DFC35C00E60F6F /* LFSRootViewController.m in Sources */,

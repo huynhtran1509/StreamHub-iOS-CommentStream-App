@@ -104,7 +104,8 @@ static NSString* const kCellSelectSegue = @"detailView";
                                     bundle:nil];
         _postCommentViewController =
         (LFSPostViewController*)[storyboard
-                                 instantiateViewControllerWithIdentifier:kLFSPostCommentViewControllerId];
+                                 instantiateViewControllerWithIdentifier:
+                                 kLFSPostCommentViewControllerId];
     }
     return _postCommentViewController;
 }
@@ -195,7 +196,7 @@ static NSString* const kCellSelectSegue = @"detailView";
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+
     // hide status bar for iOS7 and later
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
@@ -259,7 +260,7 @@ static NSString* const kCellSelectSegue = @"detailView";
 #pragma mark - UIActivityIndicator
 -(void)wheelContainerSetup
 {
-    _container = [[UIView alloc] initWithFrame:self.view.frame];
+    _container = [[UIView alloc] initWithFrame:self.view.bounds];
     [_container setBackgroundColor:[UIColor whiteColor]]; // should be white by default...
     
     // set autoresizing to support landscape mode
@@ -272,17 +273,13 @@ static NSString* const kCellSelectSegue = @"detailView";
     _activityIndicator.hidesWhenStopped = YES; // we hide it manually anyway
     
     // center activity indicator
-    CGPoint center = self.view.center;
-    center.y -= 44.0f;
-    [_activityIndicator setCenter:center];
+    [_activityIndicator setCenter:_container.center];
     
     // set autoresizing to support landscape mode
     [_activityIndicator setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin |
-                                             UIViewAutoresizingFlexibleHeight |
                                              UIViewAutoresizingFlexibleLeftMargin |
                                              UIViewAutoresizingFlexibleRightMargin |
-                                             UIViewAutoresizingFlexibleTopMargin |
-                                             UIViewAutoresizingFlexibleWidth)];
+                                             UIViewAutoresizingFlexibleTopMargin)];
     
     [_container addSubview:_activityIndicator];
 }
@@ -295,13 +292,15 @@ static NSString* const kCellSelectSegue = @"detailView";
 
 -(void)startSpinning
 {
+    [_container setFrame:self.view.bounds];
     [self.view addSubview:_container];
     _container.hidden = NO;
     _activityIndicator.hidden = NO;
     [_activityIndicator startAnimating];
 }
 
--(void)stopSpinning {
+-(void)stopSpinning
+{
     [_activityIndicator stopAnimating];
     _activityIndicator.hidden = YES;
     _container.hidden = YES;
@@ -330,7 +329,7 @@ static NSString* const kCellSelectSegue = @"detailView";
             UINavigationBar *navigationBar = self.navigationController.navigationBar;
             if (hidden && navigationBar.frame.origin.y > 0.f) {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 0;
+                frame.origin.y = 0.f;
                 navigationBar.frame = frame;
             } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
                 CGRect frame = navigationBar.frame;
@@ -361,7 +360,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     // If we have some data, do not clear it and do not run bootstrap.
     // Instead, grab the latest event ID and start streaming from there
     
-    if (_content.count == 0) {
+    if (_content.count == 0u) {
         [_content removeAllObjects];
         
         [self startSpinning];
@@ -407,7 +406,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
     NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
     NSRange contentSpan;
-    contentSpan.location = 0;
+    contentSpan.location = 0u;
     contentSpan.length = [filteredContent count];
     [_content insertObjects:filteredContent
                   atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
@@ -444,8 +443,9 @@ static NSString* const kCellSelectSegue = @"detailView";
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
-    return [cell requiredRowHeight];
+    LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
+                                                     cellForRowAtIndexPath:indexPath];
+    return [cell requiredRowHeightWithFrameWidth:tableView.bounds.size.width];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
