@@ -6,10 +6,11 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-
-@class LFSRemote;
+@class LFSTriple;
+@class LFSHeader;
 @protocol LFSDetailViewDelegate;
 
 @interface LFSDetailView : UIView
@@ -19,17 +20,18 @@
 
 @end
 
+// thanks to this protocol, LFSDetailView does not need
+// to know anything about the structure of the model object
 @protocol LFSDetailViewDelegate <NSObject>
 
 // composite objects
--(LFSRemote*)profileRemote;
--(LFSRemote*)contentRemote;
+-(LFSHeader*)profileLocal;
+-(LFSTriple*)profileRemote;
+-(LFSTriple*)contentRemote;
 
 // primitives
--(NSString*)authorDisplayName;
 -(NSString*)contentBodyHtml;
--(UIImage*)avatarImage;
--(NSDate*)contentCreationDate;
+-(NSString*)contentDetail;
 
 // actions
 - (void)didSelectLike:(id)sender;
@@ -37,14 +39,30 @@
 
 @end
 
-// a little object we use to pass around information about
-// remote links
-@interface LFSRemote : NSObject
-@property (strong, nonatomic) UIImage *iconImage;
-@property (strong, nonatomic) NSString *urlString;
-@property (strong, nonatomic) NSString *displayString;
+// group related info together in this lightweight
+// "triple" object
+@interface LFSTriple : NSObject
 
--(id)initWithURLString:(NSString*)urlString
-         displayString:(NSString*)displayString
-             iconImage:(UIImage*)iconImage;
+@property (strong, nonatomic) UIImage *iconImage;
+@property (strong, nonatomic) NSString *detailString;
+@property (strong, nonatomic) NSString *mainString;
+
+-(id)initWithDetailString:(NSString*)urlString
+               mainString:(NSString*)displayString
+                iconImage:(UIImage*)iconImage;
+@end
+
+
+// group related info together
+@interface LFSHeader : NSObject
+
+@property (strong, nonatomic) UIImage *iconImage;
+@property (strong, nonatomic) NSString *attributeString;
+@property (strong, nonatomic) NSString *mainString;
+@property (strong, nonatomic) NSString *detailString;
+
+-(id)initWithDetailString:(NSString*)detailString
+          attributeString:(NSString*)attributeString
+               mainString:(NSString*)mainString
+                iconImage:(UIImage*)iconImage;
 @end

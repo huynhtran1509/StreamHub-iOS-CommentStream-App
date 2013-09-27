@@ -117,7 +117,7 @@
     
     // calculate content size for scrolling
     CGSize detailViewSize = [self.detailView sizeThatFits:
-                             CGSizeMake(self.scrollView.bounds.size.width, 10000.f)];
+                             CGSizeMake(self.scrollView.bounds.size.width, CGFLOAT_MAX)];
     detailViewSize.height += 22.f;
     detailViewSize.width = self.scrollView.bounds.size.width;
     [_scrollView setContentSize:detailViewSize];
@@ -135,36 +135,47 @@
     return self.contentItem.contentBodyHtml;
 }
 
--(LFSRemote*)contentRemote
+-(NSString*)contentDetail
 {
+    return [[[NSDateFormatter alloc] init]
+            extendedRelativeStringFromDate:self.contentItem.contentCreatedAt];
+}
+
+-(LFSTriple*)contentRemote
+{
+    // only return an object if we have a remote (Twitter) url
     NSString *twitterUrlString = self.contentItem.contentTwitterUrlString;
     return (twitterUrlString != nil
-            ? [[LFSRemote alloc]
-               initWithURLString:twitterUrlString
-               displayString:@"View on Twitter"
+            ? [[LFSTriple alloc]
+               initWithDetailString:twitterUrlString
+               mainString:@"View on Twitter >"
                iconImage:nil]
             : nil);
 }
 
--(LFSRemote*)profileRemote
+-(LFSTriple*)profileRemote
 {
+    // only return an object if we have a twitter handle
     LFSAuthor *author = self.contentItem.author;
     return (author.twitterHandle
-            ? [[LFSRemote alloc]
-               initWithURLString:author.profileUrlStringNoHashBang
-               displayString:nil
+            ? [[LFSTriple alloc]
+               initWithDetailString:author.profileUrlStringNoHashBang
+               mainString:nil
                iconImage:[UIImage imageNamed:@"SourceTwitter"]]
             : nil);
 }
 
--(NSString*)authorDisplayName
+-(LFSHeader*)profileLocal
 {
-    return self.contentItem.author.displayName;
-}
-
--(NSDate*)contentCreationDate
-{
-    return self.contentItem.contentCreatedAt;
+    // always return an object
+    LFSAuthor *author = self.contentItem.author;
+    NSNumber *moderator = [self.contentItem.contentAnnotations objectForKey:@"moderator"];
+    BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
+    return [[LFSHeader alloc]
+            initWithDetailString:author.twitterHandle
+            attributeString:(hasModerator ? @"Moderator" : nil)
+            mainString:author.displayName
+            iconImage:self.avatarImage];
 }
 
 #pragma mark - Status bar

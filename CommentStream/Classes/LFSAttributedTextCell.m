@@ -232,7 +232,7 @@ static UIColor *dateColor = nil;
 - (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width
 {
     CGSize neededSize = [self.textContentView
-                         sizeThatFits:CGSizeMake(width - kLeftColumnWidth, 3000.f)];
+                         sizeThatFits:CGSizeMake(width - kLeftColumnWidth, CGFLOAT_MAX)];
     
     CGRect imageViewFrame = self.imageView.frame;
 	CGFloat result = kBottomInset + MAX(neededSize.height + kHeaderHeight,
