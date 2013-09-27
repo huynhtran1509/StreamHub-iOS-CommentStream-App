@@ -145,7 +145,7 @@
     if (_contentBodyLabel == nil) {
         // initialize
         CGRect frame = CGRectMake(20.f,
-                                  66.f,
+                                  20.f + 38.f + 12.f,
                                   self.bounds.size.width - 40.f,
                                   10.f); // this one can vary
         _contentBodyLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
@@ -153,7 +153,7 @@
         [self addSubview:_contentBodyLabel];
         
         // configure
-        [_contentBodyLabel setFont:[UIFont fontWithName:@"Georgia" size:17.0f]];
+        [_contentBodyLabel setFont:[UIFont fontWithName:@"Georgia" size:16.0f]];
         [_contentBodyLabel setLineSpacing:8.5f];
         [_contentBodyLabel setLineBreakMode:NSLineBreakByWordWrapping];
         [_contentBodyLabel setTextAlignment:NSTextAlignmentLeft];
@@ -255,7 +255,7 @@
 {
     if (_authorLabel == nil) {
         // initialize
-        CGFloat leftColumn = 66.f;
+        CGFloat leftColumn = 20.f + 38.f + 8.f;
         CGRect frame = CGRectMake(leftColumn,
                                   20.f,
                                   self.bounds.size.width - leftColumn - 40.f,
@@ -266,7 +266,7 @@
         [self addSubview:_authorLabel];
         
         // configure
-        [_authorLabel setFont:[UIFont boldSystemFontOfSize:16.f]];
+        [_authorLabel setFont:[UIFont boldSystemFontOfSize:15.f]];
     }
     return _authorLabel;
 }
@@ -366,7 +366,7 @@
 -(CGSize)sizeThatFits:(CGSize)size
 {
     CGFloat totalWidthInset = 40.f;
-    CGFloat totalHeightInset = 44.f + 12.f + 21.f + 12.f + 66.f;
+    CGFloat totalHeightInset = (44.f + 12.f + 21.f + 12.f) + (20.f + 38.f + 12.f);
     CGSize contentSize;
     contentSize.width = size.width - totalWidthInset;
     contentSize.height = size.height - totalHeightInset;

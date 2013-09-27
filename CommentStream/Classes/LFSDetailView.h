@@ -53,8 +53,7 @@
 @end
 
 
-// group related info together in this lightweight
-// "triple" object
+// group related info together
 @interface LFSHeader : NSObject
 
 @property (strong, nonatomic) UIImage *iconImage;
