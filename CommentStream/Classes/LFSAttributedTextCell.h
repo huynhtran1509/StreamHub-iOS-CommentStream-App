@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "LFSBasicHTMLLabel.h"
 
-@interface LFSAttributedTextCell : UITableViewCell <OHAttributedLabelDelegate>
+@interface LFSAttributedTextCell : UITableViewCell
 
 @property (nonatomic, readonly) UILabel *titleView;
 @property (nonatomic, readonly) UILabel *noteView;
@@ -19,7 +19,7 @@
 
 #pragma mark - basics
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
-- (CGFloat)requiredRowHeight;
+- (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width;
 - (void)setHTMLString:(NSString *)html;
 
 @end

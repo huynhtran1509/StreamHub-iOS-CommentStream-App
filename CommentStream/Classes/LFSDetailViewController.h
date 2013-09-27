@@ -8,11 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "LFSBasicHTMLLabel.h"
 #import "LFSAuthor.h"
 #import "LFSContent.h"
 
-@interface LFSDetailViewController : UIViewController <OHAttributedLabelDelegate>
+#import "LFSDetailView.h"
+
+@protocol LFSDetailViewDelegate;
+
+@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate>
 
 @property (nonatomic, strong) NSDictionary *collection;
 @property (nonatomic, strong) NSString *collectionId;
@@ -20,6 +23,6 @@
 @property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, assign) BOOL hideStatusBar;
 
--(void)setAvatarImage:(UIImage*)image;
+@property (strong, nonatomic) UIImage *avatarImage;
 
 @end
