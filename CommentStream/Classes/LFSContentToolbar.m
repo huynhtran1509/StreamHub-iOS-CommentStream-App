@@ -40,15 +40,6 @@
 }
 
 #pragma mark - Lifecycle
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        [self applyTranslucentBackground];
-    }
-    return self;
-}
-
 - (id)initWithFrame:(CGRect) frame
 {
     self = [super initWithFrame:frame];
