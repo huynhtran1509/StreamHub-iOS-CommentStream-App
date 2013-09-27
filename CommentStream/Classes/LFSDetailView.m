@@ -279,20 +279,16 @@
 #pragma mark - Private overrides
 -(void)layoutSubviews
 {
-    // TODO: move setting HTML content in a different method and
-    // follow it by [self setNeedsLayout];
-    //
-    // set and format main content label
-    [self.contentBodyLabel setHTMLString:[self.delegate contentBodyHtml]];
+    // layout main content label
     CGRect basicHTMLLabelFrame = self.contentBodyLabel.frame;
     CGFloat contentWidth = self.bounds.size.width - 40.f;
-    basicHTMLLabelFrame.size = [self.contentBodyLabel
-                                sizeThatFits:CGSizeMake(contentWidth, 10000.f)];
+    basicHTMLLabelFrame.size = [self contentSizeThatFits:
+                                CGSizeMake(contentWidth, 10000.f)];
     [self.contentBodyLabel setFrame:basicHTMLLabelFrame];
     
     CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
     
-    // set and format url link
+    // layout url link
     LFSRemote *contentRemote = [self.delegate contentRemote];
     if (contentRemote != nil) {
         [self.remoteUrlLabel setHTMLString:
@@ -304,7 +300,7 @@
         [self.remoteUrlLabel setFrame:remoteUrlFrame];
     }
     
-    // set source icon
+    // layout source icon
     LFSRemote *profileRemote = [self.delegate profileRemote];
     if (profileRemote != nil) {
         [self.authorProfileButton setImage:[profileRemote iconImage]
@@ -312,13 +308,13 @@
         _profileRemoteURL = [NSURL URLWithString:[profileRemote urlString]];
     }
     
-    // format author name label
+    // layout author name label
     NSString *authorDisplayName = [self.delegate authorDisplayName];
     if (authorDisplayName) {
         [self.authorLabel setText:authorDisplayName];
     }
     
-    // format date label
+    // layout date label
     CGRect dateFrame = self.dateLabel.frame;
     dateFrame.origin.y = bottom + 12.f;
     [self.dateLabel setFrame:dateFrame];
@@ -326,19 +322,33 @@
                              extendedRelativeStringFromDate:
                              [self.delegate contentCreationDate]]];
     
-    // set avatar view
+    // layout avatar view
     [self.avatarView setImage:[self.delegate avatarImage]];
     
-    // set toolbar frame
+    // layout toolbar frame
     CGRect toolbarFrame = self.contentToolbar.frame;
     toolbarFrame.origin = CGPointMake(0.f, dateFrame.origin.y + dateFrame.size.height + 12.f);
     [self.contentToolbar setFrame:toolbarFrame];
-    
-    // calculate total view frame size
-    CGRect frame = CGRectZero;
-    frame.size = CGSizeMake(self.frame.size.width,
-                            toolbarFrame.origin.y + toolbarFrame.size.height + 20.f);
-    [self setFrame:frame];
+}
+
+-(CGSize)sizeThatFits:(CGSize)size
+{
+    CGFloat totalWidthInset = 40.f;
+    CGFloat totalHeightInset = 44.f + 12.f + 21.f + 12.f + 66.f;
+    CGSize contentSize;
+    contentSize.width = size.width - totalWidthInset;
+    contentSize.height = size.height - totalHeightInset;
+    CGSize actualContentSize = [self contentSizeThatFits:contentSize];
+    actualContentSize.width += totalWidthInset;
+    actualContentSize.height += totalHeightInset;
+    return actualContentSize;
+}
+
+#pragma mark - Private methods
+-(CGSize)contentSizeThatFits:(CGSize)size
+{
+    [self.contentBodyLabel setHTMLString:[self.delegate contentBodyHtml]];
+    return [self.contentBodyLabel sizeThatFits:size];
 }
 
 #pragma mark - Lifecycle

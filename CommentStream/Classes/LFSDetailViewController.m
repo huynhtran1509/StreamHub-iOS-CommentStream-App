@@ -116,7 +116,11 @@
     //[self.navigationController setToolbarHidden:YES animated:animated];
     
     // calculate content size for scrolling
-    [_scrollView setContentSize:self.detailView.frame.size];
+    CGSize detailViewSize = [self.detailView sizeThatFits:
+                             CGSizeMake(self.scrollView.bounds.size.width, 10000.f)];
+    detailViewSize.height += 22.f;
+    detailViewSize.width = self.scrollView.bounds.size.width;
+    [_scrollView setContentSize:detailViewSize];
 }
 
 - (void)didReceiveMemoryWarning
