@@ -117,7 +117,7 @@
     
     // calculate content size for scrolling
     CGSize detailViewSize = [self.detailView sizeThatFits:
-                             CGSizeMake(self.scrollView.bounds.size.width, 10000.f)];
+                             CGSizeMake(self.scrollView.bounds.size.width, CGFLOAT_MAX)];
     detailViewSize.height += 22.f;
     detailViewSize.width = self.scrollView.bounds.size.width;
     [_scrollView setContentSize:detailViewSize];

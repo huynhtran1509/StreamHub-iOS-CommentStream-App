@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import <OHAttributedLabel/OHASMarkupParserBase.h>
 
 @interface LFSBasicHTMLParser : OHASMarkupParserBase

@@ -283,7 +283,7 @@
     CGRect basicHTMLLabelFrame = self.contentBodyLabel.frame;
     CGFloat contentWidth = self.bounds.size.width - 40.f;
     basicHTMLLabelFrame.size = [self contentSizeThatFits:
-                                CGSizeMake(contentWidth, 10000.f)];
+                                CGSizeMake(contentWidth, CGFLOAT_MAX)];
     [self.contentBodyLabel setFrame:basicHTMLLabelFrame];
     
     CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
