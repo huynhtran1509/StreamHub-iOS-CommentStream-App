@@ -43,6 +43,8 @@
 static const CGFloat kPaddingLeft = 20.0f;
 static const CGFloat kPaddingTop = 20.0f;
 static const CGFloat kPaddingRight = 20.0f;
+static const CGFloat kPaddingBottom = 27.0f;
+
 static const CGFloat kContentPaddingRight = 12.0f;
 static const CGFloat kContentLineSpacing = 8.0f;
 static const CGFloat kHeaderHeight = 38.0f;
@@ -550,14 +552,17 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     // layout toolbar frame
     CGRect toolbarFrame = self.contentToolbar.frame;
     toolbarFrame.origin = CGPointMake(0.f,
-                                      dateFrame.origin.y + dateFrame.size.height + kMinorVerticalSeparator);
+                                      dateFrame.origin.y +
+                                      dateFrame.size.height +
+                                      kMinorVerticalSeparator);
     [self.contentToolbar setFrame:toolbarFrame];
 }
 
 -(CGSize)sizeThatFits:(CGSize)size
 {
     CGFloat totalWidthInset = kPaddingLeft + kContentPaddingRight;
-    CGFloat totalHeightInset = (kToolbarHeight
+    CGFloat totalHeightInset = (kPaddingBottom
+                                + kToolbarHeight
                                 + kMinorVerticalSeparator
                                 + kDetailRowHeight
                                 + kMinorVerticalSeparator
@@ -565,13 +570,12 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                                 + kMajorVerticalSeparator
                                 + kHeaderHeight
                                 + kPaddingTop);
-    CGSize contentSize;
-    contentSize.width = size.width - kPaddingTop;
-    contentSize.height = size.height - totalHeightInset;
-    CGSize actualContentSize = [self contentSizeThatFits:contentSize];
-    actualContentSize.width += totalWidthInset;
-    actualContentSize.height += totalHeightInset;
-    return actualContentSize;
+    CGSize contentSize = [self contentSizeThatFits:
+                          CGSizeMake(size.width - totalWidthInset,
+                                     CGFLOAT_MAX)];
+    contentSize.width += totalWidthInset;
+    contentSize.height += totalHeightInset;
+    return contentSize;
 }
 
 #pragma mark - Private methods
