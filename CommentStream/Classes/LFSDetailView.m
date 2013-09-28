@@ -6,11 +6,13 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <math.h>
 #import <QuartzCore/QuartzCore.h>
 
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
 #import "LFSBasicHTMLLabel.h"
+#import "UILabel+VerticalAlign.h"
 
 @implementation LFSTriple
 @synthesize detailString = _detailString;
@@ -76,10 +78,13 @@
 @property (strong, nonatomic) LFSBasicHTMLLabel *remoteUrlLabel;
 @property (strong, nonatomic) UIButton *authorProfileButton;
 @property (strong, nonatomic) UIImageView *avatarView;
-@property (strong, nonatomic) UILabel *authorLabel;
 @property (strong, nonatomic) UILabel *dateLabel;
 @property (strong, nonatomic) UIButton *likeButton;
 @property (strong, nonatomic) UIButton *replyButton;
+
+@property (strong, nonatomic) UILabel *authorLabel;
+@property (strong, nonatomic) UILabel *authorAttributeLabel;
+@property (strong, nonatomic) UILabel *authorDetailLabel;
 
 @end
 
@@ -92,13 +97,16 @@
 // UIView-specific
 @synthesize contentBodyLabel = _contentBodyLabel;
 @synthesize avatarView = _avatarView;
-@synthesize authorLabel = _authorLabel;
 @synthesize dateLabel = _dateLabel;
 @synthesize remoteUrlLabel = _remoteUrlLabel;
 @synthesize contentToolbar = _contentToolbar;
 @synthesize authorProfileButton = _authorProfileButton;
 @synthesize likeButton = _likeButton;
 @synthesize replyButton = _replyButton;
+
+@synthesize authorLabel = _authorLabel;
+@synthesize authorAttributeLabel = _authorAttributeLabel;
+@synthesize authorDetailLabel = _authorDetailLabel;
 
 @synthesize contentLikedByUser = _contentLikedByUser;
 
@@ -145,8 +153,8 @@
     if (_contentBodyLabel == nil) {
         // initialize
         CGRect frame = CGRectMake(20.f,
-                                  20.f + 38.f + 12.f,
-                                  self.bounds.size.width - 40.f,
+                                  20.f + 38.f + 20.f,
+                                  self.bounds.size.width - 20.f - 12.f,
                                   10.f); // this one can vary
         _contentBodyLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         [_contentBodyLabel setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
@@ -251,15 +259,36 @@
     return _dateLabel;
 }
 
+- (UILabel*)authorAttributeLabel
+{
+    if (_authorAttributeLabel == nil) {
+        // initialize
+        CGFloat leftColumn = 20.f + 38.f + 8.f;
+        CGRect frame = CGRectMake(leftColumn,
+                                  20.f,
+                                  self.bounds.size.width - leftColumn - 40.f,
+                                  10.f);
+        _authorAttributeLabel = [[UILabel alloc] initWithFrame:frame];
+        _authorAttributeLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
+                                                  | UIViewAutoresizingFlexibleBottomMargin);
+        [self addSubview:_authorAttributeLabel];
+        
+        // configure
+        [_authorAttributeLabel setFont:[UIFont systemFontOfSize:11.f]];
+        [_authorAttributeLabel setTextColor:[UIColor blueColor]];
+    }
+    return _authorAttributeLabel;
+}
+
 - (UILabel*)authorLabel
 {
     if (_authorLabel == nil) {
         // initialize
         CGFloat leftColumn = 20.f + 38.f + 8.f;
         CGRect frame = CGRectMake(leftColumn,
-                                  20.f,
+                                  20.f + 10.f,
                                   self.bounds.size.width - leftColumn - 40.f,
-                                  38.f);
+                                  18.f);
         _authorLabel = [[UILabel alloc] initWithFrame:frame];
         _authorLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
                                          | UIViewAutoresizingFlexibleBottomMargin);
@@ -269,6 +298,27 @@
         [_authorLabel setFont:[UIFont boldSystemFontOfSize:15.f]];
     }
     return _authorLabel;
+}
+
+- (UILabel*)authorDetailLabel
+{
+    if (_authorDetailLabel == nil) {
+        // initialize
+        CGFloat leftColumn = 20.f + 38.f + 8.f;
+        CGRect frame = CGRectMake(leftColumn,
+                                  20.f + 10.f + 18.f,
+                                  self.bounds.size.width - leftColumn - 40.f,
+                                  13.f);
+        _authorDetailLabel = [[UILabel alloc] initWithFrame:frame];
+        _authorDetailLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
+                                         | UIViewAutoresizingFlexibleBottomMargin);
+        [self addSubview:_authorDetailLabel];
+        
+        // configure
+        [_authorDetailLabel setFont:[UIFont systemFontOfSize:12.f]];
+        [_authorDetailLabel setTextColor:[UIColor grayColor]];
+    }
+    return _authorDetailLabel;
 }
 
 -(LFSContentToolbar*)contentToolbar
@@ -309,7 +359,7 @@
 {
     // layout main content label
     CGRect basicHTMLLabelFrame = self.contentBodyLabel.frame;
-    CGFloat contentWidth = self.bounds.size.width - 40.f;
+    CGFloat contentWidth = self.bounds.size.width - 20.f - 12.f;
     basicHTMLLabelFrame.size = [self contentSizeThatFits:
                                 CGSizeMake(contentWidth, CGFLOAT_MAX)];
     [self.contentBodyLabel setFrame:basicHTMLLabelFrame];
@@ -343,8 +393,107 @@
     
     LFSHeader *profileLocal = [self.delegate profileLocal];
     NSString *authorDisplayName = profileLocal.mainString;
-    if (authorDisplayName) {
+    NSString *authorDetail = profileLocal.detailString;
+    NSString *authorAttribute = profileLocal.attributeString;
+    
+    if (authorDisplayName && !authorDetail && !authorAttribute)
+    {
+        // display one string
         [self.authorLabel setText:authorDisplayName];
+        [self.authorLabel setTextVerticalAlignmentCenter];
+    }
+    else if (authorDisplayName && authorDetail && !authorAttribute)
+    {
+        // full name + twitter handle
+        
+        CGRect authorLabelFrame = self.authorLabel.frame;
+        CGRect authorDetailLabelFrame = self.authorDetailLabel.frame;
+        
+        CGFloat separator = floorf((38.f
+                             - authorLabelFrame.size.height
+                             - authorDetailLabelFrame.size.height) / 3.f);
+        
+        authorLabelFrame.origin.y = 20.f + separator;
+        authorDetailLabelFrame.origin.y = (20.f
+                                           + separator
+                                           + authorLabelFrame.size.height
+                                           + separator);
+        
+        [self.authorLabel setFrame:authorLabelFrame];
+        [self.authorLabel setText:authorDisplayName];
+        [self.authorLabel setTextVerticalAlignmentCenter];
+        
+        [self.authorDetailLabel setFrame:authorDetailLabelFrame];
+        [self.authorDetailLabel setText:authorDetail];
+        [self.authorDetailLabel setTextVerticalAlignmentCenter];
+    }
+    else if (authorDisplayName && !authorDetail && authorAttribute)
+    {
+        // attribute + full name
+        
+        CGRect authorAttributeLabelFrame = self.authorAttributeLabel.frame;
+        CGRect authorLabelFrame = self.authorLabel.frame;
+        
+        CGFloat separator = floorf((38.f
+                                    - authorLabelFrame.size.height
+                                    - authorAttributeLabelFrame.size.height) / 3.f);
+        
+
+        authorAttributeLabelFrame.origin.y = (20.f + separator);
+        authorLabelFrame.origin.y = (20.f
+                                     + separator
+                                     + authorAttributeLabelFrame.size.height
+                                     + separator);
+        
+        [self.authorAttributeLabel setFrame:authorAttributeLabelFrame];
+        [self.authorAttributeLabel setText:authorAttribute];
+        [self.authorAttributeLabel setTextVerticalAlignmentCenter];
+        
+        [self.authorLabel setFrame:authorLabelFrame];
+        [self.authorLabel setText:authorDisplayName];
+        [self.authorLabel setTextVerticalAlignmentCenter];
+    }
+    else if (authorDisplayName && authorDetail && authorAttribute)
+    {
+        // attribute + full name + twitter handle
+        
+        CGRect authorAttributeLabelFrame = self.authorAttributeLabel.frame;
+        CGRect authorLabelFrame = self.authorLabel.frame;
+        CGRect authorDetailLabelFrame = self.authorDetailLabel.frame;
+        
+        CGFloat separator = floorf((38.f
+                                    - authorLabelFrame.size.height
+                                    - authorAttributeLabelFrame.size.height
+                                    - authorDetailLabelFrame.size.height) / 4.f);
+        
+        
+        authorAttributeLabelFrame.origin.y = (20.f + separator);
+        authorLabelFrame.origin.y = (20.f
+                                     + separator
+                                     + authorAttributeLabelFrame.size.height
+                                     + separator);
+        
+        authorDetailLabelFrame.origin.y = (20.f
+                                           + separator
+                                           + authorAttributeLabelFrame.size.height
+                                           + separator
+                                           + authorLabelFrame.size.height
+                                           + separator);
+        
+        [self.authorAttributeLabel setFrame:authorAttributeLabelFrame];
+        [self.authorAttributeLabel setText:authorAttribute];
+        [self.authorAttributeLabel setTextVerticalAlignmentCenter];
+        
+        [self.authorLabel setFrame:authorLabelFrame];
+        [self.authorLabel setText:authorDisplayName];
+        [self.authorLabel setTextVerticalAlignmentCenter];
+        
+        [self.authorDetailLabel setFrame:authorDetailLabelFrame];
+        [self.authorDetailLabel setText:authorDetail];
+        [self.authorDetailLabel setTextVerticalAlignmentCenter];
+    }
+    else {
+        // no author label
     }
     
     // layout date label
@@ -366,7 +515,7 @@
 -(CGSize)sizeThatFits:(CGSize)size
 {
     CGFloat totalWidthInset = 40.f;
-    CGFloat totalHeightInset = (44.f + 12.f + 21.f + 12.f) + (20.f + 38.f + 12.f);
+    CGFloat totalHeightInset = (44.f + 12.f + 21.f + 12.f) + (20.f + 38.f + 20.f);
     CGSize contentSize;
     contentSize.width = size.width - totalWidthInset;
     contentSize.height = size.height - totalHeightInset;
