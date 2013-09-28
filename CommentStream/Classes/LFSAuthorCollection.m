@@ -67,8 +67,8 @@
 }
 
 // designated initializer
--(id)initWithObjects:(const id [])objects
-             forKeys:(const id<NSCopying> [])keys
+-(id)initWithObjects:(const __unsafe_unretained id [])objects
+             forKeys:(const __unsafe_unretained id<NSCopying> [])keys
                count:(NSUInteger)cnt
 {
     self = [super init];

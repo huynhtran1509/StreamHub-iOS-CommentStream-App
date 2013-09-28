@@ -21,7 +21,7 @@
 
 -(id)initWithDetailString:(NSString*)detailString
                mainString:(NSString*)mainString
-                iconImage:(UIImage*)iconImage;
+                iconImage:(UIImage*)iconImage
 {
     self = [super init];
     if (self) {
@@ -73,7 +73,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 -(id)initWithDetailString:(NSString*)detailString
           attributeString:(NSString*)attributeString
                mainString:(NSString*)mainString
-                iconImage:(UIImage*)iconImage;
+                iconImage:(UIImage*)iconImage
 {
     self = [super init];
     if (self) {
@@ -116,6 +116,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 }
 
 #pragma mark - Properties
+
+@synthesize delegate = _delegate;
 
 // UIView-specific
 @synthesize contentBodyLabel = _contentBodyLabel;

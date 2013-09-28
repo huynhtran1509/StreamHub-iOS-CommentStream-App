@@ -72,7 +72,7 @@
             NSError *regexError1 = nil;
             regex1 = [NSRegularExpression
                       regularExpressionWithPattern:@"/#!/"
-                      options:0
+                      options:NSRegularExpressionIgnoreMetacharacters
                       error:&regexError1];
             NSAssert(regexError1 == nil,
                      @"Error creating regex: %@",
@@ -123,7 +123,7 @@
         if (regex2 == nil) {
             NSError *regexError2 = nil;
             regex2 = [NSRegularExpression
-                      regularExpressionWithPattern:@"/50.([a-zA-Z]+)\\b"
+                      regularExpressionWithPattern:@"/50.([a-z]+)\\b"
                       options:NSRegularExpressionCaseInsensitive
                       error:&regexError2];
             NSAssert(regexError2 == nil,

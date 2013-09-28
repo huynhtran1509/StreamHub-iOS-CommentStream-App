@@ -136,7 +136,7 @@
 }
 
 // note: per Apple docs, NSArray does not have adesignated initializer
--(id)initWithObjects:(const id [])objects count:(NSUInteger)cnt
+-(id)initWithObjects:(const __unsafe_unretained id [])objects count:(NSUInteger)cnt
 {
     self = [super init];
     if (self != nil) {
