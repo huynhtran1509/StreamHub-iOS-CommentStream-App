@@ -40,6 +40,27 @@
 
 @end
 
+static const CGFloat kPaddingLeft = 20.0f;
+static const CGFloat kPaddingTop = 20.0f;
+static const CGFloat kPaddingRight = 20.0f;
+static const CGFloat kContentPaddingRight = 12.0f;
+static const CGFloat kContentLineSpacing = 8.0f;
+static const CGFloat kHeaderHeight = 38.0f;
+static const CGFloat kAvatarMarginRight = 8.0f;
+static const CGFloat kDetailRowHeight = 21.0f;
+
+static const CGFloat kRemoteButtonWidth = 20.0f;
+static const CGFloat kRemoteButtonHeight = 20.0f;
+
+static const CGFloat kAuthorAttributeHeight = 10.0f;
+static const CGFloat kAuthorNameHeight = 18.0f;
+static const CGFloat kAuthorDetailHeight = 10.0f;
+
+static const CGFloat kToolbarHeight = 44.0f;
+
+static const CGFloat kMinorVerticalSeparator = 12.0f;
+static const CGFloat kMajorVerticalSeparator = 20.0f;
+
 @implementation LFSHeader
 
 @synthesize attributeString = _attributeString;
@@ -82,8 +103,8 @@
 @property (strong, nonatomic) UIButton *likeButton;
 @property (strong, nonatomic) UIButton *replyButton;
 
-@property (strong, nonatomic) UILabel *authorLabel;
 @property (strong, nonatomic) UILabel *authorAttributeLabel;
+@property (strong, nonatomic) UILabel *authorNameLabel;
 @property (strong, nonatomic) UILabel *authorDetailLabel;
 
 @end
@@ -104,7 +125,7 @@
 @synthesize likeButton = _likeButton;
 @synthesize replyButton = _replyButton;
 
-@synthesize authorLabel = _authorLabel;
+@synthesize authorNameLabel = _authorNameLabel;
 @synthesize authorAttributeLabel = _authorAttributeLabel;
 @synthesize authorDetailLabel = _authorDetailLabel;
 
@@ -152,51 +173,32 @@
 {
     if (_contentBodyLabel == nil) {
         // initialize
-        CGRect frame = CGRectMake(20.f,
-                                  20.f + 38.f + 20.f,
-                                  self.bounds.size.width - 20.f - 12.f,
-                                  10.f); // this one can vary
+        CGRect frame = CGRectMake(kPaddingLeft,
+                                  kPaddingTop + kHeaderHeight + kMajorVerticalSeparator,
+                                  self.bounds.size.width - kPaddingLeft - kContentPaddingRight,
+                                  10.f); // this could be anything
         _contentBodyLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         [_contentBodyLabel setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [self addSubview:_contentBodyLabel];
         
         // configure
         [_contentBodyLabel setFont:[UIFont fontWithName:@"Georgia" size:16.0f]];
-        [_contentBodyLabel setLineSpacing:8.f];
+        [_contentBodyLabel setLineSpacing:kContentLineSpacing];
         [_contentBodyLabel setLineBreakMode:NSLineBreakByWordWrapping];
         [_contentBodyLabel setTextAlignment:NSTextAlignmentLeft];
     }
     return _contentBodyLabel;
 }
 
-- (LFSBasicHTMLLabel*)remoteUrlLabel
-{
-    if (_remoteUrlLabel == nil) {
-        // initialize
-        CGRect frame = CGRectMake(self.bounds.size.width / 2.f,
-                                  76.f, // this one can vary
-                                  (self.bounds.size.width - 40.f) / 2.f,
-                                  21);
-        _remoteUrlLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
-        [_remoteUrlLabel setAutoresizingMask:(UIViewAutoresizingFlexibleWidth
-                                              | UIViewAutoresizingFlexibleLeftMargin)];
-        [self addSubview:_remoteUrlLabel];
-        
-        // configure
-        [_remoteUrlLabel setCenterVertically:YES]; // necessary for iOS6
-        [_remoteUrlLabel setFont:[UIFont systemFontOfSize:13.f]];
-        [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
-        [_remoteUrlLabel setLineBreakMode:NSLineBreakByWordWrapping];
-        [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
-    }
-    return _remoteUrlLabel;
-}
-
 -(UIButton*)authorProfileButton
 {
     if (_authorProfileButton == nil) {
         // initialize
-        CGRect frame = CGRectMake(self.bounds.size.width - 40.f, 20.f, 20.f, 20.f);
+        CGSize buttonSize = CGSizeMake(kRemoteButtonWidth, kRemoteButtonHeight);
+        CGRect frame;
+        frame.size = buttonSize;
+        frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - buttonSize.width,
+                                   kPaddingTop);
         _authorProfileButton = [[UIButton alloc] initWithFrame:frame];
         [_authorProfileButton addTarget:self
                                  action:@selector(didSelectProfile:)
@@ -212,22 +214,26 @@
 
 -(UIImageView*)avatarView
 {
-    static const CGFloat kAvatarCornerRadius = 4;
+    static const CGFloat kAvatarCornerRadius = 4.f;
     
     if (_avatarView == nil) {
         // initialize
-        CGRect frame;
+        CGSize avatarViewSize;
         if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)]
             && ([UIScreen mainScreen].scale == 2.0f))
         {
             // Retina display, okay to use half-points
-            frame = CGRectMake(20.f, 20.f, 37.5f, 37.5f);
+            avatarViewSize = CGSizeMake(37.5f, 37.5f);
         }
         else
         {
             // non-Retina display, do not use half-points
-            frame = CGRectMake(20.f, 20.f, 37.f, 37.f);
+            avatarViewSize = CGSizeMake(37.f, 37.f);
         }
+        CGRect frame;
+        frame.origin = CGPointMake(kPaddingLeft, kPaddingTop);
+        frame.size = avatarViewSize;
+        
         _avatarView = [[UIImageView alloc] initWithFrame:frame];
         [_avatarView setAutoresizingMask:(UIViewAutoresizingFlexibleRightMargin
                                           | UIViewAutoresizingFlexibleBottomMargin)];
@@ -244,10 +250,12 @@
 {
     if (_dateLabel == nil) {
         // initialize
-        CGRect frame = CGRectMake(21.f,
-                                  0.f, // this could vary
-                                  (self.bounds.size.width - 40.f) / 2.f,
-                                  21.f);
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPaddingLeft - kPaddingRight) / 2.f),
+                                      kDetailRowHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(kPaddingLeft,
+                                   76.f); // `y' could be anything
         _dateLabel = [[UILabel alloc] initWithFrame:frame];
         [_dateLabel setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
         [self addSubview:_dateLabel];
@@ -259,15 +267,43 @@
     return _dateLabel;
 }
 
+- (LFSBasicHTMLLabel*)remoteUrlLabel
+{
+    if (_remoteUrlLabel == nil) {
+        // initialize
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPaddingLeft - kPaddingRight) / 2.f), kDetailRowHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - labelSize.width,
+                                   76.f); // `y' could be anything
+        
+        _remoteUrlLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        [_remoteUrlLabel setAutoresizingMask:(UIViewAutoresizingFlexibleWidth
+                                              | UIViewAutoresizingFlexibleLeftMargin)];
+        [self addSubview:_remoteUrlLabel];
+        
+        // configure
+        [_remoteUrlLabel setCenterVertically:YES]; // necessary for iOS6
+        [_remoteUrlLabel setFont:[UIFont systemFontOfSize:13.f]];
+        [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
+        [_remoteUrlLabel setLineBreakMode:NSLineBreakByWordWrapping];
+        [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
+    }
+    return _remoteUrlLabel;
+}
+
 - (UILabel*)authorAttributeLabel
 {
     if (_authorAttributeLabel == nil) {
         // initialize
-        CGFloat leftColumn = 20.f + 38.f + 8.f;
-        CGRect frame = CGRectMake(leftColumn,
-                                  20.f,
-                                  self.bounds.size.width - leftColumn - 40.f,
-                                  10.f);
+        CGFloat leftColumnWidth = kPaddingLeft + kHeaderHeight + kAvatarMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kAuthorAttributeHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kPaddingTop); // `y' not important here
+        
         _authorAttributeLabel = [[UILabel alloc] initWithFrame:frame];
         _authorAttributeLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
                                                   | UIViewAutoresizingFlexibleBottomMargin);
@@ -280,35 +316,41 @@
     return _authorAttributeLabel;
 }
 
-- (UILabel*)authorLabel
+- (UILabel*)authorNameLabel
 {
-    if (_authorLabel == nil) {
+    if (_authorNameLabel == nil) {
         // initialize
-        CGFloat leftColumn = 20.f + 38.f + 8.f;
-        CGRect frame = CGRectMake(leftColumn,
-                                  20.f + 10.f,
-                                  self.bounds.size.width - leftColumn - 40.f,
-                                  18.f);
-        _authorLabel = [[UILabel alloc] initWithFrame:frame];
-        _authorLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
+        CGFloat leftColumnWidth = kPaddingLeft + kHeaderHeight + kAvatarMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kAuthorNameHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kPaddingTop + kAuthorAttributeHeight); // `y' not important here
+        
+        _authorNameLabel = [[UILabel alloc] initWithFrame:frame];
+        _authorNameLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
                                          | UIViewAutoresizingFlexibleBottomMargin);
-        [self addSubview:_authorLabel];
+        [self addSubview:_authorNameLabel];
         
         // configure
-        [_authorLabel setFont:[UIFont boldSystemFontOfSize:15.f]];
+        [_authorNameLabel setFont:[UIFont boldSystemFontOfSize:15.f]];
     }
-    return _authorLabel;
+    return _authorNameLabel;
 }
 
 - (UILabel*)authorDetailLabel
 {
     if (_authorDetailLabel == nil) {
         // initialize
-        CGFloat leftColumn = 20.f + 38.f + 8.f;
-        CGRect frame = CGRectMake(leftColumn,
-                                  20.f + 10.f + 18.f,
-                                  self.bounds.size.width - leftColumn - 40.f,
-                                  13.f);
+        CGFloat leftColumnWidth = kPaddingLeft + kHeaderHeight + kAvatarMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kAuthorDetailHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kPaddingTop + kAuthorAttributeHeight + kAuthorNameHeight); // `y' not important here
+        
         _authorDetailLabel = [[UILabel alloc] initWithFrame:frame];
         _authorDetailLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
                                          | UIViewAutoresizingFlexibleBottomMargin);
@@ -326,7 +368,7 @@
     if (_contentToolbar == nil) {
         // initialize
         CGRect frame = CGRectZero;
-        frame.size = CGSizeMake(self.bounds.size.width, 44.f);
+        frame.size = CGSizeMake(self.bounds.size.width, kToolbarHeight);
         _contentToolbar = [[LFSContentToolbar alloc] initWithFrame:frame];
         [_contentToolbar setItems:
          @[
@@ -359,7 +401,7 @@
 {
     // layout main content label
     CGRect basicHTMLLabelFrame = self.contentBodyLabel.frame;
-    CGFloat contentWidth = self.bounds.size.width - 20.f - 12.f;
+    CGFloat contentWidth = self.bounds.size.width - kPaddingLeft - kContentPaddingRight;
     basicHTMLLabelFrame.size = [self contentSizeThatFits:
                                 CGSizeMake(contentWidth, CGFLOAT_MAX)];
     [self.contentBodyLabel setFrame:basicHTMLLabelFrame];
@@ -374,7 +416,7 @@
           [contentRemote detailString],
           [contentRemote mainString]]];
         CGRect remoteUrlFrame = self.remoteUrlLabel.frame;
-        remoteUrlFrame.origin.y = bottom + 12.f;
+        remoteUrlFrame.origin.y = bottom + kMinorVerticalSeparator;
         [self.remoteUrlLabel setFrame:remoteUrlFrame];
     }
     
@@ -399,29 +441,29 @@
     if (authorDisplayName && !authorDetail && !authorAttribute)
     {
         // display one string
-        [self.authorLabel setText:authorDisplayName];
-        [self.authorLabel setTextVerticalAlignmentCenter];
+        [self.authorNameLabel setText:authorDisplayName];
+        [self.authorNameLabel setTextVerticalAlignmentCenter];
     }
     else if (authorDisplayName && authorDetail && !authorAttribute)
     {
         // full name + twitter handle
         
-        CGRect authorLabelFrame = self.authorLabel.frame;
+        CGRect authorLabelFrame = self.authorNameLabel.frame;
         CGRect authorDetailLabelFrame = self.authorDetailLabel.frame;
         
-        CGFloat separator = floorf((38.f
+        CGFloat separator = floorf((kHeaderHeight
                              - authorLabelFrame.size.height
                              - authorDetailLabelFrame.size.height) / 3.f);
         
-        authorLabelFrame.origin.y = 20.f + separator;
-        authorDetailLabelFrame.origin.y = (20.f
+        authorLabelFrame.origin.y = kPaddingTop + separator;
+        authorDetailLabelFrame.origin.y = (kPaddingTop
                                            + separator
                                            + authorLabelFrame.size.height
                                            + separator);
         
-        [self.authorLabel setFrame:authorLabelFrame];
-        [self.authorLabel setText:authorDisplayName];
-        [self.authorLabel setTextVerticalAlignmentCenter];
+        [self.authorNameLabel setFrame:authorLabelFrame];
+        [self.authorNameLabel setText:authorDisplayName];
+        [self.authorNameLabel setTextVerticalAlignmentCenter];
         
         [self.authorDetailLabel setFrame:authorDetailLabelFrame];
         [self.authorDetailLabel setText:authorDetail];
@@ -432,15 +474,15 @@
         // attribute + full name
         
         CGRect authorAttributeLabelFrame = self.authorAttributeLabel.frame;
-        CGRect authorLabelFrame = self.authorLabel.frame;
+        CGRect authorLabelFrame = self.authorNameLabel.frame;
         
-        CGFloat separator = floorf((38.f
+        CGFloat separator = floorf((kHeaderHeight
                                     - authorLabelFrame.size.height
                                     - authorAttributeLabelFrame.size.height) / 3.f);
         
 
-        authorAttributeLabelFrame.origin.y = (20.f + separator);
-        authorLabelFrame.origin.y = (20.f
+        authorAttributeLabelFrame.origin.y = (kPaddingTop + separator);
+        authorLabelFrame.origin.y = (kPaddingTop
                                      + separator
                                      + authorAttributeLabelFrame.size.height
                                      + separator);
@@ -449,31 +491,31 @@
         [self.authorAttributeLabel setText:authorAttribute];
         [self.authorAttributeLabel setTextVerticalAlignmentCenter];
         
-        [self.authorLabel setFrame:authorLabelFrame];
-        [self.authorLabel setText:authorDisplayName];
-        [self.authorLabel setTextVerticalAlignmentCenter];
+        [self.authorNameLabel setFrame:authorLabelFrame];
+        [self.authorNameLabel setText:authorDisplayName];
+        [self.authorNameLabel setTextVerticalAlignmentCenter];
     }
     else if (authorDisplayName && authorDetail && authorAttribute)
     {
         // attribute + full name + twitter handle
         
         CGRect authorAttributeLabelFrame = self.authorAttributeLabel.frame;
-        CGRect authorLabelFrame = self.authorLabel.frame;
+        CGRect authorLabelFrame = self.authorNameLabel.frame;
         CGRect authorDetailLabelFrame = self.authorDetailLabel.frame;
         
-        CGFloat separator = floorf((38.f
+        CGFloat separator = floorf((kHeaderHeight
                                     - authorLabelFrame.size.height
                                     - authorAttributeLabelFrame.size.height
                                     - authorDetailLabelFrame.size.height) / 4.f);
         
         
-        authorAttributeLabelFrame.origin.y = (20.f + separator);
-        authorLabelFrame.origin.y = (20.f
+        authorAttributeLabelFrame.origin.y = (kPaddingTop + separator);
+        authorLabelFrame.origin.y = (kPaddingTop
                                      + separator
                                      + authorAttributeLabelFrame.size.height
                                      + separator);
         
-        authorDetailLabelFrame.origin.y = (20.f
+        authorDetailLabelFrame.origin.y = (kPaddingTop
                                            + separator
                                            + authorAttributeLabelFrame.size.height
                                            + separator
@@ -484,9 +526,9 @@
         [self.authorAttributeLabel setText:authorAttribute];
         [self.authorAttributeLabel setTextVerticalAlignmentCenter];
         
-        [self.authorLabel setFrame:authorLabelFrame];
-        [self.authorLabel setText:authorDisplayName];
-        [self.authorLabel setTextVerticalAlignmentCenter];
+        [self.authorNameLabel setFrame:authorLabelFrame];
+        [self.authorNameLabel setText:authorDisplayName];
+        [self.authorNameLabel setTextVerticalAlignmentCenter];
         
         [self.authorDetailLabel setFrame:authorDetailLabelFrame];
         [self.authorDetailLabel setText:authorDetail];
@@ -498,7 +540,7 @@
     
     // layout date label
     CGRect dateFrame = self.dateLabel.frame;
-    dateFrame.origin.y = bottom + 12.f;
+    dateFrame.origin.y = bottom + kMinorVerticalSeparator;
     [self.dateLabel setFrame:dateFrame];
     [self.dateLabel setText:[self.delegate contentDetail]];
     
@@ -508,16 +550,23 @@
     // layout toolbar frame
     CGRect toolbarFrame = self.contentToolbar.frame;
     toolbarFrame.origin = CGPointMake(0.f,
-                                      dateFrame.origin.y + dateFrame.size.height + 12.f);
+                                      dateFrame.origin.y + dateFrame.size.height + kMinorVerticalSeparator);
     [self.contentToolbar setFrame:toolbarFrame];
 }
 
 -(CGSize)sizeThatFits:(CGSize)size
 {
-    CGFloat totalWidthInset = 40.f;
-    CGFloat totalHeightInset = (44.f + 12.f + 21.f + 12.f) + (20.f + 38.f + 20.f);
+    CGFloat totalWidthInset = kPaddingLeft + kContentPaddingRight;
+    CGFloat totalHeightInset = (kToolbarHeight
+                                + kMinorVerticalSeparator
+                                + kDetailRowHeight
+                                + kMinorVerticalSeparator
+                                
+                                + kMajorVerticalSeparator
+                                + kHeaderHeight
+                                + kPaddingTop);
     CGSize contentSize;
-    contentSize.width = size.width - totalWidthInset;
+    contentSize.width = size.width - kPaddingTop;
     contentSize.height = size.height - totalHeightInset;
     CGSize actualContentSize = [self contentSizeThatFits:contentSize];
     actualContentSize.width += totalWidthInset;
@@ -545,7 +594,7 @@
         _authorProfileButton = nil;
         _avatarView = nil;
         _dateLabel = nil;
-        _authorLabel = nil;
+        _authorNameLabel = nil;
         
         _profileRemoteURL = nil;
         
@@ -566,7 +615,7 @@
         _authorProfileButton = nil;
         _avatarView = nil;
         _dateLabel = nil;
-        _authorLabel = nil;
+        _authorNameLabel = nil;
         
         _profileRemoteURL = nil;
         
@@ -584,7 +633,7 @@
     _authorProfileButton = nil;
     _avatarView = nil;
     _dateLabel = nil;
-    _authorLabel = nil;
+    _authorNameLabel = nil;
     
     _profileRemoteURL = nil;
 }
