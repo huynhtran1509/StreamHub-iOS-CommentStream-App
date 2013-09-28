@@ -172,7 +172,7 @@
     NSNumber *moderator = [self.contentItem.contentAnnotations objectForKey:@"moderator"];
     BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
     return [[LFSHeader alloc]
-            initWithDetailString:author.twitterHandle
+            initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
             attributeString:(hasModerator ? @"Moderator" : nil)
             mainString:author.displayName
             iconImage:self.avatarImage];
