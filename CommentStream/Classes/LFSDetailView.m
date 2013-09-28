@@ -259,7 +259,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(kPaddingLeft,
-                                   76.f); // `y' could be anything
+                                   0.f);  // size.y will be changed in layoutSubviews
         _dateLabel = [[UILabel alloc] initWithFrame:frame];
         [_dateLabel setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
         [self addSubview:_dateLabel];
@@ -279,7 +279,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - labelSize.width,
-                                   76.f); // `y' could be anything
+                                   0.f); // size.y will be changed in layoutSubviews
         
         _remoteUrlLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         [_remoteUrlLabel setAutoresizingMask:(UIViewAutoresizingFlexibleWidth
@@ -306,7 +306,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop); // `y' not important here
+                                   kPaddingTop); // size.y will be changed in layoutSubviews
         
         _authorAttributeLabel = [[UILabel alloc] initWithFrame:frame];
         _authorAttributeLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
@@ -330,7 +330,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop + kAuthorAttributeHeight); // `y' not important here
+                                   kPaddingTop); // size.y will be changed in layoutSubviews
         
         _authorNameLabel = [[UILabel alloc] initWithFrame:frame];
         _authorNameLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
@@ -353,7 +353,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop + kAuthorAttributeHeight + kAuthorNameHeight); // `y' not important here
+                                   kPaddingTop); // size.y will be changed in layoutSubviews
         
         _authorDetailLabel = [[UILabel alloc] initWithFrame:frame];
         _authorDetailLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth

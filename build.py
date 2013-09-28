@@ -24,13 +24,13 @@ def DropPairs(forKeys, args):
     return (t for t in args if not re.match(pattern, t[0]))
 
 
-def PrefixValues(forKeys, prefix, args):
+def PrefixPaths(forKeys, root, args):
     # given a list of tuples where 1st element is a key and 2nd element is a
     # value, prefix those values which correspond to keys in forKeys list
     pattern = '^(' + '|'.join(re.escape(key) for key in forKeys) + ')$'
     for t in args:
-        if re.match(pattern, t[0]):
-            yield (t[0], prefix + t[1])
+        if (re.match(pattern, t[0]) and not os.path.isabs(t[1])):
+            yield (t[0], os.path.join(root, t[1]))
         else:
             yield t
 
@@ -43,7 +43,7 @@ def main():
     workspace_option = 'workspace'
     workspace_suffix = '.xcworkspace'
     skip_keys = ['target', 'project', 'product']
-    path_keys = ['project', 'workspace']
+    path_keys = ['workspace', 'derivedDataPath']
     script_dir = DirectoryOfThisScript()
 
     config_path = os.path.join(script_dir, '.ycm_extra_conf.cfg')
@@ -77,7 +77,7 @@ def main():
             workspace_name = options[workspace_option]
             options[workspace_option] = workspace_name + workspace_suffix
             param = PrefixAllKeys('-',
-                        PrefixValues(path_keys, os.path.join(script_dir, ''),
+                        PrefixPaths(path_keys, os.path.join(script_dir, ''),
                             DropPairs(skip_keys, options.items())))
             subprocess.call([executable] + list(param))
 
