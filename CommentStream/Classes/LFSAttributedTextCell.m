@@ -49,18 +49,20 @@ static const CGFloat kAuthorNameHeight = 18.0f;
 static const CGFloat kAuthorDetailHeight = 10.0f;
 
 @interface LFSAttributedTextCell ()
-
+// store hash to avoid relayout of same HTML
+@property (nonatomic, assign) NSUInteger htmlHash;
 @end
 
-@implementation LFSAttributedTextCell {
-    UILabel *_titleView;
-    UILabel *_noteView;
-	NSUInteger _htmlHash; // store hash to avoid relayout of same HTML
-}
+@implementation LFSAttributedTextCell
 
 #pragma mark - Properties
-@synthesize textContentView = _textContentView;
-@synthesize avatarImage = _avatarImage;
+@synthesize contentBodyView = _contentBodyView;
+@synthesize contentImage = _contentImage;
+
+@synthesize contentAccessoryRightView = _contentAccessoryRightView;
+@synthesize contentTitleView = _contentTitleView;
+
+@synthesize htmlHash = _htmlHash;
 
 - (void)setHTMLString:(NSString *)html
 {
@@ -72,19 +74,14 @@ static const CGFloat kAuthorDetailHeight = 10.0f;
 	}
 	
 	_htmlHash = newHash;
-	[self.textContentView setHTMLString:html];
+	[self.contentBodyView setHTMLString:html];
 	[self setNeedsLayout];
 }
 
-- (UIImage*)avatarImage
-{
-    return _avatarImage;
-}
-
-- (void)setAvatarImage:(UIImage*)image
+- (void)setContentImage:(UIImage*)image
 {
     // store original-size image
-    _avatarImage = image;
+    _contentImage = image;
     
     // we are on a non-Retina device
     UIScreen *screen = [UIScreen mainScreen];
@@ -139,9 +136,9 @@ static UIColor *dateColor = nil;
 
 #pragma mark - Properties
 
--(LFSBasicHTMLLabel*)textContentView
+-(LFSBasicHTMLLabel*)contentBodyView
 {
-	if (_textContentView == nil) {
+	if (_contentBodyView == nil) {
         const CGFloat kHeaderHeight = kPaddingTop + kAvatarViewSize.height + kMinorVerticalSeparator;
         CGRect frame = CGRectMake(kPaddingLeft,
                                   kHeaderHeight,
@@ -149,21 +146,21 @@ static UIColor *dateColor = nil;
                                   self.bounds.size.height - kHeaderHeight);
         
         // initialize
-		_textContentView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+		_contentBodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
-        [_textContentView setFont:bodyFont];
-        [_textContentView setLineSpacing:kContentLineSpacing];
+        [_contentBodyView setFont:bodyFont];
+        [_contentBodyView setLineSpacing:kContentLineSpacing];
         
         // add to superview
-		[self.contentView addSubview:_textContentView];
+		[self.contentView addSubview:_contentBodyView];
 	}
-	return _textContentView;
+	return _contentBodyView;
 }
 
-- (UILabel *)titleView
+- (UILabel *)contentTitleView
 {
-	if (_titleView == nil) {
+	if (_contentTitleView == nil) {
         CGFloat leftColumnWidth = kPaddingLeft + kAvatarViewSize.width + kAvatarMarginRight;
         CGFloat rightColumnWidth = kNoteViewWidth + kPaddingRight;
         
@@ -172,27 +169,27 @@ static UIColor *dateColor = nil;
         frame.origin = CGPointMake(leftColumnWidth, kPaddingTop);
         
         // initialize
-		_titleView = [[UILabel alloc] initWithFrame:frame];
+		_contentTitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_titleView setFont:titleFont];
+        [_contentTitleView setFont:titleFont];
         
         // add to superview
-		[self.contentView addSubview:_titleView];
+		[self.contentView addSubview:_contentTitleView];
 	}
-	return _titleView;
+	return _contentTitleView;
 }
 
-- (UILabel *)noteView
+- (UILabel *)contentAccessoryRightView
 {
-	if (_noteView == nil) {
-		_noteView = [[UILabel alloc] init];
-        [_noteView setFont:dateFont];
-        [_noteView setTextColor:dateColor];
-        [_noteView setTextAlignment:NSTextAlignmentRight];
-		[self.contentView addSubview:_noteView];
+	if (_contentAccessoryRightView == nil) {
+		_contentAccessoryRightView = [[UILabel alloc] init];
+        [_contentAccessoryRightView setFont:dateFont];
+        [_contentAccessoryRightView setTextColor:dateColor];
+        [_contentAccessoryRightView setTextAlignment:NSTextAlignmentRight];
+		[self.contentView addSubview:_contentAccessoryRightView];
 	}
-	return _noteView;
+	return _contentAccessoryRightView;
 }
 
 #pragma mark - Lifecycle
@@ -202,8 +199,8 @@ static UIColor *dateColor = nil;
                 reuseIdentifier:reuseIdentifier];
     if (self)
     {
-        _noteView = nil;
-        _titleView = nil;
+        _contentAccessoryRightView = nil;
+        _contentTitleView = nil;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
         [self.imageView setContentMode:UIViewContentModeScaleToFill];
@@ -226,11 +223,10 @@ static UIColor *dateColor = nil;
 }
 
 -(void)dealloc{
-    _textContentView.delegate = nil;
-    _textContentView = nil;
-    _titleView = nil;
-    _noteView = nil;
-    _avatarImage = nil;
+    _contentBodyView = nil;
+    _contentTitleView = nil;
+    _contentAccessoryRightView = nil;
+    _contentImage = nil;
 }
 
 #pragma mark - Private methods
@@ -245,25 +241,25 @@ static UIColor *dateColor = nil;
     
     // layout content view
     CGFloat width = self.bounds.size.width;
-    CGRect textContentFrame = self.textContentView.frame;
-    textContentFrame.size = [self.textContentView
+    CGRect textContentFrame = self.contentBodyView.frame;
+    textContentFrame.size = [self.contentBodyView
                              sizeThatFits:
                              CGSizeMake(width - kPaddingLeft - kContentPaddingRight,
                                         CGFLOAT_MAX)];
-    [self.textContentView setFrame:textContentFrame];
+    [self.contentBodyView setFrame:textContentFrame];
     
     const CGFloat kLeftColumnWidth = kPaddingLeft + kAvatarViewSize.width + kAvatarMarginRight;
     const CGFloat kRightColumnWidth = kNoteViewWidth + kPaddingRight;
     
     // layout title view
-    CGRect titleFrame = self.titleView.frame;
+    CGRect titleFrame = self.contentTitleView.frame;
     titleFrame.size.width = width - kLeftColumnWidth - kRightColumnWidth;
-    [self.titleView setFrame:titleFrame];
+    [self.contentTitleView setFrame:titleFrame];
     
     // layout note view
-    CGRect noteFrame = self.noteView.frame;
+    CGRect noteFrame = self.contentAccessoryRightView.frame;
     noteFrame.origin.x = width - kRightColumnWidth;
-    [self.noteView setFrame:noteFrame];
+    [self.contentAccessoryRightView setFrame:noteFrame];
     
     // layout avatar
     CGRect imageViewFrame;
@@ -282,7 +278,7 @@ static UIColor *dateColor = nil;
 #pragma mark - Public methods
 - (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width
 {
-    CGSize neededSize = [self.textContentView
+    CGSize neededSize = [self.contentBodyView
                          sizeThatFits:
                          CGSizeMake(width - kPaddingLeft - kContentPaddingRight,
                                     CGFLOAT_MAX)];
