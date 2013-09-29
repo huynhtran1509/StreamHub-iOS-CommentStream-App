@@ -18,20 +18,18 @@
 @property (weak, nonatomic) id<LFSDetailViewDelegate>delegate;
 @property (assign, nonatomic) BOOL contentLikedByUser;
 
+@property (strong, nonatomic) LFSHeader* profileLocal;
+@property (strong, nonatomic) LFSTriple* profileRemote;
+@property (strong, nonatomic) LFSTriple* contentRemote;
+
+@property (copy, nonatomic) NSString* contentBodyHtml;
+@property (copy, nonatomic) NSString* contentDetail;
+
 @end
 
 // thanks to this protocol, LFSDetailView does not need
 // to know anything about the structure of the model object
 @protocol LFSDetailViewDelegate <NSObject>
-
-// composite objects
--(LFSHeader*)profileLocal;
--(LFSTriple*)profileRemote;
--(LFSTriple*)contentRemote;
-
-// primitives
--(NSString*)contentBodyHtml;
--(NSString*)contentDetail;
 
 // actions
 - (void)didSelectLike:(id)sender;

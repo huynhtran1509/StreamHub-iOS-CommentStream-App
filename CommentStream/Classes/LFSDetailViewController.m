@@ -105,8 +105,43 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    [self.detailView setDelegate:self];
+    
+    LFSDetailView *detailView = self.detailView;
+    LFSContent *contentItem = self.contentItem;
+    
+    [detailView setDelegate:self];
+    
+    [detailView setContentBodyHtml:contentItem.contentBodyHtml];
+    
+    [detailView setContentDetail:[[[NSDateFormatter alloc] init]
+                                extendedRelativeStringFromDate:contentItem.contentCreatedAt]];
+    
+    // only set an object if we have a remote (Twitter) url
+    NSString *twitterUrlString = contentItem.contentTwitterUrlString;
+    if (twitterUrlString != nil) {
+        [detailView setContentRemote:[[LFSTriple alloc]
+                                      initWithDetailString:twitterUrlString
+                                      mainString:@"View on Twitter >"
+                                      iconImage:nil]];
+    }
+    
+    // only return an object if we have a twitter handle
+    LFSAuthor *author = contentItem.author;
+    if (author.twitterHandle != nil) {
+        [detailView setProfileRemote:[[LFSTriple alloc]
+                                      initWithDetailString:author.profileUrlStringNoHashBang
+                                      mainString:nil
+                                      iconImage:[UIImage imageNamed:@"SourceTwitter"]]];
+    }
+    
+    // always return an object
+    NSNumber *moderator = [contentItem.contentAnnotations objectForKey:@"moderator"];
+    BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
+    detailView.profileLocal = [[LFSHeader alloc]
+                               initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
+                               attributeString:(hasModerator ? @"Moderator" : nil)
+                               mainString:author.displayName
+                               iconImage:self.avatarImage];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -126,55 +161,6 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - LFSDetailViewDelegate
--(NSString*)contentBodyHtml
-{
-    return self.contentItem.contentBodyHtml;
-}
-
--(NSString*)contentDetail
-{
-    return [[[NSDateFormatter alloc] init]
-            extendedRelativeStringFromDate:self.contentItem.contentCreatedAt];
-}
-
--(LFSTriple*)contentRemote
-{
-    // only return an object if we have a remote (Twitter) url
-    NSString *twitterUrlString = self.contentItem.contentTwitterUrlString;
-    return (twitterUrlString != nil
-            ? [[LFSTriple alloc]
-               initWithDetailString:twitterUrlString
-               mainString:@"View on Twitter >"
-               iconImage:nil]
-            : nil);
-}
-
--(LFSTriple*)profileRemote
-{
-    // only return an object if we have a twitter handle
-    LFSAuthor *author = self.contentItem.author;
-    return (author.twitterHandle
-            ? [[LFSTriple alloc]
-               initWithDetailString:author.profileUrlStringNoHashBang
-               mainString:nil
-               iconImage:[UIImage imageNamed:@"SourceTwitter"]]
-            : nil);
-}
-
--(LFSHeader*)profileLocal
-{
-    // always return an object
-    LFSAuthor *author = self.contentItem.author;
-    NSNumber *moderator = [self.contentItem.contentAnnotations objectForKey:@"moderator"];
-    BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
-    return [[LFSHeader alloc]
-            initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
-            attributeString:(hasModerator ? @"Moderator" : nil)
-            mainString:author.displayName
-            iconImage:self.avatarImage];
 }
 
 #pragma mark - Status bar
@@ -210,7 +196,7 @@
     }
 }
 
-#pragma mark - Events
+#pragma mark - LFSDetailViewDelegate
 - (void)didSelectLike:(id)sender
 {
     // toggle liked state
