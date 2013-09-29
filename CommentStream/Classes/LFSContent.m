@@ -56,18 +56,6 @@
 
 @synthesize author = _author;
 
-/*
- @property (nonatomic, strong) NSString *contentParentId;
- @property (nonatomic, strong) NSString *contentBodyHTML;
- @property (nonatomic, strong) NSDictionary *contentAnnotations;
- @property (nonatomic, strong) NSString *contentAuthorId;
- @property (nonatomic, strong) NSDate *contentUpdatedAt;
- @property (nonatomic, strong) NSDate *contentCreatedAt;
- @property (nonatomic, strong) NSString *contentId;
-
- */
-
-
 -(NSString*)contentTwitterId
 {
     // try to extract twitter id from contentId --

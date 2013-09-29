@@ -40,23 +40,23 @@
 @property (nonatomic, readonly) NSString *contentTwitterId;
 @property (nonatomic, readonly) NSString *contentTwitterUrlString;
 
-@property (nonatomic, strong) NSDictionary *content;
+@property (nonatomic, strong) LFSAuthor *author;
 @property (nonatomic, strong) LFSContentCollection *childContent;
 
+@property (nonatomic, copy) NSDictionary *content;
+@property (nonatomic, copy) NSString *contentId;
+@property (nonatomic, copy) NSString *contentParentId;
+@property (nonatomic, copy) NSString *contentBodyHtml;
+@property (nonatomic, copy) NSDictionary *contentAnnotations;
+@property (nonatomic, copy) NSString *contentAuthorId;
+
+@property (nonatomic, strong) NSDate *contentUpdatedAt;
+@property (nonatomic, strong) NSDate *contentCreatedAt;
 @property (nonatomic, strong) NSNumber *eventId;
+
 @property (nonatomic, assign) LFSContentVisibility visibility;
 @property (nonatomic, assign) LFSContentType contentType;
 @property (nonatomic, assign) NSUInteger contentSource;
-
-@property (nonatomic, strong) NSString *contentParentId;
-@property (nonatomic, strong) NSString *contentBodyHtml;
-@property (nonatomic, strong) NSDictionary *contentAnnotations;
-@property (nonatomic, strong) NSString *contentAuthorId;
-@property (nonatomic, strong) NSDate *contentUpdatedAt;
-@property (nonatomic, strong) NSDate *contentCreatedAt;
-@property (nonatomic, strong) NSString *contentId;
-
-@property (nonatomic, strong) LFSAuthor *author;
 
 -(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;
 

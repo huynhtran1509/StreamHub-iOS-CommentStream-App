@@ -51,6 +51,9 @@
 
 - (id)copy
 {
+    // this is a bit sneaky since some code out there assumes
+    // that regular copy always returns an immutable version
+    // of the object
 	return [self mutableCopy];
 }
 

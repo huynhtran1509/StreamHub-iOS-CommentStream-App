@@ -18,8 +18,11 @@ static const CGFloat kHeaderHeight = 30;
 static const CGFloat kRightColumnWidth = 80;
 static const CGFloat kAvatarCornerRadius = 4;
 static const CGFloat kNoteRightInset = 12;
-static const CGSize kAvatarDisplaySize = { 25.f, 25.f };
-static const CGPoint kAvatarDisplayOrigin = { 15.f, 7.f };
+
+// TODO: C99 initializer syntax (below) may be preferred to helper
+// functions such as CGSizeMake; so consider switching to it project-wide
+static const CGSize kAvatarDisplaySize = { .width=25.f, .height=25.f };
+static const CGPoint kAvatarDisplayOrigin = { .x=15.f, .y=7.f };
 
 @interface LFSAttributedTextCell ()
 

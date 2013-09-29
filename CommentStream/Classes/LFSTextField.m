@@ -70,7 +70,7 @@
     _maskLayer = nil;
 }
 
-#pragma mark - Overrides
+#pragma mark - Drawing
 - (void)drawRect:(CGRect)rect {
     if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)) {
         [super drawRect:rect];
@@ -79,11 +79,6 @@
     }
 }
 
-- (CGRect)textRectForBounds:(CGRect)bounds {
-	return UIEdgeInsetsInsetRect([super textRectForBounds:bounds], _textEdgeInsets);
-}
-
-#pragma mark - Private methods
 -(void)drawRoundedWithRect:(CGRect)rect
 {
     // For iOS6 or earlier only
@@ -103,6 +98,11 @@
     
     [self setTextEdgeInsets:UIEdgeInsetsMake(radius - 9.0f, 8.0f, 0.0f, 0.0f)];
     
+}
+
+#pragma mark - Other
+- (CGRect)textRectForBounds:(CGRect)bounds {
+	return UIEdgeInsetsInsetRect([super textRectForBounds:bounds], _textEdgeInsets);
 }
 
 @end
