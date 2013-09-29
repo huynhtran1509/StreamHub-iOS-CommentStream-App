@@ -28,7 +28,7 @@
     self = [super initWithFrame:frame];
     if (self)
     {
-        [self setFont:[UIFont systemFontOfSize:13.0f]];
+        [self setFont:[UIFont systemFontOfSize:13.f]];
         [self setAutoresizingMask:
          (UIViewAutoresizingFlexibleHeight |
           UIViewAutoresizingFlexibleWidth)];
@@ -36,10 +36,10 @@
         if (LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70))
         {
             // iOS7
-            [self setTextEdgeInsets:UIEdgeInsetsMake(0, 5, 0, 0)];
+            [self setTextEdgeInsets:UIEdgeInsetsMake(0.f, 5.f, 0.f, 0.f)];
             
             [self.layer setMasksToBounds:YES];
-            [self.layer setCornerRadius:6.0f];
+            [self.layer setCornerRadius:6.f];
             [self.layer setBorderColor:[[UIColor lightGrayColor] CGColor]];
             [self.layer setBorderWidth:0.5f];
         } else {
@@ -52,7 +52,7 @@
             [_shadowLayer setShadowColor:[[UIColor blackColor] CGColor]];
             [_shadowLayer setShadowOffset:CGSizeMake(0.5f, 0.5f)];
             [_shadowLayer setShadowOpacity:0.95f];
-            [_shadowLayer setShadowRadius:2.0f];
+            [_shadowLayer setShadowRadius:2.f];
             [_shadowLayer setFillRule:kCAFillRuleEvenOdd];
             [_shadowLayer setMask:_maskLayer];
             [_shadowLayer setMasksToBounds:YES];
@@ -82,11 +82,11 @@
 -(void)drawRoundedWithRect:(CGRect)rect
 {
     // For iOS6 or earlier only
-    CGFloat radius = rect.size.height / 2.0f;
+    CGFloat radius = rect.size.height / 2.f;
     self.layer.cornerRadius = radius;
     [_shadowLayer setFrame:rect];
     CGMutablePathRef path = CGPathCreateMutable();
-    CGPathAddRect(path, NULL, CGRectInset(rect, -42, -42));
+    CGPathAddRect(path, NULL, CGRectInset(rect, -42.f, -42.f));
     CGPathRef innerPath =
     [[UIBezierPath bezierPathWithRoundedRect:rect
                                 cornerRadius:radius] CGPath];
@@ -96,7 +96,7 @@
     CGPathRelease(path);
     [_maskLayer setPath:innerPath];
     
-    [self setTextEdgeInsets:UIEdgeInsetsMake(radius - 9.0f, 8.0f, 0.0f, 0.0f)];
+    [self setTextEdgeInsets:UIEdgeInsetsMake(radius - 9.f, 8.f, 0.f, 0.f)];
     
 }
 

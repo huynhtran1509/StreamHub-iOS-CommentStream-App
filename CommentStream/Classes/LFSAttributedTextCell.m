@@ -12,12 +12,12 @@
 #import "LFSAttributedTextCell.h"
 
 // TODO: turn some of these consts into properties for easier customization
-static const CGFloat kLeftColumnWidth = 50;
-static const CGFloat kBottomInset = 18;
-static const CGFloat kHeaderHeight = 30;
-static const CGFloat kRightColumnWidth = 80;
-static const CGFloat kAvatarCornerRadius = 4;
-static const CGFloat kNoteRightInset = 12;
+static const CGFloat kLeftColumnWidth = 50.f;
+static const CGFloat kBottomInset = 18.f;
+static const CGFloat kHeaderHeight = 30.f;
+static const CGFloat kRightColumnWidth = 80.f;
+static const CGFloat kAvatarCornerRadius = 4.f;
+static const CGFloat kNoteRightInset = 12.f;
 
 // TODO: C99 initializer syntax (below) may be preferred to helper
 // functions such as CGSizeMake; so consider switching to it project-wide
@@ -68,17 +68,17 @@ static const CGPoint kAvatarDisplayOrigin = { .x=15.f, .y=7.f };
     if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2.f)
     {
         // Retina: scale to 2x frame size
-        size = CGSizeMake(kAvatarDisplaySize.width * 2,
-                          kAvatarDisplaySize.height * 2);
+        size = CGSizeMake(kAvatarDisplaySize.width * 2.f,
+                          kAvatarDisplaySize.height * 2.f);
     }
     else
     {
         // non-Retina
         size = kAvatarDisplaySize;
     }
-    CGRect targetRect = CGRectMake(0, 0, size.width, size.height);
+    CGRect targetRect = CGRectMake(0.f, 0.f, size.width, size.height);
     dispatch_queue_t queue =
-    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0.f);
     dispatch_async(queue, ^{
         
         // scale image on a background thread
@@ -170,10 +170,10 @@ static UIColor *dateColor = nil;
             // iOS7-like selected background color
             [self setSelectionStyle:UITableViewCellSelectionStyleGray];
             UIView *selectionColor = [[UIView alloc] init];
-            selectionColor.backgroundColor = [UIColor colorWithRed:(217/255.0)
-                                                             green:(217/255.0)
-                                                              blue:(217/255.0)
-                                                             alpha:1];
+            selectionColor.backgroundColor = [UIColor colorWithRed:(217.f/255.f)
+                                                             green:(217.f/255.f)
+                                                              blue:(217.f/255.f)
+                                                             alpha:1.f];
             self.selectedBackgroundView = selectionColor;
         }
         self.imageView.layer.cornerRadius = kAvatarCornerRadius;
@@ -211,11 +211,11 @@ static UIColor *dateColor = nil;
     [_textContentView setFrame:frame];
     
     _titleView.frame = CGRectMake(kLeftColumnWidth,
-                                  0,
+                                  0.f,
                                   contentViewWidth - kLeftColumnWidth - kRightColumnWidth,
                                   kHeaderHeight);
     _noteView.frame = CGRectMake(contentViewWidth - kRightColumnWidth,
-                                 0,
+                                 0.f,
                                  kRightColumnWidth - kNoteRightInset,
                                  kHeaderHeight);
     

@@ -12,21 +12,25 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    [[UIColor colorWithRed:(200.f/255.f) green:(199.f/255.f) blue:(204.f/255.f) alpha:1.f] setStroke];
+    [[UIColor colorWithRed:(200.f/255.f)
+                     green:(199.f/255.f)
+                      blue:(204.f/255.f) alpha:1.f] setStroke];
+    
+    CGPoint origin = rect.origin;
+    CGSize size = rect.size;
     
     // top 1px line
     UIBezierPath *horLineTop = [[UIBezierPath alloc] init];
-    [horLineTop moveToPoint:rect.origin];
-    [horLineTop addLineToPoint:CGPointMake(rect.origin.x + rect.size.width, rect.origin.y)];
+    [horLineTop moveToPoint:origin];
+    [horLineTop addLineToPoint:CGPointMake(origin.x + size.width, origin.y)];
     horLineTop.lineWidth = 1.f;
     [horLineTop stroke];
     
     // bottom 1px line
     UIBezierPath *horLineBottom = [[UIBezierPath alloc] init];
-    [horLineBottom moveToPoint:CGPointMake(rect.origin.x,
-                                           rect.origin.y + rect.size.height)];
-    [horLineBottom addLineToPoint:CGPointMake(rect.origin.x + rect.size.width,
-                                              rect.origin.y + rect.size.height)];
+    [horLineBottom moveToPoint:CGPointMake(origin.x, origin.y + size.height)];
+    [horLineBottom addLineToPoint:CGPointMake(origin.x + size.width,
+                                              origin.y + size.height)];
     horLineBottom.lineWidth = 1.f;
     [horLineBottom stroke];
 }

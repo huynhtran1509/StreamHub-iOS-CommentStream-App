@@ -87,7 +87,10 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 
 -(id)init
 {
-    self = [self initWithDetailString:nil attributeString:nil mainString:nil iconImage:nil];
+    self = [self initWithDetailString:nil
+                      attributeString:nil
+                           mainString:nil
+                            iconImage:nil];
     return self;
 }
 @end
@@ -141,7 +144,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     if (_likeButton == nil) {
         UIImage *img = [self imageForLikedState:self.contentLikedByUser];
         _likeButton = [[UIButton alloc]
-                       initWithFrame:CGRectMake(0.f, 0.f, img.size.width, img.size.height)];
+                       initWithFrame:CGRectMake(0.f, 0.f,
+                                                img.size.width, img.size.height)];
         [_likeButton setImage:img forState:UIControlStateNormal];
         [_likeButton addTarget:self action:@selector(didSelectLike:)
               forControlEvents:UIControlEventTouchUpInside];
@@ -154,7 +158,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     if (_replyButton == nil) {
         UIImage *img = [UIImage imageNamed:@"ActionReply"];
         _replyButton = [[UIButton alloc]
-                        initWithFrame:CGRectMake(0.f, 0.f, img.size.width, img.size.height)];
+                        initWithFrame:CGRectMake(0.f, 0.f,
+                                                 img.size.width, img.size.height)];
         [_replyButton setImage:img forState:UIControlStateNormal];
         [_replyButton addTarget:self action:@selector(didSelectReply:)
                forControlEvents:UIControlEventTouchUpInside];
@@ -224,7 +229,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         // initialize
         CGSize avatarViewSize;
         if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)]
-            && ([UIScreen mainScreen].scale == 2.0f))
+            && ([UIScreen mainScreen].scale == 2.f))
         {
             // Retina display, okay to use half-points
             avatarViewSize = CGSizeMake(37.5f, 37.5f);
@@ -377,19 +382,22 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         [_contentToolbar setItems:
          @[
            [[UIBarButtonItem alloc]
-            initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil],
+            initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+            target:self action:nil],
            
            [[UIBarButtonItem alloc]
             initWithCustomView:self.likeButton],
            
            [[UIBarButtonItem alloc]
-            initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil],
+            initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+            target:self action:nil],
            
            [[UIBarButtonItem alloc]
             initWithCustomView:self.replyButton],
            
            [[UIBarButtonItem alloc]
-            initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil]
+            initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+            target:self action:nil]
            ]
          ];
         _contentToolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
@@ -666,16 +674,19 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 #pragma mark - Actions
 - (IBAction)didSelectLike:(id)sender
 {
+    // simply pass the action to the delegate
     [self.delegate didSelectLike:sender];
 }
 
 - (IBAction)didSelectReply:(id)sender
 {
+    // simply pass the action to the delegate
     [self.delegate didSelectReply:sender];
 }
 
 - (IBAction)didSelectProfile:(id)sender
 {
+    // this action we handle ourselves
     if (_profileRemoteURL != nil) {
         [[UIApplication sharedApplication] openURL:_profileRemoteURL];
     }
