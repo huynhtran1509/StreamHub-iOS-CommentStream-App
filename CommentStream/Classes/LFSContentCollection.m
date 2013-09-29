@@ -51,6 +51,9 @@
 
 - (id)copy
 {
+    // this is a bit sneaky since some code out there assumes
+    // that regular copy always returns an immutable version
+    // of the object
 	return [self mutableCopy];
 }
 
@@ -136,7 +139,7 @@
 }
 
 // note: per Apple docs, NSArray does not have adesignated initializer
--(id)initWithObjects:(const id [])objects count:(NSUInteger)cnt
+-(id)initWithObjects:(const __unsafe_unretained id [])objects count:(NSUInteger)cnt
 {
     self = [super init];
     if (self != nil) {

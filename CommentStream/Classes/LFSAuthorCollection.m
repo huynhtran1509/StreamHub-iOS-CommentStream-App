@@ -19,6 +19,9 @@
 
 - (id)copy
 {
+    // this is a bit sneaky since some code out there assumes
+    // that regular copy always returns an immutable version
+    // of the object
 	return [self mutableCopy];
 }
 
@@ -67,8 +70,8 @@
 }
 
 // designated initializer
--(id)initWithObjects:(const id [])objects
-             forKeys:(const id<NSCopying> [])keys
+-(id)initWithObjects:(const __unsafe_unretained id [])objects
+             forKeys:(const __unsafe_unretained id<NSCopying> [])keys
                count:(NSUInteger)cnt
 {
     self = [super init];

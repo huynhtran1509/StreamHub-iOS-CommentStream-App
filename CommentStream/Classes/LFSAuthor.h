@@ -25,14 +25,16 @@
 -(id)initWithObject:(id)object;
 
 // Note: use lazy instantiation here
-@property (nonatomic, strong) NSString *displayName;
-@property (nonatomic, strong) NSString *profileUrlString;
-@property (nonatomic, strong) NSString *avatarUrlString;
-@property (nonatomic, readonly) NSString *avatarUrlString75;
-@property (nonatomic, strong) NSArray *userTags;
+@property (nonatomic, copy) NSString *displayName;
+@property (nonatomic, copy) NSString *profileUrlString;
+@property (nonatomic, copy) NSString *avatarUrlString;
+@property (nonatomic, copy) NSString *avatarUrlString75;
+@property (nonatomic, copy) NSString *userId;
+@property (nonatomic, copy) NSString *twitterHandle;
+@property (nonatomic, copy) NSString *profileUrlStringNoHashBang;
+
+@property (nonatomic, copy) NSArray *userTags;
+
 @property (nonatomic, strong) NSNumber *userType;
-@property (nonatomic, strong) NSString *userId;
-@property (nonatomic, readonly) NSString *twitterHandle;
-@property (nonatomic, readonly) NSString *profileUrlStringNoHashBang;
 
 @end

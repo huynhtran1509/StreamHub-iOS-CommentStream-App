@@ -17,10 +17,10 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
-@property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
-
-@property (weak, nonatomic) IBOutlet UITextView *textView;
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
+
+@property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
+@property (weak, nonatomic) IBOutlet UITextView *textView;
 
 - (IBAction)cancelClicked:(UIBarButtonItem *)sender;
 - (IBAction)postClicked:(UIBarButtonItem *)sender;
@@ -34,6 +34,9 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
+
+@synthesize postNavbar = _postNavbar;
+@synthesize textView = _textView;
 
 @synthesize writeClient = _writeClient;
 @synthesize collection = _collection;

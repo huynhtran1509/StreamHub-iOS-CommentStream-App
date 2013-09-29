@@ -146,7 +146,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                          CGRectMake(0.f, 0.f, textFieldWidth, (isPortrait ? 30.f : 18.f))];
 
     [_postCommentField setDelegate:self];
-    [_postCommentField setPlaceholder:@"Write a comment..."];
+    [_postCommentField setPlaceholder:@"Write a comment…"];
 
 
     UIBarButtonItem *writeCommentItem = [[UIBarButtonItem alloc]
