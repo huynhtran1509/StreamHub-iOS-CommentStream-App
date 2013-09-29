@@ -413,7 +413,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
     
     // layout url link
-    LFSTriple *contentRemote = [self.delegate contentRemote];
+    LFSTriple *contentRemote = self.contentRemote;
     if (contentRemote != nil) {
         [self.remoteUrlLabel setHTMLString:
          [NSString stringWithFormat:@"<a href=\"%@\">%@</a>",
@@ -425,7 +425,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     }
     
     // layout source icon
-    LFSTriple *profileRemote = [self.delegate profileRemote];
+    LFSTriple *profileRemote = self.profileRemote;
     if (profileRemote != nil) {
         [self.authorProfileButton setImage:[profileRemote iconImage]
                                   forState:UIControlStateNormal];
@@ -437,7 +437,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     // Note: preciese layout depends on whether we have detail field
     // (i.e. twitter handle)
     
-    LFSHeader *profileLocal = [self.delegate profileLocal];
+    LFSHeader *profileLocal = self.profileLocal;
     NSString *authorDisplayName = profileLocal.mainString;
     NSString *authorDetail = profileLocal.detailString;
     NSString *authorAttribute = profileLocal.attributeString;
@@ -546,7 +546,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     CGRect dateFrame = self.dateLabel.frame;
     dateFrame.origin.y = bottom + kMinorVerticalSeparator;
     [self.dateLabel setFrame:dateFrame];
-    [self.dateLabel setText:[self.delegate contentDetail]];
+    [self.dateLabel setText:self.contentDetail];
     
     // layout avatar view
     [self.avatarView setImage:profileLocal.iconImage];
@@ -583,7 +583,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 #pragma mark - Private methods
 -(CGSize)contentSizeThatFits:(CGSize)size
 {
-    [self.contentBodyLabel setHTMLString:[self.delegate contentBodyHtml]];
+    [self.contentBodyLabel setHTMLString:self.contentBodyHtml];
     return [self.contentBodyLabel sizeThatFits:size];
 }
 
@@ -605,6 +605,13 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         _profileRemoteURL = nil;
         
         _contentLikedByUser = NO;
+        
+        
+        _profileLocal = nil;
+        _profileRemote = nil;
+        _contentRemote = nil;
+        _contentBodyHtml = nil;
+        _contentDetail = nil;
     }
     return self;
 }
@@ -626,6 +633,12 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         _profileRemoteURL = nil;
         
         _contentLikedByUser = NO;
+        
+        _profileLocal = nil;
+        _profileRemote = nil;
+        _contentRemote = nil;
+        _contentBodyHtml = nil;
+        _contentDetail = nil;
     }
     return self;
 }
@@ -642,6 +655,12 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     _authorNameLabel = nil;
     
     _profileRemoteURL = nil;
+    
+    _profileLocal = nil;
+    _profileRemote = nil;
+    _contentRemote = nil;
+    _contentBodyHtml = nil;
+    _contentDetail = nil;
 }
 
 #pragma mark - Actions
