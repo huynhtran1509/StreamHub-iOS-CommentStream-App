@@ -12,17 +12,41 @@
 #import "LFSAttributedTextCell.h"
 
 // TODO: turn some of these consts into properties for easier customization
-static const CGFloat kLeftColumnWidth = 50.f;
-static const CGFloat kBottomInset = 18.f;
-static const CGFloat kHeaderHeight = 30.f;
-static const CGFloat kRightColumnWidth = 80.f;
-static const CGFloat kAvatarCornerRadius = 4.f;
-static const CGFloat kNoteRightInset = 12.f;
+//static const CGFloat kLeftColumnWidth = 50.f;
 
-// TODO: C99 initializer syntax (below) may be preferred to helper
-// functions such as CGSizeMake; so consider switching to it project-wide
-static const CGSize kAvatarDisplaySize = { .width=25.f, .height=25.f };
-static const CGPoint kAvatarDisplayOrigin = { .x=15.f, .y=7.f };
+static const CGFloat kPaddingTop = 7.f;
+static const CGFloat kPaddingRight = 12.f;
+static const CGFloat kPaddingBottom = 18.f;
+static const CGFloat kPaddingLeft = 15.f;
+
+static const CGFloat kContentPaddingRight = 7.f;
+
+// content font settings
+static NSString* const kContentFontName = @"Georgia";
+static const CGFloat kContentFontSize = 13.f;
+static const CGFloat kContentLineSpacing = 6.5f;
+
+// note (date) font settings
+static const CGFloat kNoteFontSize = 11.f;
+
+// title font settings
+static const CGFloat kAuthorNameFontSize = 12.f;
+static const CGFloat kAuthorDetailFontSize = 11.f; // not used yet
+static const CGFloat kAuthorAttributeFontSize = 10.f; // not used yet
+
+// TODO: use autoscaling for noteView label
+static const CGFloat kNoteViewWidth = 68.f;
+
+static const CGSize  kAvatarViewSize = { .width=25.f, .height=25.f };
+static const CGFloat kAvatarCornerRadius = 4.f;
+static const CGFloat kAvatarMarginRight = 8.0f;
+
+static const CGFloat kMinorVerticalSeparator = 5.0f;
+static const CGFloat kMajorVerticalSeparator = 7.0f;
+
+static const CGFloat kAuthorAttributeHeight = 10.0f;
+static const CGFloat kAuthorNameHeight = 18.0f;
+static const CGFloat kAuthorDetailHeight = 10.0f;
 
 @interface LFSAttributedTextCell ()
 
@@ -31,7 +55,7 @@ static const CGPoint kAvatarDisplayOrigin = { .x=15.f, .y=7.f };
 @implementation LFSAttributedTextCell {
     UILabel *_titleView;
     UILabel *_noteView;
-	NSUInteger _htmlHash; // preserved hash to avoid relayouting for same HTML
+	NSUInteger _htmlHash; // store hash to avoid relayout of same HTML
 }
 
 #pragma mark - Properties
@@ -40,7 +64,7 @@ static const CGPoint kAvatarDisplayOrigin = { .x=15.f, .y=7.f };
 
 - (void)setHTMLString:(NSString *)html
 {
-	// store hash isntead of html text
+	// store hash isntead of HTML source
 	NSUInteger newHash = [html hash];
 
 	if (newHash == _htmlHash) {
@@ -68,13 +92,13 @@ static const CGPoint kAvatarDisplayOrigin = { .x=15.f, .y=7.f };
     if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2.f)
     {
         // Retina: scale to 2x frame size
-        size = CGSizeMake(kAvatarDisplaySize.width * 2.f,
-                          kAvatarDisplaySize.height * 2.f);
+        size = CGSizeMake(kAvatarViewSize.width * 2.f,
+                          kAvatarViewSize.height * 2.f);
     }
     else
     {
         // non-Retina
-        size = kAvatarDisplaySize;
+        size = kAvatarViewSize;
     }
     CGRect targetRect = CGRectMake(0.f, 0.f, size.width, size.height);
     dispatch_queue_t queue =
@@ -105,9 +129,10 @@ static UIColor *dateColor = nil;
 
 + (void)initialize {
     if(self == [LFSAttributedTextCell class]) {
-        titleFont = [UIFont boldSystemFontOfSize:12.f];
-        bodyFont = [UIFont fontWithName:@"Georgia" size:13.f];
-        dateFont = [UIFont systemFontOfSize:11.f];
+        titleFont = [UIFont boldSystemFontOfSize:kAuthorNameFontSize];
+        bodyFont = [UIFont fontWithName:kContentFontName
+                                   size:kContentFontSize];
+        dateFont = [UIFont systemFontOfSize:kNoteFontSize];
         dateColor = [UIColor lightGrayColor];
     }
 }
@@ -117,15 +142,20 @@ static UIColor *dateColor = nil;
 -(LFSBasicHTMLLabel*)textContentView
 {
 	if (_textContentView == nil) {
-        // after the first call here the content view size is correct
-        CGRect frame = CGRectMake(kLeftColumnWidth,
+        const CGFloat kHeaderHeight = kPaddingTop + kAvatarViewSize.height + kMinorVerticalSeparator;
+        CGRect frame = CGRectMake(kPaddingLeft,
                                   kHeaderHeight,
-                                  self.bounds.size.width - kLeftColumnWidth,
+                                  self.bounds.size.width - kPaddingLeft - kContentPaddingRight,
                                   self.bounds.size.height - kHeaderHeight);
         
+        // initialize
 		_textContentView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        
+        // configure
         [_textContentView setFont:bodyFont];
-        [_textContentView setLineSpacing:6.5f];
+        [_textContentView setLineSpacing:kContentLineSpacing];
+        
+        // add to superview
 		[self.contentView addSubview:_textContentView];
 	}
 	return _textContentView;
@@ -134,8 +164,20 @@ static UIColor *dateColor = nil;
 - (UILabel *)titleView
 {
 	if (_titleView == nil) {
-		_titleView = [[UILabel alloc] init];
+        CGFloat leftColumnWidth = kPaddingLeft + kAvatarViewSize.width + kAvatarMarginRight;
+        CGFloat rightColumnWidth = kNoteViewWidth + kPaddingRight;
+        
+        CGRect frame;
+        frame.size = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kAuthorNameHeight);
+        frame.origin = CGPointMake(leftColumnWidth, kPaddingTop);
+        
+        // initialize
+		_titleView = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
         [_titleView setFont:titleFont];
+        
+        // add to superview
 		[self.contentView addSubview:_titleView];
 	}
 	return _titleView;
@@ -156,7 +198,8 @@ static UIColor *dateColor = nil;
 #pragma mark - Lifecycle
 -(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
 {
-    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    self = [super initWithStyle:UITableViewCellStyleDefault
+                reuseIdentifier:reuseIdentifier];
     if (self)
     {
         _noteView = nil;
@@ -199,46 +242,54 @@ static UIColor *dateColor = nil;
 	if (!self.superview) {
 		return;
 	}
-
-	CGFloat neededContentHeight = [self requiredRowHeightWithFrameWidth:self.bounds.size.width];
-
-    // after the first call here the content view size is correct
-    CGFloat contentViewWidth = self.bounds.size.width;
-    CGRect frame = CGRectMake(kLeftColumnWidth,
-                              kHeaderHeight,
-                              contentViewWidth - kLeftColumnWidth,
-                              neededContentHeight - kHeaderHeight);
-    [_textContentView setFrame:frame];
     
-    _titleView.frame = CGRectMake(kLeftColumnWidth,
-                                  0.f,
-                                  contentViewWidth - kLeftColumnWidth - kRightColumnWidth,
-                                  kHeaderHeight);
-    _noteView.frame = CGRectMake(contentViewWidth - kRightColumnWidth,
-                                 0.f,
-                                 kRightColumnWidth - kNoteRightInset,
-                                 kHeaderHeight);
+    // layout content view
+    CGFloat width = self.bounds.size.width;
+    CGRect textContentFrame = self.textContentView.frame;
+    textContentFrame.size = [self.textContentView
+                             sizeThatFits:
+                             CGSizeMake(width - kPaddingLeft - kContentPaddingRight,
+                                        CGFLOAT_MAX)];
+    [self.textContentView setFrame:textContentFrame];
     
+    const CGFloat kLeftColumnWidth = kPaddingLeft + kAvatarViewSize.width + kAvatarMarginRight;
+    const CGFloat kRightColumnWidth = kNoteViewWidth + kPaddingRight;
+    
+    // layout title view
+    CGRect titleFrame = self.titleView.frame;
+    titleFrame.size.width = width - kLeftColumnWidth - kRightColumnWidth;
+    [self.titleView setFrame:titleFrame];
+    
+    // layout note view
+    CGRect noteFrame = self.noteView.frame;
+    noteFrame.origin.x = width - kRightColumnWidth;
+    [self.noteView setFrame:noteFrame];
+    
+    // layout avatar
     CGRect imageViewFrame;
-    imageViewFrame.origin = kAvatarDisplayOrigin;
-    imageViewFrame.size = kAvatarDisplaySize;
+    imageViewFrame.origin = CGPointMake(kPaddingLeft, kPaddingTop);
+    imageViewFrame.size = kAvatarViewSize;
     self.imageView.frame = imageViewFrame;
+    
     
     // on iOS6, textContentView height sometimes overshoots
     // cell height. The code below remediates this
-    CGRect textContentFrame = _textContentView.frame;
-    textContentFrame.size.height = self.frame.size.height - kHeaderHeight;
-    [_textContentView setFrame:textContentFrame];
+    //CGRect textContentFrame = self.textContentView.frame;
+    //textContentFrame.size.height = self.frame.size.height - kHeaderHeight;
+    //[self.textContentView setFrame:textContentFrame];
 }
 
 #pragma mark - Public methods
 - (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width
 {
     CGSize neededSize = [self.textContentView
-                         sizeThatFits:CGSizeMake(width - kLeftColumnWidth, CGFLOAT_MAX)];
+                         sizeThatFits:
+                         CGSizeMake(width - kPaddingLeft - kContentPaddingRight,
+                                    CGFLOAT_MAX)];
     
     CGRect imageViewFrame = self.imageView.frame;
-	CGFloat result = kBottomInset + MAX(neededSize.height + kHeaderHeight,
+    const CGFloat kHeaderHeight = kPaddingTop + kAvatarViewSize.height + kMinorVerticalSeparator;
+	CGFloat result = kPaddingBottom + MAX(neededSize.height + kHeaderHeight,
                               imageViewFrame.size.height +
                               imageViewFrame.origin.y);
     return result;

@@ -12,7 +12,7 @@
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
 #import "LFSBasicHTMLLabel.h"
-#import "UILabel+VerticalAlign.h"
+#import "UILabel+Trim.h"
 
 @implementation LFSTriple
 @synthesize detailString = _detailString;
@@ -40,15 +40,28 @@
 
 @end
 
-static const CGFloat kPaddingLeft = 20.0f;
 static const CGFloat kPaddingTop = 20.0f;
 static const CGFloat kPaddingRight = 20.0f;
 static const CGFloat kPaddingBottom = 27.0f;
+static const CGFloat kPaddingLeft = 20.0f;
 
 static const CGFloat kContentPaddingRight = 12.0f;
+
+// content font settings
+static NSString* const kContentFontName = @"Georgia";
+static const CGFloat kContentFontSize = 16.0f;
 static const CGFloat kContentLineSpacing = 8.0f;
-static const CGFloat kHeaderHeight = 38.0f;
+
+// title font settings
+static const CGFloat kAuthorNameFontSize = 15.f;
+static const CGFloat kAuthorDetailFontSize = 12.f;
+static const CGFloat kAuthorAttributeFontSize = 11.f;
+
+// TODO: calculate avatar size based on pixel image size
+static const CGSize  kAvatarViewSize = { .width=38.0f, .height=38.0f };
+static const CGFloat kAvatarCornerRadius = 4.f;
 static const CGFloat kAvatarMarginRight = 8.0f;
+
 static const CGFloat kDetailRowHeight = 21.0f;
 
 static const CGFloat kRemoteButtonWidth = 20.0f;
@@ -143,12 +156,18 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 {
     if (_likeButton == nil) {
         UIImage *img = [self imageForLikedState:self.contentLikedByUser];
-        _likeButton = [[UIButton alloc]
-                       initWithFrame:CGRectMake(0.f, 0.f,
-                                                img.size.width, img.size.height)];
+        CGRect frame = CGRectMake(0.f, 0.f,
+                                  img.size.width,
+                                  img.size.height);
+        // initialize
+        _likeButton = [[UIButton alloc] initWithFrame:frame];
+        
+        // configure
         [_likeButton setImage:img forState:UIControlStateNormal];
         [_likeButton addTarget:self action:@selector(didSelectLike:)
               forControlEvents:UIControlEventTouchUpInside];
+        
+        // do not add to superview...
     }
     return _likeButton;
 }
@@ -157,12 +176,18 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 {
     if (_replyButton == nil) {
         UIImage *img = [UIImage imageNamed:@"ActionReply"];
-        _replyButton = [[UIButton alloc]
-                        initWithFrame:CGRectMake(0.f, 0.f,
-                                                 img.size.width, img.size.height)];
+        CGRect frame = CGRectMake(0.f, 0.f,
+                                  img.size.width,
+                                  img.size.height);
+        // initialize
+        _replyButton = [[UIButton alloc] initWithFrame:frame];
+        
+        // configure
         [_replyButton setImage:img forState:UIControlStateNormal];
         [_replyButton addTarget:self action:@selector(didSelectReply:)
                forControlEvents:UIControlEventTouchUpInside];
+        
+        // do not add to superview...
     }
     return _replyButton;
 }
@@ -181,20 +206,23 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (LFSBasicHTMLLabel*)contentBodyLabel
 {
     if (_contentBodyLabel == nil) {
-        // initialize
+
         CGRect frame = CGRectMake(kPaddingLeft,
-                                  kPaddingTop + kHeaderHeight + kMajorVerticalSeparator,
+                                  kPaddingTop + kAvatarViewSize.height + kMajorVerticalSeparator,
                                   self.bounds.size.width - kPaddingLeft - kContentPaddingRight,
                                   10.f); // this could be anything
+        // initialize
         _contentBodyLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
-        [_contentBodyLabel setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-        [self addSubview:_contentBodyLabel];
         
         // configure
-        [_contentBodyLabel setFont:[UIFont fontWithName:@"Georgia" size:16.0f]];
+        [_contentBodyLabel setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [_contentBodyLabel setFont:[UIFont fontWithName:kContentFontName size:kContentFontSize]];
         [_contentBodyLabel setLineSpacing:kContentLineSpacing];
         [_contentBodyLabel setLineBreakMode:NSLineBreakByWordWrapping];
         [_contentBodyLabel setTextAlignment:NSTextAlignmentLeft];
+        
+        // add to superview
+        [self addSubview:_contentBodyLabel];
     }
     return _contentBodyLabel;
 }
@@ -202,31 +230,31 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 -(UIButton*)authorProfileButton
 {
     if (_authorProfileButton == nil) {
-        // initialize
         CGSize buttonSize = CGSizeMake(kRemoteButtonWidth, kRemoteButtonHeight);
         CGRect frame;
         frame.size = buttonSize;
         frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - buttonSize.width,
                                    kPaddingTop);
+        // initialize
         _authorProfileButton = [[UIButton alloc] initWithFrame:frame];
+        
+        // configure
         [_authorProfileButton addTarget:self
                                  action:@selector(didSelectProfile:)
                        forControlEvents:UIControlEventTouchUpInside];
-        [_authorProfileButton setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin
-                                                   | UIViewAutoresizingFlexibleBottomMargin)];
+        [_authorProfileButton
+         setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin)];
+
+        // add to superview
         [self addSubview:_authorProfileButton];
-        
-        // configure
     }
     return _authorProfileButton;
 }
 
 -(UIImageView*)avatarView
 {
-    static const CGFloat kAvatarCornerRadius = 4.f;
-    
     if (_avatarView == nil) {
-        // initialize
+
         CGSize avatarViewSize;
         if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)]
             && ([UIScreen mainScreen].scale == 2.f))
@@ -243,14 +271,18 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         frame.origin = CGPointMake(kPaddingLeft, kPaddingTop);
         frame.size = avatarViewSize;
         
+        // initialize
         _avatarView = [[UIImageView alloc] initWithFrame:frame];
-        [_avatarView setAutoresizingMask:(UIViewAutoresizingFlexibleRightMargin
-                                          | UIViewAutoresizingFlexibleBottomMargin)];
-        [self addSubview:_avatarView];
         
         // configure
+        [_avatarView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin)];
+
         _avatarView.layer.cornerRadius = kAvatarCornerRadius;
         _avatarView.layer.masksToBounds = YES;
+        
+        // add to superview
+        [self addSubview:_avatarView];
     }
     return _avatarView;
 }
@@ -258,20 +290,23 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 -(UILabel*)dateLabel
 {
     if (_dateLabel == nil) {
-        // initialize
+
         CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPaddingLeft - kPaddingRight) / 2.f),
                                       kDetailRowHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(kPaddingLeft,
                                    0.f);  // size.y will be changed in layoutSubviews
+        // initialize
         _dateLabel = [[UILabel alloc] initWithFrame:frame];
-        [_dateLabel setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
-        [self addSubview:_dateLabel];
         
         // configure
+        [_dateLabel setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin];
         [_dateLabel setFont:[UIFont systemFontOfSize:13.f]];
         [_dateLabel setTextColor:[UIColor lightGrayColor]];
+        
+        // add to superview
+        [self addSubview:_dateLabel];
     }
     return _dateLabel;
 }
@@ -279,24 +314,27 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (LFSBasicHTMLLabel*)remoteUrlLabel
 {
     if (_remoteUrlLabel == nil) {
-        // initialize
         CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPaddingLeft - kPaddingRight) / 2.f), kDetailRowHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - labelSize.width,
                                    0.f); // size.y will be changed in layoutSubviews
         
+        // initialize
         _remoteUrlLabel = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
-        [_remoteUrlLabel setAutoresizingMask:(UIViewAutoresizingFlexibleWidth
-                                              | UIViewAutoresizingFlexibleLeftMargin)];
-        [self addSubview:_remoteUrlLabel];
         
         // configure
+        [_remoteUrlLabel
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin)];
+
         [_remoteUrlLabel setCenterVertically:YES]; // necessary for iOS6
         [_remoteUrlLabel setFont:[UIFont systemFontOfSize:13.f]];
         [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
         [_remoteUrlLabel setLineBreakMode:NSLineBreakByWordWrapping];
         [_remoteUrlLabel setTextAlignment:NSTextAlignmentRight];
+        
+        // add to superview
+        [self addSubview:_remoteUrlLabel];
     }
     return _remoteUrlLabel;
 }
@@ -304,23 +342,24 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (UILabel*)authorAttributeLabel
 {
     if (_authorAttributeLabel == nil) {
-        // initialize
-        CGFloat leftColumnWidth = kPaddingLeft + kHeaderHeight + kAvatarMarginRight;
+        CGFloat leftColumnWidth = kPaddingLeft + kAvatarViewSize.width + kAvatarMarginRight;
         CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kAuthorAttributeHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
                                    kPaddingTop); // size.y will be changed in layoutSubviews
-        
+        // initialize
         _authorAttributeLabel = [[UILabel alloc] initWithFrame:frame];
-        _authorAttributeLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
-                                                  | UIViewAutoresizingFlexibleBottomMargin);
-        [self addSubview:_authorAttributeLabel];
         
         // configure
-        [_authorAttributeLabel setFont:[UIFont systemFontOfSize:11.f]];
+        [_authorAttributeLabel
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_authorAttributeLabel setFont:[UIFont systemFontOfSize:kAuthorAttributeFontSize]];
         [_authorAttributeLabel setTextColor:[UIColor blueColor]];
+        
+        // add to superview
+        [self addSubview:_authorAttributeLabel];
     }
     return _authorAttributeLabel;
 }
@@ -328,22 +367,23 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (UILabel*)authorNameLabel
 {
     if (_authorNameLabel == nil) {
-        // initialize
-        CGFloat leftColumnWidth = kPaddingLeft + kHeaderHeight + kAvatarMarginRight;
+        CGFloat leftColumnWidth = kPaddingLeft + kAvatarViewSize.width + kAvatarMarginRight;
         CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kAuthorNameHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
                                    kPaddingTop); // size.y will be changed in layoutSubviews
-        
+        // initialize
         _authorNameLabel = [[UILabel alloc] initWithFrame:frame];
-        _authorNameLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
-                                         | UIViewAutoresizingFlexibleBottomMargin);
-        [self addSubview:_authorNameLabel];
         
         // configure
-        [_authorNameLabel setFont:[UIFont boldSystemFontOfSize:15.f]];
+        [_authorNameLabel
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_authorNameLabel setFont:[UIFont boldSystemFontOfSize:kAuthorNameFontSize]];
+        
+        // add to superview
+        [self addSubview:_authorNameLabel];
     }
     return _authorNameLabel;
 }
@@ -351,23 +391,24 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (UILabel*)authorDetailLabel
 {
     if (_authorDetailLabel == nil) {
-        // initialize
-        CGFloat leftColumnWidth = kPaddingLeft + kHeaderHeight + kAvatarMarginRight;
+        CGFloat leftColumnWidth = kPaddingLeft + kAvatarViewSize.width + kAvatarMarginRight;
         CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kAuthorDetailHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
                                    kPaddingTop); // size.y will be changed in layoutSubviews
-        
+        // initialize
         _authorDetailLabel = [[UILabel alloc] initWithFrame:frame];
-        _authorDetailLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth
-                                         | UIViewAutoresizingFlexibleBottomMargin);
-        [self addSubview:_authorDetailLabel];
         
         // configure
-        [_authorDetailLabel setFont:[UIFont systemFontOfSize:12.f]];
+        [_authorDetailLabel
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_authorDetailLabel setFont:[UIFont systemFontOfSize:kAuthorDetailFontSize]];
         [_authorDetailLabel setTextColor:[UIColor grayColor]];
+        
+        // add to superview
+        [self addSubview:_authorDetailLabel];
     }
     return _authorDetailLabel;
 }
@@ -375,10 +416,14 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 -(LFSContentToolbar*)contentToolbar
 {
     if (_contentToolbar == nil) {
-        // initialize
+
         CGRect frame = CGRectZero;
         frame.size = CGSizeMake(self.bounds.size.width, kToolbarHeight);
+        
+        // initialize
         _contentToolbar = [[LFSContentToolbar alloc] initWithFrame:frame];
+        
+        // configure
         [_contentToolbar setItems:
          @[
            [[UIBarButtonItem alloc]
@@ -400,10 +445,10 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
             target:self action:nil]
            ]
          ];
-        _contentToolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [self addSubview:_contentToolbar];
+        [_contentToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         
-        // configure
+        // add to superview
+        [self addSubview:_contentToolbar];
     }
     return _contentToolbar;
 }
@@ -454,7 +499,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     {
         // display one string
         [self.authorNameLabel setText:authorDisplayName];
-        [self.authorNameLabel setTextVerticalAlignmentCenter];
+        [self.authorNameLabel resizeVerticalCenterRightTrim];
     }
     else if (authorDisplayName && authorDetail && !authorAttribute)
     {
@@ -463,7 +508,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect authorLabelFrame = self.authorNameLabel.frame;
         CGRect authorDetailLabelFrame = self.authorDetailLabel.frame;
         
-        CGFloat separator = floorf((kHeaderHeight
+        CGFloat separator = floorf((kAvatarViewSize.height
                              - authorLabelFrame.size.height
                              - authorDetailLabelFrame.size.height) / 3.f);
         
@@ -475,11 +520,11 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         
         [self.authorNameLabel setFrame:authorLabelFrame];
         [self.authorNameLabel setText:authorDisplayName];
-        [self.authorNameLabel setTextVerticalAlignmentCenter];
+        [self.authorNameLabel resizeVerticalCenterRightTrim];
         
         [self.authorDetailLabel setFrame:authorDetailLabelFrame];
         [self.authorDetailLabel setText:authorDetail];
-        [self.authorDetailLabel setTextVerticalAlignmentCenter];
+        [self.authorDetailLabel resizeVerticalCenterRightTrim];
     }
     else if (authorDisplayName && !authorDetail && authorAttribute)
     {
@@ -488,7 +533,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect authorAttributeLabelFrame = self.authorAttributeLabel.frame;
         CGRect authorLabelFrame = self.authorNameLabel.frame;
         
-        CGFloat separator = floorf((kHeaderHeight
+        CGFloat separator = floorf((kAvatarViewSize.height
                                     - authorLabelFrame.size.height
                                     - authorAttributeLabelFrame.size.height) / 3.f);
         
@@ -501,11 +546,11 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         
         [self.authorAttributeLabel setFrame:authorAttributeLabelFrame];
         [self.authorAttributeLabel setText:authorAttribute];
-        [self.authorAttributeLabel setTextVerticalAlignmentCenter];
+        [self.authorAttributeLabel resizeVerticalCenterRightTrim];
         
         [self.authorNameLabel setFrame:authorLabelFrame];
         [self.authorNameLabel setText:authorDisplayName];
-        [self.authorNameLabel setTextVerticalAlignmentCenter];
+        [self.authorNameLabel resizeVerticalCenterRightTrim];
     }
     else if (authorDisplayName && authorDetail && authorAttribute)
     {
@@ -515,7 +560,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect authorLabelFrame = self.authorNameLabel.frame;
         CGRect authorDetailLabelFrame = self.authorDetailLabel.frame;
         
-        CGFloat separator = floorf((kHeaderHeight
+        CGFloat separator = floorf((kAvatarViewSize.height
                                     - authorLabelFrame.size.height
                                     - authorAttributeLabelFrame.size.height
                                     - authorDetailLabelFrame.size.height) / 4.f);
@@ -536,15 +581,15 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         
         [self.authorAttributeLabel setFrame:authorAttributeLabelFrame];
         [self.authorAttributeLabel setText:authorAttribute];
-        [self.authorAttributeLabel setTextVerticalAlignmentCenter];
+        [self.authorAttributeLabel resizeVerticalCenterRightTrim];
         
         [self.authorNameLabel setFrame:authorLabelFrame];
         [self.authorNameLabel setText:authorDisplayName];
-        [self.authorNameLabel setTextVerticalAlignmentCenter];
+        [self.authorNameLabel resizeVerticalCenterRightTrim];
         
         [self.authorDetailLabel setFrame:authorDetailLabelFrame];
         [self.authorDetailLabel setText:authorDetail];
-        [self.authorDetailLabel setTextVerticalAlignmentCenter];
+        [self.authorDetailLabel resizeVerticalCenterRightTrim];
     }
     else {
         // no author label
@@ -578,7 +623,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                                 + kMinorVerticalSeparator
                                 
                                 + kMajorVerticalSeparator
-                                + kHeaderHeight
+                                + kAvatarViewSize.height
                                 + kPaddingTop);
     CGSize contentSize = [self contentSizeThatFits:
                           CGSizeMake(size.width - totalWidthInset,

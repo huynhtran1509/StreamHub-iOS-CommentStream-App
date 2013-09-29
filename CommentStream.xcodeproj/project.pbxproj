@@ -25,7 +25,7 @@
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
 		EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
-		EFA21E5F17F65BF7003589EB /* UILabel+VerticalAlign.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA21E5E17F65BF7003589EB /* UILabel+VerticalAlign.m */; };
+		EFA21E5F17F65BF7003589EB /* UILabel+Trim.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA21E5E17F65BF7003589EB /* UILabel+Trim.m */; };
 		EFACF83717F4EC19003B3FF6 /* LFSDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */; };
 		EFB27A9C17EE3FFA008AD723 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB27A9B17EE3FFA008AD723 /* QuartzCore.framework */; };
 		EFC4F61317DFC35C00E60F6F /* LFSRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC4F61217DFC35C00E60F6F /* LFSRootViewController.m */; };
@@ -68,8 +68,8 @@
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		EFA21E5D17F65BF7003589EB /* UILabel+VerticalAlign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UILabel+VerticalAlign.h"; path = "Classes/UILabel+VerticalAlign.h"; sourceTree = "<group>"; };
-		EFA21E5E17F65BF7003589EB /* UILabel+VerticalAlign.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UILabel+VerticalAlign.m"; path = "Classes/UILabel+VerticalAlign.m"; sourceTree = "<group>"; };
+		EFA21E5D17F65BF7003589EB /* UILabel+Trim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UILabel+Trim.h"; path = "Classes/UILabel+Trim.h"; sourceTree = "<group>"; };
+		EFA21E5E17F65BF7003589EB /* UILabel+Trim.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UILabel+Trim.m"; path = "Classes/UILabel+Trim.m"; sourceTree = "<group>"; };
 		EFACF83517F4EC19003B3FF6 /* LFSDetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDetailView.h; path = Classes/LFSDetailView.h; sourceTree = "<group>"; };
 		EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSDetailView.m; path = Classes/LFSDetailView.m; sourceTree = "<group>"; };
 		EFB27A9B17EE3FFA008AD723 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -211,8 +211,8 @@
 		EFCB940D17F1421100FB9384 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				EFA21E5D17F65BF7003589EB /* UILabel+VerticalAlign.h */,
-				EFA21E5E17F65BF7003589EB /* UILabel+VerticalAlign.m */,
+				EFA21E5D17F65BF7003589EB /* UILabel+Trim.h */,
+				EFA21E5E17F65BF7003589EB /* UILabel+Trim.m */,
 				EFCB9F8A17EBED3B00797BCE /* LFSBasicHTMLParser.h */,
 				EFCB9F8B17EBED3B00797BCE /* LFSBasicHTMLParser.m */,
 				EFD5BFD417EC604500C28880 /* LFSBasicHTMLLabel.h */,
@@ -342,7 +342,7 @@
 				EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */,
 				EFCB9F8C17EBED3B00797BCE /* LFSBasicHTMLParser.m in Sources */,
 				EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */,
-				EFA21E5F17F65BF7003589EB /* UILabel+VerticalAlign.m in Sources */,
+				EFA21E5F17F65BF7003589EB /* UILabel+Trim.m in Sources */,
 				EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */,
 				EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */,
 				EF2251E717F21CF4006482BD /* LFSContentCollection.m in Sources */,
