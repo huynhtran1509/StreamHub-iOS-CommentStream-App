@@ -13,16 +13,12 @@
 #import "UILabel+Trim.h"
 
 // TODO: turn some of these consts into properties for easier customization
-//static const CGFloat kLeftColumnWidth = 50.f;
-
 static const UIEdgeInsets kPadding = {
     .top=7.f, .left=15.f, .bottom=18.f, .right=12.f
 };
 
 static const CGFloat kContentPaddingRight = 7.f;
 static const CGFloat kContentLineSpacing = 6.5f;
-
-static const CGFloat kHeaderAcessoryRightHeight = 21.f;
 
 // title font settings
 static const CGFloat kHeaderSubtitleFontSize = 11.f; // not used yet
@@ -33,11 +29,16 @@ static const CGFloat kImageCornerRadius = 4.f;
 static const CGFloat kImageMarginRight = 8.0f;
 
 static const CGFloat kMinorVerticalSeparator = 5.0f;
+
+// {{{ not really relevant
+static const CGFloat kHeaderAcessoryRightHeight = 21.f;
+
 static const CGFloat kMajorVerticalSeparator = 7.0f;
 
 static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 static const CGFloat kHeaderTitleHeight = 18.0f;
 static const CGFloat kHeaderSubtitleHeight = 10.0f;
+// }}}
 
 @interface LFSAttributedTextCell ()
 // store hash to avoid relayout of same HTML
@@ -326,22 +327,22 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         _requiredBodyHeight = CGFLOAT_MAX;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
-
+        
         if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
         {
             // iOS7-like selected background color
             [self setSelectionStyle:UITableViewCellSelectionStyleGray];
             UIView *selectionColor = [[UIView alloc] init];
-            selectionColor.backgroundColor = [UIColor colorWithRed:(217.f/255.f)
-                                                             green:(217.f/255.f)
-                                                              blue:(217.f/255.f)
-                                                             alpha:1.f];
-            self.selectedBackgroundView = selectionColor;
+            [selectionColor setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
+                                                               green:(217.f/255.f)
+                                                                blue:(217.f/255.f)
+                                                               alpha:1.f]];
+            [self setSelectedBackgroundView:selectionColor];
         }
         
         [self.imageView setContentMode:UIViewContentModeScaleToFill];
-        self.imageView.layer.cornerRadius = kImageCornerRadius;
-        self.imageView.layer.masksToBounds = YES;
+        [self.imageView.layer setCornerRadius:kImageCornerRadius];
+        [self.imageView.layer setMasksToBounds:YES];
     }
     return self;
 }
@@ -473,11 +474,11 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
 -(void)layoutBodyWithBounds:(CGRect)rect
 {
-    // layout content view
-    CGRect textContentFrame = self.bodyView.frame;
-    
     // layoutSubviews is always called after requiredRowHeightWithFrameWidth:
     // so we take advantage of that by reusing _requiredBodyHeight
+    CGRect textContentFrame;
+    textContentFrame.origin = CGPointMake(kPadding.left,
+                                          kPadding.top + kImageViewSize.height + kMinorVerticalSeparator);
     textContentFrame.size = CGSizeMake(rect.size.width - kPadding.left - kContentPaddingRight,
                                        self.requiredBodyHeight);
     [self.bodyView setFrame:textContentFrame];
