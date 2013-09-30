@@ -12,9 +12,9 @@
 
 @interface LFSAttributedTextCell : UITableViewCell
 
-@property (nonatomic, readonly) UILabel *contentTitleView;
-@property (nonatomic, readonly) UILabel *contentAccessoryRightView;
-@property (nonatomic, strong) UIImage *contentImage;
+@property (nonatomic, readonly) UILabel *headerTitleView;
+@property (nonatomic, readonly) UILabel *headerAccessoryRightView;
+@property (nonatomic, strong) UIImage *headerImage;
 @property (nonatomic, strong) LFSBasicHTMLLabel *contentBodyView;
 
 #pragma mark - basics

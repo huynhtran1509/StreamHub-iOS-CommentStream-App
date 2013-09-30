@@ -16,7 +16,7 @@
 @interface LFSDetailView : UIView
 
 @property (weak, nonatomic) id<LFSDetailViewDelegate>delegate;
-@property (assign, nonatomic) BOOL contentLikedByUser;
+@property (assign, nonatomic) BOOL isLikedByUser;
 
 @property (strong, nonatomic) LFSHeader* profileLocal;
 @property (strong, nonatomic) LFSTriple* profileRemote;

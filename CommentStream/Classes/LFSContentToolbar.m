@@ -20,19 +20,19 @@
     CGSize size = rect.size;
     
     // top 1px line
-    UIBezierPath *horLineTop = [[UIBezierPath alloc] init];
-    [horLineTop moveToPoint:origin];
-    [horLineTop addLineToPoint:CGPointMake(origin.x + size.width, origin.y)];
-    horLineTop.lineWidth = 1.f;
-    [horLineTop stroke];
+    UIBezierPath *lineTop = [[UIBezierPath alloc] init];
+    [lineTop moveToPoint:origin];
+    [lineTop addLineToPoint:CGPointMake(origin.x + size.width, origin.y)];
+    lineTop.lineWidth = 1.f;
+    [lineTop stroke];
     
     // bottom 1px line
-    UIBezierPath *horLineBottom = [[UIBezierPath alloc] init];
-    [horLineBottom moveToPoint:CGPointMake(origin.x, origin.y + size.height)];
-    [horLineBottom addLineToPoint:CGPointMake(origin.x + size.width,
-                                              origin.y + size.height)];
-    horLineBottom.lineWidth = 1.f;
-    [horLineBottom stroke];
+    UIBezierPath *lineBottom = [[UIBezierPath alloc] init];
+    [lineBottom moveToPoint:CGPointMake(origin.x, origin.y + size.height)];
+    [lineBottom addLineToPoint:CGPointMake(origin.x + size.width,
+                                           origin.y + size.height)];
+    lineBottom.lineWidth = 1.f;
+    [lineBottom stroke];
 }
 
 #pragma mark - Private methods

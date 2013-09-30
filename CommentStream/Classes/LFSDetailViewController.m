@@ -68,7 +68,7 @@
     _contentLikedByUser = contentLikedByUser;
     
     // mirror state to the detail view
-    [self.detailView setContentLikedByUser:_contentLikedByUser];
+    [self.detailView setIsLikedByUser:_contentLikedByUser];
 }
 
 #pragma mark - Lifecycle
