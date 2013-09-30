@@ -21,22 +21,13 @@ static const CGFloat kPaddingBottom = 18.f;
 static const CGFloat kPaddingLeft = 15.f;
 
 static const CGFloat kContentPaddingRight = 7.f;
-
-// content font settings
-static NSString* const kContentFontName = @"Georgia";
-static const CGFloat kContentFontSize = 13.f;
 static const CGFloat kContentLineSpacing = 6.5f;
 
-// note (date) font settings
-static const CGFloat kNoteFontSize = 11.f;
+static const CGFloat kHeaderAcessoryRightWidth = 68.f;
 
 // title font settings
-static const CGFloat kHeaderTitleFontSize = 12.f;
 static const CGFloat kHeaderSubtitleFontSize = 11.f; // not used yet
 static const CGFloat kHeaderAttributeTopFontSize = 10.f; // not used yet
-
-// TODO: use autoscaling for noteView label
-static const CGFloat kNoteViewWidth = 68.f;
 
 static const CGSize  kImageViewSize = { .width=25.f, .height=25.f };
 static const CGFloat kImageCornerRadius = 4.f;
@@ -54,16 +45,33 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 @property (nonatomic, assign) NSUInteger htmlHash;
 @end
 
-@implementation LFSAttributedTextCell
+static UIColor *_cheaderTitleColor;
+
+@implementation LFSAttributedTextCell {
+    BOOL _isInitializing;
+}
+
 
 #pragma mark - Properties
 @synthesize contentBodyView = _contentBodyView;
 @synthesize headerImage = _headerImage;
-
 @synthesize headerAccessoryRightView = _headerAccessoryRightView;
 @synthesize headerTitleView = _headerTitleView;
 
 @synthesize htmlHash = _htmlHash;
+
+@synthesize headerTitleFont = _headerTitleFont;
+@synthesize headerTitleColor = _headerTitleColor;
+@synthesize contentBodyFont = _contentBodyFont;
+@synthesize contentBodyColor = _contentBodyColor;
+@synthesize headerAccessoryRightFont = _headerAccessoryRightFont;
+@synthesize headerAccessoryRightColor = _headerAccessoryRightColor;
+
+// UIAppearance properties
+@synthesize backgroundCellColor;
+-(void)setBackgroundCellColor:(UIColor *)backgroundColor {
+    [super setBackgroundColor:backgroundColor];
+}
 
 - (void)setHTMLString:(NSString *)html
 {
@@ -118,25 +126,6 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     });
 }
 
-#pragma mark - Class methods
-
-static UIFont *titleFont = nil;
-static UIFont *bodyFont = nil;
-static UIFont *dateFont = nil;
-static UIColor *dateColor = nil;
-
-+ (void)initialize {
-    if(self == [LFSAttributedTextCell class]) {
-        titleFont = [UIFont boldSystemFontOfSize:kHeaderTitleFontSize];
-        bodyFont = [UIFont fontWithName:kContentFontName
-                                   size:kContentFontSize];
-        dateFont = [UIFont systemFontOfSize:kNoteFontSize];
-        dateColor = [UIColor lightGrayColor];
-    }
-}
-
-#pragma mark - Properties
-
 -(LFSBasicHTMLLabel*)contentBodyView
 {
 	if (_contentBodyView == nil) {
@@ -150,8 +139,9 @@ static UIColor *dateColor = nil;
 		_contentBodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
-        [_contentBodyView setFont:bodyFont];
+        [_contentBodyView setFont:_contentBodyFont];
         [_contentBodyView setLineSpacing:kContentLineSpacing];
+        [_contentBodyView setBackgroundColor:[UIColor clearColor]]; // for iOS6
         
         // add to superview
 		[self.contentView addSubview:_contentBodyView];
@@ -163,7 +153,7 @@ static UIColor *dateColor = nil;
 {
 	if (_headerTitleView == nil) {
         CGFloat leftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kNoteViewWidth + kPaddingRight;
+        CGFloat rightColumnWidth = kHeaderAcessoryRightWidth + kPaddingRight;
         
         CGRect frame;
         frame.size = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderTitleHeight);
@@ -173,7 +163,9 @@ static UIColor *dateColor = nil;
 		_headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerTitleView setFont:titleFont];
+        [_headerTitleView setFont:_headerTitleFont];
+        [_headerTitleView setTextColor:_cheaderTitleColor];
+        [_headerTitleView setBackgroundColor:[UIColor clearColor]]; // for iOS6
         
         // add to superview
 		[self.contentView addSubview:_headerTitleView];
@@ -185,8 +177,8 @@ static UIColor *dateColor = nil;
 {
 	if (_headerAccessoryRightView == nil) {
 		_headerAccessoryRightView = [[UILabel alloc] init];
-        [_headerAccessoryRightView setFont:dateFont];
-        [_headerAccessoryRightView setTextColor:dateColor];
+        [_headerAccessoryRightView setFont:_headerAccessoryRightFont];
+        [_headerAccessoryRightView setTextColor:_headerAccessoryRightColor];
         [_headerAccessoryRightView setTextAlignment:NSTextAlignmentRight];
 		[self.contentView addSubview:_headerAccessoryRightView];
 	}
@@ -196,11 +188,24 @@ static UIColor *dateColor = nil;
 #pragma mark - Lifecycle
 -(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
 {
+    _isInitializing = YES;
     self = [super initWithStyle:UITableViewCellStyleDefault
                 reuseIdentifier:reuseIdentifier];
     if (self)
     {
+        // fonts amnd colors
+        _headerTitleFont = [UIFont boldSystemFontOfSize:12.f];
+        _headerTitleColor = [UIColor blackColor];
+        _contentBodyFont = [UIFont fontWithName:@"Georgia"
+                                           size:13.f];
+        _contentBodyColor = [UIColor blackColor];
+        _headerAccessoryRightFont = [UIFont systemFontOfSize:11.f];
+        _headerAccessoryRightColor = [UIColor lightGrayColor];
+        
+        // initialize subview references
+        _contentBodyView = nil;
         _headerAccessoryRightView = nil;
+        _headerImage = nil;
         _headerTitleView = nil;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
@@ -220,6 +225,7 @@ static UIColor *dateColor = nil;
         self.imageView.layer.cornerRadius = kImageCornerRadius;
         self.imageView.layer.masksToBounds = YES;
     }
+    _isInitializing = NO;
     return self;
 }
 
@@ -250,7 +256,7 @@ static UIColor *dateColor = nil;
     [self.contentBodyView setFrame:textContentFrame];
     
     const CGFloat kLeftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-    const CGFloat kRightColumnWidth = kNoteViewWidth + kPaddingRight;
+    const CGFloat kRightColumnWidth = kHeaderAcessoryRightWidth + kPaddingRight;
     
     // layout title view
     CGRect titleFrame = self.headerTitleView.frame;
@@ -258,9 +264,9 @@ static UIColor *dateColor = nil;
     [self.headerTitleView setFrame:titleFrame];
     
     // layout note view
-    CGRect noteFrame = self.headerAccessoryRightView.frame;
-    noteFrame.origin.x = width - kRightColumnWidth;
-    [self.headerAccessoryRightView setFrame:noteFrame];
+    CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
+    accessoryRightFrame.origin.x = width - kRightColumnWidth;
+    [self.headerAccessoryRightView setFrame:accessoryRightFrame];
     
     // layout avatar
     CGRect imageViewFrame;
