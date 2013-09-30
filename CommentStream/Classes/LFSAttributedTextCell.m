@@ -24,6 +24,7 @@ static const CGFloat kContentPaddingRight = 7.f;
 static const CGFloat kContentLineSpacing = 6.5f;
 
 static const CGFloat kHeaderAcessoryRightWidth = 68.f;
+static const CGFloat kHeaderAcessoryRightHeight = 21.f;
 
 // title font settings
 static const CGFloat kHeaderSubtitleFontSize = 11.f; // not used yet
@@ -45,48 +46,79 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 @property (nonatomic, assign) NSUInteger htmlHash;
 @end
 
-static UIColor *_cheaderTitleColor;
-
 @implementation LFSAttributedTextCell {
     BOOL _isInitializing;
 }
 
-
-#pragma mark - Properties
-@synthesize contentBodyView = _contentBodyView;
-@synthesize headerImage = _headerImage;
-@synthesize headerAccessoryRightView = _headerAccessoryRightView;
-@synthesize headerTitleView = _headerTitleView;
-
-@synthesize htmlHash = _htmlHash;
-
-@synthesize headerTitleFont = _headerTitleFont;
-@synthesize headerTitleColor = _headerTitleColor;
-@synthesize contentBodyFont = _contentBodyFont;
-@synthesize contentBodyColor = _contentBodyColor;
-@synthesize headerAccessoryRightFont = _headerAccessoryRightFont;
-@synthesize headerAccessoryRightColor = _headerAccessoryRightColor;
-
-// UIAppearance properties
+#pragma mark - UIAppearance properties
 @synthesize backgroundCellColor;
+-(UIColor*)backgroundCellColor
+{
+    return self.backgroundColor;
+}
 -(void)setBackgroundCellColor:(UIColor *)backgroundColor {
     [super setBackgroundColor:backgroundColor];
 }
 
-- (void)setHTMLString:(NSString *)html
-{
-	// store hash isntead of HTML source
-	NSUInteger newHash = [html hash];
-
-	if (newHash == _htmlHash) {
-		return;
-	}
-	
-	_htmlHash = newHash;
-	[self.contentBodyView setHTMLString:html];
-	[self setNeedsLayout];
+#pragma mark -
+@synthesize headerTitleFont = _headerTitleFont;
+-(UIFont*)headerTitleFont {
+    return self.headerTitleView.font;
+}
+-(void)setHeaderTitleFont:(UIFont *)headerTitleFont {
+    self.headerTitleView.font = headerTitleFont;
 }
 
+#pragma mark -
+@synthesize headerTitleColor = _headerTitleColor;
+-(UIColor*)headerTitleColor {
+    return self.headerTitleView.textColor;
+}
+-(void)setHeaderTitleColor:(UIColor *)headerTitlecolor {
+    self.headerTitleView.textColor = headerTitlecolor;
+}
+
+#pragma mark -
+@synthesize contentBodyFont = _contentBodyFont;
+-(UIFont*)contentBodyFont {
+    return self.contentBodyView.font;
+}
+-(void)setContentBodyFont:(UIFont *)contentBodyFont {
+    self.contentBodyView.font = contentBodyFont;
+}
+
+#pragma mark -
+@synthesize contentBodyColor = _contentBodyColor;
+-(UIColor*)contentBodyColor {
+    return self.contentBodyView.textColor;
+}
+-(void)setContentBodyColor:(UIColor *)contentBodyColor {
+    self.contentBodyView.textColor = contentBodyColor;
+}
+
+#pragma mark -
+@synthesize headerAccessoryRightFont = _headerAccessoryRightFont;
+-(UIFont*)headerAccessoryRightFont {
+    return self.headerAccessoryRightView.font;
+}
+-(void)setHeaderAccessoryRightFont:(UIFont *)headerAccessoryRightFont {
+    self.headerAccessoryRightView.font = headerAccessoryRightFont;
+}
+
+#pragma mark -
+@synthesize headerAccessoryRightColor = _headerAccessoryRightColor;
+-(UIColor*)headerAccessoryRightColor {
+    return self.headerAccessoryRightView.textColor;
+}
+-(void)setHeaderAccessoryRightColor:(UIColor *)headerAccessoryRightColor {
+    self.headerAccessoryRightView.textColor = headerAccessoryRightColor;
+}
+
+#pragma mark - Other properties
+@synthesize htmlHash = _htmlHash;
+
+#pragma mark -
+@synthesize headerImage = _headerImage;
 - (void)setHeaderImage:(UIImage*)image
 {
     // store original-size image
@@ -126,6 +158,8 @@ static UIColor *_cheaderTitleColor;
     });
 }
 
+#pragma mark -
+@synthesize contentBodyView = _contentBodyView;
 -(LFSBasicHTMLLabel*)contentBodyView
 {
 	if (_contentBodyView == nil) {
@@ -139,9 +173,10 @@ static UIColor *_cheaderTitleColor;
 		_contentBodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
-        [_contentBodyView setFont:_contentBodyFont];
-        [_contentBodyView setLineSpacing:kContentLineSpacing];
+        [_contentBodyView setFont:[UIFont fontWithName:@"Georgia" size:13.f]];
+        [_contentBodyView setTextColor:[UIColor blackColor]];
         [_contentBodyView setBackgroundColor:[UIColor clearColor]]; // for iOS6
+        [_contentBodyView setLineSpacing:kContentLineSpacing];
         
         // add to superview
 		[self.contentView addSubview:_contentBodyView];
@@ -149,6 +184,8 @@ static UIColor *_cheaderTitleColor;
 	return _contentBodyView;
 }
 
+#pragma mark -
+@synthesize headerTitleView = _headerTitleView;
 - (UILabel *)headerTitleView
 {
 	if (_headerTitleView == nil) {
@@ -163,8 +200,8 @@ static UIColor *_cheaderTitleColor;
 		_headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerTitleView setFont:_headerTitleFont];
-        [_headerTitleView setTextColor:_cheaderTitleColor];
+        [_headerTitleView setFont:[UIFont boldSystemFontOfSize:12.f]];
+        [_headerTitleView setTextColor:[UIColor blackColor]];
         [_headerTitleView setBackgroundColor:[UIColor clearColor]]; // for iOS6
         
         // add to superview
@@ -173,13 +210,24 @@ static UIColor *_cheaderTitleColor;
 	return _headerTitleView;
 }
 
+#pragma mark -
+@synthesize headerAccessoryRightView = _headerAccessoryRightView;
 - (UILabel *)headerAccessoryRightView
 {
 	if (_headerAccessoryRightView == nil) {
-		_headerAccessoryRightView = [[UILabel alloc] init];
-        [_headerAccessoryRightView setFont:_headerAccessoryRightFont];
-        [_headerAccessoryRightView setTextColor:_headerAccessoryRightColor];
+        CGRect frame;
+        frame.size = CGSizeMake(kHeaderAcessoryRightWidth, kHeaderAcessoryRightHeight);
+        frame.origin = CGPointMake(self.bounds.size.width - kHeaderAcessoryRightWidth - kPaddingRight, kPaddingTop);
+        
+        // initialize
+		_headerAccessoryRightView = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
+        [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:11.f]];
+        [_headerAccessoryRightView setTextColor:[UIColor lightGrayColor]];
         [_headerAccessoryRightView setTextAlignment:NSTextAlignmentRight];
+        
+        // add to superview
 		[self.contentView addSubview:_headerAccessoryRightView];
 	}
 	return _headerAccessoryRightView;
@@ -193,15 +241,6 @@ static UIColor *_cheaderTitleColor;
                 reuseIdentifier:reuseIdentifier];
     if (self)
     {
-        // fonts amnd colors
-        _headerTitleFont = [UIFont boldSystemFontOfSize:12.f];
-        _headerTitleColor = [UIColor blackColor];
-        _contentBodyFont = [UIFont fontWithName:@"Georgia"
-                                           size:13.f];
-        _contentBodyColor = [UIColor blackColor];
-        _headerAccessoryRightFont = [UIFont systemFontOfSize:11.f];
-        _headerAccessoryRightColor = [UIColor lightGrayColor];
-        
         // initialize subview references
         _contentBodyView = nil;
         _headerAccessoryRightView = nil;
@@ -209,8 +248,7 @@ static UIColor *_cheaderTitleColor;
         _headerTitleView = nil;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
-        [self.imageView setContentMode:UIViewContentModeScaleToFill];
-        
+
         if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
         {
             // iOS7-like selected background color
@@ -222,6 +260,8 @@ static UIColor *_cheaderTitleColor;
                                                              alpha:1.f];
             self.selectedBackgroundView = selectionColor;
         }
+        
+        [self.imageView setContentMode:UIViewContentModeScaleToFill];
         self.imageView.layer.cornerRadius = kImageCornerRadius;
         self.imageView.layer.masksToBounds = YES;
     }
@@ -275,7 +315,22 @@ static UIColor *_cheaderTitleColor;
     self.imageView.frame = imageViewFrame;
 }
 
+
 #pragma mark - Public methods
+- (void)setHTMLString:(NSString *)html
+{
+	// store hash isntead of HTML source
+	NSUInteger newHash = [html hash];
+    
+	if (newHash == _htmlHash) {
+		return;
+	}
+	
+	_htmlHash = newHash;
+	[self.contentBodyView setHTMLString:html];
+	[self setNeedsLayout];
+}
+
 - (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width
 {
     CGSize neededSize = [self.contentBodyView

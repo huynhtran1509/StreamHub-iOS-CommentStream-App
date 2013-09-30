@@ -21,6 +21,8 @@
     [[OHAttributedLabel appearance] setLinkUnderlineStyle:kCTUnderlineStyleNone];
     
     [[LFSAttributedTextCell appearance] setBackgroundCellColor:[UIColor whiteColor]];
+
+    //[[LFSAttributedTextCell appearance] setHeaderTitleColor:[UIColor blackColor]];
     return YES;
 }
 
