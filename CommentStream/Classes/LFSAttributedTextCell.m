@@ -119,9 +119,27 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 }
 
 #pragma mark - Other properties
-@synthesize requiredBodyHeight = _requiredBodyHeight;
+
 @synthesize htmlHash = _htmlHash;
+
 @synthesize headerAccessoryRightText = _headerAccessoryRightText;
+@synthesize profileLocal = _profileLocal;
+@synthesize profileRemote = _profileRemote;
+@synthesize contentRemote = _contentRemote;
+
+#pragma mark -
+@synthesize requiredBodyHeight = _requiredBodyHeight;
+-(CGFloat)requiredBodyHeight
+{
+    if (_requiredBodyHeight == CGFLOAT_MAX) {
+        // calculate afresh
+        CGSize bodySize = CGSizeMake(self.bounds.size.width - kPadding.left - kContentPaddingRight,
+                                     CGFLOAT_MAX);
+        CGSize requiredBodySize = [self.bodyView sizeThatFits:bodySize];
+        _requiredBodyHeight = requiredBodySize.height;
+    }
+    return _requiredBodyHeight;
+}
 
 #pragma mark -
 @synthesize headerImage = _headerImage;
@@ -305,7 +323,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         _headerImage = nil;
         _headerTitleView = nil;
         
-        _requiredBodyHeight = 0.f;
+        _requiredBodyHeight = CGFLOAT_MAX;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
 
@@ -345,26 +363,14 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 		return;
 	}
     
-    [self layoutHeader];
-    
-    [self layoutBody];
+    CGRect bounds = self.bounds;
+    [self layoutHeaderWithBounds:bounds];
+    [self layoutBodyWithBounds:bounds];
 }
 
 #pragma mark - Private methods
 
--(void)layoutBody
-{
-    // layout content view
-    CGRect textContentFrame = self.bodyView.frame;
-    
-    // layoutSubviews is always called after requiredRowHeightWithFrameWidth
-    // so we take advantage of that by reusing _requiredBodyHeight
-    textContentFrame.size = CGSizeMake(self.bounds.size.width - kPadding.left - kContentPaddingRight,
-                                       _requiredBodyHeight);
-    [self.bodyView setFrame:textContentFrame];
-}
-
--(void)layoutHeader
+-(void)layoutHeaderWithBounds:(CGRect)rect
 {
     // layout header title label
     //
@@ -387,7 +393,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     if (headerTitle) {
         CGRect titleFrame = self.headerTitleView.frame;
         titleFrame.origin.x = kPadding.left + kImageViewSize.width + kImageMarginRight;
-        titleFrame.size.width = self.bounds.size.width - leftColumnWidth - kPadding.right;
+        titleFrame.size.width = rect.size.width - leftColumnWidth - kPadding.right;
         [self.headerTitleView setFrame:titleFrame];
     }
     if (headerTitle && !headerSubtitle && !headerAccessory)
@@ -401,7 +407,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         // full name + twitter handle
         [self.headerTitleView setText:headerTitle];
         [self.headerTitleView resizeVerticalTopRightTrim];
-
+        
         [self.headerSubtitleView setText:headerSubtitle];
         [self.headerSubtitleView resizeVerticalBottomRightTrim];
     }
@@ -417,7 +423,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
                                                      + headerTitleFrame.size.width
                                                      + kImageMarginRight,
                                                      headerTitleFrame.origin.y);
-        headerAttributeTopFrame.size = CGSizeMake(self.bounds.size.width
+        headerAttributeTopFrame.size = CGSizeMake(rect.size.width
                                                   - headerTitleFrame.origin.x
                                                   - headerTitleFrame.size.width,
                                                   headerTitleFrame.size.height);
@@ -425,7 +431,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
         [self.headerAttributeTopView setText:headerAccessory];
         [self.headerAttributeTopView resizeVerticalCenterRightTrim];
-
+        
     }
     else if (headerTitle && headerSubtitle && headerAccessory)
     {
@@ -443,7 +449,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
                                                      + headerTitleFrame.size.width
                                                      + kImageMarginRight,
                                                      headerTitleFrame.origin.y);
-        headerAttributeTopFrame.size = CGSizeMake(self.bounds.size.width
+        headerAttributeTopFrame.size = CGSizeMake(rect.size.width
                                                   - headerTitleFrame.origin.x
                                                   - headerTitleFrame.size.width,
                                                   headerTitleFrame.size.height);
@@ -459,10 +465,22 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     // layout note view
     CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
     accessoryRightFrame.origin.x = leftColumnWidth;
-    accessoryRightFrame.size.width = self.bounds.size.width - leftColumnWidth - kPadding.right;
+    accessoryRightFrame.size.width = rect.size.width - leftColumnWidth - kPadding.right;
     [self.headerAccessoryRightView setFrame:accessoryRightFrame];
     [self.headerAccessoryRightView setText:_headerAccessoryRightText];
     [self.headerAccessoryRightView resizeVerticalTopLeftTrim];
+}
+
+-(void)layoutBodyWithBounds:(CGRect)rect
+{
+    // layout content view
+    CGRect textContentFrame = self.bodyView.frame;
+    
+    // layoutSubviews is always called after requiredRowHeightWithFrameWidth:
+    // so we take advantage of that by reusing _requiredBodyHeight
+    textContentFrame.size = CGSizeMake(rect.size.width - kPadding.left - kContentPaddingRight,
+                                       self.requiredBodyHeight);
+    [self.bodyView setFrame:textContentFrame];
 }
 
 #pragma mark - Public methods
@@ -487,8 +505,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
                                CGSizeMake(width - kPadding.left - kContentPaddingRight,
                                           CGFLOAT_MAX)];
     
-    _requiredBodyHeight = requiredBodySize.height;
-    
+    [self setRequiredBodyHeight:requiredBodySize.height];
     return kPadding.bottom + requiredBodySize.height + kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
 }
 

@@ -14,13 +14,13 @@
 - (void)resizeVerticalCenterRightTrim
 {
     CGSize textSize = [self sizeThatFits:self.bounds.size];
-    CGRect textRect = CGRectMake(self.frame.origin.x,
-                                 self.frame.origin.y + floorf((self.bounds.size.height - textSize.height) / 2.f),
-                                 textSize.width,
-                                 textSize.height);
+    CGRect textRect;
+    textRect.origin = CGPointMake(self.frame.origin.x,
+                                  self.frame.origin.y + floorf((self.bounds.size.height - textSize.height) / 2.f)
+                                  );
+    textRect.size = textSize;
     [self setFrame:textRect];
 }
-
 
 - (void)resizeVerticalTopRightTrim
 {
