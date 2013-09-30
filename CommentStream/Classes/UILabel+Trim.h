@@ -14,4 +14,9 @@
 // size, and trim off right margin
 - (void)resizeVerticalCenterRightTrim;
 
+- (void)resizeVerticalTopRightTrim;
+
+- (void)resizeVerticalTopLeftTrim;
+
+- (void)resizeVerticalBottomRightTrim;
 @end
