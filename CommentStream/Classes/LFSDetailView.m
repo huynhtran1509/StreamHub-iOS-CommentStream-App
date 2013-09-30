@@ -40,10 +40,9 @@
 
 @end
 
-static const CGFloat kPaddingTop = 20.0f;
-static const CGFloat kPaddingRight = 20.0f;
-static const CGFloat kPaddingBottom = 27.0f;
-static const CGFloat kPaddingLeft = 20.0f;
+static const UIEdgeInsets kPadding = {
+    .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
+};
 
 static const CGFloat kContentPaddingRight = 12.0f;
 
@@ -211,9 +210,9 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 {
     if (_contentBodyView == nil) {
 
-        CGRect frame = CGRectMake(kPaddingLeft,
-                                  kPaddingTop + kImageViewSize.height + kMajorVerticalSeparator,
-                                  self.bounds.size.width - kPaddingLeft - kContentPaddingRight,
+        CGRect frame = CGRectMake(kPadding.left,
+                                  kPadding.top + kImageViewSize.height + kMajorVerticalSeparator,
+                                  self.bounds.size.width - kPadding.left - kContentPaddingRight,
                                   10.f); // this could be anything
         // initialize
         _contentBodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
@@ -237,8 +236,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGSize buttonSize = CGSizeMake(kRemoteButtonWidth, kRemoteButtonHeight);
         CGRect frame;
         frame.size = buttonSize;
-        frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - buttonSize.width,
-                                   kPaddingTop);
+        frame.origin = CGPointMake(self.bounds.size.width - kPadding.right - buttonSize.width, kPadding.top);
         // initialize
         _headerAccessoryRightView = [[UIButton alloc] initWithFrame:frame];
         
@@ -272,7 +270,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
             avatarViewSize = CGSizeMake(37.f, 37.f);
         }
         CGRect frame;
-        frame.origin = CGPointMake(kPaddingLeft, kPaddingTop);
+        frame.origin = CGPointMake(kPadding.left, kPadding.top);
         frame.size = avatarViewSize;
         
         // initialize
@@ -295,11 +293,10 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 {
     if (_footerLeftView == nil) {
 
-        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPaddingLeft - kPaddingRight) / 2.f),
-                                      kFooterHeight);
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPadding.left - kPadding.right) / 2.f), kFooterHeight);
         CGRect frame;
         frame.size = labelSize;
-        frame.origin = CGPointMake(kPaddingLeft,
+        frame.origin = CGPointMake(kPadding.left,
                                    0.f);  // size.y will be changed in layoutSubviews
         // initialize
         _footerLeftView = [[UILabel alloc] initWithFrame:frame];
@@ -318,10 +315,10 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (LFSBasicHTMLLabel*)footerRightView
 {
     if (_footerRightView == nil) {
-        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPaddingLeft - kPaddingRight) / 2.f), kFooterHeight);
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPadding.left - kPadding.right) / 2.f), kFooterHeight);
         CGRect frame;
         frame.size = labelSize;
-        frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - labelSize.width,
+        frame.origin = CGPointMake(self.bounds.size.width - kPadding.right - labelSize.width,
                                    0.f); // size.y will be changed in layoutSubviews
         
         // initialize
@@ -346,13 +343,13 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (UILabel*)headerAttributeTopView
 {
     if (_headerAttributeTopView == nil) {
-        CGFloat leftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderAttributeTopHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop); // size.y will be changed in layoutSubviews
+                                   kPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerAttributeTopView = [[UILabel alloc] initWithFrame:frame];
         
@@ -371,13 +368,13 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (UILabel*)headerTitleView
 {
     if (_headerTitleView == nil) {
-        CGFloat leftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderTitleHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop); // size.y will be changed in layoutSubviews
+                                   kPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
@@ -395,13 +392,13 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 - (UILabel*)headerSubtitleView
 {
     if (_headerSubtitleView == nil) {
-        CGFloat leftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderSubtitleHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop); // size.y will be changed in layoutSubviews
+                                   kPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerSubtitleView = [[UILabel alloc] initWithFrame:frame];
         
@@ -462,7 +459,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 {
     // layout main content label
     CGRect basicHTMLLabelFrame = self.contentBodyView.frame;
-    CGFloat contentWidth = self.bounds.size.width - kPaddingLeft - kContentPaddingRight;
+    CGFloat contentWidth = self.bounds.size.width - kPadding.left - kContentPaddingRight;
     basicHTMLLabelFrame.size = [self contentSizeThatFits:
                                 CGSizeMake(contentWidth, CGFLOAT_MAX)];
     [self.contentBodyView setFrame:basicHTMLLabelFrame];
@@ -516,8 +513,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                              - headerTitleFrame.size.height
                              - headerSubtitleFrame.size.height) / 3.f);
         
-        headerTitleFrame.origin.y = kPaddingTop + separator;
-        headerSubtitleFrame.origin.y = (kPaddingTop
+        headerTitleFrame.origin.y = kPadding.top + separator;
+        headerSubtitleFrame.origin.y = (kPadding.top
                                            + separator
                                            + headerTitleFrame.size.height
                                            + separator);
@@ -542,8 +539,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                                     - headerAttributeTopFrame.size.height) / 3.f);
         
 
-        headerAttributeTopFrame.origin.y = (kPaddingTop + separator);
-        headerTitleFrame.origin.y = (kPaddingTop
+        headerAttributeTopFrame.origin.y = (kPadding.top + separator);
+        headerTitleFrame.origin.y = (kPadding.top
                                      + separator
                                      + headerAttributeTopFrame.size.height
                                      + separator);
@@ -570,13 +567,13 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                                     - headerSubtitleFrame.size.height) / 4.f);
         
         
-        headerAttributeTopFrame.origin.y = (kPaddingTop + separator);
-        headerTitleFrame.origin.y = (kPaddingTop
+        headerAttributeTopFrame.origin.y = (kPadding.top + separator);
+        headerTitleFrame.origin.y = (kPadding.top
                                      + separator
                                      + headerAttributeTopFrame.size.height
                                      + separator);
         
-        headerSubtitleFrame.origin.y = (kPaddingTop
+        headerSubtitleFrame.origin.y = (kPadding.top
                                            + separator
                                            + headerAttributeTopFrame.size.height
                                            + separator
@@ -619,8 +616,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 
 -(CGSize)sizeThatFits:(CGSize)size
 {
-    CGFloat totalWidthInset = kPaddingLeft + kContentPaddingRight;
-    CGFloat totalHeightInset = (kPaddingBottom
+    CGFloat totalWidthInset = kPadding.left + kContentPaddingRight;
+    CGFloat totalHeightInset = (kPadding.bottom
                                 + kToolbarHeight
                                 + kMinorVerticalSeparator
                                 + kFooterHeight
@@ -628,7 +625,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                                 
                                 + kMajorVerticalSeparator
                                 + kImageViewSize.height
-                                + kPaddingTop);
+                                + kPadding.top);
     CGSize contentSize = [self contentSizeThatFits:
                           CGSizeMake(size.width - totalWidthInset,
                                      CGFLOAT_MAX)];

@@ -15,10 +15,9 @@
 // TODO: turn some of these consts into properties for easier customization
 //static const CGFloat kLeftColumnWidth = 50.f;
 
-static const CGFloat kPaddingTop = 7.f;
-static const CGFloat kPaddingRight = 12.f;
-static const CGFloat kPaddingBottom = 18.f;
-static const CGFloat kPaddingLeft = 15.f;
+static const UIEdgeInsets kPadding = {
+    .top=7.f, .left=15.f, .bottom=18.f, .right=12.f
+};
 
 static const CGFloat kContentPaddingRight = 7.f;
 static const CGFloat kContentLineSpacing = 6.5f;
@@ -46,9 +45,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 @property (nonatomic, assign) NSUInteger htmlHash;
 @end
 
-@implementation LFSAttributedTextCell {
-    BOOL _isInitializing;
-}
+@implementation LFSAttributedTextCell
 
 #pragma mark - UIAppearance properties
 @synthesize backgroundCellColor;
@@ -163,14 +160,14 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 -(LFSBasicHTMLLabel*)contentBodyView
 {
 	if (_contentBodyView == nil) {
-        const CGFloat kHeaderHeight = kPaddingTop + kImageViewSize.height + kMinorVerticalSeparator;
-        CGRect frame = CGRectMake(kPaddingLeft,
+        const CGFloat kHeaderHeight = kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
+        CGRect frame = CGRectMake(kPadding.left,
                                   kHeaderHeight,
-                                  self.bounds.size.width - kPaddingLeft - kContentPaddingRight,
+                                  self.bounds.size.width - kPadding.left - kContentPaddingRight,
                                   self.bounds.size.height - kHeaderHeight);
         
         // initialize
-		_contentBodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        _contentBodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
         [_contentBodyView setFont:[UIFont fontWithName:@"Georgia" size:13.f]];
@@ -189,15 +186,15 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 - (UILabel *)headerTitleView
 {
 	if (_headerTitleView == nil) {
-        CGFloat leftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kHeaderAcessoryRightWidth + kPaddingRight;
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat rightColumnWidth = kHeaderAcessoryRightWidth + kPadding.right;
         
         CGRect frame;
         frame.size = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderTitleHeight);
-        frame.origin = CGPointMake(leftColumnWidth, kPaddingTop);
+        frame.origin = CGPointMake(leftColumnWidth, kPadding.top);
         
         // initialize
-		_headerTitleView = [[UILabel alloc] initWithFrame:frame];
+        _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
         [_headerTitleView setFont:[UIFont boldSystemFontOfSize:12.f]];
@@ -217,10 +214,10 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 	if (_headerAccessoryRightView == nil) {
         CGRect frame;
         frame.size = CGSizeMake(kHeaderAcessoryRightWidth, kHeaderAcessoryRightHeight);
-        frame.origin = CGPointMake(self.bounds.size.width - kHeaderAcessoryRightWidth - kPaddingRight, kPaddingTop);
+        frame.origin = CGPointMake(self.bounds.size.width - kHeaderAcessoryRightWidth - kPadding.right, kPadding.top);
         
         // initialize
-		_headerAccessoryRightView = [[UILabel alloc] initWithFrame:frame];
+        _headerAccessoryRightView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
         [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:11.f]];
@@ -236,7 +233,6 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 #pragma mark - Lifecycle
 -(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
 {
-    _isInitializing = YES;
     self = [super initWithStyle:UITableViewCellStyleDefault
                 reuseIdentifier:reuseIdentifier];
     if (self)
@@ -265,7 +261,6 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         self.imageView.layer.cornerRadius = kImageCornerRadius;
         self.imageView.layer.masksToBounds = YES;
     }
-    _isInitializing = NO;
     return self;
 }
 
@@ -291,12 +286,12 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     CGRect textContentFrame = self.contentBodyView.frame;
     textContentFrame.size = [self.contentBodyView
                              sizeThatFits:
-                             CGSizeMake(width - kPaddingLeft - kContentPaddingRight,
+                             CGSizeMake(width - kPadding.left - kContentPaddingRight,
                                         CGFLOAT_MAX)];
     [self.contentBodyView setFrame:textContentFrame];
     
-    const CGFloat kLeftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-    const CGFloat kRightColumnWidth = kHeaderAcessoryRightWidth + kPaddingRight;
+    const CGFloat kLeftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+    const CGFloat kRightColumnWidth = kHeaderAcessoryRightWidth + kPadding.right;
     
     // layout title view
     CGRect titleFrame = self.headerTitleView.frame;
@@ -310,7 +305,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     
     // layout avatar
     CGRect imageViewFrame;
-    imageViewFrame.origin = CGPointMake(kPaddingLeft, kPaddingTop);
+    imageViewFrame.origin = CGPointMake(kPadding.left, kPadding.top);
     imageViewFrame.size = kImageViewSize;
     self.imageView.frame = imageViewFrame;
 }
@@ -335,12 +330,12 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 {
     CGSize neededSize = [self.contentBodyView
                          sizeThatFits:
-                         CGSizeMake(width - kPaddingLeft - kContentPaddingRight,
+                         CGSizeMake(width - kPadding.left - kContentPaddingRight,
                                     CGFLOAT_MAX)];
     
     CGRect imageViewFrame = self.imageView.frame;
-    const CGFloat kHeaderHeight = kPaddingTop + kImageViewSize.height + kMinorVerticalSeparator;
-	CGFloat result = kPaddingBottom + MAX(neededSize.height + kHeaderHeight,
+    const CGFloat kHeaderHeight = kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
+	CGFloat result = kPadding.bottom + MAX(neededSize.height + kHeaderHeight,
                               imageViewFrame.size.height +
                               imageViewFrame.origin.y);
     return result;
