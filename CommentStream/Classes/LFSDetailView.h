@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "LFSTriple.h"
+#import "LFSHeader.h"
 
-@class LFSTriple;
-@class LFSHeader;
 @protocol LFSDetailViewDelegate;
 
 @interface LFSDetailView : UIView
@@ -35,32 +35,4 @@
 - (void)didSelectLike:(id)sender;
 - (void)didSelectReply:(id)sender;
 
-@end
-
-// group related info together in this lightweight
-// "triple" object
-@interface LFSTriple : NSObject
-
-@property (strong, nonatomic) UIImage *iconImage;
-@property (copy, nonatomic) NSString *detailString;
-@property (copy, nonatomic) NSString *mainString;
-
--(id)initWithDetailString:(NSString*)urlString
-               mainString:(NSString*)displayString
-                iconImage:(UIImage*)iconImage;
-@end
-
-
-// group related info together
-@interface LFSHeader : NSObject
-
-@property (strong, nonatomic) UIImage *iconImage;
-@property (copy, nonatomic) NSString *attributeString;
-@property (copy, nonatomic) NSString *mainString;
-@property (copy, nonatomic) NSString *detailString;
-
--(id)initWithDetailString:(NSString*)detailString
-          attributeString:(NSString*)attributeString
-               mainString:(NSString*)mainString
-                iconImage:(UIImage*)iconImage;
 @end

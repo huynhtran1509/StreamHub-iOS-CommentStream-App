@@ -14,36 +14,9 @@
 #import "LFSBasicHTMLLabel.h"
 #import "UILabel+Trim.h"
 
-@implementation LFSTriple
-@synthesize detailString = _detailString;
-@synthesize iconImage = _iconImage;
-@synthesize mainString = _mainString;
-
--(id)initWithDetailString:(NSString*)detailString
-               mainString:(NSString*)mainString
-                iconImage:(UIImage*)iconImage
-{
-    self = [super init];
-    if (self) {
-        _detailString = detailString;
-        _iconImage = iconImage;
-        _mainString = mainString;
-    }
-    return self;
-}
-
--(id)init
-{
-    self = [self initWithDetailString:nil mainString:nil iconImage:nil];
-    return self;
-}
-
-@end
-
-static const CGFloat kPaddingTop = 20.0f;
-static const CGFloat kPaddingRight = 20.0f;
-static const CGFloat kPaddingBottom = 27.0f;
-static const CGFloat kPaddingLeft = 20.0f;
+static const UIEdgeInsets kPadding = {
+    .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
+};
 
 static const CGFloat kContentPaddingRight = 12.0f;
 
@@ -77,57 +50,25 @@ static const CGFloat kToolbarHeight = 44.0f;
 static const CGFloat kMinorVerticalSeparator = 12.0f;
 static const CGFloat kMajorVerticalSeparator = 20.0f;
 
-@implementation LFSHeader
-
-@synthesize attributeString = _attributeString;
-@synthesize detailString = _detailString;
-@synthesize iconImage = _iconImage;
-@synthesize mainString = _mainString;
-
--(id)initWithDetailString:(NSString*)detailString
-          attributeString:(NSString*)attributeString
-               mainString:(NSString*)mainString
-                iconImage:(UIImage*)iconImage
-{
-    self = [super init];
-    if (self) {
-        _detailString = detailString;
-        _attributeString = attributeString;
-        _iconImage = iconImage;
-        _mainString = mainString;
-    }
-    return self;
-}
-
--(id)init
-{
-    self = [self initWithDetailString:nil
-                      attributeString:nil
-                           mainString:nil
-                            iconImage:nil];
-    return self;
-}
-@end
-
 #pragma mark -
 @interface LFSDetailView ()
 
 // UIView-specific
-@property (strong, nonatomic) LFSContentToolbar *toolbar;
-@property (strong, nonatomic) LFSBasicHTMLLabel *contentBodyView;
+@property (readonly, nonatomic) LFSContentToolbar *toolbar;
+@property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
-@property (strong, nonatomic) UIButton *headerAccessoryRightView;
-@property (strong, nonatomic) UIImageView *headerImageView;
+@property (readonly, nonatomic) UIButton *headerAccessoryRightView;
+@property (readonly, nonatomic) UIImageView *headerImageView;
 
-@property (strong, nonatomic) UILabel *footerLeftView;
-@property (strong, nonatomic) LFSBasicHTMLLabel *footerRightView;
+@property (readonly, nonatomic) UILabel *footerLeftView;
+@property (readonly, nonatomic) LFSBasicHTMLLabel *footerRightView;
 
-@property (strong, nonatomic) UIButton *likeButton;
-@property (strong, nonatomic) UIButton *replyButton;
+@property (readonly, nonatomic) UIButton *likeButton;
+@property (readonly, nonatomic) UIButton *replyButton;
 
-@property (strong, nonatomic) UILabel *headerAttributeTopView;
-@property (strong, nonatomic) UILabel *headerTitleView;
-@property (strong, nonatomic) UILabel *headerSubtitleView;
+@property (readonly, nonatomic) UILabel *headerAttributeTopView;
+@property (readonly, nonatomic) UILabel *headerTitleView;
+@property (readonly, nonatomic) UILabel *headerSubtitleView;
 
 @end
 
@@ -139,23 +80,16 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 
 @synthesize delegate = _delegate;
 
-// UIView-specific
-@synthesize contentBodyView = _contentBodyView;
-@synthesize headerImageView = _headerImageView;
-@synthesize footerLeftView = _footerLeftView;
-@synthesize footerRightView = _footerRightView;
-@synthesize toolbar = _toolbar;
-@synthesize headerAccessoryRightView = _headerAccessoryRightView;
-@synthesize likeButton = _likeButton;
-@synthesize replyButton = _replyButton;
-
-@synthesize headerTitleView = _headerTitleView;
-@synthesize headerAttributeTopView = _headerAttributeTopView;
-@synthesize headerSubtitleView = _headerSubtitleView;
-
+#pragma mark -
 @synthesize isLikedByUser = _isLikedByUser;
+- (void)setIsLikedByUser:(BOOL)liked
+{
+    [_likeButton setImage:[self imageForLikedState:liked]
+                 forState:UIControlStateNormal];
+}
 
 #pragma mark -
+@synthesize likeButton = _likeButton;
 - (UIButton*)likeButton
 {
     if (_likeButton == nil) {
@@ -176,6 +110,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _likeButton;
 }
 
+#pragma mark -
+@synthesize replyButton = _replyButton;
 - (UIButton*)replyButton
 {
     if (_replyButton == nil) {
@@ -196,49 +132,41 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _replyButton;
 }
 
-- (UIImage*)imageForLikedState:(BOOL)liked
+#pragma mark -
+@synthesize bodyView = _bodyView;
+- (LFSBasicHTMLLabel*)bodyView
 {
-    return [UIImage imageNamed:(liked ? @"StateLiked" : @"StateNotLiked")];
-}
+    if (_bodyView == nil) {
 
-- (void)setIsLikedByUser:(BOOL)liked
-{
-    [_likeButton setImage:[self imageForLikedState:liked]
-                 forState:UIControlStateNormal];
-}
-
-- (LFSBasicHTMLLabel*)contentBodyView
-{
-    if (_contentBodyView == nil) {
-
-        CGRect frame = CGRectMake(kPaddingLeft,
-                                  kPaddingTop + kImageViewSize.height + kMajorVerticalSeparator,
-                                  self.bounds.size.width - kPaddingLeft - kContentPaddingRight,
+        CGRect frame = CGRectMake(kPadding.left,
+                                  kPadding.top + kImageViewSize.height + kMajorVerticalSeparator,
+                                  self.bounds.size.width - kPadding.left - kContentPaddingRight,
                                   10.f); // this could be anything
         // initialize
-        _contentBodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        _bodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
-        [_contentBodyView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-        [_contentBodyView setFont:[UIFont fontWithName:kContentFontName size:kContentFontSize]];
-        [_contentBodyView setLineSpacing:kContentLineSpacing];
-        [_contentBodyView setLineBreakMode:NSLineBreakByWordWrapping];
-        [_contentBodyView setTextAlignment:NSTextAlignmentLeft];
+        [_bodyView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [_bodyView setFont:[UIFont fontWithName:kContentFontName size:kContentFontSize]];
+        [_bodyView setLineSpacing:kContentLineSpacing];
+        [_bodyView setLineBreakMode:NSLineBreakByWordWrapping];
+        [_bodyView setTextAlignment:NSTextAlignmentLeft];
         
         // add to superview
-        [self addSubview:_contentBodyView];
+        [self addSubview:_bodyView];
     }
-    return _contentBodyView;
+    return _bodyView;
 }
 
+#pragma mark -
+@synthesize headerAccessoryRightView = _headerAccessoryRightView;
 -(UIButton*)headerAccessoryRightView
 {
     if (_headerAccessoryRightView == nil) {
         CGSize buttonSize = CGSizeMake(kRemoteButtonWidth, kRemoteButtonHeight);
         CGRect frame;
         frame.size = buttonSize;
-        frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - buttonSize.width,
-                                   kPaddingTop);
+        frame.origin = CGPointMake(self.bounds.size.width - kPadding.right - buttonSize.width, kPadding.top);
         // initialize
         _headerAccessoryRightView = [[UIButton alloc] initWithFrame:frame];
         
@@ -255,6 +183,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _headerAccessoryRightView;
 }
 
+#pragma mark -
+@synthesize headerImageView = _headerImageView;
 -(UIImageView*)headerImageView
 {
     if (_headerImageView == nil) {
@@ -272,7 +202,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
             avatarViewSize = CGSizeMake(37.f, 37.f);
         }
         CGRect frame;
-        frame.origin = CGPointMake(kPaddingLeft, kPaddingTop);
+        frame.origin = CGPointMake(kPadding.left, kPadding.top);
         frame.size = avatarViewSize;
         
         // initialize
@@ -291,15 +221,16 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _headerImageView;
 }
 
+#pragma mark -
+@synthesize footerLeftView = _footerLeftView;
 -(UILabel*)footerLeftView
 {
     if (_footerLeftView == nil) {
 
-        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPaddingLeft - kPaddingRight) / 2.f),
-                                      kFooterHeight);
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPadding.left - kPadding.right) / 2.f), kFooterHeight);
         CGRect frame;
         frame.size = labelSize;
-        frame.origin = CGPointMake(kPaddingLeft,
+        frame.origin = CGPointMake(kPadding.left,
                                    0.f);  // size.y will be changed in layoutSubviews
         // initialize
         _footerLeftView = [[UILabel alloc] initWithFrame:frame];
@@ -315,13 +246,15 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _footerLeftView;
 }
 
+#pragma mark -
+@synthesize footerRightView = _footerRightView;
 - (LFSBasicHTMLLabel*)footerRightView
 {
     if (_footerRightView == nil) {
-        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPaddingLeft - kPaddingRight) / 2.f), kFooterHeight);
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPadding.left - kPadding.right) / 2.f), kFooterHeight);
         CGRect frame;
         frame.size = labelSize;
-        frame.origin = CGPointMake(self.bounds.size.width - kPaddingRight - labelSize.width,
+        frame.origin = CGPointMake(self.bounds.size.width - kPadding.right - labelSize.width,
                                    0.f); // size.y will be changed in layoutSubviews
         
         // initialize
@@ -343,16 +276,18 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _footerRightView;
 }
 
+#pragma mark -
+@synthesize headerAttributeTopView = _headerAttributeTopView;
 - (UILabel*)headerAttributeTopView
 {
     if (_headerAttributeTopView == nil) {
-        CGFloat leftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderAttributeTopHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop); // size.y will be changed in layoutSubviews
+                                   kPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerAttributeTopView = [[UILabel alloc] initWithFrame:frame];
         
@@ -368,16 +303,18 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _headerAttributeTopView;
 }
 
+#pragma mark -
+@synthesize headerTitleView = _headerTitleView;
 - (UILabel*)headerTitleView
 {
     if (_headerTitleView == nil) {
-        CGFloat leftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderTitleHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop); // size.y will be changed in layoutSubviews
+                                   kPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
@@ -392,16 +329,18 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _headerTitleView;
 }
 
+#pragma mark -
+@synthesize headerSubtitleView = _headerSubtitleView;
 - (UILabel*)headerSubtitleView
 {
     if (_headerSubtitleView == nil) {
-        CGFloat leftColumnWidth = kPaddingLeft + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPaddingRight;
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderSubtitleHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPaddingTop); // size.y will be changed in layoutSubviews
+                                   kPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerSubtitleView = [[UILabel alloc] initWithFrame:frame];
         
@@ -417,6 +356,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     return _headerSubtitleView;
 }
 
+#pragma mark -
+@synthesize toolbar = _toolbar;
 -(LFSContentToolbar*)toolbar
 {
     if (_toolbar == nil) {
@@ -461,13 +402,16 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 -(void)layoutSubviews
 {
     // layout main content label
-    CGRect basicHTMLLabelFrame = self.contentBodyView.frame;
-    CGFloat contentWidth = self.bounds.size.width - kPaddingLeft - kContentPaddingRight;
+    CGRect basicHTMLLabelFrame = self.bodyView.frame;
+    CGFloat contentWidth = self.bounds.size.width - kPadding.left - kContentPaddingRight;
     basicHTMLLabelFrame.size = [self contentSizeThatFits:
                                 CGSizeMake(contentWidth, CGFLOAT_MAX)];
-    [self.contentBodyView setFrame:basicHTMLLabelFrame];
+    [self.bodyView setFrame:basicHTMLLabelFrame];
     
     CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
+    
+    // start with the header
+    [self layoutHeader];
     
     // layout url link
     LFSTriple *contentRemote = self.contentRemote;
@@ -488,7 +432,51 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                                   forState:UIControlStateNormal];
         _profileRemoteURL = [NSURL URLWithString:[profileRemote detailString]];
     }
+
+    // layout date label
+    CGRect dateFrame = self.footerLeftView.frame;
+    dateFrame.origin.y = bottom + kMinorVerticalSeparator;
+    [self.footerLeftView setFrame:dateFrame];
+    [self.footerLeftView setText:self.contentDetail];
     
+    // layout toolbar frame
+    CGRect toolbarFrame = self.toolbar.frame;
+    toolbarFrame.origin = CGPointMake(0.f,
+                                      dateFrame.origin.y +
+                                      dateFrame.size.height +
+                                      kMinorVerticalSeparator);
+    [self.toolbar setFrame:toolbarFrame];
+}
+
+-(CGSize)sizeThatFits:(CGSize)size
+{
+    CGFloat totalWidthInset = kPadding.left + kContentPaddingRight;
+    CGFloat totalHeightInset = (kPadding.bottom
+                                + kToolbarHeight
+                                + kMinorVerticalSeparator
+                                + kFooterHeight
+                                + kMinorVerticalSeparator
+                                
+                                + kMajorVerticalSeparator
+                                + kImageViewSize.height
+                                + kPadding.top);
+    CGSize contentSize = [self contentSizeThatFits:
+                          CGSizeMake(size.width - totalWidthInset,
+                                     CGFLOAT_MAX)];
+    contentSize.width += totalWidthInset;
+    contentSize.height += totalHeightInset;
+    return contentSize;
+}
+
+#pragma mark - Private methods
+
+- (UIImage*)imageForLikedState:(BOOL)liked
+{
+    return [UIImage imageNamed:(liked ? @"StateLiked" : @"StateNotLiked")];
+}
+
+-(void)layoutHeader
+{
     // layout header title label
     //
     // Note: preciese layout depends on whether we have subtitle field
@@ -513,14 +501,14 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         CGRect headerSubtitleFrame = self.headerSubtitleView.frame;
         
         CGFloat separator = floorf((kImageViewSize.height
-                             - headerTitleFrame.size.height
-                             - headerSubtitleFrame.size.height) / 3.f);
+                                    - headerTitleFrame.size.height
+                                    - headerSubtitleFrame.size.height) / 3.f);
         
-        headerTitleFrame.origin.y = kPaddingTop + separator;
-        headerSubtitleFrame.origin.y = (kPaddingTop
-                                           + separator
-                                           + headerTitleFrame.size.height
-                                           + separator);
+        headerTitleFrame.origin.y = kPadding.top + separator;
+        headerSubtitleFrame.origin.y = (kPadding.top
+                                        + separator
+                                        + headerTitleFrame.size.height
+                                        + separator);
         
         [self.headerTitleView setFrame:headerTitleFrame];
         [self.headerTitleView setText:headerTitle];
@@ -541,9 +529,9 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                                     - headerTitleFrame.size.height
                                     - headerAttributeTopFrame.size.height) / 3.f);
         
-
-        headerAttributeTopFrame.origin.y = (kPaddingTop + separator);
-        headerTitleFrame.origin.y = (kPaddingTop
+        
+        headerAttributeTopFrame.origin.y = (kPadding.top + separator);
+        headerTitleFrame.origin.y = (kPadding.top
                                      + separator
                                      + headerAttributeTopFrame.size.height
                                      + separator);
@@ -570,18 +558,18 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
                                     - headerSubtitleFrame.size.height) / 4.f);
         
         
-        headerAttributeTopFrame.origin.y = (kPaddingTop + separator);
-        headerTitleFrame.origin.y = (kPaddingTop
+        headerAttributeTopFrame.origin.y = (kPadding.top + separator);
+        headerTitleFrame.origin.y = (kPadding.top
                                      + separator
                                      + headerAttributeTopFrame.size.height
                                      + separator);
         
-        headerSubtitleFrame.origin.y = (kPaddingTop
-                                           + separator
-                                           + headerAttributeTopFrame.size.height
-                                           + separator
-                                           + headerTitleFrame.size.height
-                                           + separator);
+        headerSubtitleFrame.origin.y = (kPadding.top
+                                        + separator
+                                        + headerAttributeTopFrame.size.height
+                                        + separator
+                                        + headerTitleFrame.size.height
+                                        + separator);
         
         [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
         [self.headerAttributeTopView setText:headerAccessory];
@@ -598,50 +586,16 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     else {
         // no header
     }
-    
-    // layout date label
-    CGRect dateFrame = self.footerLeftView.frame;
-    dateFrame.origin.y = bottom + kMinorVerticalSeparator;
-    [self.footerLeftView setFrame:dateFrame];
-    [self.footerLeftView setText:self.contentDetail];
-    
+
     // layout avatar view
     [self.headerImageView setImage:profileLocal.iconImage];
     
-    // layout toolbar frame
-    CGRect toolbarFrame = self.toolbar.frame;
-    toolbarFrame.origin = CGPointMake(0.f,
-                                      dateFrame.origin.y +
-                                      dateFrame.size.height +
-                                      kMinorVerticalSeparator);
-    [self.toolbar setFrame:toolbarFrame];
 }
 
--(CGSize)sizeThatFits:(CGSize)size
-{
-    CGFloat totalWidthInset = kPaddingLeft + kContentPaddingRight;
-    CGFloat totalHeightInset = (kPaddingBottom
-                                + kToolbarHeight
-                                + kMinorVerticalSeparator
-                                + kFooterHeight
-                                + kMinorVerticalSeparator
-                                
-                                + kMajorVerticalSeparator
-                                + kImageViewSize.height
-                                + kPaddingTop);
-    CGSize contentSize = [self contentSizeThatFits:
-                          CGSizeMake(size.width - totalWidthInset,
-                                     CGFLOAT_MAX)];
-    contentSize.width += totalWidthInset;
-    contentSize.height += totalHeightInset;
-    return contentSize;
-}
-
-#pragma mark - Private methods
 -(CGSize)contentSizeThatFits:(CGSize)size
 {
-    [self.contentBodyView setHTMLString:self.contentBodyHtml];
-    return [self.contentBodyView sizeThatFits:size];
+    [self.bodyView setHTMLString:self.contentBodyHtml];
+    return [self.bodyView sizeThatFits:size];
 }
 
 #pragma mark - Lifecycle
@@ -652,7 +606,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     if (self) {
         _likeButton = nil;
         _replyButton = nil;
-        _contentBodyView = nil;
+        _bodyView = nil;
         _footerRightView = nil;
         _headerAccessoryRightView = nil;
         _headerImageView = nil;
@@ -680,7 +634,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         // Initialization code
         _likeButton = nil;
         _replyButton = nil;
-        _contentBodyView = nil;
+        _bodyView = nil;
         _footerRightView = nil;
         _headerAccessoryRightView = nil;
         _headerImageView = nil;
@@ -704,7 +658,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
 {
     _likeButton = nil;
     _replyButton = nil;
-    _contentBodyView = nil;
+    _bodyView = nil;
     _footerRightView = nil;
     _headerAccessoryRightView = nil;
     _headerImageView = nil;
