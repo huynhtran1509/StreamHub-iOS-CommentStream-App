@@ -42,6 +42,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 @interface LFSAttributedTextCell ()
 // store hash to avoid relayout of same HTML
 @property (nonatomic, assign) NSUInteger htmlHash;
+@property (nonatomic, assign) CGFloat requiredBodyHeight;
 
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
@@ -118,6 +119,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 }
 
 #pragma mark - Other properties
+@synthesize requiredBodyHeight = _requiredBodyHeight;
 @synthesize htmlHash = _htmlHash;
 @synthesize headerAccessoryRightText = _headerAccessoryRightText;
 
@@ -303,6 +305,8 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         _headerImage = nil;
         _headerTitleView = nil;
         
+        _requiredBodyHeight = 0.f;
+        
         [self setAccessoryType:UITableViewCellAccessoryNone];
 
         if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
@@ -351,12 +355,12 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 -(void)layoutBody
 {
     // layout content view
-    CGFloat width = self.bounds.size.width;
     CGRect textContentFrame = self.bodyView.frame;
-    textContentFrame.size = [self.bodyView
-                             sizeThatFits:
-                             CGSizeMake(width - kPadding.left - kContentPaddingRight,
-                                        CGFLOAT_MAX)];
+    
+    // layoutSubviews is always called after requiredRowHeightWithFrameWidth
+    // so we take advantage of that by reusing _requiredBodyHeight
+    textContentFrame.size = CGSizeMake(self.bounds.size.width - kPadding.left - kContentPaddingRight,
+                                       _requiredBodyHeight);
     [self.bodyView setFrame:textContentFrame];
 }
 
@@ -478,17 +482,14 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
 - (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width
 {
-    CGSize neededSize = [self.bodyView
-                         sizeThatFits:
-                         CGSizeMake(width - kPadding.left - kContentPaddingRight,
-                                    CGFLOAT_MAX)];
+    CGSize requiredBodySize = [self.bodyView
+                               sizeThatFits:
+                               CGSizeMake(width - kPadding.left - kContentPaddingRight,
+                                          CGFLOAT_MAX)];
     
-    CGRect imageViewFrame = self.imageView.frame;
-    const CGFloat kHeaderHeight = kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
-	CGFloat result = kPadding.bottom + MAX(neededSize.height + kHeaderHeight,
-                              imageViewFrame.size.height +
-                              imageViewFrame.origin.y);
-    return result;
+    _requiredBodyHeight = requiredBodySize.height;
+    
+    return kPadding.bottom + requiredBodySize.height + kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
 }
 
 @end
