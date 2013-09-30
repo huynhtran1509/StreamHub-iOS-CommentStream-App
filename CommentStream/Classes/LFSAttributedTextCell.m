@@ -43,6 +43,13 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 @interface LFSAttributedTextCell ()
 // store hash to avoid relayout of same HTML
 @property (nonatomic, assign) NSUInteger htmlHash;
+
+@property (readonly, nonatomic) UILabel *headerAttributeTopView;
+@property (readonly, nonatomic) UILabel *headerTitleView;
+@property (readonly, nonatomic) UILabel *headerSubtitleView;
+
+@property (nonatomic, readonly) LFSBasicHTMLLabel *bodyView;
+@property (nonatomic, readonly) UILabel *headerAccessoryRightView;
 @end
 
 @implementation LFSAttributedTextCell
@@ -76,21 +83,21 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 }
 
 #pragma mark -
-@synthesize contentBodyFont = _contentBodyFont;
--(UIFont*)contentBodyFont {
-    return self.contentBodyView.font;
+@synthesize bodyFont = _bodyFont;
+-(UIFont*)bodyFont {
+    return self.bodyView.font;
 }
--(void)setContentBodyFont:(UIFont *)contentBodyFont {
-    self.contentBodyView.font = contentBodyFont;
+-(void)setBodyFont:(UIFont *)contentBodyFont {
+    self.bodyView.font = contentBodyFont;
 }
 
 #pragma mark -
-@synthesize contentBodyColor = _contentBodyColor;
--(UIColor*)contentBodyColor {
-    return self.contentBodyView.textColor;
+@synthesize bodyColor = _bodyColor;
+-(UIColor*)bodyColor {
+    return self.bodyView.textColor;
 }
--(void)setContentBodyColor:(UIColor *)contentBodyColor {
-    self.contentBodyView.textColor = contentBodyColor;
+-(void)setBodyColor:(UIColor *)contentBodyColor {
+    self.bodyView.textColor = contentBodyColor;
 }
 
 #pragma mark -
@@ -113,6 +120,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
 #pragma mark - Other properties
 @synthesize htmlHash = _htmlHash;
+@synthesize headerAccessoryRightText = _headerAccessoryRightText;
 
 #pragma mark -
 @synthesize headerImage = _headerImage;
@@ -156,10 +164,10 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 }
 
 #pragma mark -
-@synthesize contentBodyView = _contentBodyView;
--(LFSBasicHTMLLabel*)contentBodyView
+@synthesize bodyView = _bodyView;
+-(LFSBasicHTMLLabel*)bodyView
 {
-	if (_contentBodyView == nil) {
+	if (_bodyView == nil) {
         const CGFloat kHeaderHeight = kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
         CGRect frame = CGRectMake(kPadding.left,
                                   kHeaderHeight,
@@ -167,18 +175,44 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
                                   self.bounds.size.height - kHeaderHeight);
         
         // initialize
-        _contentBodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        _bodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
-        [_contentBodyView setFont:[UIFont fontWithName:@"Georgia" size:13.f]];
-        [_contentBodyView setTextColor:[UIColor blackColor]];
-        [_contentBodyView setBackgroundColor:[UIColor clearColor]]; // for iOS6
-        [_contentBodyView setLineSpacing:kContentLineSpacing];
+        [_bodyView setFont:[UIFont fontWithName:@"Georgia" size:13.f]];
+        [_bodyView setTextColor:[UIColor blackColor]];
+        [_bodyView setBackgroundColor:[UIColor clearColor]]; // for iOS6
+        [_bodyView setLineSpacing:kContentLineSpacing];
         
         // add to superview
-		[self.contentView addSubview:_contentBodyView];
+		[self.contentView addSubview:_bodyView];
 	}
-	return _contentBodyView;
+	return _bodyView;
+}
+
+#pragma mark -
+@synthesize headerAttributeTopView = _headerAttributeTopView;
+- (UILabel*)headerAttributeTopView
+{
+    if (_headerAttributeTopView == nil) {
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kPadding.right, kHeaderAttributeTopHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kPadding.top); // size.y will be changed in layoutSubviews
+        // initialize
+        _headerAttributeTopView = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
+        [_headerAttributeTopView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_headerAttributeTopView setFont:[UIFont systemFontOfSize:kHeaderAttributeTopFontSize]];
+        [_headerAttributeTopView setTextColor:[UIColor blueColor]];
+        
+        // add to superview
+        [self.contentView addSubview:_headerAttributeTopView];
+    }
+    return _headerAttributeTopView;
 }
 
 #pragma mark -
@@ -205,6 +239,32 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 		[self.contentView addSubview:_headerTitleView];
 	}
 	return _headerTitleView;
+}
+
+#pragma mark -
+@synthesize headerSubtitleView = _headerSubtitleView;
+- (UILabel*)headerSubtitleView
+{
+    if (_headerSubtitleView == nil) {
+        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kPadding.right, kHeaderSubtitleHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kPadding.top); // size.y will be changed in layoutSubviews
+        // initialize
+        _headerSubtitleView = [[UILabel alloc] initWithFrame:frame];
+        
+        // configure
+        [_headerSubtitleView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_headerSubtitleView setFont:[UIFont systemFontOfSize:kHeaderSubtitleFontSize]];
+        [_headerSubtitleView setTextColor:[UIColor grayColor]];
+        
+        // add to superview
+        [self.contentView addSubview:_headerSubtitleView];
+    }
+    return _headerSubtitleView;
 }
 
 #pragma mark -
@@ -238,7 +298,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     if (self)
     {
         // initialize subview references
-        _contentBodyView = nil;
+        _bodyView = nil;
         _headerAccessoryRightView = nil;
         _headerImage = nil;
         _headerTitleView = nil;
@@ -265,13 +325,13 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 }
 
 -(void)dealloc{
-    _contentBodyView = nil;
+    _bodyView = nil;
     _headerTitleView = nil;
     _headerAccessoryRightView = nil;
     _headerImage = nil;
 }
 
-#pragma mark - Private methods
+#pragma mark - Overrides
 
 - (void)layoutSubviews
 {
@@ -283,15 +343,18 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     
     // layout content view
     CGFloat width = self.bounds.size.width;
-    CGRect textContentFrame = self.contentBodyView.frame;
-    textContentFrame.size = [self.contentBodyView
+    CGRect textContentFrame = self.bodyView.frame;
+    textContentFrame.size = [self.bodyView
                              sizeThatFits:
                              CGSizeMake(width - kPadding.left - kContentPaddingRight,
                                         CGFLOAT_MAX)];
-    [self.contentBodyView setFrame:textContentFrame];
+    [self.bodyView setFrame:textContentFrame];
     
     const CGFloat kLeftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
     const CGFloat kRightColumnWidth = kHeaderAcessoryRightWidth + kPadding.right;
+    
+    // start with the header
+    [self layoutHeader];
     
     // layout title view
     CGRect titleFrame = self.headerTitleView.frame;
@@ -302,14 +365,132 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
     accessoryRightFrame.origin.x = width - kRightColumnWidth;
     [self.headerAccessoryRightView setFrame:accessoryRightFrame];
+    [self.headerAccessoryRightView setText:_headerAccessoryRightText];
     
-    // layout avatar
+     // layout avatar
     CGRect imageViewFrame;
     imageViewFrame.origin = CGPointMake(kPadding.left, kPadding.top);
     imageViewFrame.size = kImageViewSize;
     self.imageView.frame = imageViewFrame;
 }
 
+#pragma mark - Private methods
+-(void)layoutHeader
+{
+    // layout header title label
+    //
+    // Note: preciese layout depends on whether we have subtitle field
+    // (i.e. twitter handle)
+    
+    LFSHeader *profileLocal = self.profileLocal;
+    NSString *headerTitle = profileLocal.mainString;
+    NSString *headerSubtitle = profileLocal.detailString;
+    NSString *headerAccessory = profileLocal.attributeString;
+    
+    if (headerTitle && !headerSubtitle && !headerAccessory)
+    {
+        // display one string
+        [self.headerTitleView setText:headerTitle];
+        [self.headerTitleView resizeVerticalCenterRightTrim];
+    }
+    else if (headerTitle && headerSubtitle && !headerAccessory)
+    {
+        // full name + twitter handle
+        
+        CGRect headerTitleFrame = self.headerTitleView.frame;
+        CGRect headerSubtitleFrame = self.headerSubtitleView.frame;
+        
+        CGFloat separator = floorf((kImageViewSize.height
+                                    - headerTitleFrame.size.height
+                                    - headerSubtitleFrame.size.height) / 3.f);
+        
+        headerTitleFrame.origin.y = kPadding.top + separator;
+        headerSubtitleFrame.origin.y = (kPadding.top
+                                        + separator
+                                        + headerTitleFrame.size.height
+                                        + separator);
+        
+        [self.headerTitleView setFrame:headerTitleFrame];
+        [self.headerTitleView setText:headerTitle];
+        [self.headerTitleView resizeVerticalCenterRightTrim];
+        
+        [self.headerSubtitleView setFrame:headerSubtitleFrame];
+        [self.headerSubtitleView setText:headerSubtitle];
+        [self.headerSubtitleView resizeVerticalCenterRightTrim];
+    }
+    else if (headerTitle && !headerSubtitle && headerAccessory)
+    {
+        // attribute + full name
+        
+        CGRect headerAttributeTopFrame = self.headerAttributeTopView.frame;
+        CGRect headerTitleFrame = self.headerTitleView.frame;
+        
+        CGFloat separator = floorf((kImageViewSize.height
+                                    - headerTitleFrame.size.height
+                                    - headerAttributeTopFrame.size.height) / 3.f);
+        
+        
+        headerAttributeTopFrame.origin.y = (kPadding.top + separator);
+        headerTitleFrame.origin.y = (kPadding.top
+                                     + separator
+                                     + headerAttributeTopFrame.size.height
+                                     + separator);
+        
+        [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
+        [self.headerAttributeTopView setText:headerAccessory];
+        [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        
+        [self.headerTitleView setFrame:headerTitleFrame];
+        [self.headerTitleView setText:headerTitle];
+        [self.headerTitleView resizeVerticalCenterRightTrim];
+    }
+    else if (headerTitle && headerSubtitle && headerAccessory)
+    {
+        // attribute + full name + twitter handle
+        
+        CGRect headerAttributeTopFrame = self.headerAttributeTopView.frame;
+        CGRect headerTitleFrame = self.headerTitleView.frame;
+        CGRect headerSubtitleFrame = self.headerSubtitleView.frame;
+        
+        CGFloat separator = floorf((kImageViewSize.height
+                                    - headerTitleFrame.size.height
+                                    - headerAttributeTopFrame.size.height
+                                    - headerSubtitleFrame.size.height) / 4.f);
+        
+        
+        headerAttributeTopFrame.origin.y = (kPadding.top + separator);
+        headerTitleFrame.origin.y = (kPadding.top
+                                     + separator
+                                     + headerAttributeTopFrame.size.height
+                                     + separator);
+        
+        headerSubtitleFrame.origin.y = (kPadding.top
+                                        + separator
+                                        + headerAttributeTopFrame.size.height
+                                        + separator
+                                        + headerTitleFrame.size.height
+                                        + separator);
+        
+        [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
+        [self.headerAttributeTopView setText:headerAccessory];
+        [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        
+        [self.headerTitleView setFrame:headerTitleFrame];
+        [self.headerTitleView setText:headerTitle];
+        [self.headerTitleView resizeVerticalCenterRightTrim];
+        
+        [self.headerSubtitleView setFrame:headerSubtitleFrame];
+        [self.headerSubtitleView setText:headerSubtitle];
+        [self.headerSubtitleView resizeVerticalCenterRightTrim];
+    }
+    else {
+        // no header
+    }
+    
+    // layout avatar view
+    //[self.imageView setImage:profileLocal.iconImage];
+    
+}
 
 #pragma mark - Public methods
 - (void)setHTMLString:(NSString *)html
@@ -322,13 +503,13 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 	}
 	
 	_htmlHash = newHash;
-	[self.contentBodyView setHTMLString:html];
+	[self.bodyView setHTMLString:html];
 	[self setNeedsLayout];
 }
 
 - (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width
 {
-    CGSize neededSize = [self.contentBodyView
+    CGSize neededSize = [self.bodyView
                          sizeThatFits:
                          CGSizeMake(width - kPadding.left - kContentPaddingRight,
                                     CGFLOAT_MAX)];

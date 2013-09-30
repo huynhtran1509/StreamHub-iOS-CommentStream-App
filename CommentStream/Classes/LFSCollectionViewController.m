@@ -492,9 +492,18 @@ static NSString* const kCellSelectSegue = @"detailView";
     NSDate *createdAt = [content contentCreatedAt];
     NSString *bodyHTML = [content contentBodyHtml];
     
-    [cell.headerTitleView setText:content.author.displayName];
     NSString *dateTime = [self.dateFormatter relativeStringFromDate:createdAt];
-    [cell.headerAccessoryRightView setText:dateTime];
+    [cell setHeaderAccessoryRightText:dateTime];
+    
+    // always set an object
+    LFSAuthor *author = content.author;
+    NSNumber *moderator = [content.contentAnnotations objectForKey:@"moderator"];
+    BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
+    cell.profileLocal = [[LFSHeader alloc]
+                               initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
+                               attributeString:(hasModerator ? @"Moderator" : nil)
+                               mainString:author.displayName
+                               iconImage:nil];
     
     // load avatar images in a separate queue
     NSURLRequest *request =

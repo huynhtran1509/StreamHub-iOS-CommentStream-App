@@ -125,16 +125,16 @@
                                       iconImage:nil]];
     }
     
-    // only return an object if we have a twitter handle
+    // only set an object if we have a twitter handle
     LFSAuthor *author = contentItem.author;
-    if (author.twitterHandle != nil) {
+    if (author.profileUrlStringNoHashBang != nil) {
         [detailView setProfileRemote:[[LFSTriple alloc]
                                       initWithDetailString:author.profileUrlStringNoHashBang
                                       mainString:nil
                                       iconImage:[UIImage imageNamed:@"SourceTwitter"]]];
     }
     
-    // always return an object
+    // always set an object
     NSNumber *moderator = [contentItem.contentAnnotations objectForKey:@"moderator"];
     BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
     detailView.profileLocal = [[LFSHeader alloc]
