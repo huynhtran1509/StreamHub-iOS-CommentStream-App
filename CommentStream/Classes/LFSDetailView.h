@@ -16,7 +16,7 @@
 @interface LFSDetailView : UIView
 
 @property (weak, nonatomic) id<LFSDetailViewDelegate>delegate;
-@property (assign, nonatomic) BOOL contentLikedByUser;
+@property (assign, nonatomic) BOOL isLikedByUser;
 
 @property (strong, nonatomic) LFSHeader* profileLocal;
 @property (strong, nonatomic) LFSTriple* profileRemote;
@@ -42,8 +42,8 @@
 @interface LFSTriple : NSObject
 
 @property (strong, nonatomic) UIImage *iconImage;
-@property (strong, nonatomic) NSString *detailString;
-@property (strong, nonatomic) NSString *mainString;
+@property (copy, nonatomic) NSString *detailString;
+@property (copy, nonatomic) NSString *mainString;
 
 -(id)initWithDetailString:(NSString*)urlString
                mainString:(NSString*)displayString
@@ -55,9 +55,9 @@
 @interface LFSHeader : NSObject
 
 @property (strong, nonatomic) UIImage *iconImage;
-@property (strong, nonatomic) NSString *attributeString;
-@property (strong, nonatomic) NSString *mainString;
-@property (strong, nonatomic) NSString *detailString;
+@property (copy, nonatomic) NSString *attributeString;
+@property (copy, nonatomic) NSString *mainString;
+@property (copy, nonatomic) NSString *detailString;
 
 -(id)initWithDetailString:(NSString*)detailString
           attributeString:(NSString*)attributeString

@@ -12,23 +12,27 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    [[UIColor colorWithRed:(200.f/255.f) green:(199.f/255.f) blue:(204.f/255.f) alpha:1.f] setStroke];
+    [[UIColor colorWithRed:(200.f/255.f)
+                     green:(199.f/255.f)
+                      blue:(204.f/255.f) alpha:1.f] setStroke];
+    
+    CGPoint origin = rect.origin;
+    CGSize size = rect.size;
     
     // top 1px line
-    UIBezierPath *horLineTop = [[UIBezierPath alloc] init];
-    [horLineTop moveToPoint:rect.origin];
-    [horLineTop addLineToPoint:CGPointMake(rect.origin.x + rect.size.width, rect.origin.y)];
-    horLineTop.lineWidth = 1.f;
-    [horLineTop stroke];
+    UIBezierPath *lineTop = [[UIBezierPath alloc] init];
+    [lineTop moveToPoint:origin];
+    [lineTop addLineToPoint:CGPointMake(origin.x + size.width, origin.y)];
+    lineTop.lineWidth = 1.f;
+    [lineTop stroke];
     
     // bottom 1px line
-    UIBezierPath *horLineBottom = [[UIBezierPath alloc] init];
-    [horLineBottom moveToPoint:CGPointMake(rect.origin.x,
-                                           rect.origin.y + rect.size.height)];
-    [horLineBottom addLineToPoint:CGPointMake(rect.origin.x + rect.size.width,
-                                              rect.origin.y + rect.size.height)];
-    horLineBottom.lineWidth = 1.f;
-    [horLineBottom stroke];
+    UIBezierPath *lineBottom = [[UIBezierPath alloc] init];
+    [lineBottom moveToPoint:CGPointMake(origin.x, origin.y + size.height)];
+    [lineBottom addLineToPoint:CGPointMake(origin.x + size.width,
+                                           origin.y + size.height)];
+    lineBottom.lineWidth = 1.f;
+    [lineBottom stroke];
 }
 
 #pragma mark - Private methods

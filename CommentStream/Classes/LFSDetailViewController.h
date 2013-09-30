@@ -17,12 +17,11 @@
 
 @interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate>
 
-@property (nonatomic, strong) NSDictionary *collection;
-@property (nonatomic, strong) NSString *collectionId;
-
-@property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, assign) BOOL hideStatusBar;
 
-@property (strong, nonatomic) UIImage *avatarImage;
+@property (nonatomic, copy) NSDictionary *collection;
+@property (nonatomic, copy) NSString *collectionId;
+@property (nonatomic, strong) UIImage *avatarImage;
+@property (nonatomic, strong) LFSContent *contentItem;
 
 @end

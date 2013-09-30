@@ -492,9 +492,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     NSDate *createdAt = [content contentCreatedAt];
     NSString *bodyHTML = [content contentBodyHtml];
     
-    [cell.titleView setText:content.author.displayName];
+    [cell.headerTitleView setText:content.author.displayName];
     NSString *dateTime = [self.dateFormatter relativeStringFromDate:createdAt];
-    [cell.noteView setText:dateTime];
+    [cell.headerAccessoryRightView setText:dateTime];
     
     // load avatar images in a separate queue
     NSURLRequest *request =
@@ -506,7 +506,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                                                      NSHTTPURLResponse *response,
                                                      UIImage *image)
                                           {
-                                              [cell setAvatarImage:image];
+                                              [cell setHeaderImage:image];
                                           }
                                           failure:nil];
     [operation start];
@@ -531,7 +531,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                 // assign model object(s)
                 LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
                 [vc setContentItem:contentItem];
-                [vc setAvatarImage:cell.avatarImage];
+                [vc setAvatarImage:cell.headerImage];
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
                 [vc setHideStatusBar:self.prefersStatusBarHidden];

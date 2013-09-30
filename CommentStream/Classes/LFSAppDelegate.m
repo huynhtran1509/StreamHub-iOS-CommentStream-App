@@ -8,6 +8,7 @@
 
 #import "LFSAppDelegate.h"
 #import <OHAttributedLabel/OHAttributedLabel.h>
+#import "LFSAttributedTextCell.h"
 
 @implementation LFSAppDelegate
 
@@ -18,6 +19,10 @@
     // Override point for customization after application launch.
     [[OHAttributedLabel appearance] setLinkColor:[UIColor grayColor]];
     [[OHAttributedLabel appearance] setLinkUnderlineStyle:kCTUnderlineStyleNone];
+    
+    [[LFSAttributedTextCell appearance] setBackgroundCellColor:[UIColor whiteColor]];
+
+    //[[LFSAttributedTextCell appearance] setHeaderTitleColor:[UIColor blackColor]];
     return YES;
 }
 

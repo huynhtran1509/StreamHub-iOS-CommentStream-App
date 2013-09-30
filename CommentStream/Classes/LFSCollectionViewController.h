@@ -14,7 +14,7 @@
 
 @interface LFSCollectionViewController : UITableViewController <UITextFieldDelegate>
 
-@property (nonatomic, strong) NSDictionary *collection;
-@property (nonatomic, strong) NSString *collectionId;
+@property (nonatomic, copy) NSDictionary *collection;
+@property (nonatomic, copy) NSString *collectionId;
 
 @end
