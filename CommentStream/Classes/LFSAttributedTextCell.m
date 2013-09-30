@@ -18,17 +18,19 @@ static const UIEdgeInsets kPadding = {
 };
 
 static const CGFloat kContentPaddingRight = 7.f;
-static const CGFloat kContentLineSpacing = 6.5f;
+static const CGFloat kContentLineSpacing = 6.f;
 
 // title font settings
 static const CGFloat kHeaderSubtitleFontSize = 11.f; // not used yet
 static const CGFloat kHeaderAttributeTopFontSize = 10.f; // not used yet
 
+static const CGFloat kHeaderAdjust = 2.f;
+
 static const CGSize  kImageViewSize = { .width=25.f, .height=25.f };
 static const CGFloat kImageCornerRadius = 4.f;
 static const CGFloat kImageMarginRight = 8.0f;
 
-static const CGFloat kMinorVerticalSeparator = 5.0f;
+static const CGFloat kMinorVerticalSeparator = 12.0f;
 
 // {{{ not really relevant
 static const CGFloat kHeaderAcessoryRightHeight = 21.f;
@@ -243,9 +245,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 	if (_headerTitleView == nil) {
         CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
-                                  kPadding.top,
+                                  kPadding.top - kHeaderAdjust,
                                   self.bounds.size.width - leftColumnWidth - kPadding.right,
-                                  kImageViewSize.height);
+                                  kImageViewSize.height + kHeaderAdjust * 2.f);
 
         // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
@@ -268,9 +270,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     if (_headerSubtitleView == nil) {
         CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
-                                  kPadding.top,
+                                  kPadding.top - kHeaderAdjust,
                                   self.bounds.size.width - leftColumnWidth - kPadding.right,
-                                  kImageViewSize.height);
+                                  kImageViewSize.height + kHeaderAdjust * 2.f);
         // initialize
         _headerSubtitleView = [[UILabel alloc] initWithFrame:frame];
         
