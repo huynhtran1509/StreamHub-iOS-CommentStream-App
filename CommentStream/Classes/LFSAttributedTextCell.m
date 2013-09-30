@@ -482,6 +482,13 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     textContentFrame.size = CGSizeMake(rect.size.width - kPadding.left - kContentPaddingRight,
                                        self.requiredBodyHeight);
     [self.bodyView setFrame:textContentFrame];
+    
+    // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds
+    // would go in the negative direction if frame origin y-value exceeded
+    // 44 pts (due to 44-pt toolbar being present?)
+    CGRect bounds = self.bodyView.bounds;
+    bounds.origin = CGPointZero;
+    [_bodyView setBounds:bounds];
 }
 
 #pragma mark - Public methods
