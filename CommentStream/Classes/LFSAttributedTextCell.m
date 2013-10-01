@@ -8,6 +8,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import <StreamHub-iOS-SDK/LFSConstants.h>
+#import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSBasicHTMLParser.h"
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
@@ -122,11 +123,24 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 #pragma mark - Other properties
 
 @synthesize htmlHash = _htmlHash;
+@synthesize dateFormatter = _dateFormatter;
 
-@synthesize headerAccessoryRightText = _headerAccessoryRightText;
 @synthesize profileLocal = _profileLocal;
 @synthesize profileRemote = _profileRemote;
 @synthesize contentRemote = _contentRemote;
+
+#pragma mark -
+@synthesize contentDate = _contentDate;
+-(void)setContentDate:(NSDate *)contentDate
+{
+    if (contentDate != _contentDate) {
+        NSString *dateTime = [self.dateFormatter relativeStringFromDate:contentDate];
+        [self.headerAccessoryRightView setText:dateTime];
+        [self setNeedsLayout];
+    
+        _contentDate = contentDate;
+    }
+}
 
 #pragma mark -
 @synthesize requiredBodyHeight = _requiredBodyHeight;
@@ -324,6 +338,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         _headerImage = nil;
         _headerTitleView = nil;
         
+        _contentDate = nil;
+        _dateFormatter = nil;
+        
         _requiredBodyHeight = CGFLOAT_MAX;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
@@ -352,6 +369,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     _headerTitleView = nil;
     _headerAccessoryRightView = nil;
     _headerImage = nil;
+    
+    _contentDate = nil;
+    _dateFormatter = nil;
 }
 
 #pragma mark - Overrides
@@ -468,7 +488,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     accessoryRightFrame.origin.x = leftColumnWidth;
     accessoryRightFrame.size.width = rect.size.width - leftColumnWidth - kPadding.right;
     [self.headerAccessoryRightView setFrame:accessoryRightFrame];
-    [self.headerAccessoryRightView setText:_headerAccessoryRightText];
+    [self.headerAccessoryRightView setText:[self.dateFormatter relativeStringFromDate:self.contentDate]];
     [self.headerAccessoryRightView resizeVerticalTopLeftTrim];
 }
 

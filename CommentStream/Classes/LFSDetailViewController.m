@@ -113,8 +113,8 @@
     
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     
-    [detailView setContentDetail:[[[NSDateFormatter alloc] init]
-                                extendedRelativeStringFromDate:contentItem.contentCreatedAt]];
+    [detailView setDateFormatter:[[NSDateFormatter alloc] init]];
+    [detailView setContentDate:contentItem.contentCreatedAt];
     
     // only set an object if we have a remote (Twitter) url
     NSString *twitterUrlString = contentItem.contentTwitterUrlString;
