@@ -22,12 +22,12 @@ static const CGFloat kContentLineSpacing = 6.f;
 
 static const CGFloat kHeaderSubtitleFontSize = 11.f;
 static const CGFloat kHeaderAttributeTopFontSize = 10.f;
-
 static const CGFloat kHeaderAdjust = 2.f;
+static const CGFloat kHeaderAccessoryRightImageAlpha = 0.618f;
+
+static const CGSize  kHeaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
 
 static const CGSize  kImageViewSize = { .width=25.f, .height=25.f };
-
-static const CGSize kheaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
 
 static const CGFloat kImageCornerRadius = 4.f;
 static const CGFloat kImageMarginRight = 8.0f;
@@ -56,7 +56,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 @property (nonatomic, readonly) LFSBasicHTMLLabel *bodyView;
 @property (nonatomic, readonly) UILabel *headerAccessoryRightView;
 
-@property (nonatomic, strong) UIImageView *headerAccessoryRightIconView;
+@property (nonatomic, strong) UIImageView *headerAccessoryRightImageView;
 @end
 
 @implementation LFSAttributedTextCell
@@ -331,19 +331,20 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 }
 
 #pragma mark -
-@synthesize headerAccessoryRightIconView = _headerAccessoryRightIconView;
-- (UIImageView *)headerAccessoryRightIconView
+@synthesize headerAccessoryRightImageView = _headerAccessoryRightImageView;
+- (UIImageView *)headerAccessoryRightImageView
 {
-	if (_headerAccessoryRightIconView == nil) {
+	if (_headerAccessoryRightImageView == nil) {
         // initialize
         UIImage *icon = self.indicatorIcon;
-        _headerAccessoryRightIconView = [[UIImageView alloc] initWithImage:icon];
+        _headerAccessoryRightImageView = [[UIImageView alloc] initWithImage:icon];
         // configure
-
+        [_headerAccessoryRightImageView setAlpha:kHeaderAccessoryRightImageAlpha];
+        
         // add to superview
-		[self.contentView addSubview:_headerAccessoryRightIconView];
+		[self.contentView addSubview:_headerAccessoryRightImageView];
 	}
-	return _headerAccessoryRightIconView;
+	return _headerAccessoryRightImageView;
 }
 
 #pragma mark - Overrides
@@ -466,9 +467,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     
     if (self.indicatorIcon != nil) {
         CGFloat centerY = self.headerAccessoryRightView.center.y;
-        [self.headerAccessoryRightIconView setCenter:
+        [self.headerAccessoryRightImageView setCenter:
          CGPointMake(self.headerAccessoryRightView.frame.origin.x -
-                     self.headerAccessoryRightIconView.frame.size.width,
+                     self.headerAccessoryRightImageView.frame.size.width,
                      centerY)];
     }
     
@@ -534,7 +535,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         _bodyView = nil;
         _indicatorIcon = nil;
         _headerAccessoryRightView = nil;
-        _headerAccessoryRightIconView = nil;
+        _headerAccessoryRightImageView = nil;
         _headerImage = nil;
         _headerTitleView = nil;
         
@@ -564,12 +565,13 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     return self;
 }
 
--(void)dealloc{
+-(void)dealloc
+{
     _bodyView = nil;
     _headerTitleView = nil;
     _indicatorIcon = nil;
     _headerAccessoryRightView = nil;
-    _headerAccessoryRightIconView = nil;
+    _headerAccessoryRightImageView = nil;
     _headerImage = nil;
     
     _contentDate = nil;
