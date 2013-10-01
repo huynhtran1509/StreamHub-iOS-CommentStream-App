@@ -20,6 +20,9 @@ static const UIEdgeInsets kPadding = {
 static const CGFloat kContentPaddingRight = 7.f;
 static const CGFloat kContentLineSpacing = 6.f;
 
+static NSString* const kBodyFontName = @"Georgia";
+static const CGFloat kBodyFontSize = 13.f;
+
 static const CGFloat kHeaderAcessoryRightFontSize = 11.f;
 
 static const CGFloat kHeaderTitleFontSize = 12.f;
@@ -38,13 +41,13 @@ static const CGFloat kImageMarginRight = 8.0f;
 static const CGFloat kMinorVerticalSeparator = 12.0f;
 
 // {{{ TODO: remove these?
-static const CGFloat kHeaderAcessoryRightHeight = 21.f;
+//static const CGFloat kHeaderAcessoryRightHeight = 21.f;
 
-static const CGFloat kMajorVerticalSeparator = 7.0f;
+//static const CGFloat kMajorVerticalSeparator = 7.0f;
 
 static const CGFloat kHeaderAttributeTopHeight = 10.0f;
-static const CGFloat kHeaderTitleHeight = 18.0f;
-static const CGFloat kHeaderSubtitleHeight = 10.0f;
+//static const CGFloat kHeaderTitleHeight = 18.0f;
+//static const CGFloat kHeaderSubtitleHeight = 10.0f;
 // }}}
 
 @interface LFSAttributedTextCell ()
@@ -185,7 +188,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         // non-Retina
         size = kImageViewSize;
     }
-    CGRect targetRect = CGRectMake(0.f, 0.f, size.width, size.height);
+    CGRect targetRect;
+    targetRect.origin = CGPointZero;
+    targetRect.size = size;
     dispatch_queue_t queue =
     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0.f);
     dispatch_async(queue, ^{
@@ -220,7 +225,8 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         _bodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
-        [_bodyView setFont:[UIFont fontWithName:@"Georgia" size:13.f]];
+        [_bodyView setFont:[UIFont fontWithName:kBodyFontName
+                                           size:kBodyFontSize]];
         [_bodyView setTextColor:[UIColor blackColor]];
         [_bodyView setBackgroundColor:[UIColor clearColor]]; // for iOS6
         [_bodyView setLineSpacing:kContentLineSpacing];
@@ -292,7 +298,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kPadding.top - kHeaderAdjust,
                                   self.bounds.size.width - leftColumnWidth - kPadding.right,
-                                  kImageViewSize.height + kHeaderAdjust * 2.f);
+                                  kImageViewSize.height + kHeaderAdjust + kHeaderAdjust);
         // initialize
         _headerSubtitleView = [[UILabel alloc] initWithFrame:frame];
         
