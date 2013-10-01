@@ -23,6 +23,7 @@
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 
 @property (nonatomic, strong) UIImage *headerImage;
+@property (nonatomic, strong) UIImage *indicatorIcon;
 
 #pragma mark - UIApperance properties
 @property (nonatomic, strong) UIFont *headerTitleFont UI_APPEARANCE_SELECTOR;

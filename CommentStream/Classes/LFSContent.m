@@ -34,6 +34,43 @@
  }
  */
 
+
+// For more info, see
+// https://github.com/Livefyre/lfdj/blob/production/lfcore/lfcore/v2/publishing/models.proto
+
+static const NSUInteger kLFSContentSourceDecode[] = {
+    LFSContentSourceLivefyre, // 0
+    LFSContentSourceTwitter,  // 1
+    LFSContentSourceTwitter,  // 2
+    LFSContentSourceFacebook, // 3
+    LFSContentSourceLivefyre, // 4
+    LFSContentSourceLivefyre, // 5
+    LFSContentSourceFacebook,  // 6
+    LFSContentSourceTwitter,  // 7
+    LFSContentSourceLivefyre,  // 8
+    LFSContentSourceLivefyre,  // 9
+    LFSContentSourceGooglePlus,  // 10
+    LFSContentSourceFlickr,  // 11
+    LFSContentSourceYouTube,  // 12
+    LFSContentSourceRSS,  // 13
+    LFSContentSourceFacebook,  // 14
+    LFSContentSourceTwitter,  // 15
+    LFSContentSourceYouTube,  // 16
+    LFSContentSourceLivefyre,  // 17
+    LFSContentInstagram,  // 18
+};
+
+static NSString* const kLFSSourceImageMap[] = {
+    nil, // LFSContentSourceLivefyre (0)
+    @"SourceTwitter", //LFSContentSourceTwitter (1)
+    @"SourceFacebook", //LFSContentSourceFacebook (2)
+    nil, //LFSContentSourceGooglePlus (3)
+    nil, //LFSContentSourceFlickr (4)
+    nil, //LFSContentSourceYouTube (5)
+    @"SourceRSS", //LFSContentSourceRSS (6)
+    @"SourceInstagram", //LFSContentInstagram (7)
+};
+
 #pragma mark - Properties
 
 @synthesize contentTwitterId = _contentTwitterId;
@@ -220,6 +257,57 @@
     }
     return _contentSource;
 }
+
+-(UIImage*)contentSourceIcon
+{
+    NSUInteger rawContentSource = self.contentSource;
+    if (rawContentSource <= 18u) {
+        LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
+        return [self imageForContentSource:contentSource];
+    } else {
+        return nil;
+    }
+}
+
+-(UIImage*)contentSourceIconSmall
+{
+    NSUInteger rawContentSource = self.contentSource;
+    if (rawContentSource <= 18u) {
+        LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
+        return [self smallImageForContentSource:contentSource];
+    } else {
+        return nil;
+    }
+}
+
+
+#pragma mark - Private methods
+
+-(UIImage*)imageForContentSource:(LFSContentSource)contentSource
+{
+    // do a simple range check for memory safety
+    if (contentSource <= LFSContentInstagram) {
+        NSString* const imageName = kLFSSourceImageMap[contentSource];
+        return [UIImage imageNamed:imageName];
+    } else {
+        return nil;
+    }
+}
+
+-(UIImage*)smallImageForContentSource:(LFSContentSource)contentSource
+{
+    // do a simple range check for memory safety
+    if (contentSource <= LFSContentInstagram) {
+        NSString* const imageName = kLFSSourceImageMap[contentSource];
+        NSString *smallImageName = [imageName stringByAppendingString:@"Small"];
+        return [UIImage imageNamed:smallImageName];
+    } else {
+        return nil;
+    }
+}
+
+
+#pragma mark - Public methods
 
 -(void)setAuthorWithCollection:(LFSAuthorCollection *)authorCollection
 {

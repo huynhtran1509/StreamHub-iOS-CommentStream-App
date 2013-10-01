@@ -492,6 +492,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     [cell setHTMLString:[content contentBodyHtml]];
     [cell setDateFormatter:self.dateFormatter];
     [cell setContentDate:[content contentCreatedAt]];
+    [cell setIndicatorIcon:content.contentSourceIconSmall];
     
     // always set an object
     LFSAuthor *author = content.author;
