@@ -8,10 +8,7 @@
 
 #import "LFSAuthor.h"
 
-@implementation LFSAuthor {
-    id _object;
-}
-
+@implementation LFSAuthor
 /*
  * Sample JSON object:
  {
@@ -24,6 +21,9 @@
  }
  
  */
+
+#pragma mark - Properties
+@synthesize object = _object;
 
 @synthesize displayName = _displayName;
 @synthesize profileUrlString = _profileUrlString;

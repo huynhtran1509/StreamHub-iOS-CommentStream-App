@@ -9,7 +9,6 @@
 #import "LFSContent.h"
 
 @implementation LFSContent {
-    id _object;
     BOOL _visibilityIsSet;
     BOOL _contentTypeIsSet;
     BOOL _contentSourceIsSet;
@@ -76,6 +75,8 @@ static NSString* const kLFSSourceImageMap[] = {
 };
 
 #pragma mark - Properties
+
+@synthesize object = _object;
 
 @synthesize contentTwitterId = _contentTwitterId;
 @synthesize contentTwitterUrlString = _contentTwitterUrlString;

@@ -24,6 +24,8 @@
  */
 -(id)initWithObject:(id)object;
 
+@property (nonatomic, strong) id object;
+
 // Note: use lazy instantiation here
 @property (nonatomic, copy) NSString *displayName;
 @property (nonatomic, copy) NSString *profileUrlString;
