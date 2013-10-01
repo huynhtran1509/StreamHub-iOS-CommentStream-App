@@ -13,7 +13,7 @@
 #import "UILabel+Trim.h"
 
 static const UIEdgeInsets kPadding = {
-    .top=7.f, .left=15.f, .bottom=18.f, .right=12.f
+    .top=10.f, .left=15.f, .bottom=12.f, .right=12.f
 };
 
 static const CGFloat kContentPaddingRight = 7.f;
