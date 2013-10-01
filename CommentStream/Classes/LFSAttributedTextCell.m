@@ -20,6 +20,9 @@ static const UIEdgeInsets kPadding = {
 static const CGFloat kContentPaddingRight = 7.f;
 static const CGFloat kContentLineSpacing = 6.f;
 
+static const CGFloat kHeaderAcessoryRightFontSize = 11.f;
+
+static const CGFloat kHeaderTitleFontSize = 12.f;
 static const CGFloat kHeaderSubtitleFontSize = 11.f;
 static const CGFloat kHeaderAttributeTopFontSize = 10.f;
 static const CGFloat kHeaderAdjust = 2.f;
@@ -264,13 +267,13 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kPadding.top - kHeaderAdjust,
                                   self.bounds.size.width - leftColumnWidth - kPadding.right,
-                                  kImageViewSize.height + kHeaderAdjust * 2.f);
+                                  kImageViewSize.height + kHeaderAdjust + kHeaderAdjust);
 
         // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerTitleView setFont:[UIFont boldSystemFontOfSize:12.f]];
+        [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kHeaderTitleFontSize]];
         [_headerTitleView setTextColor:[UIColor blackColor]];
         [_headerTitleView setBackgroundColor:[UIColor clearColor]]; // for iOS6
         
@@ -320,7 +323,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         _headerAccessoryRightView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:11.f]];
+        [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:kHeaderAcessoryRightFontSize]];
         [_headerAccessoryRightView setTextColor:[UIColor lightGrayColor]];
         //[_headerAccessoryRightView setTextAlignment:NSTextAlignmentRight];
         
