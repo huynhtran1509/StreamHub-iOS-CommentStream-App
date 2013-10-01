@@ -26,6 +26,9 @@ static const CGFloat kHeaderAttributeTopFontSize = 10.f;
 static const CGFloat kHeaderAdjust = 2.f;
 
 static const CGSize  kImageViewSize = { .width=25.f, .height=25.f };
+
+static const CGSize kheaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
+
 static const CGFloat kImageCornerRadius = 4.f;
 static const CGFloat kImageMarginRight = 8.0f;
 
@@ -52,6 +55,8 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
 @property (nonatomic, readonly) LFSBasicHTMLLabel *bodyView;
 @property (nonatomic, readonly) UILabel *headerAccessoryRightView;
+
+@property (nonatomic, strong) UIImageView *headerAccessoryRightIconView;
 @end
 
 @implementation LFSAttributedTextCell
@@ -325,53 +330,20 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 	return _headerAccessoryRightView;
 }
 
-#pragma mark - Lifecycle
--(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
+#pragma mark -
+@synthesize headerAccessoryRightIconView = _headerAccessoryRightIconView;
+- (UIImageView *)headerAccessoryRightIconView
 {
-    self = [super initWithStyle:UITableViewCellStyleDefault
-                reuseIdentifier:reuseIdentifier];
-    if (self)
-    {
-        // initialize subview references
-        _bodyView = nil;
-        _headerAccessoryRightView = nil;
-        _headerImage = nil;
-        _headerTitleView = nil;
-        
-        _contentDate = nil;
-        _dateFormatter = nil;
-        
-        _requiredBodyHeight = CGFLOAT_MAX;
-        
-        [self setAccessoryType:UITableViewCellAccessoryNone];
-        
-        if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
-        {
-            // iOS7-like selected background color
-            [self setSelectionStyle:UITableViewCellSelectionStyleGray];
-            UIView *selectionColor = [[UIView alloc] init];
-            [selectionColor setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
-                                                               green:(217.f/255.f)
-                                                                blue:(217.f/255.f)
-                                                               alpha:1.f]];
-            [self setSelectedBackgroundView:selectionColor];
-        }
-        
-        [self.imageView setContentMode:UIViewContentModeScaleToFill];
-        [self.imageView.layer setCornerRadius:kImageCornerRadius];
-        [self.imageView.layer setMasksToBounds:YES];
-    }
-    return self;
-}
+	if (_headerAccessoryRightIconView == nil) {
+        // initialize
+        UIImage *icon = self.indicatorIcon;
+        _headerAccessoryRightIconView = [[UIImageView alloc] initWithImage:icon];
+        // configure
 
--(void)dealloc{
-    _bodyView = nil;
-    _headerTitleView = nil;
-    _headerAccessoryRightView = nil;
-    _headerImage = nil;
-    
-    _contentDate = nil;
-    _dateFormatter = nil;
+        // add to superview
+		[self.contentView addSubview:_headerAccessoryRightIconView];
+	}
+	return _headerAccessoryRightIconView;
 }
 
 #pragma mark - Overrides
@@ -488,8 +460,18 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     accessoryRightFrame.origin.x = leftColumnWidth;
     accessoryRightFrame.size.width = rect.size.width - leftColumnWidth - kPadding.right;
     [self.headerAccessoryRightView setFrame:accessoryRightFrame];
-    [self.headerAccessoryRightView setText:[self.dateFormatter relativeStringFromDate:self.contentDate]];
+    [self.headerAccessoryRightView setText:
+     [self.dateFormatter relativeStringFromDate:self.contentDate]];
     [self.headerAccessoryRightView resizeVerticalTopLeftTrim];
+    
+    if (self.indicatorIcon != nil) {
+        CGFloat centerY = self.headerAccessoryRightView.center.y;
+        [self.headerAccessoryRightIconView setCenter:
+         CGPointMake(self.headerAccessoryRightView.frame.origin.x -
+                     self.headerAccessoryRightIconView.frame.size.width,
+                     centerY)];
+    }
+    
 }
 
 -(void)layoutBodyWithBounds:(CGRect)rect
@@ -538,6 +520,60 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     
     [self setRequiredBodyHeight:requiredBodySize.height];
     return kPadding.bottom + requiredBodySize.height + kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
+}
+
+
+#pragma mark - Lifecycle
+-(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:UITableViewCellStyleDefault
+                reuseIdentifier:reuseIdentifier];
+    if (self)
+    {
+        // initialize subview references
+        _bodyView = nil;
+        _indicatorIcon = nil;
+        _headerAccessoryRightView = nil;
+        _headerAccessoryRightIconView = nil;
+        _headerImage = nil;
+        _headerTitleView = nil;
+        
+        _contentDate = nil;
+        _dateFormatter = nil;
+        
+        _requiredBodyHeight = CGFLOAT_MAX;
+        
+        [self setAccessoryType:UITableViewCellAccessoryNone];
+        
+        if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
+        {
+            // iOS7-like selected background color
+            [self setSelectionStyle:UITableViewCellSelectionStyleGray];
+            UIView *selectionColor = [[UIView alloc] init];
+            [selectionColor setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
+                                                               green:(217.f/255.f)
+                                                                blue:(217.f/255.f)
+                                                               alpha:1.f]];
+            [self setSelectedBackgroundView:selectionColor];
+        }
+        
+        [self.imageView setContentMode:UIViewContentModeScaleToFill];
+        [self.imageView.layer setCornerRadius:kImageCornerRadius];
+        [self.imageView.layer setMasksToBounds:YES];
+    }
+    return self;
+}
+
+-(void)dealloc{
+    _bodyView = nil;
+    _headerTitleView = nil;
+    _indicatorIcon = nil;
+    _headerAccessoryRightView = nil;
+    _headerAccessoryRightIconView = nil;
+    _headerImage = nil;
+    
+    _contentDate = nil;
+    _dateFormatter = nil;
 }
 
 @end

@@ -269,7 +269,7 @@ static NSString* const kLFSSourceImageMap[] = {
     }
 }
 
--(UIImage*)smallContentSourceIcon
+-(UIImage*)contentSourceIconSmall
 {
     NSUInteger rawContentSource = self.contentSource;
     if (rawContentSource <= 18u) {
