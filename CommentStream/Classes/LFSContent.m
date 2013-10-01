@@ -38,7 +38,10 @@
 // For more info, see
 // https://github.com/Livefyre/lfdj/blob/production/lfcore/lfcore/v2/publishing/models.proto
 
-static const NSUInteger kLFSContentSourceDecode[] = {
+#define CONTENT_SOURCE_DECODE_LENGTH 20u
+
+static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
+{
     LFSContentSourceLivefyre, // 0
     LFSContentSourceTwitter,  // 1
     LFSContentSourceTwitter,  // 2
@@ -57,7 +60,8 @@ static const NSUInteger kLFSContentSourceDecode[] = {
     LFSContentSourceTwitter,  // 15
     LFSContentSourceYouTube,  // 16
     LFSContentSourceLivefyre,  // 17
-    LFSContentInstagram,  // 18
+    LFSContentSourceLivefyre,  // 18
+    LFSContentSourceInstagram,  // 19
 };
 
 static NSString* const kLFSSourceImageMap[] = {
@@ -68,7 +72,7 @@ static NSString* const kLFSSourceImageMap[] = {
     nil, //LFSContentSourceFlickr (4)
     nil, //LFSContentSourceYouTube (5)
     @"SourceRSS", //LFSContentSourceRSS (6)
-    @"SourceInstagram", //LFSContentInstagram (7)
+    @"SourceInstagram", //LFSContentSourceInstagram (7)
 };
 
 #pragma mark - Properties
@@ -261,7 +265,7 @@ static NSString* const kLFSSourceImageMap[] = {
 -(UIImage*)contentSourceIcon
 {
     NSUInteger rawContentSource = self.contentSource;
-    if (rawContentSource <= 18u) {
+    if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
         LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
         return [self imageForContentSource:contentSource];
     } else {
@@ -272,7 +276,7 @@ static NSString* const kLFSSourceImageMap[] = {
 -(UIImage*)contentSourceIconSmall
 {
     NSUInteger rawContentSource = self.contentSource;
-    if (rawContentSource <= 18u) {
+    if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
         LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
         return [self smallImageForContentSource:contentSource];
     } else {
@@ -286,7 +290,7 @@ static NSString* const kLFSSourceImageMap[] = {
 -(UIImage*)imageForContentSource:(LFSContentSource)contentSource
 {
     // do a simple range check for memory safety
-    if (contentSource <= LFSContentInstagram) {
+    if (contentSource <= LFSContentSourceInstagram) {
         NSString* const imageName = kLFSSourceImageMap[contentSource];
         return [UIImage imageNamed:imageName];
     } else {
@@ -297,7 +301,7 @@ static NSString* const kLFSSourceImageMap[] = {
 -(UIImage*)smallImageForContentSource:(LFSContentSource)contentSource
 {
     // do a simple range check for memory safety
-    if (contentSource <= LFSContentInstagram) {
+    if (contentSource <= LFSContentSourceInstagram) {
         NSString* const imageName = kLFSSourceImageMap[contentSource];
         NSString *smallImageName = [imageName stringByAppendingString:@"Small"];
         return [UIImage imageNamed:smallImageName];
