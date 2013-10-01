@@ -12,7 +12,6 @@
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
 
-// TODO: turn some of these consts into properties for easier customization
 static const UIEdgeInsets kPadding = {
     .top=7.f, .left=15.f, .bottom=18.f, .right=12.f
 };
@@ -20,9 +19,8 @@ static const UIEdgeInsets kPadding = {
 static const CGFloat kContentPaddingRight = 7.f;
 static const CGFloat kContentLineSpacing = 6.f;
 
-// title font settings
-static const CGFloat kHeaderSubtitleFontSize = 11.f; // not used yet
-static const CGFloat kHeaderAttributeTopFontSize = 10.f; // not used yet
+static const CGFloat kHeaderSubtitleFontSize = 11.f;
+static const CGFloat kHeaderAttributeTopFontSize = 10.f;
 
 static const CGFloat kHeaderAdjust = 2.f;
 
@@ -32,7 +30,7 @@ static const CGFloat kImageMarginRight = 8.0f;
 
 static const CGFloat kMinorVerticalSeparator = 12.0f;
 
-// {{{ not really relevant
+// {{{ TODO: remove these?
 static const CGFloat kHeaderAcessoryRightHeight = 21.f;
 
 static const CGFloat kMajorVerticalSeparator = 7.0f;
@@ -503,6 +501,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 		return;
 	}
 	
+    // reset requiredbodyheight
+    [self setRequiredBodyHeight:CGFLOAT_MAX];
+    
 	_htmlHash = newHash;
 	[self.bodyView setHTMLString:html];
 	[self setNeedsLayout];
