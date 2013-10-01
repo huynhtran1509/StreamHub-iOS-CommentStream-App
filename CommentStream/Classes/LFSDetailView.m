@@ -51,6 +51,8 @@ static const CGFloat kToolbarHeight = 44.0f;
 static const CGFloat kMinorVerticalSeparator = 12.0f;
 static const CGFloat kMajorVerticalSeparator = 20.0f;
 
+static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
+
 #pragma mark -
 @interface LFSDetailView ()
 
@@ -172,6 +174,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         _headerAccessoryRightView = [[UIButton alloc] initWithFrame:frame];
         
         // configure
+        [_headerAccessoryRightView setAlpha:kHeaderAccessoryRightAlpha];
+        
         [_headerAccessoryRightView addTarget:self
                                  action:@selector(didSelectProfile:)
                        forControlEvents:UIControlEventTouchUpInside];
