@@ -37,6 +37,8 @@
 
 -(id)initWithObject:(id)object;
 
+@property (nonatomic, readonly) UIImage *smallContentSourceIcon;
+@property (nonatomic, readonly) UIImage *contentSourceIcon;
 @property (nonatomic, readonly) NSString *contentTwitterId;
 @property (nonatomic, readonly) NSString *contentTwitterUrlString;
 
