@@ -8,21 +8,20 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import <StreamHub-iOS-SDK/LFSConstants.h>
+#import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import "LFSBasicHTMLParser.h"
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
 
-// TODO: turn some of these consts into properties for easier customization
 static const UIEdgeInsets kPadding = {
-    .top=7.f, .left=15.f, .bottom=18.f, .right=12.f
+    .top=10.f, .left=15.f, .bottom=12.f, .right=12.f
 };
 
 static const CGFloat kContentPaddingRight = 7.f;
 static const CGFloat kContentLineSpacing = 6.f;
 
-// title font settings
-static const CGFloat kHeaderSubtitleFontSize = 11.f; // not used yet
-static const CGFloat kHeaderAttributeTopFontSize = 10.f; // not used yet
+static const CGFloat kHeaderSubtitleFontSize = 11.f;
+static const CGFloat kHeaderAttributeTopFontSize = 10.f;
 
 static const CGFloat kHeaderAdjust = 2.f;
 
@@ -32,7 +31,7 @@ static const CGFloat kImageMarginRight = 8.0f;
 
 static const CGFloat kMinorVerticalSeparator = 12.0f;
 
-// {{{ not really relevant
+// {{{ TODO: remove these?
 static const CGFloat kHeaderAcessoryRightHeight = 21.f;
 
 static const CGFloat kMajorVerticalSeparator = 7.0f;
@@ -124,11 +123,24 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 #pragma mark - Other properties
 
 @synthesize htmlHash = _htmlHash;
+@synthesize dateFormatter = _dateFormatter;
 
-@synthesize headerAccessoryRightText = _headerAccessoryRightText;
 @synthesize profileLocal = _profileLocal;
 @synthesize profileRemote = _profileRemote;
 @synthesize contentRemote = _contentRemote;
+
+#pragma mark -
+@synthesize contentDate = _contentDate;
+-(void)setContentDate:(NSDate *)contentDate
+{
+    if (contentDate != _contentDate) {
+        NSString *dateTime = [self.dateFormatter relativeStringFromDate:contentDate];
+        [self.headerAccessoryRightView setText:dateTime];
+        [self setNeedsLayout];
+    
+        _contentDate = contentDate;
+    }
+}
 
 #pragma mark -
 @synthesize requiredBodyHeight = _requiredBodyHeight;
@@ -326,6 +338,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
         _headerImage = nil;
         _headerTitleView = nil;
         
+        _contentDate = nil;
+        _dateFormatter = nil;
+        
         _requiredBodyHeight = CGFLOAT_MAX;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
@@ -354,6 +369,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     _headerTitleView = nil;
     _headerAccessoryRightView = nil;
     _headerImage = nil;
+    
+    _contentDate = nil;
+    _dateFormatter = nil;
 }
 
 #pragma mark - Overrides
@@ -470,7 +488,7 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
     accessoryRightFrame.origin.x = leftColumnWidth;
     accessoryRightFrame.size.width = rect.size.width - leftColumnWidth - kPadding.right;
     [self.headerAccessoryRightView setFrame:accessoryRightFrame];
-    [self.headerAccessoryRightView setText:_headerAccessoryRightText];
+    [self.headerAccessoryRightView setText:[self.dateFormatter relativeStringFromDate:self.contentDate]];
     [self.headerAccessoryRightView resizeVerticalTopLeftTrim];
 }
 
@@ -503,6 +521,9 @@ static const CGFloat kHeaderSubtitleHeight = 10.0f;
 		return;
 	}
 	
+    // reset requiredbodyheight
+    [self setRequiredBodyHeight:CGFLOAT_MAX];
+    
 	_htmlHash = newHash;
 	[self.bodyView setHTMLString:html];
 	[self setNeedsLayout];

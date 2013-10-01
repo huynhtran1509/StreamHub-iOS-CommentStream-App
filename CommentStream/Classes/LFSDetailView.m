@@ -8,6 +8,7 @@
 
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
+#import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
@@ -437,7 +438,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     CGRect dateFrame = self.footerLeftView.frame;
     dateFrame.origin.y = bottom + kMinorVerticalSeparator;
     [self.footerLeftView setFrame:dateFrame];
-    [self.footerLeftView setText:self.contentDetail];
+    [self.footerLeftView setText:[self.dateFormatter relativeStringFromDate:self.contentDate]];
     
     // layout toolbar frame
     CGRect toolbarFrame = self.toolbar.frame;
@@ -622,7 +623,9 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         _profileRemote = nil;
         _contentRemote = nil;
         _contentBodyHtml = nil;
-        _contentDetail = nil;
+        
+        _contentDate = nil;
+        _dateFormatter = nil;
     }
     return self;
 }
@@ -649,7 +652,9 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         _profileRemote = nil;
         _contentRemote = nil;
         _contentBodyHtml = nil;
-        _contentDetail = nil;
+        
+        _contentDate = nil;
+        _dateFormatter = nil;
     }
     return self;
 }
@@ -671,7 +676,9 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     _profileRemote = nil;
     _contentRemote = nil;
     _contentBodyHtml = nil;
-    _contentDetail = nil;
+    
+    _contentDate = nil;
+    _dateFormatter = nil;
 }
 
 #pragma mark - Actions

@@ -15,11 +15,12 @@
 @interface LFSAttributedTextCell : UITableViewCell <UIAppearance>
 
 #pragma mark - Properties
-@property (strong, nonatomic) LFSHeader* profileLocal;
-@property (strong, nonatomic) LFSTriple* profileRemote;
-@property (strong, nonatomic) LFSTriple* contentRemote;
+@property (nonatomic, strong) LFSHeader* profileLocal;
+@property (nonatomic, strong) LFSTriple* profileRemote;
+@property (nonatomic, strong) LFSTriple* contentRemote;
 
-@property (copy, nonatomic) NSString *headerAccessoryRightText;
+@property (nonatomic, strong) NSDate* contentDate;
+@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 
 @property (nonatomic, strong) UIImage *headerImage;
 

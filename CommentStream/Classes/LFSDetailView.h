@@ -15,15 +15,17 @@
 
 @interface LFSDetailView : UIView
 
-@property (weak, nonatomic) id<LFSDetailViewDelegate>delegate;
-@property (assign, nonatomic) BOOL isLikedByUser;
+@property (nonatomic, weak) id<LFSDetailViewDelegate>delegate;
+@property (nonatomic, assign) BOOL isLikedByUser;
 
-@property (strong, nonatomic) LFSHeader* profileLocal;
-@property (strong, nonatomic) LFSTriple* profileRemote;
-@property (strong, nonatomic) LFSTriple* contentRemote;
+@property (nonatomic, strong) LFSHeader* profileLocal;
+@property (nonatomic, strong) LFSTriple* profileRemote;
+@property (nonatomic, strong) LFSTriple* contentRemote;
 
-@property (copy, nonatomic) NSString* contentBodyHtml;
-@property (copy, nonatomic) NSString* contentDetail;
+@property (nonatomic, copy) NSString* contentBodyHtml;
+
+@property (nonatomic, strong) NSDate* contentDate;
+@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 
 @end
 
