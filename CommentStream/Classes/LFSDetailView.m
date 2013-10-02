@@ -442,7 +442,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
     CGRect dateFrame = self.footerLeftView.frame;
     dateFrame.origin.y = bottom + kMinorVerticalSeparator;
     [self.footerLeftView setFrame:dateFrame];
-    [self.footerLeftView setText:[self.dateFormatter relativeStringFromDate:self.contentDate]];
+    [self.footerLeftView setText:[self.dateFormatter extendedRelativeStringFromDate:self.contentDate]];
     
     // layout toolbar frame
     CGRect toolbarFrame = self.toolbar.frame;
