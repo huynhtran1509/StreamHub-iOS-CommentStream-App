@@ -18,7 +18,7 @@
 
 #import "LFSContentCollection.h"
 
-//#define USE_CELL_CACHE
+#define USE_CELL_CACHE
 
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSContentCollection *content;
@@ -465,10 +465,10 @@ static NSString* const kCellSelectSegue = @"detailView";
 {
     LFSAttributedTextCell *cell;
 
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    
 #ifdef USE_CELL_CACHE
-    // uniquing of NSIndexPath objects was disabled in iOS5, so use a string
-    // key as a workaround
-    NSString *key = [NSString stringWithFormat:@"%d-%d", indexPath.section, indexPath.row];
+    NSString *key = content.contentId;
     cell = [_cellCache objectForKey:key];
 #else
     cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:
@@ -488,16 +488,15 @@ static NSString* const kCellSelectSegue = @"detailView";
     [_cellCache setObject:cell forKey:key];
 #endif
     
-    [self configureCell:cell forIndexPath:indexPath];
+    [self configureCell:cell withContent:content];
     return cell;
 }
 
 #pragma mark - Table and cell helpers
 
 // called every time a cell is configured
-- (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
+- (void)configureCell:(LFSAttributedTextCell *)cell withContent:(LFSContent *)content
 {
-    LFSContent *content = [_content objectAtIndex:indexPath.row];
     [cell setHTMLString:content.contentBodyHtml];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];

@@ -28,7 +28,11 @@ static const CGFloat kHeaderAcessoryRightFontSize = 11.f;
 static const CGFloat kHeaderTitleFontSize = 12.f;
 static const CGFloat kHeaderSubtitleFontSize = 11.f;
 static const CGFloat kHeaderAttributeTopFontSize = 10.f;
+
 static const CGFloat kHeaderAdjust = 2.f;
+static const CGFloat kHeaderAttributeAdjust = -1.f;
+static const CGFloat kHeaderAccessoryRightAdjust = 1.f;
+
 static const CGFloat kHeaderAccessoryRightImageAlpha = 0.618f;
 
 static const CGSize  kHeaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
@@ -321,7 +325,7 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 	if (_headerAccessoryRightView == nil) {
         CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
-                                  kPadding.top,
+                                  kPadding.top - kHeaderAccessoryRightAdjust,
                                   self.bounds.size.width - leftColumnWidth - kPadding.right,
                                   kImageViewSize.height);
 
@@ -425,7 +429,7 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
                                                      + headerTitleFrame.size.width
                                                      + kImageMarginRight,
-                                                     headerTitleFrame.origin.y);
+                                                     headerTitleFrame.origin.y - kHeaderAttributeAdjust);
         headerAttributeTopFrame.size = CGSizeMake(rect.size.width
                                                   - headerTitleFrame.origin.x
                                                   - headerTitleFrame.size.width,
@@ -450,7 +454,7 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
                                                      + headerTitleFrame.size.width
                                                      + kImageMarginRight,
-                                                     headerTitleFrame.origin.y);
+                                                     headerTitleFrame.origin.y - kHeaderAttributeAdjust);
         headerAttributeTopFrame.size = CGSizeMake(rect.size.width
                                                   - headerTitleFrame.origin.x
                                                   - headerTitleFrame.size.width,
