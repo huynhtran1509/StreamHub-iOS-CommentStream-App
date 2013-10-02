@@ -561,7 +561,6 @@ static NSString* const kCellSelectSegue = @"detailView";
 #ifdef CACHE_SCALED_IMAGES
     }
 #endif
-    
 }
 
 - (void)scaleImage:(UIImage*)image forContent:(LFSContent*)content
@@ -603,7 +602,7 @@ static NSString* const kCellSelectSegue = @"detailView";
         dispatch_sync(dispatch_get_main_queue(), ^{
             LFSAttributedTextCell *cell = [_cellCache objectForKey:contentId];
             [cell.imageView setImage:scaledImage];
-            [cell.imageView setNeedsDisplay];
+            [cell setNeedsLayout];
         });
     });
 }
