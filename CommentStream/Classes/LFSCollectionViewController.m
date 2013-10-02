@@ -411,7 +411,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     [_content addAuthorsCollection:authors];
 
     // TODO: move filtering to model/collection object?
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1"];
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1 && type == 0"];
     NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
     NSRange contentSpan;
     contentSpan.location = 0u;
