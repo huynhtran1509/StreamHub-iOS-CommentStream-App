@@ -105,9 +105,13 @@
 {
     if ([anObject isKindOfClass:[LFSContent class]]) {
         [_array replaceObjectAtIndex:index withObject:anObject];
+        //LFSContent *content = [_array objectAtIndex:index];
+        //[content setObject:[anObject object]];
     } else {
         LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
         [_array replaceObjectAtIndex:index withObject:content];
+        //LFSContent *content = [_array objectAtIndex:index];
+        //[content setObject:anObject];
     }
 }
 

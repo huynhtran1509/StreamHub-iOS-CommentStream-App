@@ -13,6 +13,8 @@
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
 
+const CGSize kImageViewSize = { .width=25.f, .height=25.f };
+
 static const UIEdgeInsets kPadding = {
     .top=10.f, .left=15.f, .bottom=12.f, .right=12.f
 };
@@ -36,8 +38,6 @@ static const CGFloat kHeaderAccessoryRightAdjust = 1.f;
 static const CGFloat kHeaderAccessoryRightImageAlpha = 0.618f;
 
 static const CGSize  kHeaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
-
-static const CGSize  kImageViewSize = { .width=25.f, .height=25.f };
 
 static const CGFloat kImageCornerRadius = 4.f;
 static const CGFloat kImageMarginRight = 8.0f;
@@ -169,49 +169,6 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         _requiredBodyHeight = requiredBodySize.height;
     }
     return _requiredBodyHeight;
-}
-
-#pragma mark -
-@synthesize headerImage = _headerImage;
-- (void)setHeaderImage:(UIImage*)image
-{
-    // store original-size image
-    _headerImage = image;
-    
-    // we are on a non-Retina device
-    UIScreen *screen = [UIScreen mainScreen];
-    CGSize size;
-    if ([screen respondsToSelector:@selector(scale)] && [screen scale] == 2.f)
-    {
-        // Retina: scale to 2x frame size
-        size = CGSizeMake(kImageViewSize.width * 2.f,
-                          kImageViewSize.height * 2.f);
-    }
-    else
-    {
-        // non-Retina
-        size = kImageViewSize;
-    }
-    CGRect targetRect;
-    targetRect.origin = CGPointZero;
-    targetRect.size = size;
-    dispatch_queue_t queue =
-    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0.f);
-    dispatch_async(queue, ^{
-        
-        // scale image on a background thread
-        // Note: this will not preserve aspect ratio
-        UIGraphicsBeginImageContext(size);
-        [image drawInRect:targetRect];
-        UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        
-        // display image on the main thread
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            self.imageView.image = scaledImage;
-            [self setNeedsLayout];
-        });
-    });
 }
 
 #pragma mark -
@@ -384,16 +341,16 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
     // Note: preciese layout depends on whether we have subtitle field
     // (i.e. twitter handle)
     
+    // layout avatar view
+    CGRect imageViewFrame;
+    imageViewFrame.origin = CGPointMake(kPadding.left, kPadding.top);
+    imageViewFrame.size = kImageViewSize;
+    [self.imageView setFrame:imageViewFrame];
+    
     LFSHeader *profileLocal = self.profileLocal;
     NSString *headerTitle = profileLocal.mainString;
     NSString *headerSubtitle = profileLocal.detailString;
     NSString *headerAccessory = profileLocal.attributeString;
-    
-    // layout avatar
-    CGRect imageViewFrame;
-    imageViewFrame.origin = CGPointMake(kPadding.left, kPadding.top);
-    imageViewFrame.size = kImageViewSize;
-    self.imageView.frame = imageViewFrame;
     
     CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
     
@@ -548,7 +505,6 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         _indicatorIcon = nil;
         _headerAccessoryRightView = nil;
         _headerAccessoryRightImageView = nil;
-        _headerImage = nil;
         _headerTitleView = nil;
         
         _contentDate = nil;
@@ -584,7 +540,6 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
     _indicatorIcon = nil;
     _headerAccessoryRightView = nil;
     _headerAccessoryRightImageView = nil;
-    _headerImage = nil;
     
     _contentDate = nil;
     _dateFormatter = nil;

@@ -163,7 +163,7 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
     [self.writeClient postNewContent:text
                              forUser:[self.collection objectForKey:@"lftoken"]
                        forCollection:self.collectionId
-                           inReplyTo:self.replyToContent.contentId
+                           inReplyTo:self.replyToContent.idString
                            onSuccess:^(NSOperation *operation, id responseObject)
      {
          // do nothing

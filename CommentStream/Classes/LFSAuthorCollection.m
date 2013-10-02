@@ -49,11 +49,24 @@
 
 -(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey
 {
+    // only update object data if the two
+    // objects turn out to have the same key
     if ([anObject isKindOfClass:[LFSAuthor class]]) {
+        LFSAuthor *author = [_dictionary objectForKey:aKey];
+        if (author == nil) {
+            [_dictionary setObject:anObject forKey:aKey];
+        } else {
+            [author setObject:[anObject object]];
+        }
         [_dictionary setObject:anObject forKey:aKey];
     } else {
-        LFSAuthor *author = [[LFSAuthor alloc] initWithObject:anObject];
-        [_dictionary setObject:author forKey:aKey];
+        LFSAuthor *author = [_dictionary objectForKey:aKey];
+        if (author == nil) {
+            [_dictionary setObject:[[LFSAuthor alloc] initWithObject:anObject]
+                            forKey:aKey];
+        } else {
+            [author setObject:anObject];
+        }
     }
 }
 

@@ -26,12 +26,14 @@
 
 @property (nonatomic, strong) id object;
 
+@property (nonatomic, strong) UIImage *avatarImage;
+
 // Note: use lazy instantiation here
 @property (nonatomic, copy) NSString *displayName;
 @property (nonatomic, copy) NSString *profileUrlString;
 @property (nonatomic, copy) NSString *avatarUrlString;
 @property (nonatomic, copy) NSString *avatarUrlString75;
-@property (nonatomic, copy) NSString *userId;
+@property (nonatomic, copy) NSString *idString;
 @property (nonatomic, copy) NSString *twitterHandle;
 @property (nonatomic, copy) NSString *profileUrlStringNoHashBang;
 

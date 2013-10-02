@@ -24,17 +24,22 @@
 
 #pragma mark - Properties
 @synthesize object = _object;
+-(void)setObject:(id)object
+{
+    if (_object != nil && _object != object) {
+        id newObject = [[self.class alloc] initWithObject:object];
+        NSString *newId = [newObject idString];
+        if (![self.idString isEqualToString:newId]) {
+            [NSException raise:@"Object rebase conflict"
+                        format:@"Cannot rebase object with id %@ on top %@", self.idString, newId];
+        }
+        [self resetCached];
+    }
+    _object = object;
+}
 
+#pragma mark -
 @synthesize displayName = _displayName;
-@synthesize profileUrlString = _profileUrlString;
-@synthesize avatarUrlString = _avatarUrlString;
-@synthesize avatarUrlString75 = _avatarUrlString75;
-@synthesize userTags = _userTags;
-@synthesize userType = _userType;
-@synthesize userId = _userId;
-@synthesize twitterHandle = _twitterHandle;
-@synthesize profileUrlStringNoHashBang = _profileUrlStringNoHashBang;
-
 -(NSString*)displayName
 {
     const static NSString* const key = @"displayName";
@@ -44,16 +49,19 @@
     return _displayName;
 }
 
--(NSString*)userId
+#pragma mark -
+@synthesize idString = _idString;
+-(NSString*)idString
 {
     const static NSString* const key = @"id";
-    if (_userId == nil) {
-        _userId = [_object objectForKey:key];
+    if (_idString == nil) {
+        _idString = [_object objectForKey:key];
     }
-    return _userId;
+    return _idString;
 }
 
-
+#pragma mark -
+@synthesize profileUrlString = _profileUrlString;
 -(NSString*)profileUrlString
 {
     const static NSString* const key = @"profileUrl";
@@ -63,6 +71,8 @@
     return _profileUrlString;
 }
 
+#pragma mark -
+@synthesize profileUrlStringNoHashBang = _profileUrlStringNoHashBang;
 -(NSString*)profileUrlStringNoHashBang
 {
     static NSRegularExpression *regex1 = nil;
@@ -87,6 +97,8 @@
     return _profileUrlStringNoHashBang;
 }
 
+#pragma mark -
+@synthesize avatarUrlString = _avatarUrlString;
 -(NSString*)avatarUrlString
 {
     const static NSString* const key = @"avatar";
@@ -96,6 +108,8 @@
     return _avatarUrlString;
 }
 
+#pragma mark -
+@synthesize avatarUrlString75 = _avatarUrlString75;
 -(NSString*)avatarUrlString75
 {
     // create 75px avatar url
@@ -143,6 +157,8 @@
     return _avatarUrlString75;
 }
 
+#pragma mark -
+@synthesize userType = _userType;
 -(NSNumber*)userType
 {
     const static NSString* const key = @"type";
@@ -152,6 +168,8 @@
     return _userType;
 }
 
+#pragma mark -
+@synthesize userTags = _userTags;
 -(NSArray*)userTags
 {
     const static NSString* const key = @"tags";
@@ -161,6 +179,8 @@
     return _userTags;
 }
 
+#pragma mark -
+@synthesize twitterHandle = _twitterHandle;
 -(NSString*)twitterHandle
 {
     static NSString* const twitterHost = @"twitter.com";
@@ -180,13 +200,8 @@
     if (self ) {
         // initialization stuff here
         _object = object;
-        _displayName = nil;
-        _profileUrlString = nil;
-        _avatarUrlString = nil;
-        _userTags = nil;
-        _userType = nil;
-        _userId = nil;
-        _twitterHandle = nil;
+        _avatarImage = nil;
+        [self resetCached];
     }
     return self;
 }
@@ -195,23 +210,29 @@
 {
     // simply call designated initializer
     self = [self initWithObject:nil];
-    if (self) {
-        // initialize stuff here
-    }
     return self;
 }
 
 -(void)dealloc
 {
-    _displayName = nil;
-    _profileUrlString = nil;
-    _avatarUrlString = nil;
-    _userTags = nil;
-    _userType = nil;
-    _userId = nil;
-    _twitterHandle = nil;
+    [self resetCached];
+    _avatarImage = nil;
     _object = nil;
 }
 
+-(void)resetCached
+{
+    // reset all cached properties except _object
+    // and _avatarImage
+    _displayName = nil;
+    _idString = nil;
+    _profileUrlString = nil;
+    _profileUrlStringNoHashBang = nil;
+    _avatarUrlString = nil;
+    _avatarUrlString75 = nil;
+    _userType = nil;
+    _userTags = nil;
+    _twitterHandle = nil;
+}
 
 @end
