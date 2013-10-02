@@ -46,7 +46,8 @@ static const CGFloat kFooterHeight = 21.0f;
 static const CGFloat kRemoteButtonWidth = 20.0f;
 static const CGFloat kRemoteButtonHeight = 20.0f;
 
-static const CGFloat kToolbarHeight = 44.0f;
+static const CGFloat kBarButtonHeight = 44.0f;
+static const CGFloat kBarButtonWidth = 88.0f;
 
 static const CGFloat kMinorVerticalSeparator = 12.0f;
 static const CGFloat kMajorVerticalSeparator = 20.0f;
@@ -98,8 +99,8 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
     if (_likeButton == nil) {
         UIImage *img = [self imageForLikedState:self.isLikedByUser];
         CGRect frame = CGRectMake(0.f, 0.f,
-                                  img.size.width,
-                                  img.size.height);
+                                  kBarButtonWidth,
+                                  kBarButtonHeight);
         // initialize
         _likeButton = [[UIButton alloc] initWithFrame:frame];
         
@@ -120,8 +121,8 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
     if (_replyButton == nil) {
         UIImage *img = [UIImage imageNamed:@"ActionReply"];
         CGRect frame = CGRectMake(0.f, 0.f,
-                                  img.size.width,
-                                  img.size.height);
+                                  kBarButtonWidth,
+                                  kBarButtonHeight);
         // initialize
         _replyButton = [[UIButton alloc] initWithFrame:frame];
         
@@ -368,7 +369,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
     if (_toolbar == nil) {
 
         CGRect frame = CGRectZero;
-        frame.size = CGSizeMake(self.bounds.size.width, kToolbarHeight);
+        frame.size = CGSizeMake(self.bounds.size.width, kBarButtonHeight);
         
         // initialize
         _toolbar = [[LFSContentToolbar alloc] initWithFrame:frame];
@@ -457,7 +458,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 {
     CGFloat totalWidthInset = kPadding.left + kContentPaddingRight;
     CGFloat totalHeightInset = (kPadding.bottom
-                                + kToolbarHeight
+                                + kBarButtonHeight
                                 + kMinorVerticalSeparator
                                 + kFooterHeight
                                 + kMinorVerticalSeparator
