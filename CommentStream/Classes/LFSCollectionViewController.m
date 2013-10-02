@@ -603,7 +603,7 @@ static NSString* const kCellSelectSegue = @"detailView";
         dispatch_sync(dispatch_get_main_queue(), ^{
             LFSAttributedTextCell *cell = [_cellCache objectForKey:contentId];
             [cell.imageView setImage:scaledImage];
-            //[cell setNeedsLayout];
+            [cell.imageView setNeedsDisplay];
         });
     });
 }
