@@ -51,6 +51,8 @@ static const CGFloat kToolbarHeight = 44.0f;
 static const CGFloat kMinorVerticalSeparator = 12.0f;
 static const CGFloat kMajorVerticalSeparator = 20.0f;
 
+static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
+
 #pragma mark -
 @interface LFSDetailView ()
 
@@ -172,6 +174,8 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
         _headerAccessoryRightView = [[UIButton alloc] initWithFrame:frame];
         
         // configure
+        [_headerAccessoryRightView setAlpha:kHeaderAccessoryRightAlpha];
+        
         [_headerAccessoryRightView addTarget:self
                                  action:@selector(didSelectProfile:)
                        forControlEvents:UIControlEventTouchUpInside];
@@ -438,7 +442,7 @@ static const CGFloat kMajorVerticalSeparator = 20.0f;
     CGRect dateFrame = self.footerLeftView.frame;
     dateFrame.origin.y = bottom + kMinorVerticalSeparator;
     [self.footerLeftView setFrame:dateFrame];
-    [self.footerLeftView setText:[self.dateFormatter relativeStringFromDate:self.contentDate]];
+    [self.footerLeftView setText:[self.dateFormatter extendedRelativeStringFromDate:self.contentDate]];
     
     // layout toolbar frame
     CGRect toolbarFrame = self.toolbar.frame;

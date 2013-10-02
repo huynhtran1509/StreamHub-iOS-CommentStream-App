@@ -468,6 +468,9 @@ static NSString* const kCellSelectSegue = @"detailView";
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc]
                     initWithReuseIdentifier:kCellReuseIdentifier];
+            
+            // content-independent configuration
+            [cell setDateFormatter:self.dateFormatter];
         }
         // cache the cell, if there is a cache
         [_cellCache setObject:cell forKey:key];
@@ -489,9 +492,8 @@ static NSString* const kCellSelectSegue = @"detailView";
 - (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    [cell setHTMLString:[content contentBodyHtml]];
-    [cell setDateFormatter:self.dateFormatter];
-    [cell setContentDate:[content contentCreatedAt]];
+    [cell setHTMLString:content.contentBodyHtml];
+    [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
     
     // always set an object
