@@ -77,27 +77,71 @@ static NSString* const kLFSSourceImageMap[] = {
 #pragma mark - Properties
 
 @synthesize object = _object;
+-(void)setObject:(id)object
+{
+    if (_object != nil && _object != object) {
+        id newObject = [[self.class alloc] initWithObject:object];
+        NSString *newId = [newObject idString];
+        if (![self.idString isEqualToString:newId]) {
+            [NSException raise:@"Object rebase conflict"
+                        format:@"Cannot rebase object with id %@ on top %@", self.idString, newId];
+        }
+        [self resetCached];
+    }
+    _object = object;
+}
 
-@synthesize contentTwitterId = _contentTwitterId;
-@synthesize contentTwitterUrlString = _contentTwitterUrlString;
-
-@synthesize content = _content;
-@synthesize eventId = _eventId;
-@synthesize visibility = _visibility;
-@synthesize childContent = _childContent;
-@synthesize contentType = _contentType;
-@synthesize contentSource = _contentSource;
-
-@synthesize contentParentId = _contentParentId;
-@synthesize contentBodyHtml = _contentBodyHtml;
-@synthesize contentAnnotations = _contentAnnotations;
-@synthesize contentAuthorId = _contentAuthorId;
-@synthesize contentCreatedAt = _contentCreatedAt;
-@synthesize contentUpdatedAt = _contentUpdatedAt;
-@synthesize contentId = _contentId;
-
+#pragma mark -
 @synthesize author = _author;
 
+#pragma mark -
+-(UIImage*)contentSourceIcon
+{
+    NSUInteger rawContentSource = self.contentSource;
+    if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
+        LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
+        return [self imageForContentSource:contentSource];
+    } else {
+        return nil;
+    }
+}
+
+#pragma mark -
+-(UIImage*)contentSourceIconSmall
+{
+    NSUInteger rawContentSource = self.contentSource;
+    if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
+        LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
+        return [self smallImageForContentSource:contentSource];
+    } else {
+        return nil;
+    }
+}
+
+#pragma mark -
+@synthesize content = _content;
+-(NSDictionary*)content
+{
+    const static NSString* const key = @"content";
+    if (_content == nil) {
+        _content = [_object objectForKey:key];
+    }
+    return _content;
+}
+
+#pragma mark -
+@synthesize idString = _idString;
+-(NSString*)idString
+{
+    const static NSString* const key = @"id";
+    if (_idString == nil) {
+        _idString = [self.content objectForKey:key];
+    }
+    return _idString;
+}
+
+#pragma mark -
+@synthesize contentTwitterId = _contentTwitterId;
 -(NSString*)contentTwitterId
 {
     // try to extract twitter id from contentId --
@@ -115,16 +159,18 @@ static NSString* const kLFSSourceImageMap[] = {
                      regexError.localizedDescription);
         }
         NSTextCheckingResult *match =
-        [regex firstMatchInString:self.contentId
+        [regex firstMatchInString:self.idString
                           options:0
-                            range:NSMakeRange(0, [self.contentId length])];
+                            range:NSMakeRange(0, [self.idString length])];
         if (match != nil) {
-            _contentTwitterId = [self.contentId substringWithRange:[match rangeAtIndex:1u]];
+            _contentTwitterId = [self.idString substringWithRange:[match rangeAtIndex:1u]];
         }
     }
     return _contentTwitterId;
 }
 
+#pragma mark -
+@synthesize contentTwitterUrlString = _contentTwitterUrlString;
 -(NSString*)contentTwitterUrlString
 {
     if (_contentTwitterUrlString == nil) {
@@ -140,15 +186,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _contentTwitterUrlString;
 }
 
--(NSDictionary*)content
-{
-    const static NSString* const key = @"content";
-    if (_content == nil) {
-        _content = [_object objectForKey:key];
-    }
-    return _content;
-}
-
+#pragma mark -
+@synthesize contentParentId = _contentParentId;
 -(NSString*)contentParentId
 {
     const static NSString* const key = @"parentId";
@@ -158,6 +197,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _contentParentId;
 }
 
+#pragma mark -
+@synthesize contentBodyHtml = _contentBodyHtml;
 -(NSString*)contentBodyHtml
 {
     const static NSString* const key = @"bodyHtml";
@@ -167,6 +208,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _contentBodyHtml;
 }
 
+#pragma mark -
+@synthesize contentAnnotations = _contentAnnotations;
 -(NSDictionary*)contentAnnotations
 {
     const static NSString* const key = @"annotations";
@@ -176,6 +219,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _contentAnnotations;
 }
 
+#pragma mark -
+@synthesize contentAuthorId = _contentAuthorId;
 -(NSString*)contentAuthorId
 {
     const static NSString* const key = @"authorId";
@@ -185,6 +230,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _contentAuthorId;
 }
 
+#pragma mark -
+@synthesize contentUpdatedAt = _contentUpdatedAt;
 -(NSDate*)contentUpdatedAt
 {
     const static NSString* const key = @"updatedAt";
@@ -195,6 +242,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _contentUpdatedAt;
 }
 
+#pragma mark -
+@synthesize contentCreatedAt = _contentCreatedAt;
 -(NSDate*)contentCreatedAt
 {
     const static NSString* const key = @"createdAt";
@@ -205,15 +254,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _contentCreatedAt;
 }
 
--(NSString*)contentId
-{
-    const static NSString* const key = @"id";
-    if (_contentId == nil) {
-        _contentId = [self.content objectForKey:key];
-    }
-    return _contentId;
-}
-
+#pragma mark -
+@synthesize childContent = _childContent;
 -(LFSContentCollection*)childContent
 {
     const static NSString* const key = @"childContent";
@@ -224,6 +266,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _childContent;
 }
 
+#pragma mark -
+@synthesize eventId = _eventId;
 -(NSNumber*)eventId
 {
     const static NSString* const key = @"event";
@@ -233,6 +277,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _eventId;
 }
 
+#pragma mark -
+@synthesize visibility = _visibility;
 -(LFSContentVisibility)visibility
 {
     const static NSString* const key = @"vis";
@@ -243,6 +289,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _visibility;
 }
 
+#pragma mark -
+@synthesize contentType = _contentType;
 -(LFSContentType)contentType
 {
     const static NSString* const key = @"type";
@@ -253,6 +301,8 @@ static NSString* const kLFSSourceImageMap[] = {
     return _contentType;
 }
 
+#pragma mark -
+@synthesize contentSource = _contentSource;
 -(NSUInteger)contentSource
 {
     const static NSString* const key = @"source";
@@ -262,29 +312,6 @@ static NSString* const kLFSSourceImageMap[] = {
     }
     return _contentSource;
 }
-
--(UIImage*)contentSourceIcon
-{
-    NSUInteger rawContentSource = self.contentSource;
-    if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
-        LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
-        return [self imageForContentSource:contentSource];
-    } else {
-        return nil;
-    }
-}
-
--(UIImage*)contentSourceIconSmall
-{
-    NSUInteger rawContentSource = self.contentSource;
-    if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
-        LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
-        return [self smallImageForContentSource:contentSource];
-    } else {
-        return nil;
-    }
-}
-
 
 #pragma mark - Private methods
 
@@ -328,27 +355,7 @@ static NSString* const kLFSSourceImageMap[] = {
     if (self ) {
         // initialization stuff here
         _object = object;
-
-        _contentTwitterId = nil;
-        _contentTwitterUrlString = nil;
-        
-        _author = nil;
-        
-        _visibilityIsSet = NO;
-        _contentTypeIsSet = NO;
-        _contentSourceIsSet = NO;
-        
-        _content = nil;
-        _eventId = nil;
-        _childContent = nil;
-        
-        _contentParentId = nil;
-        _contentBodyHtml = nil;
-        _contentAnnotations = nil;
-        _contentAuthorId = nil;
-        _contentCreatedAt = nil;
-        _contentUpdatedAt = nil;
-        _contentId = nil;
+        [self resetCached];
     }
     return self;
 }
@@ -362,24 +369,33 @@ static NSString* const kLFSSourceImageMap[] = {
 
 -(void)dealloc
 {
+    [self resetCached];
     _object = nil;
-    
-    _contentTwitterId = nil;
-    _contentTwitterUrlString = nil;
-    
+}
+
+-(void)resetCached
+{
+    // reset all cached properties except _object
     _author = nil;
     
     _content = nil;
-    _eventId = nil;
-    _childContent = nil;
     
+    _idString = nil;
+    
+    _contentTwitterId = nil;
+    _contentTwitterUrlString = nil;
     _contentParentId = nil;
     _contentBodyHtml = nil;
     _contentAnnotations = nil;
     _contentAuthorId = nil;
-    _contentCreatedAt = nil;
     _contentUpdatedAt = nil;
-    _contentId = nil;
+    _contentCreatedAt = nil;
+    _childContent = nil;
+    _eventId = nil;
+    
+    _visibility = LFSContentVisibilityNone;
+    _contentType = LFSContentTypeMessage;
+    _contentSource = 0u;
 }
 
 @end

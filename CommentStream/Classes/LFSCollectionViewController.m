@@ -18,7 +18,7 @@
 
 #import "LFSContentCollection.h"
 
-#define USE_CELL_CACHE
+#define USE_IMAGE_CACHE
 
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSContentCollection *content;
@@ -37,14 +37,20 @@
 @end
 
 // some module-level constants
-static NSString* const kCellReuseIdentifier = @"AttributedTextCellReuseIdentifier";
+static NSString* const kCellReuseIdentifier = @"LFSContentCell";
 static NSString* const kCellSelectSegue = @"detailView";
 
 @implementation LFSCollectionViewController
 {
-#ifdef USE_CELL_CACHE
+    BOOL _haveRetinaDevice;
+    
+    // NSCache automatically disposes its content when the available RAM is running low
     NSCache* _cellCache;
+    
+#ifdef USE_IMAGE_CACHE
+    NSCache* _imageCache;
 #endif
+    
     UIActivityIndicatorView *_activityIndicator;
     UIView *_container;
     CGPoint _scrollOffset;
@@ -119,6 +125,10 @@ static NSString* const kCellSelectSegue = @"detailView";
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    // see if we are on a Retina device
+    UIScreen *screen = [UIScreen mainScreen];
+    _haveRetinaDevice = [screen respondsToSelector:@selector(scale)] && [screen scale] == 2.f;
+
     _content = [LFSContentCollection array];
     
     self.title = [_collection objectForKey:@"_name"];
@@ -183,10 +193,12 @@ static NSString* const kCellSelectSegue = @"detailView";
      recommended since the cells are cached anyway.
      */
     
-#ifdef USE_CELL_CACHE
     // establish a cache for prepared cells because heightForRowAtIndexPath and
     // cellForRowAtIndexPath both need the same cell for an index path
     _cellCache = [[NSCache alloc] init];
+    
+#ifdef USE_IMAGE_CACHE
+    _imageCache = [[NSCache alloc] init];
 #endif
     
     // set system cache for URL data to 5MB
@@ -236,10 +248,10 @@ static NSString* const kCellSelectSegue = @"detailView";
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-    
-#ifdef USE_CELL_CACHE
-    [_cellCache removeAllObjects];
+#ifdef USE_IMAGE_CACHE
+    [_imageCache removeAllObjects];
 #endif
+    [_cellCache removeAllObjects];
 }
 
 - (void) dealloc
@@ -252,10 +264,13 @@ static NSString* const kCellSelectSegue = @"detailView";
     _postCommentField.delegate = nil;
     _postCommentField = nil;
     
-#ifdef USE_CELL_CACHE
+#ifdef USE_IMAGE_CACHE
+    [_imageCache removeAllObjects];
+    _imageCache = nil;
+#endif
     [_cellCache removeAllObjects];
     _cellCache = nil;
-#endif
+    
     _streamClient = nil;
     _bootstrapClient = nil;
     
@@ -362,6 +377,15 @@ static NSString* const kCellSelectSegue = @"detailView";
     _scrollOffset = scrollView.contentOffset;
 }
 
+
+#pragma mark - UITextFieldDelegate
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    [self createComment:textField];
+    return NO;
+}
+
 #pragma mark - Private methods
 - (void)startStreamWithBoostrap
 {
@@ -432,14 +456,6 @@ static NSString* const kCellSelectSegue = @"detailView";
     [self.tableView reloadData];
 }
 
-#pragma mark - UITextFieldDelegate
-
--(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-    [self createComment:textField];
-    return NO;
-}
-
 #pragma mark - UITableViewControllerDelegate
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -467,13 +483,10 @@ static NSString* const kCellSelectSegue = @"detailView";
 
     LFSContent *content = [_content objectAtIndex:indexPath.row];
     
-#ifdef USE_CELL_CACHE
-    NSString *key = content.contentId;
+    const NSString* const key = content.idString;
     cell = [_cellCache objectForKey:key];
-#else
-    cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:
-                                     kCellReuseIdentifier];
-#endif
+    //cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:
+    //                                 kCellReuseIdentifier];
     
     if (!cell) {
         cell = [[LFSAttributedTextCell alloc]
@@ -483,20 +496,19 @@ static NSString* const kCellSelectSegue = @"detailView";
         [cell setDateFormatter:self.dateFormatter];
     }
     
-#ifdef USE_CELL_CACHE
-    // cache the cell, if there is a cache
+    // cache the cell
     [_cellCache setObject:cell forKey:key];
-#endif
-    
-    [self configureCell:cell withContent:content];
+    [self configureCell:cell atIndexPath:indexPath];
     return cell;
 }
 
 #pragma mark - Table and cell helpers
 
 // called every time a cell is configured
-- (void)configureCell:(LFSAttributedTextCell *)cell withContent:(LFSContent *)content
+- (void)configureCell:(LFSAttributedTextCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    
     [cell setHTMLString:content.contentBodyHtml];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
@@ -511,20 +523,69 @@ static NSString* const kCellSelectSegue = @"detailView";
                            mainString:author.displayName
                            iconImage:nil]];
     
-    // load avatar images in a separate queue
-    NSURLRequest *request = [NSURLRequest requestWithURL:
-                             [NSURL URLWithString:author.avatarUrlString75]];
-    AFImageRequestOperation* operation = [AFImageRequestOperation
-                                          imageRequestOperationWithRequest:request
-                                          imageProcessingBlock:nil
-                                          success: ^(NSURLRequest *req,
-                                                     NSHTTPURLResponse *response,
-                                                     UIImage *image)
-                                          {
-                                              [cell setHeaderImage:image];
-                                          }
-                                          failure:nil];
-    [operation start];
+
+#ifdef USE_IMAGE_CACHE
+    NSString *authorId = author.idString;
+    UIImage *scaledImage = [_imageCache objectForKey:authorId];
+    if (scaledImage) {
+        [_imageCache setObject:scaledImage forKey:authorId];
+        [cell.imageView setImage:scaledImage];
+    }
+    else {
+#endif
+        // load avatar images in a separate queue
+        NSURLRequest *request = [NSURLRequest requestWithURL:
+                                 [NSURL URLWithString:author.avatarUrlString75]];
+        AFImageRequestOperation* operation = [AFImageRequestOperation
+                                              imageRequestOperationWithRequest:request
+                                              imageProcessingBlock:nil
+                                              success:^(NSURLRequest *req,
+                                                        NSHTTPURLResponse *response,
+                                                        UIImage *image)
+                                              {
+                                                  [content.author setAvatarImage:image];
+                                                  [self scaleImage:image forContent:content];
+                                              }
+                                              failure:nil];
+        [operation start];
+#ifdef USE_IMAGE_CACHE
+    }
+#endif
+    
+}
+
+- (void)scaleImage:(UIImage*)image forContent:(LFSContent*)content
+{
+    // we are on a non-Retina device
+    CGSize size = (_haveRetinaDevice
+                   ? CGSizeMake(kImageViewSize.width * 2.f, kImageViewSize.height * 2.f)
+                   : kImageViewSize);
+    CGRect targetRect;
+    targetRect.origin = CGPointZero;
+    targetRect.size = size;
+    
+    const NSString* const contentId = content.idString;
+    
+    dispatch_queue_t queue =
+    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0.f);
+    dispatch_async(queue, ^{
+        
+        // scale image on a background thread
+        // Note: this will not preserve aspect ratio
+        UIGraphicsBeginImageContext(size);
+        [image drawInRect:targetRect];
+        UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+#ifdef USE_IMAGE_CACHE
+        [_imageCache setObject:scaledImage forKey:content.author.idString];
+#endif
+        // display image on the main thread
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            LFSAttributedTextCell *cell = [_cellCache objectForKey:contentId];
+            [cell.imageView setImage:scaledImage];
+            [cell setNeedsLayout];
+        });
+    });
 }
 
 #pragma mark - Navigation
@@ -544,7 +605,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                 // assign model object(s)
                 LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
                 [vc setContentItem:contentItem];
-                [vc setAvatarImage:cell.headerImage];
+                [vc setAvatarImage:contentItem.author.avatarImage];
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
                 [vc setHideStatusBar:self.prefersStatusBarHidden];

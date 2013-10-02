@@ -12,6 +12,8 @@
 #import "LFSTriple.h"
 #import "LFSHeader.h"
 
+extern const CGSize kImageViewSize;
+
 @interface LFSAttributedTextCell : UITableViewCell <UIAppearance>
 
 #pragma mark - Properties
@@ -22,7 +24,6 @@
 @property (nonatomic, strong) NSDate* contentDate;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 
-@property (nonatomic, strong) UIImage *headerImage;
 @property (nonatomic, strong) UIImage *indicatorIcon;
 
 #pragma mark - UIApperance properties

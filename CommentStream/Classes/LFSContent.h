@@ -48,7 +48,7 @@
 @property (nonatomic, strong) LFSContentCollection *childContent;
 
 @property (nonatomic, copy) NSDictionary *content;
-@property (nonatomic, copy) NSString *contentId;
+@property (nonatomic, copy) NSString *idString;
 @property (nonatomic, copy) NSString *contentParentId;
 @property (nonatomic, copy) NSString *contentBodyHtml;
 @property (nonatomic, copy) NSDictionary *contentAnnotations;
