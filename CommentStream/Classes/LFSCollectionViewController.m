@@ -18,6 +18,8 @@
 
 #import "LFSContentCollection.h"
 
+//#define USE_CELL_CACHE
+
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSContentCollection *content;
 
@@ -32,7 +34,6 @@
 
 @property (nonatomic, strong) LFSPostViewController *postCommentViewController;
 
-- (BOOL)canReuseCells;
 @end
 
 // some module-level constants
@@ -41,7 +42,9 @@ static NSString* const kCellSelectSegue = @"detailView";
 
 @implementation LFSCollectionViewController
 {
+#ifdef USE_CELL_CACHE
     NSCache* _cellCache;
+#endif
     UIActivityIndicatorView *_activityIndicator;
     UIView *_container;
     CGPoint _scrollOffset;
@@ -180,10 +183,11 @@ static NSString* const kCellSelectSegue = @"detailView";
      recommended since the cells are cached anyway.
      */
     
-    
+#ifdef USE_CELL_CACHE
     // establish a cache for prepared cells because heightForRowAtIndexPath and
     // cellForRowAtIndexPath both need the same cell for an index path
     _cellCache = [[NSCache alloc] init];
+#endif
     
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
@@ -233,7 +237,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
     
+#ifdef USE_CELL_CACHE
     [_cellCache removeAllObjects];
+#endif
 }
 
 - (void) dealloc
@@ -246,8 +252,10 @@ static NSString* const kCellSelectSegue = @"detailView";
     _postCommentField.delegate = nil;
     _postCommentField = nil;
     
+#ifdef USE_CELL_CACHE
     [_cellCache removeAllObjects];
     _cellCache = nil;
+#endif
     _streamClient = nil;
     _bootstrapClient = nil;
     
@@ -455,38 +463,36 @@ static NSString* const kCellSelectSegue = @"detailView";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    LFSAttributedTextCell *cell;
+
+#ifdef USE_CELL_CACHE
     // uniquing of NSIndexPath objects was disabled in iOS5, so use a string
     // key as a workaround
     NSString *key = [NSString stringWithFormat:@"%d-%d", indexPath.section, indexPath.row];
-    LFSAttributedTextCell *cell = [_cellCache objectForKey:key];
-
+    cell = [_cellCache objectForKey:key];
+#else
+    cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:
+                                     kCellReuseIdentifier];
+#endif
+    
     if (!cell) {
-        if ([self canReuseCells]) {
-            cell = (LFSAttributedTextCell *)[tableView
-                                             dequeueReusableCellWithIdentifier:kCellReuseIdentifier];
-        }
-        if (!cell) {
-            cell = [[LFSAttributedTextCell alloc]
-                    initWithReuseIdentifier:kCellReuseIdentifier];
-            
-            // content-independent configuration
-            [cell setDateFormatter:self.dateFormatter];
-        }
-        // cache the cell, if there is a cache
-        [_cellCache setObject:cell forKey:key];
+        cell = [[LFSAttributedTextCell alloc]
+                initWithReuseIdentifier:kCellReuseIdentifier];
+        
+        // content-independent configuration
+        [cell setDateFormatter:self.dateFormatter];
     }
+    
+#ifdef USE_CELL_CACHE
+    // cache the cell, if there is a cache
+    [_cellCache setObject:cell forKey:key];
+#endif
     
     [self configureCell:cell forIndexPath:indexPath];
     return cell;
 }
 
 #pragma mark - Table and cell helpers
-
-- (BOOL)canReuseCells
-{
-    // reuse does not work for variable height -- only reuse cells with fixed height
-    return (![self respondsToSelector:@selector(tableView:heightForRowAtIndexPath:)]);
-}
 
 // called every time a cell is configured
 - (void)configureCell:(LFSAttributedTextCell *)cell forIndexPath:(NSIndexPath *)indexPath
@@ -501,8 +507,8 @@ static NSString* const kCellSelectSegue = @"detailView";
     NSNumber *moderator = [content.contentAnnotations objectForKey:@"moderator"];
     BOOL hasModerator = (moderator != nil && [moderator boolValue]);
     [cell setProfileLocal:[[LFSHeader alloc]
-                           initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
-                           attributeString:(hasModerator ? @"Moderator" : nil)
+                           initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
+                           attributeString:(hasModerator ? @"Moderator" : @"")
                            mainString:author.displayName
                            iconImage:nil]];
     
