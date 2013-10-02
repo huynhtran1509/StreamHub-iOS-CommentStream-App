@@ -565,6 +565,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     targetRect.size = size;
     
     const NSString* const contentId = content.idString;
+#ifdef USE_IMAGE_CACHE
+    const NSString* const authorId = content.author.idString;
+#endif
     
     dispatch_queue_t queue =
     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0.f);
@@ -572,12 +575,19 @@ static NSString* const kCellSelectSegue = @"detailView";
         
         // scale image on a background thread
         // Note: this will not preserve aspect ratio
-        UIGraphicsBeginImageContext(size);
-        [image drawInRect:targetRect];
-        UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
+        UIImage *scaledImage;
 #ifdef USE_IMAGE_CACHE
-        [_imageCache setObject:scaledImage forKey:content.author.idString];
+        scaledImage = [_imageCache objectForKey:authorId];
+        if (scaledImage == nil) {
+#endif
+            UIGraphicsBeginImageContext(size);
+            [image drawInRect:targetRect];
+            scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+#ifdef USE_IMAGE_CACHE
+        }
+        [_imageCache setObject:scaledImage forKey:authorId];
 #endif
         // display image on the main thread
         dispatch_sync(dispatch_get_main_queue(), ^{
