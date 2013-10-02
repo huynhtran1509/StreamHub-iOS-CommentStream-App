@@ -15,7 +15,6 @@
 #define MRC_AUTORELEASE(x) [(x) autorelease]
 #endif
 
-
 @implementation LFSBasicHTMLParser
 
 +(NSDictionary*)tagMappings
@@ -69,24 +68,6 @@
                     return nil;
                 }
             }, @"<(span)\\b[^>]*>(.*?)</\\1>",
-            
-            // Twitter (remove hashbangs)
-            ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
-            {
-                NSRange schemaRange = [match rangeAtIndex:2];
-                NSRange hrefRange = [match rangeAtIndex:3];
-                NSRange innerRange = [match rangeAtIndex:4];
-                if (hrefRange.length > 0 && innerRange.length > 0)
-                {
-                    NSString* schema = [str attributedSubstringFromRange:schemaRange].string;
-                    NSString* href = [str attributedSubstringFromRange:hrefRange].string;
-                    NSMutableAttributedString* innerText = [[str attributedSubstringFromRange:innerRange] mutableCopy];
-                    [innerText setLink:[NSURL URLWithString:[NSString stringWithFormat:@"%@://twitter.com/%@", schema, href]] range:NSMakeRange(0,innerRange.length)];
-                    return MRC_AUTORELEASE(innerText);
-                } else {
-                    return nil;
-                }
-            }, @"<a\\s[^>]*\\bhref\\s*=\\s*(['\"])(http|https)://twitter.com/#!/(.*?)\\1[^>]*>(.*?)</a>",
             
             // Hyperlinks
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
