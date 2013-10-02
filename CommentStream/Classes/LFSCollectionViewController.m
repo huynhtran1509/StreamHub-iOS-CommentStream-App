@@ -6,9 +6,16 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+
+#define CACHE_SCALED_IMAGES
+#define LOG_ALL_HTTP_REQUESTS
+
 #import <StreamHub-iOS-SDK/LFSClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
+
+#ifdef LOG_ALL_HTTP_REQUESTS
 #import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
+#endif
 
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
@@ -17,8 +24,6 @@
 #import "LFSTextField.h"
 
 #import "LFSContentCollection.h"
-
-#define USE_IMAGE_CACHE
 
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSContentCollection *content;
@@ -47,7 +52,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     // NSCache automatically disposes its content when the available RAM is running low
     NSCache* _cellCache;
     
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
     NSCache* _imageCache;
 #endif
     
@@ -197,7 +202,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     // cellForRowAtIndexPath both need the same cell for an index path
     _cellCache = [[NSCache alloc] init];
     
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
     _imageCache = [[NSCache alloc] init];
 #endif
     
@@ -217,7 +222,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
     
+#ifdef LOG_ALL_HTTP_REQUESTS
     [[AFHTTPRequestOperationLogger sharedLogger] startLogging];
+#endif
     
     [self startStreamWithBoostrap];
 }
@@ -238,7 +245,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     [super viewWillDisappear:animated];
     [self.streamClient stopStream];
     
+#ifdef LOG_ALL_HTTP_REQUESTS
     [[AFHTTPRequestOperationLogger sharedLogger] stopLogging];
+#endif
     
     [self.navigationController setToolbarHidden:YES animated:animated];
 }
@@ -248,7 +257,7 @@ static NSString* const kCellSelectSegue = @"detailView";
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
     [_imageCache removeAllObjects];
 #endif
     [_cellCache removeAllObjects];
@@ -264,7 +273,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     _postCommentField.delegate = nil;
     _postCommentField = nil;
     
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
     [_imageCache removeAllObjects];
     _imageCache = nil;
 #endif
@@ -498,6 +507,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     
     // cache the cell
     [_cellCache setObject:cell forKey:key];
+    
     [self configureCell:cell atIndexPath:indexPath];
     return cell;
 }
@@ -524,7 +534,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                            iconImage:nil]];
     
 
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
     NSString *authorId = author.idString;
     UIImage *scaledImage = [_imageCache objectForKey:authorId];
     if (scaledImage) {
@@ -548,7 +558,7 @@ static NSString* const kCellSelectSegue = @"detailView";
                                               }
                                               failure:nil];
         [operation start];
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
     }
 #endif
     
@@ -565,7 +575,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     targetRect.size = size;
     
     const NSString* const contentId = content.idString;
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
     const NSString* const authorId = content.author.idString;
 #endif
     
@@ -576,7 +586,7 @@ static NSString* const kCellSelectSegue = @"detailView";
         // scale image on a background thread
         // Note: this will not preserve aspect ratio
         UIImage *scaledImage;
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
         scaledImage = [_imageCache objectForKey:authorId];
         if (scaledImage == nil) {
 #endif
@@ -585,7 +595,7 @@ static NSString* const kCellSelectSegue = @"detailView";
             scaledImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
             
-#ifdef USE_IMAGE_CACHE
+#ifdef CACHE_SCALED_IMAGES
         }
         [_imageCache setObject:scaledImage forKey:authorId];
 #endif
@@ -593,7 +603,7 @@ static NSString* const kCellSelectSegue = @"detailView";
         dispatch_sync(dispatch_get_main_queue(), ^{
             LFSAttributedTextCell *cell = [_cellCache objectForKey:contentId];
             [cell.imageView setImage:scaledImage];
-            [cell setNeedsLayout];
+            //[cell setNeedsLayout];
         });
     });
 }
