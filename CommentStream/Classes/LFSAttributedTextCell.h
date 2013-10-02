@@ -40,7 +40,7 @@ extern const CGSize kImageViewSize;
 
 #pragma mark - Methods
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
-- (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width;
+- (CGFloat)cellHeightForBoundsWidth:(CGFloat)width;
 - (void)setHTMLString:(NSString *)html;
 
 @end
