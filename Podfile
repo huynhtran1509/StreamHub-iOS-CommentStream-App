@@ -4,5 +4,3 @@ xcodeproj 'CommentStream.xcodeproj'
 pod 'AFHTTPRequestOperationLogger'
 pod 'OHAttributedLabel', '~> 3.4.2'
 pod 'StreamHub-iOS-SDK', :path => '../../'
-
-pod "Reveal-iOS-SDK"

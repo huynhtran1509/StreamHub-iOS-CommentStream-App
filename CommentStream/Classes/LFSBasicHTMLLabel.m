@@ -110,7 +110,7 @@
               colorForLink:(NSTextCheckingResult*)linkInfo
             underlineStyle:(int32_t*)underlineStyle
 {
-    static NSString* const kTwitterSearchPrefix = @"https://twitter.com/#!/search/realtime/";
+    static NSString* const kTwitterSearchPrefix = @"https://twitter.com/search/realtime/";
     NSString *linkString = [linkInfo.URL absoluteString];
     if ([linkString hasPrefix:kTwitterSearchPrefix])
     {
