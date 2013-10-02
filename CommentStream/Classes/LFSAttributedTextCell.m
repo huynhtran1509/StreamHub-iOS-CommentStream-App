@@ -444,7 +444,6 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         CGRect headerTitleFrame = self.headerTitleView.frame;
         
         [self.headerSubtitleView setText:headerSubtitle];
-        [self.headerSubtitleView resizeVerticalCenterRightTrim];
         [self.headerSubtitleView resizeVerticalBottomRightTrim];
         
         CGRect headerAttributeTopFrame;
