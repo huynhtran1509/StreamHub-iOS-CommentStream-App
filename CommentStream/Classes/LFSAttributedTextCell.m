@@ -481,15 +481,15 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 	[self setNeedsLayout];
 }
 
-- (CGFloat)requiredRowHeightWithFrameWidth:(CGFloat)width
+- (CGFloat)cellHeightForBoundsWidth:(CGFloat)width
 {
-    CGSize requiredBodySize = [self.bodyView
-                               sizeThatFits:
-                               CGSizeMake(width - kPadding.left - kContentPaddingRight,
-                                          CGFLOAT_MAX)];
+    CGSize bodySize = [self.bodyView
+                       sizeThatFits:
+                       CGSizeMake(width - kPadding.left - kContentPaddingRight,
+                                  CGFLOAT_MAX)];
     
-    [self setRequiredBodyHeight:requiredBodySize.height];
-    return kPadding.bottom + requiredBodySize.height + kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
+    [self setRequiredBodyHeight:bodySize.height];
+    return kPadding.bottom + bodySize.height + kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
 }
 
 

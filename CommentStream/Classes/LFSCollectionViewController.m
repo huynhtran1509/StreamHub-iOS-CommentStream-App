@@ -478,7 +478,7 @@ static NSString* const kCellSelectSegue = @"detailView";
 {
     LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
                                                      cellForRowAtIndexPath:indexPath];
-    return [cell requiredRowHeightWithFrameWidth:tableView.bounds.size.width];
+    return [cell cellHeightForBoundsWidth:tableView.bounds.size.width];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
