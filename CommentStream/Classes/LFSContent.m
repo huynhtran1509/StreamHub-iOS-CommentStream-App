@@ -34,23 +34,33 @@
  */
 
 
-// For more info, see
+// For detailed info, see
 // https://github.com/Livefyre/lfdj/blob/production/lfcore/lfcore/v2/publishing/models.proto
+typedef NS_ENUM(NSUInteger, LFSContentSource) {
+    LFSContentSourceDefault = 0u,
+    LFSContentSourceTwitter,
+    LFSContentSourceFacebook,
+    LFSContentSourceGooglePlus,
+    LFSContentSourceFlickr,
+    LFSContentSourceYouTube,
+    LFSContentSourceRSS,
+    LFSContentSourceInstagram
+};
 
 #define CONTENT_SOURCE_DECODE_LENGTH 20u
 
 static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 {
-    LFSContentSourceLivefyre, // 0
+    LFSContentSourceDefault, // 0
     LFSContentSourceTwitter,  // 1
     LFSContentSourceTwitter,  // 2
     LFSContentSourceFacebook, // 3
-    LFSContentSourceLivefyre, // 4
-    LFSContentSourceLivefyre, // 5
+    LFSContentSourceDefault, // 4
+    LFSContentSourceDefault, // 5
     LFSContentSourceFacebook,  // 6
     LFSContentSourceTwitter,  // 7
-    LFSContentSourceLivefyre,  // 8
-    LFSContentSourceLivefyre,  // 9
+    LFSContentSourceDefault,  // 8
+    LFSContentSourceDefault,  // 9
     LFSContentSourceGooglePlus,  // 10
     LFSContentSourceFlickr,  // 11
     LFSContentSourceYouTube,  // 12
@@ -58,13 +68,13 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     LFSContentSourceFacebook,  // 14
     LFSContentSourceTwitter,  // 15
     LFSContentSourceYouTube,  // 16
-    LFSContentSourceLivefyre,  // 17
-    LFSContentSourceLivefyre,  // 18
+    LFSContentSourceDefault,  // 17
+    LFSContentSourceDefault,  // 18
     LFSContentSourceInstagram,  // 19
 };
 
 static NSString* const kLFSSourceImageMap[] = {
-    nil, // LFSContentSourceLivefyre (0)
+    nil, // LFSContentSourceDefault (0)
     @"SourceTwitter", //LFSContentSourceTwitter (1)
     @"SourceFacebook", //LFSContentSourceFacebook (2)
     nil, //LFSContentSourceGooglePlus (3)

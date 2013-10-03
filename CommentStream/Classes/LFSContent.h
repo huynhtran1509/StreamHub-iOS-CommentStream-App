@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import <StreamHub-iOS-SDK/LFSConstants.h>
 
 #import "LFSAuthorCollection.h"
