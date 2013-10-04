@@ -42,7 +42,8 @@
     self = [super init];
 	if (self != nil)
 	{
-        _dictionary = [[NSMutableDictionary alloc] initWithCapacity:numItems];
+        _dictionary = [[NSMutableDictionary alloc]
+                       initWithCapacity:numItems];
 	}
 	return self;
 }
@@ -62,7 +63,8 @@
     } else {
         LFSAuthor *author = [_dictionary objectForKey:aKey];
         if (author == nil) {
-            [_dictionary setObject:[[LFSAuthor alloc] initWithObject:anObject]
+            [_dictionary setObject:[[LFSAuthor alloc]
+                                    initWithObject:anObject]
                             forKey:aKey];
         } else {
             [author setObject:anObject];
@@ -100,7 +102,8 @@
             id object = objects[i];
             LFSAuthor *author = ([object isKindOfClass:classOfLFSAuthor]
                                  ? (LFSAuthor*)object
-                                 : [[LFSAuthor alloc] initWithObject:object]);
+                                 : [[LFSAuthor alloc]
+                                    initWithObject:object]);
             array[i] = author;
         }
         _dictionary = [[NSMutableDictionary alloc]

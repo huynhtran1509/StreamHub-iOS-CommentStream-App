@@ -26,7 +26,7 @@
 #import "LFSContentCollection.h"
 
 @interface LFSCollectionViewController ()
-@property (nonatomic, strong) LFSContentCollection *content;
+@property (nonatomic, strong) LFSMutableContentCollection *content;
 
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
@@ -134,7 +134,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     UIScreen *screen = [UIScreen mainScreen];
     _haveRetinaDevice = [screen respondsToSelector:@selector(scale)] && [screen scale] == 2.f;
 
-    _content = [LFSContentCollection array];
+    _content = [[LFSMutableContentCollection alloc] init];
     
     self.title = [_collection objectForKey:@"_name"];
     
@@ -449,8 +449,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     NSRange contentSpan;
     contentSpan.location = 0u;
     contentSpan.length = [filteredContent count];
-    [_content insertObjects:filteredContent
-                  atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
+    [_content addObjectsFromArray:filteredContent];
     
     // also cause table to redraw
     if ([filteredContent count] == 1u) {

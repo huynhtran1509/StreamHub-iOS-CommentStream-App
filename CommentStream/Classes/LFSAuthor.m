@@ -38,6 +38,11 @@
     _object = object;
 }
 
+-(NSString*)description
+{
+    return [_object description];
+}
+
 #pragma mark -
 @synthesize displayName = _displayName;
 -(NSString*)displayName
