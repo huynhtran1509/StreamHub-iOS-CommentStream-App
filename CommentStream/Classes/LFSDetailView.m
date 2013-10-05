@@ -15,44 +15,44 @@
 #import "LFSBasicHTMLLabel.h"
 #import "UILabel+Trim.h"
 
-static const UIEdgeInsets kPadding = {
+static const UIEdgeInsets kDetailPadding = {
     .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
 };
 
-static const CGFloat kContentPaddingRight = 12.0f;
+static const CGFloat kDetailContentPaddingRight = 12.0f;
 
 // content font settings
-static NSString* const kContentFontName = @"Georgia";
-static const CGFloat kContentFontSize = 16.0f;
-static const CGFloat kContentLineSpacing = 8.0f;
+static NSString* const kDetailContentFontName = @"Georgia";
+static const CGFloat kDetailContentFontSize = 16.0f;
+static const CGFloat kDetailContentLineSpacing = 8.0f;
 
 // header font settings
-static const CGFloat kHeaderAttributeTopFontSize = 11.f;
-static const CGFloat kHeaderTitleFontSize = 15.f;
-static const CGFloat kHeaderSubtitleFontSize = 12.f;
+static const CGFloat kDetailHeaderAttributeTopFontSize = 11.f;
+static const CGFloat kDetailHeaderTitleFontSize = 15.f;
+static const CGFloat kDetailHeaderSubtitleFontSize = 12.f;
 
 // header label heights
-static const CGFloat kHeaderAttributeTopHeight = 10.0f;
-static const CGFloat kHeaderTitleHeight = 18.0f;
+static const CGFloat kDetailHeaderAttributeTopHeight = 10.0f;
+static const CGFloat kDetailHeaderTitleHeight = 18.0f;
 static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
 // TODO: calculate avatar size based on pixel image size
-static const CGSize  kImageViewSize = { .width=38.0f, .height=38.0f };
-static const CGFloat kImageCornerRadius = 4.f;
-static const CGFloat kImageMarginRight = 8.0f;
+static const CGSize  kDetailImageViewSize = { .width=38.0f, .height=38.0f };
+static const CGFloat kDetailImageCornerRadius = 4.f;
+static const CGFloat kDetailImageMarginRight = 8.0f;
 
-static const CGFloat kFooterHeight = 21.0f;
+static const CGFloat kDetailFooterHeight = 21.0f;
 
-static const CGFloat kRemoteButtonWidth = 20.0f;
-static const CGFloat kRemoteButtonHeight = 20.0f;
+static const CGFloat kDetailRemoteButtonWidth = 20.0f;
+static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
-static const CGFloat kBarButtonHeight = 44.0f;
-static const CGFloat kBarButtonWidth = 88.0f;
+static const CGFloat kDetailBarButtonHeight = 44.0f;
+static const CGFloat kDetailBarButtonWidth = 88.0f;
 
-static const CGFloat kMinorVerticalSeparator = 12.0f;
-static const CGFloat kMajorVerticalSeparator = 20.0f;
+static const CGFloat kDetailMinorVerticalSeparator = 12.0f;
+static const CGFloat kDetailMajorVerticalSeparator = 20.0f;
 
-static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
+static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 #pragma mark -
 @interface LFSDetailView ()
@@ -99,8 +99,8 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
     if (_likeButton == nil) {
         UIImage *img = [self imageForLikedState:self.isLikedByUser];
         CGRect frame = CGRectMake(0.f, 0.f,
-                                  kBarButtonWidth,
-                                  kBarButtonHeight);
+                                  kDetailBarButtonWidth,
+                                  kDetailBarButtonHeight);
         // initialize
         _likeButton = [[UIButton alloc] initWithFrame:frame];
         
@@ -121,8 +121,8 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
     if (_replyButton == nil) {
         UIImage *img = [UIImage imageNamed:@"ActionReply"];
         CGRect frame = CGRectMake(0.f, 0.f,
-                                  kBarButtonWidth,
-                                  kBarButtonHeight);
+                                  kDetailBarButtonWidth,
+                                  kDetailBarButtonHeight);
         // initialize
         _replyButton = [[UIButton alloc] initWithFrame:frame];
         
@@ -142,17 +142,17 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 {
     if (_bodyView == nil) {
 
-        CGRect frame = CGRectMake(kPadding.left,
-                                  kPadding.top + kImageViewSize.height + kMajorVerticalSeparator,
-                                  self.bounds.size.width - kPadding.left - kContentPaddingRight,
+        CGRect frame = CGRectMake(kDetailPadding.left,
+                                  kDetailPadding.top + kDetailImageViewSize.height + kDetailMajorVerticalSeparator,
+                                  self.bounds.size.width - kDetailPadding.left - kDetailContentPaddingRight,
                                   10.f); // this could be anything
         // initialize
         _bodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
         [_bodyView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-        [_bodyView setFont:[UIFont fontWithName:kContentFontName size:kContentFontSize]];
-        [_bodyView setLineSpacing:kContentLineSpacing];
+        [_bodyView setFont:[UIFont fontWithName:kDetailContentFontName size:kDetailContentFontSize]];
+        [_bodyView setLineSpacing:kDetailContentLineSpacing];
         [_bodyView setLineBreakMode:NSLineBreakByWordWrapping];
         [_bodyView setTextAlignment:NSTextAlignmentLeft];
         
@@ -167,15 +167,15 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 -(UIButton*)headerAccessoryRightView
 {
     if (_headerAccessoryRightView == nil) {
-        CGSize buttonSize = CGSizeMake(kRemoteButtonWidth, kRemoteButtonHeight);
+        CGSize buttonSize = CGSizeMake(kDetailRemoteButtonWidth, kDetailRemoteButtonHeight);
         CGRect frame;
         frame.size = buttonSize;
-        frame.origin = CGPointMake(self.bounds.size.width - kPadding.right - buttonSize.width, kPadding.top);
+        frame.origin = CGPointMake(self.bounds.size.width - kDetailPadding.right - buttonSize.width, kDetailPadding.top);
         // initialize
         _headerAccessoryRightView = [[UIButton alloc] initWithFrame:frame];
         
         // configure
-        [_headerAccessoryRightView setAlpha:kHeaderAccessoryRightAlpha];
+        [_headerAccessoryRightView setAlpha:kDetailHeaderAccessoryRightAlpha];
         
         [_headerAccessoryRightView addTarget:self
                                  action:@selector(didSelectProfile:)
@@ -208,7 +208,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
             avatarViewSize = CGSizeMake(37.f, 37.f);
         }
         CGRect frame;
-        frame.origin = CGPointMake(kPadding.left, kPadding.top);
+        frame.origin = CGPointMake(kDetailPadding.left, kDetailPadding.top);
         frame.size = avatarViewSize;
         
         // initialize
@@ -218,7 +218,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
         [_headerImageView
          setAutoresizingMask:(UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin)];
 
-        _headerImageView.layer.cornerRadius = kImageCornerRadius;
+        _headerImageView.layer.cornerRadius = kDetailImageCornerRadius;
         _headerImageView.layer.masksToBounds = YES;
         
         // add to superview
@@ -233,10 +233,10 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 {
     if (_footerLeftView == nil) {
 
-        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPadding.left - kPadding.right) / 2.f), kFooterHeight);
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kDetailPadding.left - kDetailPadding.right) / 2.f), kDetailFooterHeight);
         CGRect frame;
         frame.size = labelSize;
-        frame.origin = CGPointMake(kPadding.left,
+        frame.origin = CGPointMake(kDetailPadding.left,
                                    0.f);  // size.y will be changed in layoutSubviews
         // initialize
         _footerLeftView = [[UILabel alloc] initWithFrame:frame];
@@ -257,10 +257,10 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 - (LFSBasicHTMLLabel*)footerRightView
 {
     if (_footerRightView == nil) {
-        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kPadding.left - kPadding.right) / 2.f), kFooterHeight);
+        CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kDetailPadding.left - kDetailPadding.right) / 2.f), kDetailFooterHeight);
         CGRect frame;
         frame.size = labelSize;
-        frame.origin = CGPointMake(self.bounds.size.width - kPadding.right - labelSize.width,
+        frame.origin = CGPointMake(self.bounds.size.width - kDetailPadding.right - labelSize.width,
                                    0.f); // size.y will be changed in layoutSubviews
         
         // initialize
@@ -287,20 +287,20 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 - (UILabel*)headerAttributeTopView
 {
     if (_headerAttributeTopView == nil) {
-        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
-        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderAttributeTopHeight);
+        CGFloat leftColumnWidth = kDetailPadding.left + kDetailImageViewSize.width + kDetailImageMarginRight;
+        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderAttributeTopHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPadding.top); // size.y will be changed in layoutSubviews
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerAttributeTopView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
         [_headerAttributeTopView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_headerAttributeTopView setFont:[UIFont systemFontOfSize:kHeaderAttributeTopFontSize]];
+        [_headerAttributeTopView setFont:[UIFont systemFontOfSize:kDetailHeaderAttributeTopFontSize]];
         [_headerAttributeTopView setTextColor:[UIColor blueColor]];
         
         // add to superview
@@ -314,20 +314,20 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 - (UILabel*)headerTitleView
 {
     if (_headerTitleView == nil) {
-        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
-        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderTitleHeight);
+        CGFloat leftColumnWidth = kDetailPadding.left + kDetailImageViewSize.width + kDetailImageMarginRight;
+        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderTitleHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPadding.top); // size.y will be changed in layoutSubviews
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
         [_headerTitleView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kHeaderTitleFontSize]];
+        [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kDetailHeaderTitleFontSize]];
         
         // add to superview
         [self addSubview:_headerTitleView];
@@ -340,20 +340,20 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 - (UILabel*)headerSubtitleView
 {
     if (_headerSubtitleView == nil) {
-        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
-        CGFloat rightColumnWidth = kRemoteButtonWidth + kPadding.right;
+        CGFloat leftColumnWidth = kDetailPadding.left + kDetailImageViewSize.width + kDetailImageMarginRight;
+        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kHeaderSubtitleHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPadding.top); // size.y will be changed in layoutSubviews
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerSubtitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
         [_headerSubtitleView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_headerSubtitleView setFont:[UIFont systemFontOfSize:kHeaderSubtitleFontSize]];
+        [_headerSubtitleView setFont:[UIFont systemFontOfSize:kDetailHeaderSubtitleFontSize]];
         [_headerSubtitleView setTextColor:[UIColor grayColor]];
         
         // add to superview
@@ -369,7 +369,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
     if (_toolbar == nil) {
 
         CGRect frame = CGRectZero;
-        frame.size = CGSizeMake(self.bounds.size.width, kBarButtonHeight);
+        frame.size = CGSizeMake(self.bounds.size.width, kDetailBarButtonHeight);
         
         // initialize
         _toolbar = [[LFSContentToolbar alloc] initWithFrame:frame];
@@ -409,7 +409,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 {
     // layout main content label
     CGRect basicHTMLLabelFrame = self.bodyView.frame;
-    CGFloat contentWidth = self.bounds.size.width - kPadding.left - kContentPaddingRight;
+    CGFloat contentWidth = self.bounds.size.width - kDetailPadding.left - kDetailContentPaddingRight;
     basicHTMLLabelFrame.size = [self contentSizeThatFits:
                                 CGSizeMake(contentWidth, CGFLOAT_MAX)];
     [self.bodyView setFrame:basicHTMLLabelFrame];
@@ -427,7 +427,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
           [contentRemote detailString],
           [contentRemote mainString]]];
         CGRect remoteUrlFrame = self.footerRightView.frame;
-        remoteUrlFrame.origin.y = bottom + kMinorVerticalSeparator;
+        remoteUrlFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
         [self.footerRightView setFrame:remoteUrlFrame];
     }
     
@@ -441,7 +441,7 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
 
     // layout date label
     CGRect dateFrame = self.footerLeftView.frame;
-    dateFrame.origin.y = bottom + kMinorVerticalSeparator;
+    dateFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
     [self.footerLeftView setFrame:dateFrame];
     [self.footerLeftView setText:[self.dateFormatter extendedRelativeStringFromDate:self.contentDate]];
     
@@ -450,22 +450,22 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
     toolbarFrame.origin = CGPointMake(0.f,
                                       dateFrame.origin.y +
                                       dateFrame.size.height +
-                                      kMinorVerticalSeparator);
+                                      kDetailMinorVerticalSeparator);
     [self.toolbar setFrame:toolbarFrame];
 }
 
 -(CGSize)sizeThatFits:(CGSize)size
 {
-    CGFloat totalWidthInset = kPadding.left + kContentPaddingRight;
-    CGFloat totalHeightInset = (kPadding.bottom
-                                + kBarButtonHeight
-                                + kMinorVerticalSeparator
-                                + kFooterHeight
-                                + kMinorVerticalSeparator
+    CGFloat totalWidthInset = kDetailPadding.left + kDetailContentPaddingRight;
+    CGFloat totalHeightInset = (kDetailPadding.bottom
+                                + kDetailBarButtonHeight
+                                + kDetailMinorVerticalSeparator
+                                + kDetailFooterHeight
+                                + kDetailMinorVerticalSeparator
                                 
-                                + kMajorVerticalSeparator
-                                + kImageViewSize.height
-                                + kPadding.top);
+                                + kDetailMajorVerticalSeparator
+                                + kDetailImageViewSize.height
+                                + kDetailPadding.top);
     CGSize contentSize = [self contentSizeThatFits:
                           CGSizeMake(size.width - totalWidthInset,
                                      CGFLOAT_MAX)];
@@ -506,12 +506,12 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
         CGRect headerTitleFrame = self.headerTitleView.frame;
         CGRect headerSubtitleFrame = self.headerSubtitleView.frame;
         
-        CGFloat separator = floorf((kImageViewSize.height
+        CGFloat separator = floorf((kDetailImageViewSize.height
                                     - headerTitleFrame.size.height
                                     - headerSubtitleFrame.size.height) / 3.f);
         
-        headerTitleFrame.origin.y = kPadding.top + separator;
-        headerSubtitleFrame.origin.y = (kPadding.top
+        headerTitleFrame.origin.y = kDetailPadding.top + separator;
+        headerSubtitleFrame.origin.y = (kDetailPadding.top
                                         + separator
                                         + headerTitleFrame.size.height
                                         + separator);
@@ -531,13 +531,13 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
         CGRect headerAttributeTopFrame = self.headerAttributeTopView.frame;
         CGRect headerTitleFrame = self.headerTitleView.frame;
         
-        CGFloat separator = floorf((kImageViewSize.height
+        CGFloat separator = floorf((kDetailImageViewSize.height
                                     - headerTitleFrame.size.height
                                     - headerAttributeTopFrame.size.height) / 3.f);
         
         
-        headerAttributeTopFrame.origin.y = (kPadding.top + separator);
-        headerTitleFrame.origin.y = (kPadding.top
+        headerAttributeTopFrame.origin.y = (kDetailPadding.top + separator);
+        headerTitleFrame.origin.y = (kDetailPadding.top
                                      + separator
                                      + headerAttributeTopFrame.size.height
                                      + separator);
@@ -558,19 +558,19 @@ static const CGFloat kHeaderAccessoryRightAlpha = 0.618f;
         CGRect headerTitleFrame = self.headerTitleView.frame;
         CGRect headerSubtitleFrame = self.headerSubtitleView.frame;
         
-        CGFloat separator = floorf((kImageViewSize.height
+        CGFloat separator = floorf((kDetailImageViewSize.height
                                     - headerTitleFrame.size.height
                                     - headerAttributeTopFrame.size.height
                                     - headerSubtitleFrame.size.height) / 4.f);
         
         
-        headerAttributeTopFrame.origin.y = (kPadding.top + separator);
-        headerTitleFrame.origin.y = (kPadding.top
+        headerAttributeTopFrame.origin.y = (kDetailPadding.top + separator);
+        headerTitleFrame.origin.y = (kDetailPadding.top
                                      + separator
                                      + headerAttributeTopFrame.size.height
                                      + separator);
         
-        headerSubtitleFrame.origin.y = (kPadding.top
+        headerSubtitleFrame.origin.y = (kDetailPadding.top
                                         + separator
                                         + headerAttributeTopFrame.size.height
                                         + separator

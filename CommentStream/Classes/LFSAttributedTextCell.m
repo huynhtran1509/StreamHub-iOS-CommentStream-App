@@ -13,43 +13,43 @@
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
 
-const CGSize kImageViewSize = { .width=25.f, .height=25.f };
+const CGSize kCellImageViewSize = { .width=25.f, .height=25.f };
 
-static const UIEdgeInsets kPadding = {
+static const UIEdgeInsets kCellPadding = {
     .top=10.f, .left=15.f, .bottom=12.f, .right=12.f
 };
 
-static const CGFloat kContentPaddingRight = 7.f;
-static const CGFloat kContentLineSpacing = 6.f;
+static const CGFloat kCellContentPaddingRight = 7.f;
+static const CGFloat kCellContentLineSpacing = 6.f;
 
-static NSString* const kBodyFontName = @"Georgia";
-static const CGFloat kBodyFontSize = 13.f;
+static NSString* const kCellBodyFontName = @"Georgia";
+static const CGFloat kCellBodyFontSize = 13.f;
 
-static const CGFloat kHeaderAcessoryRightFontSize = 11.f;
+static const CGFloat kCellHeaderAcessoryRightFontSize = 11.f;
 
-static const CGFloat kHeaderTitleFontSize = 12.f;
-static const CGFloat kHeaderSubtitleFontSize = 11.f;
-static const CGFloat kHeaderAttributeTopFontSize = 10.f;
+static const CGFloat kCellHeaderTitleFontSize = 12.f;
+static const CGFloat kCellHeaderSubtitleFontSize = 11.f;
+static const CGFloat kCellHeaderAttributeTopFontSize = 10.f;
 
-static const CGFloat kHeaderAdjust = 2.f;
-static const CGFloat kHeaderAttributeAdjust = -1.f;
-static const CGFloat kHeaderAccessoryRightAdjust = 1.f;
+static const CGFloat kCellHeaderAdjust = 2.f;
+static const CGFloat kCellHeaderAttributeAdjust = -1.f;
+static const CGFloat kCellHeaderAccessoryRightAdjust = 1.f;
 
-static const CGFloat kHeaderAccessoryRightImageAlpha = 0.618f;
+static const CGFloat kCellHeaderAccessoryRightImageAlpha = 0.618f;
 
-static const CGSize  kHeaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
+static const CGSize  kCellHeaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
 
-static const CGFloat kImageCornerRadius = 4.f;
-static const CGFloat kImageMarginRight = 8.0f;
+static const CGFloat kCellImageCornerRadius = 4.f;
+static const CGFloat kCellImageMarginRight = 8.0f;
 
-static const CGFloat kMinorVerticalSeparator = 12.0f;
+static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 
 // {{{ TODO: remove these?
 //static const CGFloat kHeaderAcessoryRightHeight = 21.f;
 
 //static const CGFloat kMajorVerticalSeparator = 7.0f;
 
-static const CGFloat kHeaderAttributeTopHeight = 10.0f;
+static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 //static const CGFloat kHeaderTitleHeight = 18.0f;
 //static const CGFloat kHeaderSubtitleHeight = 10.0f;
 // }}}
@@ -163,7 +163,7 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 {
     if (_requiredBodyHeight == CGFLOAT_MAX) {
         // calculate afresh
-        CGSize bodySize = CGSizeMake(self.bounds.size.width - kPadding.left - kContentPaddingRight,
+        CGSize bodySize = CGSizeMake(self.bounds.size.width - kCellPadding.left - kCellContentPaddingRight,
                                      CGFLOAT_MAX);
         CGSize requiredBodySize = [self.bodyView sizeThatFits:bodySize];
         _requiredBodyHeight = requiredBodySize.height;
@@ -176,21 +176,21 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 -(LFSBasicHTMLLabel*)bodyView
 {
 	if (_bodyView == nil) {
-        const CGFloat kHeaderHeight = kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
-        CGRect frame = CGRectMake(kPadding.left,
+        const CGFloat kHeaderHeight = kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+        CGRect frame = CGRectMake(kCellPadding.left,
                                   kHeaderHeight,
-                                  self.bounds.size.width - kPadding.left - kContentPaddingRight,
+                                  self.bounds.size.width - kCellPadding.left - kCellContentPaddingRight,
                                   self.bounds.size.height - kHeaderHeight);
         
         // initialize
         _bodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
         // configure
-        [_bodyView setFont:[UIFont fontWithName:kBodyFontName
-                                           size:kBodyFontSize]];
+        [_bodyView setFont:[UIFont fontWithName:kCellBodyFontName
+                                           size:kCellBodyFontSize]];
         [_bodyView setTextColor:[UIColor blackColor]];
         [_bodyView setBackgroundColor:[UIColor clearColor]]; // for iOS6
-        [_bodyView setLineSpacing:kContentLineSpacing];
+        [_bodyView setLineSpacing:kCellContentLineSpacing];
         
         // add to superview
 		[self.contentView addSubview:_bodyView];
@@ -203,20 +203,20 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 - (UILabel*)headerAttributeTopView
 {
     if (_headerAttributeTopView == nil) {
-        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
-        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kPadding.right,
-                                      kHeaderAttributeTopHeight);
+        CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+                                      kCellHeaderAttributeTopHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
-                                   kPadding.top); // size.y will be changed in layoutSubviews
+                                   kCellPadding.top); // size.y will be changed in layoutSubviews
         // initialize
         _headerAttributeTopView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
         [_headerAttributeTopView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_headerAttributeTopView setFont:[UIFont systemFontOfSize:kHeaderAttributeTopFontSize]];
+        [_headerAttributeTopView setFont:[UIFont systemFontOfSize:kCellHeaderAttributeTopFontSize]];
         [_headerAttributeTopView setTextColor:[UIColor blueColor]];
         
         // add to superview
@@ -230,17 +230,17 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 - (UILabel *)headerTitleView
 {
 	if (_headerTitleView == nil) {
-        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
-                                  kPadding.top - kHeaderAdjust,
-                                  self.bounds.size.width - leftColumnWidth - kPadding.right,
-                                  kImageViewSize.height + kHeaderAdjust + kHeaderAdjust);
+                                  kCellPadding.top - kCellHeaderAdjust,
+                                  self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+                                  kCellImageViewSize.height + kCellHeaderAdjust + kCellHeaderAdjust);
 
         // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kHeaderTitleFontSize]];
+        [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kCellHeaderTitleFontSize]];
         [_headerTitleView setTextColor:[UIColor blackColor]];
         [_headerTitleView setBackgroundColor:[UIColor clearColor]]; // for iOS6
         
@@ -255,18 +255,18 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 - (UILabel*)headerSubtitleView
 {
     if (_headerSubtitleView == nil) {
-        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
-                                  kPadding.top - kHeaderAdjust,
-                                  self.bounds.size.width - leftColumnWidth - kPadding.right,
-                                  kImageViewSize.height + kHeaderAdjust + kHeaderAdjust);
+                                  kCellPadding.top - kCellHeaderAdjust,
+                                  self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+                                  kCellImageViewSize.height + kCellHeaderAdjust + kCellHeaderAdjust);
         // initialize
         _headerSubtitleView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
         [_headerSubtitleView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_headerSubtitleView setFont:[UIFont systemFontOfSize:kHeaderSubtitleFontSize]];
+        [_headerSubtitleView setFont:[UIFont systemFontOfSize:kCellHeaderSubtitleFontSize]];
         [_headerSubtitleView setTextColor:[UIColor grayColor]];
         
         // add to superview
@@ -280,17 +280,17 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 - (UILabel *)headerAccessoryRightView
 {
 	if (_headerAccessoryRightView == nil) {
-        CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
-                                  kPadding.top - kHeaderAccessoryRightAdjust,
-                                  self.bounds.size.width - leftColumnWidth - kPadding.right,
-                                  kImageViewSize.height);
+                                  kCellPadding.top - kCellHeaderAccessoryRightAdjust,
+                                  self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+                                  kCellImageViewSize.height);
 
         // initialize
         _headerAccessoryRightView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:kHeaderAcessoryRightFontSize]];
+        [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:kCellHeaderAcessoryRightFontSize]];
         [_headerAccessoryRightView setTextColor:[UIColor lightGrayColor]];
         //[_headerAccessoryRightView setTextAlignment:NSTextAlignmentRight];
         
@@ -309,7 +309,7 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         UIImage *icon = self.indicatorIcon;
         _headerAccessoryRightImageView = [[UIImageView alloc] initWithImage:icon];
         // configure
-        [_headerAccessoryRightImageView setAlpha:kHeaderAccessoryRightImageAlpha];
+        [_headerAccessoryRightImageView setAlpha:kCellHeaderAccessoryRightImageAlpha];
         
         // add to superview
 		[self.contentView addSubview:_headerAccessoryRightImageView];
@@ -343,8 +343,8 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
     
     // layout avatar view
     CGRect imageViewFrame;
-    imageViewFrame.origin = CGPointMake(kPadding.left, kPadding.top);
-    imageViewFrame.size = kImageViewSize;
+    imageViewFrame.origin = CGPointMake(kCellPadding.left, kCellPadding.top);
+    imageViewFrame.size = kCellImageViewSize;
     [self.imageView setFrame:imageViewFrame];
     
     LFSHeader *profileLocal = self.profileLocal;
@@ -352,12 +352,12 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
     NSString *headerSubtitle = profileLocal.detailString;
     NSString *headerAccessory = profileLocal.attributeString;
     
-    CGFloat leftColumnWidth = kPadding.left + kImageViewSize.width + kImageMarginRight;
+    CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
     
     if (headerTitle) {
         CGRect titleFrame = self.headerTitleView.frame;
-        titleFrame.origin.x = kPadding.left + kImageViewSize.width + kImageMarginRight;
-        titleFrame.size.width = rect.size.width - leftColumnWidth - kPadding.right;
+        titleFrame.origin.x = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
+        titleFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
         [self.headerTitleView setFrame:titleFrame];
     }
     if (headerTitle && !headerSubtitle && !headerAccessory)
@@ -385,8 +385,8 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         CGRect headerAttributeTopFrame;
         headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
                                                      + headerTitleFrame.size.width
-                                                     + kImageMarginRight,
-                                                     headerTitleFrame.origin.y - kHeaderAttributeAdjust);
+                                                     + kCellImageMarginRight,
+                                                     headerTitleFrame.origin.y - kCellHeaderAttributeAdjust);
         headerAttributeTopFrame.size = CGSizeMake(rect.size.width
                                                   - headerTitleFrame.origin.x
                                                   - headerTitleFrame.size.width,
@@ -410,8 +410,8 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         CGRect headerAttributeTopFrame;
         headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
                                                      + headerTitleFrame.size.width
-                                                     + kImageMarginRight,
-                                                     headerTitleFrame.origin.y - kHeaderAttributeAdjust);
+                                                     + kCellImageMarginRight,
+                                                     headerTitleFrame.origin.y - kCellHeaderAttributeAdjust);
         headerAttributeTopFrame.size = CGSizeMake(rect.size.width
                                                   - headerTitleFrame.origin.x
                                                   - headerTitleFrame.size.width,
@@ -428,7 +428,7 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
     // layout note view
     CGRect accessoryRightFrame = self.headerAccessoryRightView.frame;
     accessoryRightFrame.origin.x = leftColumnWidth;
-    accessoryRightFrame.size.width = rect.size.width - leftColumnWidth - kPadding.right;
+    accessoryRightFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
     [self.headerAccessoryRightView setFrame:accessoryRightFrame];
     [self.headerAccessoryRightView setText:
      [self.dateFormatter relativeStringFromDate:self.contentDate]];
@@ -449,9 +449,9 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
     // layoutSubviews is always called after requiredRowHeightWithFrameWidth:
     // so we take advantage of that by reusing _requiredBodyHeight
     CGRect textContentFrame;
-    textContentFrame.origin = CGPointMake(kPadding.left,
-                                          kPadding.top + kImageViewSize.height + kMinorVerticalSeparator);
-    textContentFrame.size = CGSizeMake(rect.size.width - kPadding.left - kContentPaddingRight,
+    textContentFrame.origin = CGPointMake(kCellPadding.left,
+                                          kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
+    textContentFrame.size = CGSizeMake(rect.size.width - kCellPadding.left - kCellContentPaddingRight,
                                        self.requiredBodyHeight);
     [self.bodyView setFrame:textContentFrame];
     
@@ -485,11 +485,11 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
 {
     CGSize bodySize = [self.bodyView
                        sizeThatFits:
-                       CGSizeMake(width - kPadding.left - kContentPaddingRight,
+                       CGSizeMake(width - kCellPadding.left - kCellContentPaddingRight,
                                   CGFLOAT_MAX)];
     
     [self setRequiredBodyHeight:bodySize.height];
-    return kPadding.bottom + bodySize.height + kPadding.top + kImageViewSize.height + kMinorVerticalSeparator;
+    return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
 }
 
 
@@ -527,7 +527,7 @@ static const CGFloat kHeaderAttributeTopHeight = 10.0f;
         }
         
         [self.imageView setContentMode:UIViewContentModeScaleToFill];
-        [self.imageView.layer setCornerRadius:kImageCornerRadius];
+        [self.imageView.layer setCornerRadius:kCellImageCornerRadius];
         [self.imageView.layer setMasksToBounds:YES];
     }
     return self;

@@ -12,7 +12,7 @@
 #import "LFSTriple.h"
 #import "LFSHeader.h"
 
-extern const CGSize kImageViewSize;
+extern const CGSize kCellImageViewSize;
 
 @interface LFSAttributedTextCell : UITableViewCell <UIAppearance>
 

@@ -564,13 +564,9 @@ static NSString* const kCellSelectSegue = @"detailView";
 
 - (void)scaleImage:(UIImage*)image forContent:(LFSContent*)content
 {
-    // we are on a non-Retina device
-    CGSize size = (_haveRetinaDevice
-                   ? CGSizeMake(kImageViewSize.width * 2.f, kImageViewSize.height * 2.f)
-                   : kImageViewSize);
     CGRect targetRect;
     targetRect.origin = CGPointZero;
-    targetRect.size = size;
+    targetRect.size = kCellImageViewSize;
     
     const NSString* const contentId = content.idString;
 #ifdef CACHE_SCALED_IMAGES
@@ -588,7 +584,9 @@ static NSString* const kCellSelectSegue = @"detailView";
         scaledImage = [_imageCache objectForKey:authorId];
         if (scaledImage == nil) {
 #endif
-            UIGraphicsBeginImageContext(size);
+            // don't call UIGraphicsBeginImageContext when supporting Retina,
+            // instead call UIGraphicsBeginImageContextWithOptions with zero for scale
+            UIGraphicsBeginImageContextWithOptions(kCellImageViewSize, YES, 0.f);
             [image drawInRect:targetRect];
             scaledImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
