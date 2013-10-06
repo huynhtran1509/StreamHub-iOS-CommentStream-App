@@ -63,6 +63,8 @@
 @property (nonatomic, assign) LFSContentType contentType;
 @property (nonatomic, assign) NSUInteger contentSource;
 
+@property (nonatomic, assign) CGFloat displayHeight;
+
 -(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;
 
 @end

@@ -57,7 +57,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 @interface LFSAttributedTextCell ()
 // store hash to avoid relayout of same HTML
 @property (nonatomic, assign) NSUInteger htmlHash;
-@property (nonatomic, assign) CGFloat requiredBodyHeight;
 
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
@@ -157,8 +156,11 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     }
 }
 
+
 #pragma mark -
 @synthesize requiredBodyHeight = _requiredBodyHeight;
+
+/*
 -(CGFloat)requiredBodyHeight
 {
     if (_requiredBodyHeight == CGFLOAT_MAX) {
@@ -170,6 +172,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     }
     return _requiredBodyHeight;
 }
+*/
 
 #pragma mark -
 @synthesize bodyView = _bodyView;
@@ -474,21 +477,24 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 	}
 	
     // reset requiredbodyheight
-    [self setRequiredBodyHeight:CGFLOAT_MAX];
+    //[self setRequiredBodyHeight:CGFLOAT_MAX];
     
 	_htmlHash = newHash;
 	[self.bodyView setHTMLString:html];
 	[self setNeedsLayout];
 }
 
-- (CGFloat)cellHeightForBoundsWidth:(CGFloat)width
++ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html
 {
-    CGSize bodySize = [self.bodyView
-                       sizeThatFits:
+    LFSBasicHTMLLabel *label = [[LFSBasicHTMLLabel alloc] init];
+    [label setFont:[UIFont fontWithName:kCellBodyFontName
+                                       size:kCellBodyFontSize]];
+    [label setLineSpacing:kCellContentLineSpacing];
+    [label setHTMLString:html];
+    CGSize bodySize = [label sizeThatFits:
                        CGSizeMake(width - kCellPadding.left - kCellContentPaddingRight,
                                   CGFLOAT_MAX)];
     
-    [self setRequiredBodyHeight:bodySize.height];
     return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
 }
 
@@ -510,7 +516,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
         _contentDate = nil;
         _dateFormatter = nil;
         
-        _requiredBodyHeight = CGFLOAT_MAX;
+        //_requiredBodyHeight = CGFLOAT_MAX;
         
         [self setAccessoryType:UITableViewCellAccessoryNone];
         

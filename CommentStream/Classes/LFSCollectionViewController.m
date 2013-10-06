@@ -45,6 +45,8 @@
 static NSString* const kCellReuseIdentifier = @"LFSContentCell";
 static NSString* const kCellSelectSegue = @"detailView";
 
+static const NSString* const kContentCellHeightKey = @"contentCellHeight";
+
 @implementation LFSCollectionViewController
 {
     BOOL _haveRetinaDevice;
@@ -475,9 +477,15 @@ static NSString* const kCellSelectSegue = @"detailView";
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
-                                                     cellForRowAtIndexPath:indexPath];
-    return [cell cellHeightForBoundsWidth:tableView.bounds.size.width];
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    CGFloat cellHeight = content.displayHeight;
+    
+    if (cellHeight == CGFLOAT_MAX) {
+        cellHeight = [LFSAttributedTextCell cellHeightForBoundsWidth:tableView.bounds.size.width withHTMLString:content.contentBodyHtml];
+        [content setDisplayHeight:cellHeight];
+    }
+    
+    return cellHeight;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -521,6 +529,8 @@ static NSString* const kCellSelectSegue = @"detailView";
     [cell setHTMLString:content.contentBodyHtml];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
+    
+    [cell setRequiredBodyHeight:content.displayHeight];
     
     // always set an object
     LFSAuthor *author = content.author;

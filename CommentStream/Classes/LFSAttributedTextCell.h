@@ -38,9 +38,11 @@ extern const CGSize kCellImageViewSize;
 // UIAppearance protocol, but for iOS6 we need to do this workaround:
 @property (nonatomic, weak) UIColor *backgroundCellColor UI_APPEARANCE_SELECTOR;
 
+@property (nonatomic, assign) CGFloat requiredBodyHeight;
+
 #pragma mark - Methods
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
-- (CGFloat)cellHeightForBoundsWidth:(CGFloat)width;
++ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html;
 - (void)setHTMLString:(NSString *)html;
 
 @end
