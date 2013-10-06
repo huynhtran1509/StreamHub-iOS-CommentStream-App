@@ -6,16 +6,235 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-
+#import "LFSContent.h"
 #import "LFSContentCollection.h"
 #import "LFSAuthorCollection.h"
 
-@implementation LFSContentCollection {
-    NSMutableArray *_array;
+NSString *descriptionForObject(id object, id locale, NSUInteger indent)
+{
+    if ([object respondsToSelector:@selector(descriptionWithLocale:indent:)])
+    {
+        return [object descriptionWithLocale:locale indent:indent];
+    }
+    else if ([object respondsToSelector:@selector(descriptionWithLocale:)])
+    {
+        return [object descriptionWithLocale:locale];
+    }
+    else
+    {
+        return [object description];
+    }
+}
+
+#pragma mark LFSOrderedKeyEnumerator
+@interface LFSContentKeyEnumerator : NSEnumerator
+
+@property (nonatomic, copy) NSArray *array;
+@property (nonatomic, assign) NSUInteger index;
+
+- (id)initWithObjects:(NSArray *)array;
+
+@end
+
+@implementation LFSContentKeyEnumerator
+
+- (id)initWithObjects:(NSArray *)array
+{
+    self = [super init];
+    if (self)
+    {
+        _array = [array copy];
+        _index = [_array count];
+    }
+    return self;
+}
+
+- (id)nextObject
+{
+    if (_index > 0) {
+        LFSContent *content = _array[--_index];
+        return content.idString;
+    } else {
+        return nil;
+    }
+}
+
+@end
+
+#pragma mark - LFSContentCollection
+@interface LFSContentCollection ()
+
+@property (nonatomic, strong) NSMutableDictionary *mapping;
+@property (nonatomic, strong) NSMutableArray *array;
+
+@end
+
+
+@implementation LFSContentCollection
+
+@synthesize mapping = _mapping;
+@synthesize array = _array;
+
+- (id)copyWithZone:(__unused NSZone *)zone
+{
+    return self;
+}
+
+- (id)mutableCopyWithZone:(NSZone *)zone
+{
+    return [[[LFSMutableContentCollection class] allocWithZone:zone]
+            initWithDictionary:self];
+}
+
+#pragma mark - insertion stuff
+
+-(void)insertContentObject:(LFSContent*)content
+{
+    // here we determine the correct index to insert the object into
+    NSRange searchRange = NSMakeRange(0u, [_array count]);
+    NSUInteger index = [_array indexOfObject:content
+                               inSortedRange:searchRange
+                                     options:NSBinarySearchingInsertionIndex
+                             usingComparator:^(LFSContent *obj1,
+                                               LFSContent *obj2)
+                        {
+                            return [obj2.eventId compare:obj1.eventId];
+                        }];
+    [_array insertObject:content atIndex:index];
+}
+
+- (void)setObject:(id)object forKey:(id<NSCopying>)key
+{
+    LFSContent *content;
+    LFSContent *oldContent = _mapping[key];
+    if (oldContent)
+    {
+        // update content
+        content = [[LFSContent alloc] initWithObject:oldContent];
+        [content setObject:object];
+        // not setting the array -- it should already contain the object
+    } else {
+        content = [[LFSContent alloc] initWithObject:object];
+        [self insertContentObject:content];
+    }
+    _mapping[key] = content;
+}
+
+- (void)addObject:(id)anObject
+{
+    LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
+    id<NSCopying> key = content.idString;
+    LFSContent *oldContent = _mapping[key];
+    if (oldContent)
+    {
+        // update content
+        content = [[LFSContent alloc] initWithObject:oldContent];
+        [content setObject:anObject];
+        // not setting the array -- it should already contain the object
+    } else {
+        [self insertContentObject:content];
+    }
+    _mapping[key] = content;
 }
 
 
-#pragma mark - Properties
+#pragma mark - Description
+
+- (NSString *)descriptionWithLocale:(id)locale indent:(NSUInteger)indent
+{
+    NSMutableString *padding = [NSMutableString string];
+    for (NSUInteger i = 0; i < indent; i++)
+    {
+        [padding appendString:@"    "];
+    }
+    
+    NSMutableString *description = [NSMutableString string];
+    [description appendFormat:@"%@{\n", padding];
+    for (LFSContent *object in _array)
+    {
+        [description appendFormat:@"%@    %@ = %@;\n", padding,
+         descriptionForObject(object.idString, locale, indent),
+         descriptionForObject([object description], locale, indent)];
+    }
+    [description appendFormat:@"%@}\n", padding];
+    return description;
+}
+
+
+
+#pragma mark - NSDictionary primitives
+
+
+- (NSUInteger)count
+{
+    return [_array count];
+}
+
+// designated initializer
+
+-(id)initWithObjects:(const __unsafe_unretained id [])objects
+             forKeys:(const __unsafe_unretained id<NSCopying> [])keys
+               count:(NSUInteger)cnt
+{
+    self = [super init];
+    if (self != nil) {
+        // initialize stuff here
+        _mapping = [[NSMutableDictionary alloc] initWithCapacity:cnt];
+        _array = [[NSMutableArray alloc] initWithCapacity:cnt];
+        
+        for (NSUInteger i = 0; i < cnt; i++)
+        {
+            [self setObject:objects[i] forKey:keys[i]];
+        }
+    }
+    return self;
+}
+
+- (id)objectForKey:(id)key
+{
+    return _mapping[key];
+}
+
+- (id)objectAtIndex:(NSUInteger)index
+{
+    return _array[index];
+}
+
+- (NSEnumerator *)keyEnumerator
+{
+    return [[LFSContentKeyEnumerator alloc] initWithObjects:_array];
+}
+
+#pragma mark - NSDictionary (not primitives)
+
+-(NSEnumerator*)objectEnumerator
+{
+    return [_array objectEnumerator];
+}
+
+#pragma mark - NSArray
+- (NSEnumerator *)reverseObjectEnumerator
+{
+    return [_array reverseObjectEnumerator];
+}
+
+-(instancetype)initWithArray:(NSArray*)array
+{
+    self = [super init];
+    if (self != nil) {
+        for (id object in array) {
+            [self addObject:object];
+        }
+    }
+    return self;
+}
+
+@end
+
+
+#pragma mark - LFSMutableContentCollection
+
+@implementation LFSMutableContentCollection
 
 @synthesize authors = _authors;
 
@@ -42,141 +261,126 @@
     [self.authors addEntriesFromDictionary:collection];
 }
 
-#pragma mark - Other/Lifecycle
 
-- (id)init
+- (id)objectAtIndex:(NSUInteger)index
 {
-	return [self initWithCapacity:0u];
-}
-
-- (id)copy
-{
-    // this is a bit sneaky since some code out there assumes
-    // that regular copy always returns an immutable version
-    // of the object
-	return [self mutableCopy];
-}
-
--(void)dealloc
-{
-    _array = nil;
-}
-
-+(instancetype)array
-{
-    return [[self alloc] init];
-}
-
-
-#pragma mark - NSMutableArray primitives
-
--(id)initWithCapacity:(NSUInteger)numItems
-{
-    self = [super init];
-	if (self != nil)
-	{
-        _authors = nil;
-        _array = [[NSMutableArray alloc] initWithCapacity:numItems];
-	}
-	return self;
-}
-
--(void)removeObjectAtIndex:(NSUInteger)index
-{
-    [_array removeObjectAtIndex:index];
-}
-
--(void)removeLastObject
-{
-    [_array removeLastObject];
-}
-
--(void)insertObject:(id)anObject atIndex:(NSUInteger)index
-{
-    if ([anObject isKindOfClass:[LFSContent class]]) {
-        [_array insertObject:anObject atIndex:index];
-    } else {
-        LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
-        [_array insertObject:content atIndex:index];
-    }
-}
-
--(void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject
-{
-    if ([anObject isKindOfClass:[LFSContent class]]) {
-        [_array replaceObjectAtIndex:index withObject:anObject];
-        //LFSContent *content = [_array objectAtIndex:index];
-        //[content setObject:[anObject object]];
-    } else {
-        LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
-        [_array replaceObjectAtIndex:index withObject:content];
-        //LFSContent *content = [_array objectAtIndex:index];
-        //[content setObject:anObject];
-    }
-}
-
--(void)addObject:(id)anObject
-{
-    if ([anObject isKindOfClass:[LFSContent class]]) {
-        [_array addObject:anObject];
-    } else {
-        LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
-        [_array addObject:content];
-    }
-}
-
-
-#pragma mark - NSArray primitives
-
--(NSUInteger)count
-{
-    return [_array count];
-}
-
--(id)objectAtIndex:(NSUInteger)index
-{
-    LFSContent *content = [_array objectAtIndex:index];
+    LFSContent *content = [self.array objectAtIndex:index];
     if (content.author == nil && _authors != nil) {
         [content setAuthorWithCollection:_authors];
     }
-    return [_array objectAtIndex:index];
+    return self.array[index];
 }
 
-// note: per Apple docs, NSArray does not have adesignated initializer
--(id)initWithObjects:(const __unsafe_unretained id [])objects count:(NSUInteger)cnt
+
+#pragma mark - NSMutableDictionary methods
++ (id)dictionaryWithCapacity:(NSUInteger)count
+{
+    return [[self alloc] initWithCapacity:count];
+}
+
+// designated initializer
+- (id)initWithCapacity:(NSUInteger)capacity
 {
     self = [super init];
-    if (self != nil) {
-        // initialize stuff here
+    if (self)
+    {
         _authors = nil;
         
-        // create an NSArray from a C array of object pointers
-        // and a C array of key pointers
-        Class classOfLFSContent = [LFSContent class];
-        LFSContent *__strong *array =
-        (LFSContent *__strong *)malloc(sizeof(LFSContent*) * cnt);
-        for (NSUInteger i = 0; i < cnt; i++) {
-            id object = objects[i];
-            LFSContent *Content = ([object isKindOfClass:classOfLFSContent]
-                                   ? (LFSContent*)object
-                                   : [[LFSContent alloc] initWithObject:object]);
-            array[i] = Content;
-        }
-        _array = [[NSMutableArray alloc]
-                  initWithObjects:array
-                  count:cnt];
-        free(array);
+        // values and keys are private to LFSOrderedDictionary that we
+        // inherit from
+        self.mapping = [[NSMutableDictionary alloc] initWithCapacity:capacity];
+        self.array = [[NSMutableArray alloc] initWithCapacity:capacity];
+        
+        // just checking that we didn't mess up attribute naming
+        NSAssert(self.mapping != nil, @"self.mapping failed to initialize");
+        NSAssert(self.array != nil, @"self.array failed to initialize");
     }
-    
     return self;
 }
 
--(NSEnumerator*)objectEnumerator {
-    return [_array objectEnumerator];
+- (id)init
+{
+    return [self initWithCapacity:0u];
 }
 
--(NSEnumerator*)reverseObjectEnumerator {
-    return [_array reverseObjectEnumerator];
+- (id)copyWithZone:(NSZone *)zone
+{    
+    return [[[LFSContentCollection class] allocWithZone:zone]
+            initWithDictionary:self];
+}
+
+- (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary
+{    
+    for (id key in otherDictionary)
+    {
+        [self setObject:otherDictionary[key] forKey:key];
+    }
+}
+
+- (void)removeObjectAtIndex:(NSUInteger)index
+{
+    LFSContent *object = [self.array objectAtIndex:index];
+    [self.mapping removeObjectForKey:object.idString];
+    [self.array removeObjectAtIndex:index];
+}
+
+- (void)removeObjectForKey:(id)key
+{
+    LFSContent *object = [self.mapping objectForKey:key];
+    [self.mapping removeObjectForKey:key];
+    [self.array removeObject:object];
+}
+
+- (void)removeAllObjects
+{
+    [self removeObjectsForKeys:[self allKeys]];
+}
+ 
+- (void)removeObjectsForKeys:(NSArray *)keyArray
+{    
+    for (id key in [keyArray copy])
+    {
+        [self removeObjectForKey:key];
+    }
+}
+
+- (void)setDictionary:(NSDictionary *)otherDictionary
+{    
+    [self removeAllObjects];
+    [self addEntriesFromDictionary:otherDictionary];
+}
+
+- (void)setObject:(id)object forKey:(id<NSCopying>)key
+{
+    [super setObject:object forKey:key];
+}
+
+#pragma mark - NSMutableArray
+
+- (void)addObject:(id)anObject
+{
+    [super addObject:anObject];
+}
+
+-(void)addObjectsFromArray:(NSArray*)array
+{
+    for (id object in array)
+    {
+        [self addObject:object];
+    }
+}
+
+#pragma mark - KVC
+- (void)setValue:(id)value forKey:(id<NSCopying>)key
+{
+    if (value)
+    {
+        [self setObject:value forKey:key];
+    }
+    else
+    {
+        [self removeObjectForKey:key];
+    }
 }
 
 @end

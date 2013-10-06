@@ -17,6 +17,8 @@
 #import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
 #endif
 
+#import <objc/objc-runtime.h>
+
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
@@ -26,7 +28,7 @@
 #import "LFSContentCollection.h"
 
 @interface LFSCollectionViewController ()
-@property (nonatomic, strong) LFSContentCollection *content;
+@property (nonatomic, strong) LFSMutableContentCollection *content;
 
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
@@ -44,6 +46,7 @@
 // some module-level constants
 static NSString* const kCellReuseIdentifier = @"LFSContentCell";
 static NSString* const kCellSelectSegue = @"detailView";
+const static char kContentCellHeightKey;
 
 @implementation LFSCollectionViewController
 {
@@ -134,7 +137,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     UIScreen *screen = [UIScreen mainScreen];
     _haveRetinaDevice = [screen respondsToSelector:@selector(scale)] && [screen scale] == 2.f;
 
-    _content = [LFSContentCollection array];
+    _content = [[LFSMutableContentCollection alloc] init];
     
     self.title = [_collection objectForKey:@"_name"];
     
@@ -449,8 +452,7 @@ static NSString* const kCellSelectSegue = @"detailView";
     NSRange contentSpan;
     contentSpan.location = 0u;
     contentSpan.length = [filteredContent count];
-    [_content insertObjects:filteredContent
-                  atIndexes:[NSIndexSet indexSetWithIndexesInRange:contentSpan]];
+    [_content addObjectsFromArray:filteredContent];
     
     // also cause table to redraw
     if ([filteredContent count] == 1u) {
@@ -476,9 +478,22 @@ static NSString* const kCellSelectSegue = @"detailView";
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self tableView:tableView
-                                                     cellForRowAtIndexPath:indexPath];
-    return [cell cellHeightForBoundsWidth:tableView.bounds.size.width];
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
+    CGFloat cellHeightValue;
+    
+    if (cellHeight == nil) {
+        cellHeightValue = [LFSAttributedTextCell
+                           cellHeightForBoundsWidth:tableView.bounds.size.width
+                           withHTMLString:content.contentBodyHtml];
+        objc_setAssociatedObject(content, &kContentCellHeightKey,
+                                 [NSNumber numberWithFloat:cellHeightValue],
+                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    } else {
+        cellHeightValue = [cellHeight floatValue];
+    }
+    
+    return cellHeightValue;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -523,6 +538,9 @@ static NSString* const kCellSelectSegue = @"detailView";
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
     
+    NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
+    [cell setRequiredBodyHeight:[cellHeight floatValue]];
+    
     // always set an object
     LFSAuthor *author = content.author;
     NSNumber *moderator = [content.contentAnnotations objectForKey:@"moderator"];
@@ -565,13 +583,9 @@ static NSString* const kCellSelectSegue = @"detailView";
 
 - (void)scaleImage:(UIImage*)image forContent:(LFSContent*)content
 {
-    // we are on a non-Retina device
-    CGSize size = (_haveRetinaDevice
-                   ? CGSizeMake(kImageViewSize.width * 2.f, kImageViewSize.height * 2.f)
-                   : kImageViewSize);
     CGRect targetRect;
     targetRect.origin = CGPointZero;
-    targetRect.size = size;
+    targetRect.size = kCellImageViewSize;
     
     const NSString* const contentId = content.idString;
 #ifdef CACHE_SCALED_IMAGES
@@ -589,7 +603,9 @@ static NSString* const kCellSelectSegue = @"detailView";
         scaledImage = [_imageCache objectForKey:authorId];
         if (scaledImage == nil) {
 #endif
-            UIGraphicsBeginImageContext(size);
+            // don't call UIGraphicsBeginImageContext when supporting Retina,
+            // instead call UIGraphicsBeginImageContextWithOptions with zero for scale
+            UIGraphicsBeginImageContextWithOptions(kCellImageViewSize, YES, 0.f);
             [image drawInRect:targetRect];
             scaledImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();

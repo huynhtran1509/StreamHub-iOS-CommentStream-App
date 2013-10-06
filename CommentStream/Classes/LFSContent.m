@@ -101,6 +101,11 @@ static NSString* const kLFSSourceImageMap[] = {
     _object = object;
 }
 
+-(NSString*)description
+{
+    return [_object description];
+}
+
 #pragma mark -
 @synthesize author = _author;
 
@@ -270,7 +275,7 @@ static NSString* const kLFSSourceImageMap[] = {
 {
     const static NSString* const key = @"childContent";
     if (_childContent == nil) {
-        _childContent = [[LFSContentCollection alloc]
+        _childContent = [[LFSMutableContentCollection alloc]
                          initWithArray:[_object objectForKey:key]];
     }
     return _childContent;
@@ -361,11 +366,20 @@ static NSString* const kLFSSourceImageMap[] = {
 // designated initializer
 -(id)initWithObject:(id)object
 {
-    self = [super init];
-    if (self ) {
-        // initialization stuff here
-        _object = object;
-        [self resetCached];
+    // check if object is of appropriate type
+    if ([object isKindOfClass:[self class]])
+    {
+        self = object; // let ARC release self
+    }
+    else
+    {
+        self = [super init];
+        if (self)
+        {
+            // initialization stuff here
+            [self resetCached];
+            _object = object;
+        }
     }
     return self;
 }
@@ -406,6 +420,10 @@ static NSString* const kLFSSourceImageMap[] = {
     _visibility = LFSContentVisibilityNone;
     _contentType = LFSContentTypeMessage;
     _contentSource = 0u;
+    
+    _visibilityIsSet = NO;
+    _contentSourceIsSet = NO;
+    _contentTypeIsSet = NO;
 }
 
 @end
