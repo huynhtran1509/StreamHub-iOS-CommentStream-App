@@ -82,15 +82,67 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 }
 
 - (id)mutableCopyWithZone:(NSZone *)zone
-{    
+{
     return [[[LFSMutableContentCollection class] allocWithZone:zone]
             initWithDictionary:self];
 }
 
+#pragma mark - insertion stuff
+
+-(void)insertContentObject:(LFSContent*)content
+{
+    // here we determine the correct index to insert the object into
+    NSRange searchRange = NSMakeRange(0u, [_array count]);
+    NSUInteger index = [_array indexOfObject:content
+                               inSortedRange:searchRange
+                                     options:NSBinarySearchingInsertionIndex
+                             usingComparator:^(LFSContent *obj1,
+                                               LFSContent *obj2)
+                        {
+                            return obj1.eventId < obj2.eventId;
+                        }];
+    [_array insertObject:content atIndex:index];
+}
+
+- (void)setObject:(id)object forKey:(id<NSCopying>)key
+{
+    LFSContent *content;
+    LFSContent *oldContent = _mapping[key];
+    if (oldContent)
+    {
+        // update content
+        content = [[LFSContent alloc] initWithObject:oldContent];
+        [content setObject:object];
+        // not setting the array -- it should already contain the object
+    } else {
+        content = [[LFSContent alloc] initWithObject:object];
+        [self insertContentObject:content];
+    }
+    _mapping[key] = content;
+}
+
+- (void)addObject:(id)anObject
+{
+    LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
+    id<NSCopying> key = content.idString;
+    LFSContent *oldContent = _mapping[key];
+    if (oldContent)
+    {
+        // update content
+        content = [[LFSContent alloc] initWithObject:oldContent];
+        [content setObject:anObject];
+        // not setting the array -- it should already contain the object
+    } else {
+        [self insertContentObject:content];
+    }
+    _mapping[key] = content;
+}
+
+
 #pragma mark - Description
 
 - (NSString *)descriptionWithLocale:(id)locale indent:(NSUInteger)indent
-{    
+{
     NSMutableString *padding = [NSMutableString string];
     for (NSUInteger i = 0; i < indent; i++)
     {
@@ -133,38 +185,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         
         for (NSUInteger i = 0; i < cnt; i++)
         {
-            id key = keys[i];
-            id object = objects[i];
-            
-            // TODO: handle "replaces" cases here...
-            
-            // note that array is added to at the end but it is actually
-            // the most recent stuff that is being added
-            
-            LFSContent *content;
-            LFSContent *oldContent = _mapping[key];
-            if (oldContent)
-            {
-                // update content
-                content = [[LFSContent alloc] initWithObject:oldContent];
-                [content setObject:object];
-                // not setting the array -- it should already contain the object
-            } else {
-                // find the appropriate index to insert content at
-                // always keep the array sorted by eventId
-                content = [[LFSContent alloc] initWithObject:object];
-                NSRange searchRange = NSMakeRange(0u, [_array count]);
-                NSUInteger index = [_array indexOfObject:content
-                                           inSortedRange:searchRange
-                                                 options:NSBinarySearchingInsertionIndex
-                                         usingComparator:^(LFSContent *obj1,
-                                                           LFSContent *obj2)
-                                    {
-                                        return obj1.eventId < obj2.eventId;
-                                    }];
-                [_array insertObject:content atIndex:index];
-            }
-            _mapping[key] = content;
+            [self setObject:objects[i] forKey:keys[i]];
         }
     }
     return self;
@@ -202,38 +223,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     self = [super init];
     if (self != nil) {
-        for (id object in array)
-        {
-            // TODO: handle "replaces" cases here...
-            
-            // note that array is added to at the end but it is actually
-            // the most recent stuff that is being added
-            
-            LFSContent *content = [[LFSContent alloc] initWithObject:object];
-            id key = content.idString;
-            LFSContent *oldContent = _mapping[key];
-            if (oldContent)
-            {
-                // update content
-                content = [[LFSContent alloc] initWithObject:oldContent];
-                [content setObject:object];
-                // not setting the array -- it should already contain the object
-            } else {
-                // find the appropriate index to insert content at
-                // always keep the array sorted by eventId
-                content = [[LFSContent alloc] initWithObject:object];
-                NSRange searchRange = NSMakeRange(0u, [_array count]);
-                NSUInteger index = [_array indexOfObject:content
-                                           inSortedRange:searchRange
-                                                 options:NSBinarySearchingInsertionIndex
-                                         usingComparator:^(LFSContent *obj1,
-                                                           LFSContent *obj2)
-                                    {
-                                        return obj1.eventId < obj2.eventId;
-                                    }];
-                [_array insertObject:content atIndex:index];
-            }
-            _mapping[key] = content;
+        for (id object in array) {
+            [self addObject:object];
         }
     }
     return self;
@@ -362,55 +353,14 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (void)setObject:(id)object forKey:(id<NSCopying>)key
 {
-    LFSContent *content;
-    LFSContent *oldContent = self.mapping[key];
-    if (oldContent)
-    {
-        // update content
-        content = [[LFSContent alloc] initWithObject:oldContent];
-        [content setObject:object];
-        // not setting the array -- it should already contain the object
-    } else {
-        // find the appropriate index to insert content at
-        // always keep the array sorted by eventId
-        content = [[LFSContent alloc] initWithObject:object];
-        NSRange searchRange = NSMakeRange(0u, [self.array count]);
-        NSUInteger index = [self.array indexOfObject:content
-                                       inSortedRange:searchRange
-                                             options:NSBinarySearchingInsertionIndex
-                                     usingComparator:^(LFSContent *obj1,
-                                                       LFSContent *obj2)
-                            {
-                                return obj1.eventId < obj2.eventId;
-                            }];
-        [self.array insertObject:content atIndex:index];
-    }
-    self.mapping[key] = content;
+    [super setObject:object forKey:key];
 }
 
 #pragma mark - NSMutableArray
 
 - (void)addObject:(id)anObject
 {
-    LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
-    NSString *key = content.idString;
-    LFSContent *oldContent = self.mapping[content.idString];
-    if (!oldContent)
-    {
-        // find the appropriate index to insert content at
-        // always keep the array sorted by eventId
-        NSRange searchRange = NSMakeRange(0u, [self.array count]);
-        NSUInteger index = [self.array indexOfObject:content
-                                       inSortedRange:searchRange
-                                             options:NSBinarySearchingInsertionIndex
-                                     usingComparator:^(LFSContent *obj1,
-                                                       LFSContent *obj2)
-                            {
-                                return obj1.eventId < obj2.eventId;
-                            }];
-        [self.array insertObject:content atIndex:index];
-    }
-    self.mapping[key] = content;
+    [super addObject:anObject];
 }
 
 -(void)addObjectsFromArray:(NSArray*)array
@@ -422,7 +372,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 }
 
 #pragma mark - KVC
-- (void)setValue:(id)value forKey:(NSString *)key
+- (void)setValue:(id)value forKey:(id<NSCopying>)key
 {
     if (value)
     {

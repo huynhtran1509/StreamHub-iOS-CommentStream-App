@@ -176,6 +176,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         
         // configure
         [_headerAccessoryRightView setAlpha:kDetailHeaderAccessoryRightAlpha];
+        [_headerAccessoryRightView setContentMode:UIViewContentModeCenter];
         
         [_headerAccessoryRightView addTarget:self
                                  action:@selector(didSelectProfile:)
@@ -434,9 +435,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // layout source icon
     LFSTriple *profileRemote = self.profileRemote;
     if (profileRemote != nil) {
-        [self.headerAccessoryRightView setImage:[profileRemote iconImage]
+        [self.headerAccessoryRightView setImage:profileRemote.iconImage
                                   forState:UIControlStateNormal];
-        _profileRemoteURL = [NSURL URLWithString:[profileRemote detailString]];
+        _profileRemoteURL = [NSURL URLWithString:profileRemote.detailString];
     }
 
     // layout date label

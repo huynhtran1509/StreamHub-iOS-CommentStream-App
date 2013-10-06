@@ -126,11 +126,10 @@
     }
     
     LFSAuthor *author = contentItem.author;
-    UIImage *icon = contentItem.contentSourceIcon;
     [detailView setProfileRemote:[[LFSTriple alloc]
                                   initWithDetailString:author.profileUrlStringNoHashBang
                                   mainString:nil
-                                  iconImage:icon]];
+                                  iconImage:contentItem.contentSourceIcon]];
     
     NSNumber *moderator = [contentItem.contentAnnotations objectForKey:@"moderator"];
     BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);

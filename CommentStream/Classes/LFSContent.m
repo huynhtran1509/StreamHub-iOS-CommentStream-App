@@ -377,8 +377,8 @@ static NSString* const kLFSSourceImageMap[] = {
         if (self)
         {
             // initialization stuff here
-            _object = object;
             [self resetCached];
+            _object = object;
         }
     }
     return self;
@@ -420,6 +420,10 @@ static NSString* const kLFSSourceImageMap[] = {
     _visibility = LFSContentVisibilityNone;
     _contentType = LFSContentTypeMessage;
     _contentSource = 0u;
+    
+    _visibilityIsSet = NO;
+    _contentSourceIsSet = NO;
+    _contentTypeIsSet = NO;
 }
 
 @end

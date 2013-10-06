@@ -29,7 +29,7 @@
 - (void)removeAllObjects;
 - (void)setDictionary:(NSDictionary *)otherDictionary;
 - (void)setObject:(id)object forKey:(id)key;
-- (void)setValue:(id)value forKey:(NSString *)key;
+- (void)setValue:(id)value forKey:(id<NSCopying>)key;
 - (void)removeObjectForKey:(id)key;
 - (void)removeObjectsForKeys:(NSArray *)keyArray;
 - (void)addObjectsFromArray:(NSArray*)array;
