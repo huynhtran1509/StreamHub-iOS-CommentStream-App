@@ -190,7 +190,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return self;
 }
 
-- (id)objectForKey:(id)key
+- (id)objectForKey:(id<NSCopying>)key
 {
     return _mapping[key];
 }
@@ -311,7 +311,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary
 {    
-    for (id key in otherDictionary)
+    for (id<NSCopying> key in otherDictionary)
     {
         [self setObject:otherDictionary[key] forKey:key];
     }
@@ -324,7 +324,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [self.array removeObjectAtIndex:index];
 }
 
-- (void)removeObjectForKey:(id)key
+- (void)removeObjectForKey:(id<NSCopying>)key
 {
     LFSContent *object = [self.mapping objectForKey:key];
     [self.mapping removeObjectForKey:key];
@@ -338,7 +338,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
  
 - (void)removeObjectsForKeys:(NSArray *)keyArray
 {    
-    for (id key in [keyArray copy])
+    for (id<NSCopying> key in [keyArray copy])
     {
         [self removeObjectForKey:key];
     }
@@ -367,19 +367,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     for (id object in array)
     {
         [self addObject:object];
-    }
-}
-
-#pragma mark - KVC
-- (void)setValue:(id)value forKey:(id<NSCopying>)key
-{
-    if (value)
-    {
-        [self setObject:value forKey:key];
-    }
-    else
-    {
-        [self removeObjectForKey:key];
     }
 }
 
