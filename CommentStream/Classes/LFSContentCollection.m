@@ -26,7 +26,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
-
 #pragma mark LFSOrderedKeyEnumerator
 @interface LFSContentKeyEnumerator : NSEnumerator
 

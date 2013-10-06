@@ -108,7 +108,6 @@ static NSString* const kLFSSourceImageMap[] = {
 
 #pragma mark -
 @synthesize author = _author;
-@synthesize displayHeight = _displayHeight;
 
 #pragma mark -
 -(UIImage*)contentSourceIcon
@@ -401,8 +400,6 @@ static NSString* const kLFSSourceImageMap[] = {
 -(void)resetCached
 {
     // reset all cached properties except _object
-    _displayHeight = CGFLOAT_MAX;
-    
     _author = nil;
     
     _content = nil;

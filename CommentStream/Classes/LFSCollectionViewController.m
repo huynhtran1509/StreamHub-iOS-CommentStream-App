@@ -17,6 +17,8 @@
 #import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
 #endif
 
+#import <objc/objc-runtime.h>
+
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
@@ -44,8 +46,7 @@
 // some module-level constants
 static NSString* const kCellReuseIdentifier = @"LFSContentCell";
 static NSString* const kCellSelectSegue = @"detailView";
-
-static const NSString* const kContentCellHeightKey = @"contentCellHeight";
+const static char kContentCellHeightKey;
 
 @implementation LFSCollectionViewController
 {
@@ -478,14 +479,21 @@ static const NSString* const kContentCellHeightKey = @"contentCellHeight";
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    CGFloat cellHeight = content.displayHeight;
+    NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
+    CGFloat cellHeightValue;
     
-    if (cellHeight == CGFLOAT_MAX) {
-        cellHeight = [LFSAttributedTextCell cellHeightForBoundsWidth:tableView.bounds.size.width withHTMLString:content.contentBodyHtml];
-        [content setDisplayHeight:cellHeight];
+    if (cellHeight == nil) {
+        cellHeightValue = [LFSAttributedTextCell
+                           cellHeightForBoundsWidth:tableView.bounds.size.width
+                           withHTMLString:content.contentBodyHtml];
+        objc_setAssociatedObject(content, &kContentCellHeightKey,
+                                 [NSNumber numberWithFloat:cellHeightValue],
+                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    } else {
+        cellHeightValue = [cellHeight floatValue];
     }
     
-    return cellHeight;
+    return cellHeightValue;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -530,7 +538,8 @@ static const NSString* const kContentCellHeightKey = @"contentCellHeight";
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
     
-    [cell setRequiredBodyHeight:content.displayHeight];
+    NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
+    [cell setRequiredBodyHeight:[cellHeight floatValue]];
     
     // always set an object
     LFSAuthor *author = content.author;
