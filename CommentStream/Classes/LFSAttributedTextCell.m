@@ -70,6 +70,26 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 
 @implementation LFSAttributedTextCell
 
+#pragma mark - class methods
+
++ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html
+{
+    static LFSBasicHTMLLabel *label = nil;
+    if (label == nil) {
+        label = [[LFSBasicHTMLLabel alloc] init];
+        [label setFont:[UIFont fontWithName:kCellBodyFontName
+                                       size:kCellBodyFontSize]];
+        [label setLineSpacing:kCellContentLineSpacing];
+    }
+    [label setHTMLString:html];
+    CGSize bodySize = [label sizeThatFits:
+                       CGSizeMake(width - kCellPadding.left - kCellContentPaddingRight,
+                                  CGFLOAT_MAX)];
+    
+    return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+}
+
+
 #pragma mark - UIAppearance properties
 @synthesize backgroundCellColor;
 -(UIColor*)backgroundCellColor
@@ -482,20 +502,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 	_htmlHash = newHash;
 	[self.bodyView setHTMLString:html];
 	[self setNeedsLayout];
-}
-
-+ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html
-{
-    LFSBasicHTMLLabel *label = [[LFSBasicHTMLLabel alloc] init];
-    [label setFont:[UIFont fontWithName:kCellBodyFontName
-                                       size:kCellBodyFontSize]];
-    [label setLineSpacing:kCellContentLineSpacing];
-    [label setHTMLString:html];
-    CGSize bodySize = [label sizeThatFits:
-                       CGSizeMake(width - kCellPadding.left - kCellContentPaddingRight,
-                                  CGFLOAT_MAX)];
-    
-    return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
 }
 
 

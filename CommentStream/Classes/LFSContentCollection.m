@@ -99,7 +99,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
                              usingComparator:^(LFSContent *obj1,
                                                LFSContent *obj2)
                         {
-                            return obj1.eventId < obj2.eventId;
+                            return [obj2.eventId compare:obj1.eventId];
                         }];
     [_array insertObject:content atIndex:index];
 }
