@@ -44,6 +44,7 @@
 @property (nonatomic, strong) LFSPostViewController *postCommentViewController;
 
 @property (nonatomic, strong) UIImage *placeholderImage;
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
 @end
 
 // some module-level constants
@@ -76,6 +77,7 @@ const static char kContentCellHeightKey;
 @synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
 @synthesize placeholderImage = _placeholderImage;
+@synthesize operationQueue = _operationQueue;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -224,6 +226,8 @@ const static char kContentCellHeightKey;
                                           blue:239.f / 255.f
                                          alpha:1.f]];
     
+    _operationQueue = [[NSOperationQueue alloc] init];
+    [_operationQueue setMaxConcurrentOperationCount:8];
     [self wheelContainerSetup];
 }
 
@@ -257,6 +261,7 @@ const static char kContentCellHeightKey;
     // hide the navigation controller here
     [super viewWillDisappear:animated];
     [self.streamClient stopStream];
+    [self.operationQueue cancelAllOperations];
     
 #ifdef LOG_ALL_HTTP_REQUESTS
     [[AFHTTPRequestOperationLogger sharedLogger] stopLogging];
@@ -586,7 +591,8 @@ const static char kContentCellHeightKey;
                                                   [self scaleImage:image forContent:content];
                                               }
                                               failure:nil];
-        [operation start];
+        
+        [self.operationQueue addOperation:operation];
 #ifdef CACHE_SCALED_IMAGES
     }
 #endif
