@@ -622,7 +622,7 @@ const static CGFloat kStatusBarHeight = 20.f;
                 // assign model object(s)
                 LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
                 [vc setContentItem:contentItem];
-                [vc setAvatarImage:contentItem.author.avatarImage];
+                [vc setAvatarImage:contentItem.author.avatarImage ?: self.placeholderImage];
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
                 [vc setHideStatusBar:self.prefersStatusBarHidden];
