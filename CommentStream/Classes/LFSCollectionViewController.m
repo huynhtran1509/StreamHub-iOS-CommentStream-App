@@ -103,7 +103,8 @@ const static CGFloat kStatusBarHeight = 20.f;
         [self.streamClient setResultHandler:^(id responseObject) {
             //NSLog(@"%@", responseObject);
             [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
-                             withAuthors:[responseObject objectForKey:@"authors"]];
+                             withAuthors:[responseObject objectForKey:@"authors"]
+                              fromStream:YES];
             
         } success:nil failure:nil];
     }
@@ -402,7 +403,8 @@ const static CGFloat kStatusBarHeight = 20.f;
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
              [self addTopLevelContent:[headDocument objectForKey:@"content"]
-                          withAuthors:[headDocument objectForKey:@"authors"]];
+                          withAuthors:[headDocument objectForKey:@"authors"]
+                           fromStream:NO];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [collectionSettings objectForKey:@"event"];
@@ -428,22 +430,15 @@ const static CGFloat kStatusBarHeight = 20.f;
     }
 }
 
--(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
+-(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors fromStream:(BOOL)fromStream
 {
-    // This method is responsible for both adding content from Bootstrap and
+    // This callback is responsible for both adding content from Bootstrap and
     // for streaming new updates.
     [_content addAuthorsCollection:authors];
-
-    // TODO: move filtering to model/collection object?
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1 && type == 0"];
-    NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
-    NSRange contentSpan;
-    contentSpan.location = 0u;
-    contentSpan.length = [filteredContent count];
-    [_content addObjectsFromArray:filteredContent];
+    [_content addObjectsFromArray:content];
     
     // also cause table to redraw
-    if ([filteredContent count] == 1u) {
+    if (fromStream) {
         // animate insertion
         [self.tableView beginUpdates];
         [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:

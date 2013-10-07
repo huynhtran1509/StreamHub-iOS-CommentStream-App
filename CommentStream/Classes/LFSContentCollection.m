@@ -121,7 +121,12 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (void)setObject:(id)object forKey:(id<NSCopying>)key
 {
-    LFSContent *content;
+    LFSContent *content = [[LFSContent alloc] initWithObject:object];
+    if (content.visibility != LFSContentVisibilityEveryone
+        || content.contentType != LFSContentTypeMessage)
+    {
+        return;
+    }
     LFSContent *oldContent = _mapping[key];
     if (oldContent)
     {
@@ -130,7 +135,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [content setObject:object];
         // not setting the array -- it should already contain the object
     } else {
-        content = [[LFSContent alloc] initWithObject:object];
         [self insertContentObject:content];
     }
     
@@ -143,6 +147,11 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 - (void)addObject:(id)anObject
 {
     LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
+    if (content.visibility != LFSContentVisibilityEveryone
+        || content.contentType != LFSContentTypeMessage)
+    {
+        return;
+    }
     id<NSCopying> key = content.idString;
     LFSContent *oldContent = _mapping[key];
     if (oldContent)
@@ -184,7 +193,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
              }];
         } else {
             [NSException raise:@"Uknown childContent type"
-                        format:@"Child content type %@ while expected NSArray or NSDictionary", [childContent class]];
+                        format:@"Child content type %@ while expected NSArray or NSDictionary",
+             [childContent class]];
         }
     }
 }
