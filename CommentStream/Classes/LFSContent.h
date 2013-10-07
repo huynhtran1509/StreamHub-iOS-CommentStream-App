@@ -63,6 +63,10 @@
 @property (nonatomic, assign) LFSContentType contentType;
 @property (nonatomic, assign) NSUInteger contentSource;
 
+@property (nonatomic, assign) NSUInteger generation;
+
 -(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;
+
+- (void)updateGenerationInCollection:(LFSContentCollection*)collection withLimit:(NSUInteger)limit;
 
 @end

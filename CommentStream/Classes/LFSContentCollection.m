@@ -102,7 +102,12 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 -(void)insertContentObject:(LFSContent*)content
 {
-    // here we determine the correct index to insert the object into
+    // determine recursion level (will be used to offset content
+    // to show replies)
+    
+    [content updateGenerationInCollection:self withLimit:4u];
+
+    // determine the correct index to insert the object into
     NSUInteger index = [_array indexOfObject:content
                                inSortedRange:NSMakeRange(0u, [_array count])
                                      options:NSBinarySearchingInsertionIndex
@@ -129,8 +134,10 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [self insertContentObject:content];
     }
     
-    [self addChildContent:content];
+    // important: add child content *after* adding current object
+    // to the mapping structure
     _mapping[key] = content;
+    [self addChildContent:content];
 }
 
 - (void)addObject:(id)anObject
@@ -148,8 +155,10 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [self insertContentObject:content];
     }
     
-    [self addChildContent:content];
+    // important: add child content *after* adding current object
+    // to the mapping structure
     _mapping[key] = content;
+    [self addChildContent:content];
 }
 
 - (void)addChildContent:(LFSContent*)content

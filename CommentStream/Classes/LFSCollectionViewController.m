@@ -50,6 +50,8 @@
 static NSString* const kCellReuseIdentifier = @"LFSContentCell";
 static NSString* const kCellSelectSegue = @"detailView";
 const static char kContentCellHeightKey;
+const static CGFloat kGenerationOffset = 20.f;
+const static CGFloat kStatusBarHeight = 20.f;
 
 @implementation LFSCollectionViewController
 {
@@ -352,9 +354,9 @@ const static char kContentCellHeightKey;
                 CGRect frame = navigationBar.frame;
                 frame.origin.y = 0.f;
                 navigationBar.frame = frame;
-            } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
+            } else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight) {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 20.f;
+                frame.origin.y = kStatusBarHeight;
                 navigationBar.frame = frame;
             }
         }
@@ -469,9 +471,11 @@ const static char kContentCellHeightKey;
     CGFloat cellHeightValue;
     
     if (cellHeight == nil) {
+        CGFloat leftOffset = (CGFloat)content.generation * kGenerationOffset;
         cellHeightValue = [LFSAttributedTextCell
                            cellHeightForBoundsWidth:tableView.bounds.size.width
-                           withHTMLString:content.contentBodyHtml];
+                           withHTMLString:content.contentBodyHtml
+                           withLeftOffset:leftOffset];
         objc_setAssociatedObject(content, &kContentCellHeightKey,
                                  [NSNumber numberWithFloat:cellHeightValue],
                                  OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -513,6 +517,8 @@ const static char kContentCellHeightKey;
     [cell setHTMLString:content.contentBodyHtml];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
+    
+    [cell setLeftOffset: (CGFloat)content.generation * kGenerationOffset];
     
     NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
     [cell setRequiredBodyHeight:[cellHeight floatValue]];

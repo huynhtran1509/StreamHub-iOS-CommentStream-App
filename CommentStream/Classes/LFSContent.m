@@ -108,6 +108,7 @@ static NSString* const kLFSSourceImageMap[] = {
 
 #pragma mark -
 @synthesize author = _author;
+@synthesize generation = _generation;
 
 #pragma mark -
 -(UIImage*)contentSourceIcon
@@ -360,6 +361,21 @@ static NSString* const kLFSSourceImageMap[] = {
     self.author = [authorCollection objectForKey:self.contentAuthorId];
 }
 
+- (void)updateGenerationInCollection:(LFSContentCollection*)collection withLimit:(NSUInteger)limit
+{
+    NSString *parentId = self.contentParentId;
+    NSLog(@"%@", parentId);
+    NSUInteger generation = 0u;
+    LFSContent *tmp;
+    for (; generation < limit
+         && parentId != nil
+         && ((tmp = [collection objectForKey:parentId]) != nil);
+         parentId = tmp.contentParentId, generation++)
+    {}
+    _generation = generation;
+    NSLog(@"%d", generation);
+}
+
 #pragma mark - Lifecycle
 
 // designated initializer
@@ -400,6 +416,7 @@ static NSString* const kLFSSourceImageMap[] = {
 {
     // reset all cached properties except _object
     _author = nil;
+    _generation = 0u;
     
     _content = nil;
     

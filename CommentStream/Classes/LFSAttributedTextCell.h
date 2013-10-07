@@ -39,9 +39,12 @@ extern const CGSize kCellImageViewSize;
 
 @property (nonatomic, assign) CGFloat requiredBodyHeight;
 
+@property (nonatomic, assign) CGFloat leftOffset;
+
 #pragma mark - Methods
++ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html withLeftOffset:(CGFloat)offset;
+
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
-+ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html;
 - (void)setHTMLString:(NSString *)html;
 
 @end
