@@ -63,10 +63,9 @@
 @property (nonatomic, assign) LFSContentType contentType;
 @property (nonatomic, assign) NSUInteger contentSource;
 
-@property (nonatomic, assign) NSUInteger generation;
+@property (nonatomic, copy) NSMutableArray *eventPath;
 
 -(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;
-
-- (void)updateGenerationInCollection:(LFSContentCollection*)collection withLimit:(NSUInteger)limit;
+-(NSComparisonResult)compare:(LFSContent*)content;
 
 @end

@@ -467,7 +467,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     CGFloat cellHeightValue;
     
     if (cellHeight == nil) {
-        CGFloat leftOffset = (CGFloat)content.generation * kGenerationOffset;
+        CGFloat leftOffset = (CGFloat)([content.eventPath count] - 1) * kGenerationOffset;
         cellHeightValue = [LFSAttributedTextCell
                            cellHeightForBoundsWidth:tableView.bounds.size.width
                            withHTMLString:content.contentBodyHtml
@@ -514,7 +514,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
     
-    [cell setLeftOffset: (CGFloat)content.generation * kGenerationOffset];
+    [cell setLeftOffset:((CGFloat)([content.eventPath count] - 1) * kGenerationOffset)];
     
     NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
     [cell setRequiredBodyHeight:[cellHeight floatValue]];

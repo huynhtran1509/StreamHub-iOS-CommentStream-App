@@ -96,16 +96,28 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
                  usingComparator:^NSComparisonResult(LFSContent *obj1,
                                                      LFSContent *obj2)
             {
-                return [obj2.eventId compare:obj1.eventId];
+                return [obj2 compare:obj1];
             }];
 }
 
 -(void)insertContentObject:(LFSContent*)content
 {
-    // determine recursion level (will be used to offset content
-    // to show replies)
-    
-    [content updateGenerationInCollection:self withLimit:4u];
+    // prepare our nested enumeration data
+    if (content.contentParentId == nil
+        || [self objectForKey:content.contentParentId] == nil)
+    {
+        // either no nesting or parent does not exist in memory
+        content.eventPath = [[NSMutableArray alloc] initWithObjects:content.eventId, nil];
+    }
+    else
+    {
+        // have nesting
+        LFSContent *parent = [self objectForKey:content.contentParentId];
+        NSAssert(parent.eventPath != nil, @"evenPath cannot be nil");
+        NSMutableArray *array = [parent.eventPath mutableCopy];
+        [array addObject:content.eventId];
+        [content setEventPath:array];
+    }
 
     // determine the correct index to insert the object into
     NSUInteger index = [_array indexOfObject:content
@@ -114,7 +126,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
                              usingComparator:^NSComparisonResult(LFSContent *obj1,
                                                                  LFSContent *obj2)
                         {
-                            return [obj2.eventId compare:obj1.eventId];
+                            return [obj2 compare:obj1];
                         }];
     [_array insertObject:content atIndex:index];
 }

@@ -108,7 +108,6 @@ static NSString* const kLFSSourceImageMap[] = {
 
 #pragma mark -
 @synthesize author = _author;
-@synthesize generation = _generation;
 
 #pragma mark -
 -(UIImage*)contentSourceIcon
@@ -361,17 +360,18 @@ static NSString* const kLFSSourceImageMap[] = {
     self.author = [authorCollection objectForKey:self.contentAuthorId];
 }
 
-- (void)updateGenerationInCollection:(LFSContentCollection*)collection withLimit:(NSUInteger)limit
+-(NSComparisonResult)compare:(LFSContent*)otherObject
 {
-    NSString *parentId = self.contentParentId;
-    NSUInteger generation = 0u;
-    LFSContent *tmp;
-    for (; generation < limit
-         && parentId != nil
-         && ((tmp = [collection objectForKey:parentId]) != nil);
-         parentId = tmp.contentParentId, generation++)
-    {}
-    _generation = generation;
+    // this is where the magic happens
+    NSArray *path1 = self.eventPath;
+    NSArray *path2 = otherObject.eventPath;
+    NSUInteger minCount = MIN(path1.count, path2.count);
+    NSComparisonResult result = NSOrderedSame;
+    NSUInteger i;
+    for (i = 0u; i < minCount && result == NSOrderedSame; i++) {
+        result = [[path1 objectAtIndex:i] compare:[path2 objectAtIndex:i]];
+    }
+    return result;
 }
 
 #pragma mark - Lifecycle
@@ -392,6 +392,7 @@ static NSString* const kLFSSourceImageMap[] = {
             // initialization stuff here
             [self resetCached];
             _object = object;
+            _eventPath = nil;
         }
     }
     return self;
@@ -408,13 +409,13 @@ static NSString* const kLFSSourceImageMap[] = {
 {
     [self resetCached];
     _object = nil;
+    _eventPath = nil;
 }
 
 -(void)resetCached
 {
     // reset all cached properties except _object
     _author = nil;
-    _generation = 0u;
     
     _content = nil;
     
