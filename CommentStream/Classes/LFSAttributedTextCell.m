@@ -467,7 +467,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     textContentFrame.origin = CGPointMake(kCellPadding.left + _leftOffset,
                                           kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
     textContentFrame.size = CGSizeMake(rect.size.width - kCellPadding.left - _leftOffset - kCellContentPaddingRight,
-                                       self.requiredBodyHeight);
+                                       self.requiredBodyHeight - textContentFrame.origin.y);
     [self.bodyView setFrame:textContentFrame];
     
     // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds
