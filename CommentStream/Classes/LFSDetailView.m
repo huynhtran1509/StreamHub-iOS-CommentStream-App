@@ -80,6 +80,15 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     NSURL *_profileRemoteURL;
 }
 
+#pragma mark - Class methods
++ (NSDateFormatter*)dateFormatter {
+    static NSDateFormatter *_dateFormatter = nil;
+    if (_dateFormatter == nil) {
+        _dateFormatter = [[NSDateFormatter alloc] init];
+    }
+    return _dateFormatter;
+}
+
 #pragma mark - Properties
 
 @synthesize delegate = _delegate;
@@ -444,7 +453,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     CGRect dateFrame = self.footerLeftView.frame;
     dateFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
     [self.footerLeftView setFrame:dateFrame];
-    [self.footerLeftView setText:[self.dateFormatter extendedRelativeStringFromDate:self.contentDate]];
+    [self.footerLeftView setText:[[[self class] dateFormatter] extendedRelativeStringFromDate:self.contentDate]];
     
     // layout toolbar frame
     CGRect toolbarFrame = self.toolbar.frame;
@@ -631,7 +640,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         _contentBodyHtml = nil;
         
         _contentDate = nil;
-        _dateFormatter = nil;
     }
     return self;
 }
@@ -660,7 +668,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         _contentBodyHtml = nil;
         
         _contentDate = nil;
-        _dateFormatter = nil;
     }
     return self;
 }
@@ -684,7 +691,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     _contentBodyHtml = nil;
     
     _contentDate = nil;
-    _dateFormatter = nil;
 }
 
 #pragma mark - Actions

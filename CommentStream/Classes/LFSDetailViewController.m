@@ -110,10 +110,7 @@
     LFSContent *contentItem = self.contentItem;
     
     [detailView setDelegate:self];
-    
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
-    
-    [detailView setDateFormatter:[[NSDateFormatter alloc] init]];
     [detailView setContentDate:contentItem.contentCreatedAt];
     
     // only set an object if we have a remote (Twitter) url

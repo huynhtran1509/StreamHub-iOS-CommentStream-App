@@ -66,6 +66,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 @property (nonatomic, readonly) UILabel *headerAccessoryRightView;
 
 @property (nonatomic, strong) UIImageView *headerAccessoryRightImageView;
+
 @end
 
 @implementation LFSAttributedTextCell
@@ -87,6 +88,14 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
                                   CGFLOAT_MAX)];
     
     return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+}
+
++ (NSDateFormatter*)dateFormatter {
+    static NSDateFormatter *_dateFormatter = nil;
+    if (_dateFormatter == nil) {
+        _dateFormatter = [[NSDateFormatter alloc] init];
+    }
+    return _dateFormatter;
 }
 
 
@@ -157,42 +166,25 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 #pragma mark - Other properties
 
 @synthesize htmlHash = _htmlHash;
-@synthesize dateFormatter = _dateFormatter;
 
 @synthesize profileLocal = _profileLocal;
 @synthesize profileRemote = _profileRemote;
 @synthesize contentRemote = _contentRemote;
+@synthesize requiredBodyHeight = _requiredBodyHeight;
 
 #pragma mark -
 @synthesize contentDate = _contentDate;
 -(void)setContentDate:(NSDate *)contentDate
 {
     if (contentDate != _contentDate) {
-        NSString *dateTime = [self.dateFormatter relativeStringFromDate:contentDate];
+        NSString *dateTime = [[[self class] dateFormatter]
+                              relativeStringFromDate:contentDate];
         [self.headerAccessoryRightView setText:dateTime];
         [self setNeedsLayout];
     
         _contentDate = contentDate;
     }
 }
-
-
-#pragma mark -
-@synthesize requiredBodyHeight = _requiredBodyHeight;
-
-/*
--(CGFloat)requiredBodyHeight
-{
-    if (_requiredBodyHeight == CGFLOAT_MAX) {
-        // calculate afresh
-        CGSize bodySize = CGSizeMake(self.bounds.size.width - kCellPadding.left - kCellContentPaddingRight,
-                                     CGFLOAT_MAX);
-        CGSize requiredBodySize = [self.bodyView sizeThatFits:bodySize];
-        _requiredBodyHeight = requiredBodySize.height;
-    }
-    return _requiredBodyHeight;
-}
-*/
 
 #pragma mark -
 @synthesize bodyView = _bodyView;
@@ -454,7 +446,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     accessoryRightFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
     [self.headerAccessoryRightView setFrame:accessoryRightFrame];
     [self.headerAccessoryRightView setText:
-     [self.dateFormatter relativeStringFromDate:self.contentDate]];
+     [[[self class] dateFormatter] relativeStringFromDate:self.contentDate]];
     [self.headerAccessoryRightView resizeVerticalTopLeftTrim];
     
     if (self.indicatorIcon != nil) {
@@ -495,10 +487,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 	if (newHash == _htmlHash) {
 		return;
 	}
-	
-    // reset requiredbodyheight
-    //[self setRequiredBodyHeight:CGFLOAT_MAX];
-    
+
 	_htmlHash = newHash;
 	[self.bodyView setHTMLString:html];
 	[self setNeedsLayout];
@@ -518,12 +507,8 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
         _headerAccessoryRightView = nil;
         _headerAccessoryRightImageView = nil;
         _headerTitleView = nil;
-        
         _contentDate = nil;
-        _dateFormatter = nil;
-        
-        //_requiredBodyHeight = CGFLOAT_MAX;
-        
+
         [self setAccessoryType:UITableViewCellAccessoryNone];
         
         if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
@@ -554,7 +539,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     _headerAccessoryRightImageView = nil;
     
     _contentDate = nil;
-    _dateFormatter = nil;
 }
 
 @end

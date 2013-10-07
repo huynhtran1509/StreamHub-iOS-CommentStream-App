@@ -17,7 +17,9 @@
 #import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
 #endif
 
-#import <objc/objc-runtime.h>
+#import <objc/runtime.h>
+
+#import "UIImage+LFSColor.h"
 
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
@@ -30,7 +32,6 @@
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSMutableContentCollection *content;
 
-@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
 @property (nonatomic, readonly) LFSTextField *postCommentField;
@@ -41,6 +42,8 @@
 
 @property (nonatomic, strong) LFSPostViewController *postCommentViewController;
 
+@property (nonatomic, strong) UIImage *placeholderImage;
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
 @end
 
 // some module-level constants
@@ -50,11 +53,6 @@ const static char kContentCellHeightKey;
 
 @implementation LFSCollectionViewController
 {
-    BOOL _haveRetinaDevice;
-    
-    // NSCache automatically disposes its content when the available RAM is running low
-    NSCache* _cellCache;
-    
 #ifdef CACHE_SCALED_IMAGES
     NSCache* _imageCache;
 #endif
@@ -68,10 +66,11 @@ const static char kContentCellHeightKey;
 @synthesize content = _content;
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
-@synthesize dateFormatter = _dateFormatter;
 @synthesize postCommentField = _postCommentField;
 @synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
+@synthesize placeholderImage = _placeholderImage;
+@synthesize operationQueue = _operationQueue;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -133,10 +132,6 @@ const static char kContentCellHeightKey;
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    // see if we are on a Retina device
-    UIScreen *screen = [UIScreen mainScreen];
-    _haveRetinaDevice = [screen respondsToSelector:@selector(scale)] && [screen scale] == 2.f;
-
     _content = [[LFSMutableContentCollection alloc] init];
     
     self.title = [_collection objectForKey:@"_name"];
@@ -193,27 +188,21 @@ const static char kContentCellHeightKey;
     _postCommentViewController = nil;
     // }}}
     
-    /*
-     if you enable static row height in this demo then the cell height 
-     is determined from the tableView.rowHeight. Cells can be reused 
-     in this mode. If you disable this then cells are prepared and cached
-     to reused their internal layouter and layoutFrame. Reuse is not
-     recommended since the cells are cached anyway.
-     */
-    
-    // establish a cache for prepared cells because heightForRowAtIndexPath and
-    // cellForRowAtIndexPath both need the same cell for an index path
-    _cellCache = [[NSCache alloc] init];
-    
 #ifdef CACHE_SCALED_IMAGES
     _imageCache = [[NSCache alloc] init];
 #endif
     
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
+
+    _placeholderImage = [UIImage imageWithColor:
+                         [UIColor colorWithRed:232.f / 255.f
+                                         green:236.f / 255.f
+                                          blue:239.f / 255.f
+                                         alpha:1.f]];
     
-    _dateFormatter = [[NSDateFormatter alloc] init];
-    
+    _operationQueue = [[NSOperationQueue alloc] init];
+    [_operationQueue setMaxConcurrentOperationCount:8];
     [self wheelContainerSetup];
 }
 
@@ -247,6 +236,7 @@ const static char kContentCellHeightKey;
     // hide the navigation controller here
     [super viewWillDisappear:animated];
     [self.streamClient stopStream];
+    [self.operationQueue cancelAllOperations];
     
 #ifdef LOG_ALL_HTTP_REQUESTS
     [[AFHTTPRequestOperationLogger sharedLogger] stopLogging];
@@ -263,7 +253,6 @@ const static char kContentCellHeightKey;
 #ifdef CACHE_SCALED_IMAGES
     [_imageCache removeAllObjects];
 #endif
-    [_cellCache removeAllObjects];
 }
 
 - (void) dealloc
@@ -280,16 +269,13 @@ const static char kContentCellHeightKey;
     [_imageCache removeAllObjects];
     _imageCache = nil;
 #endif
-    [_cellCache removeAllObjects];
-    _cellCache = nil;
-    
+
     _streamClient = nil;
     _bootstrapClient = nil;
     
     _content = nil;
     _container = nil;
     _activityIndicator = nil;
-    _dateFormatter = nil;
 }
 
 #pragma mark - UIActivityIndicator
@@ -505,23 +491,13 @@ const static char kContentCellHeightKey;
 {
     LFSAttributedTextCell *cell;
 
-    LFSContent *content = [_content objectAtIndex:indexPath.row];
-    
-    const NSString* const key = content.idString;
-    cell = [_cellCache objectForKey:key];
-    //cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:
-    //                                 kCellReuseIdentifier];
+    cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:
+                                     kCellReuseIdentifier];
     
     if (!cell) {
         cell = [[LFSAttributedTextCell alloc]
                 initWithReuseIdentifier:kCellReuseIdentifier];
-        
-        // content-independent configuration
-        [cell setDateFormatter:self.dateFormatter];
     }
-    
-    // cache the cell
-    [_cellCache setObject:cell forKey:key];
     
     [self configureCell:cell atIndexPath:indexPath];
     return cell;
@@ -562,6 +538,7 @@ const static char kContentCellHeightKey;
     else {
 #endif
         // load avatar images in a separate queue
+        [cell.imageView setImage:self.placeholderImage];
         NSURLRequest *request = [NSURLRequest requestWithURL:
                                  [NSURL URLWithString:author.avatarUrlString75]];
         AFImageRequestOperation* operation = [AFImageRequestOperation
@@ -575,7 +552,8 @@ const static char kContentCellHeightKey;
                                                   [self scaleImage:image forContent:content];
                                               }
                                               failure:nil];
-        [operation start];
+        
+        [self.operationQueue addOperation:operation];
 #ifdef CACHE_SCALED_IMAGES
     }
 #endif
@@ -587,7 +565,6 @@ const static char kContentCellHeightKey;
     targetRect.origin = CGPointZero;
     targetRect.size = kCellImageViewSize;
     
-    const NSString* const contentId = content.idString;
 #ifdef CACHE_SCALED_IMAGES
     const NSString* const authorId = content.author.idString;
 #endif
@@ -616,9 +593,13 @@ const static char kContentCellHeightKey;
 #endif
         // display image on the main thread
         dispatch_sync(dispatch_get_main_queue(), ^{
-            LFSAttributedTextCell *cell = [_cellCache objectForKey:contentId];
-            [cell.imageView setImage:scaledImage];
-            [cell setNeedsLayout];
+            NSUInteger row = [_content indexOfObject:content];
+            
+            LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0u]];
+            if (cell) {
+                [cell.imageView setImage:scaledImage];
+                [cell setNeedsLayout];
+            }
         });
     });
 }

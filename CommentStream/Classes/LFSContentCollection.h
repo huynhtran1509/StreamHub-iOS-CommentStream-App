@@ -14,6 +14,8 @@
 - (NSEnumerator *)reverseObjectEnumerator;
 - (instancetype)initWithArray:(NSArray*)array;
 
+- (NSUInteger)indexOfObject:(id)anObject; // implemented using sorted range
+
 @end
 
 /**
