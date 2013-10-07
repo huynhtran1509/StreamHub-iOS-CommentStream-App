@@ -364,7 +364,6 @@ static NSString* const kLFSSourceImageMap[] = {
 - (void)updateGenerationInCollection:(LFSContentCollection*)collection withLimit:(NSUInteger)limit
 {
     NSString *parentId = self.contentParentId;
-    NSLog(@"%@", parentId);
     NSUInteger generation = 0u;
     LFSContent *tmp;
     for (; generation < limit
@@ -373,7 +372,6 @@ static NSString* const kLFSSourceImageMap[] = {
          parentId = tmp.contentParentId, generation++)
     {}
     _generation = generation;
-    NSLog(@"%d", generation);
 }
 
 #pragma mark - Lifecycle
