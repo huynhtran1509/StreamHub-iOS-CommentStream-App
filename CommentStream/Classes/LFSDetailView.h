@@ -25,7 +25,6 @@
 @property (nonatomic, copy) NSString* contentBodyHtml;
 
 @property (nonatomic, strong) NSDate* contentDate;
-@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 
 @end
 

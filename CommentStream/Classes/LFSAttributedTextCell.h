@@ -22,7 +22,6 @@ extern const CGSize kCellImageViewSize;
 @property (nonatomic, strong) LFSTriple* contentRemote;
 
 @property (nonatomic, strong) NSDate* contentDate;
-@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 
 @property (nonatomic, strong) UIImage *indicatorIcon;
 

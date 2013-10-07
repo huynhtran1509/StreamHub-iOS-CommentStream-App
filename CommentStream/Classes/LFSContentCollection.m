@@ -88,15 +88,26 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 #pragma mark - insertion stuff
 
+- (NSUInteger)indexOfObject:(id)anObject
+{
+    return [_array indexOfObject:anObject
+                   inSortedRange:NSMakeRange(0u, [_array count])
+                         options:NSBinarySearchingFirstEqual
+                 usingComparator:^NSComparisonResult(LFSContent *obj1,
+                                                     LFSContent *obj2)
+            {
+                return [obj2.eventId compare:obj1.eventId];
+            }];
+}
+
 -(void)insertContentObject:(LFSContent*)content
 {
     // here we determine the correct index to insert the object into
-    NSRange searchRange = NSMakeRange(0u, [_array count]);
     NSUInteger index = [_array indexOfObject:content
-                               inSortedRange:searchRange
+                               inSortedRange:NSMakeRange(0u, [_array count])
                                      options:NSBinarySearchingInsertionIndex
-                             usingComparator:^(LFSContent *obj1,
-                                               LFSContent *obj2)
+                             usingComparator:^NSComparisonResult(LFSContent *obj1,
+                                                                 LFSContent *obj2)
                         {
                             return [obj2.eventId compare:obj1.eventId];
                         }];
