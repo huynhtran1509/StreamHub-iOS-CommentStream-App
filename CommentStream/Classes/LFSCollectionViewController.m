@@ -19,6 +19,8 @@
 
 #import <objc/objc-runtime.h>
 
+#import "UIImage+LFSColor.h"
+
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
 #import "LFSCollectionViewController.h"
@@ -41,6 +43,7 @@
 
 @property (nonatomic, strong) LFSPostViewController *postCommentViewController;
 
+@property (nonatomic, strong) UIImage *placeholderImage;
 @end
 
 // some module-level constants
@@ -72,6 +75,7 @@ const static char kContentCellHeightKey;
 @synthesize postCommentField = _postCommentField;
 @synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
+@synthesize placeholderImage = _placeholderImage;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -213,6 +217,12 @@ const static char kContentCellHeightKey;
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
     
     _dateFormatter = [[NSDateFormatter alloc] init];
+    
+    _placeholderImage = [UIImage imageWithColor:
+                         [UIColor colorWithRed:232.f / 255.f
+                                         green:236.f / 255.f
+                                          blue:239.f / 255.f
+                                         alpha:1.f]];
     
     [self wheelContainerSetup];
 }
@@ -562,6 +572,7 @@ const static char kContentCellHeightKey;
     else {
 #endif
         // load avatar images in a separate queue
+        [cell.imageView setImage:self.placeholderImage];
         NSURLRequest *request = [NSURLRequest requestWithURL:
                                  [NSURL URLWithString:author.avatarUrlString75]];
         AFImageRequestOperation* operation = [AFImageRequestOperation
