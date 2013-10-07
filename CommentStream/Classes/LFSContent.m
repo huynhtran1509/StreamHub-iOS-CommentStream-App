@@ -271,12 +271,11 @@ static NSString* const kLFSSourceImageMap[] = {
 
 #pragma mark -
 @synthesize childContent = _childContent;
--(LFSContentCollection*)childContent
+-(id)childContent
 {
     const static NSString* const key = @"childContent";
     if (_childContent == nil) {
-        _childContent = [[LFSMutableContentCollection alloc]
-                         initWithArray:[_object objectForKey:key]];
+        _childContent = [_object objectForKey:key];
     }
     return _childContent;
 }

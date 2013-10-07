@@ -128,6 +128,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         content = [[LFSContent alloc] initWithObject:object];
         [self insertContentObject:content];
     }
+    
+    [self addChildContent:content];
     _mapping[key] = content;
 }
 
@@ -145,9 +147,38 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     } else {
         [self insertContentObject:content];
     }
+    
+    [self addChildContent:content];
     _mapping[key] = content;
 }
 
+- (void)addChildContent:(LFSContent*)content
+{
+    // Purpose: recursively add all children
+    //
+    // Note: there is no need to add children in deterministic order,
+    // so we use concurrent enumeration
+    //
+    id childContent = content.childContent;
+    if (childContent != nil) {
+        if ([childContent isKindOfClass:[NSArray class]]) {
+            [childContent
+             enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                 [self addObject:obj];
+             }];
+        } else if ([childContent isKindOfClass:[NSDictionary class]]) {
+            [childContent
+             enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent
+             usingBlock:^(id<NSCopying> key, id obj, BOOL *stop)
+             {
+                 [self setObject:obj forKey:key];
+             }];
+        } else {
+            [NSException raise:@"Uknown childContent type"
+                        format:@"Child content type %@ while expected NSArray or NSDictionary", [childContent class]];
+        }
+    }
+}
 
 #pragma mark - Description
 
@@ -321,11 +352,13 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 }
 
 - (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary
-{    
-    for (id<NSCopying> key in otherDictionary)
-    {
-        [self setObject:otherDictionary[key] forKey:key];
-    }
+{
+    [otherDictionary
+     enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent
+     usingBlock:^(id<NSCopying> key, id value, BOOL *stop)
+     {
+         [self setObject:value forKey:key];
+     }];
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index
