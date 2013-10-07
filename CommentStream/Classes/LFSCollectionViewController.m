@@ -151,7 +151,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     
     // {{{ Toolbar
     
-    _scrollOffset = CGPointMake(0.f, 0.f);
+    _scrollOffset = CGPointZero;
     
     // in landscape mode, toolbar height is 32, in portrait, it is 44
     CGFloat textFieldWidth =
@@ -437,8 +437,9 @@ const static CGFloat kStatusBarHeight = 20.f;
     [_content addAuthorsCollection:authors];
     [_content addObjectsFromArray:content];
     
-    // also cause table to redraw
-    if (fromStream) {
+    // TODO: only perform animated insertion of cells when the top of the
+    // viewport is the same as the top of the first cell
+    if (fromStream && [content count] == 1u) {
         // animate insertion
         [self.tableView beginUpdates];
         [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:

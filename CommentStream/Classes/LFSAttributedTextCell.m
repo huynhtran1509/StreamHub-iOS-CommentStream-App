@@ -375,6 +375,12 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
         titleFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
         [self.headerTitleView setFrame:titleFrame];
     }
+    if (headerSubtitle) {
+        CGRect subtitleFrame = self.headerSubtitleView.frame;
+        subtitleFrame.origin.x = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+        subtitleFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
+        [self.headerSubtitleView setFrame:subtitleFrame];
+    }
     if (headerTitle && !headerSubtitle && !headerAccessory)
     {
         // display one string
