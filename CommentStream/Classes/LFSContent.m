@@ -363,13 +363,22 @@ static NSString* const kLFSSourceImageMap[] = {
 -(NSComparisonResult)compare:(LFSContent*)otherObject
 {
     // this is where the magic happens
-    NSArray *path1 = self.eventPath;
-    NSArray *path2 = otherObject.eventPath;
+    NSArray *path1 = self.datePath;
+    NSArray *path2 = otherObject.datePath;
+    
     NSUInteger minCount = MIN(path1.count, path2.count);
-    NSComparisonResult result = NSOrderedSame;
+    NSComparisonResult result = [[path1 objectAtIndex:0u] compare:[path2 objectAtIndex:0u]];
     NSUInteger i;
-    for (i = 0u; i < minCount && result == NSOrderedSame; i++) {
-        result = [[path1 objectAtIndex:i] compare:[path2 objectAtIndex:i]];
+    if (minCount > 0u) {
+        result = [[path1 objectAtIndex:0u] compare:[path2 objectAtIndex:0u]];
+    }
+    for (i = 1u; i < minCount && result == NSOrderedSame; i++) {
+        result = [[path2 objectAtIndex:i] compare:[path1 objectAtIndex:i]];
+    }
+    if (result == NSOrderedSame) {
+        NSNumber *count1 = [NSNumber numberWithUnsignedInteger:path1.count];
+        NSNumber *count2 = [NSNumber numberWithUnsignedInteger:path2.count];
+        result = [count2 compare:count1];
     }
     return result;
 }
@@ -392,7 +401,7 @@ static NSString* const kLFSSourceImageMap[] = {
             // initialization stuff here
             [self resetCached];
             _object = object;
-            _eventPath = nil;
+            _datePath = nil;
         }
     }
     return self;
@@ -409,7 +418,7 @@ static NSString* const kLFSSourceImageMap[] = {
 {
     [self resetCached];
     _object = nil;
-    _eventPath = nil;
+    _datePath = nil;
 }
 
 -(void)resetCached

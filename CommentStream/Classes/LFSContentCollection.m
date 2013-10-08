@@ -107,16 +107,16 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         || [self objectForKey:content.contentParentId] == nil)
     {
         // either no nesting or parent does not exist in memory
-        content.eventPath = [[NSMutableArray alloc] initWithObjects:content.eventId, nil];
+        content.datePath = [[NSMutableArray alloc] initWithObjects:content.contentCreatedAt, nil];
     }
     else
     {
         // have nesting
         LFSContent *parent = [self objectForKey:content.contentParentId];
-        NSAssert(parent.eventPath != nil, @"evenPath cannot be nil");
-        NSMutableArray *array = [parent.eventPath mutableCopy];
-        [array addObject:content.eventId];
-        [content setEventPath:array];
+        NSAssert(parent.datePath != nil, @"evenPath cannot be nil");
+        NSMutableArray *array = [parent.datePath mutableCopy];
+        [array addObject:content.contentCreatedAt];
+        [content setDatePath:array];
     }
 
     // determine the correct index to insert the object into

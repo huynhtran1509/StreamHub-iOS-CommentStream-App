@@ -63,7 +63,7 @@
 @property (nonatomic, assign) LFSContentType contentType;
 @property (nonatomic, assign) NSUInteger contentSource;
 
-@property (nonatomic, copy) NSMutableArray *eventPath;
+@property (nonatomic, copy) NSMutableArray *datePath;
 
 -(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;
 -(NSComparisonResult)compare:(LFSContent*)content;
