@@ -271,12 +271,11 @@ static NSString* const kLFSSourceImageMap[] = {
 
 #pragma mark -
 @synthesize childContent = _childContent;
--(LFSContentCollection*)childContent
+-(id)childContent
 {
     const static NSString* const key = @"childContent";
     if (_childContent == nil) {
-        _childContent = [[LFSMutableContentCollection alloc]
-                         initWithArray:[_object objectForKey:key]];
+        _childContent = [_object objectForKey:key];
     }
     return _childContent;
 }
@@ -361,6 +360,29 @@ static NSString* const kLFSSourceImageMap[] = {
     self.author = [authorCollection objectForKey:self.contentAuthorId];
 }
 
+-(NSComparisonResult)compare:(LFSContent*)otherObject
+{
+    // this is where the magic happens
+    NSArray *path1 = self.datePath;
+    NSArray *path2 = otherObject.datePath;
+    
+    NSUInteger minCount = MIN(path1.count, path2.count);
+    NSComparisonResult result = [[path1 objectAtIndex:0u] compare:[path2 objectAtIndex:0u]];
+    NSUInteger i;
+    if (minCount > 0u) {
+        result = [[path1 objectAtIndex:0u] compare:[path2 objectAtIndex:0u]];
+    }
+    for (i = 1u; i < minCount && result == NSOrderedSame; i++) {
+        result = [[path2 objectAtIndex:i] compare:[path1 objectAtIndex:i]];
+    }
+    if (result == NSOrderedSame) {
+        NSNumber *count1 = [NSNumber numberWithUnsignedInteger:path1.count];
+        NSNumber *count2 = [NSNumber numberWithUnsignedInteger:path2.count];
+        result = [count2 compare:count1];
+    }
+    return result;
+}
+
 #pragma mark - Lifecycle
 
 // designated initializer
@@ -379,6 +401,7 @@ static NSString* const kLFSSourceImageMap[] = {
             // initialization stuff here
             [self resetCached];
             _object = object;
+            _datePath = nil;
         }
     }
     return self;
@@ -395,6 +418,7 @@ static NSString* const kLFSSourceImageMap[] = {
 {
     [self resetCached];
     _object = nil;
+    _datePath = nil;
 }
 
 -(void)resetCached

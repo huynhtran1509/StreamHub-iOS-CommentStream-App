@@ -73,7 +73,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 
 #pragma mark - class methods
 
-+ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html
++ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html withLeftOffset:(CGFloat)_offsetLeft
 {
     static LFSBasicHTMLLabel *label = nil;
     if (label == nil) {
@@ -84,7 +84,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     }
     [label setHTMLString:html];
     CGSize bodySize = [label sizeThatFits:
-                       CGSizeMake(width - kCellPadding.left - kCellContentPaddingRight,
+                       CGSizeMake(width - kCellPadding.left - _offsetLeft - kCellContentPaddingRight,
                                   CGFLOAT_MAX)];
     
     return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
@@ -98,6 +98,15 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     return _dateFormatter;
 }
 
+#pragma mark - Misc properties
+@synthesize htmlHash = _htmlHash;
+
+@synthesize profileLocal = _profileLocal;
+@synthesize profileRemote = _profileRemote;
+@synthesize contentRemote = _contentRemote;
+@synthesize requiredBodyHeight = _requiredBodyHeight;
+
+@synthesize leftOffset = _leftOffset;
 
 #pragma mark - UIAppearance properties
 @synthesize backgroundCellColor;
@@ -164,15 +173,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 }
 
 #pragma mark - Other properties
-
-@synthesize htmlHash = _htmlHash;
-
-@synthesize profileLocal = _profileLocal;
-@synthesize profileRemote = _profileRemote;
-@synthesize contentRemote = _contentRemote;
-@synthesize requiredBodyHeight = _requiredBodyHeight;
-
-#pragma mark -
 @synthesize contentDate = _contentDate;
 -(void)setContentDate:(NSDate *)contentDate
 {
@@ -192,9 +192,9 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 {
 	if (_bodyView == nil) {
         const CGFloat kHeaderHeight = kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
-        CGRect frame = CGRectMake(kCellPadding.left,
+        CGRect frame = CGRectMake(kCellPadding.left + _leftOffset,
                                   kHeaderHeight,
-                                  self.bounds.size.width - kCellPadding.left - kCellContentPaddingRight,
+                                  self.bounds.size.width - kCellPadding.left - _leftOffset - kCellContentPaddingRight,
                                   self.bounds.size.height - kHeaderHeight);
         
         // initialize
@@ -218,7 +218,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (UILabel*)headerAttributeTopView
 {
     if (_headerAttributeTopView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kCellPadding.right,
                                       kCellHeaderAttributeTopHeight);
         CGRect frame;
@@ -245,7 +245,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (UILabel *)headerTitleView
 {
 	if (_headerTitleView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kCellPadding.top - kCellHeaderAdjust,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
@@ -270,7 +270,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (UILabel*)headerSubtitleView
 {
     if (_headerSubtitleView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kCellPadding.top - kCellHeaderAdjust,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
@@ -295,7 +295,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (UILabel *)headerAccessoryRightView
 {
 	if (_headerAccessoryRightView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kCellPadding.top - kCellHeaderAccessoryRightAdjust,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
@@ -358,7 +358,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     
     // layout avatar view
     CGRect imageViewFrame;
-    imageViewFrame.origin = CGPointMake(kCellPadding.left, kCellPadding.top);
+    imageViewFrame.origin = CGPointMake(kCellPadding.left + _leftOffset, kCellPadding.top);
     imageViewFrame.size = kCellImageViewSize;
     [self.imageView setFrame:imageViewFrame];
     
@@ -367,13 +367,19 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     NSString *headerSubtitle = profileLocal.detailString;
     NSString *headerAccessory = profileLocal.attributeString;
     
-    CGFloat leftColumnWidth = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
+    CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
     
     if (headerTitle) {
         CGRect titleFrame = self.headerTitleView.frame;
-        titleFrame.origin.x = kCellPadding.left + kCellImageViewSize.width + kCellImageMarginRight;
+        titleFrame.origin.x = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
         titleFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
         [self.headerTitleView setFrame:titleFrame];
+    }
+    if (headerSubtitle) {
+        CGRect subtitleFrame = self.headerSubtitleView.frame;
+        subtitleFrame.origin.x = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+        subtitleFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
+        [self.headerSubtitleView setFrame:subtitleFrame];
     }
     if (headerTitle && !headerSubtitle && !headerAccessory)
     {
@@ -464,10 +470,10 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     // layoutSubviews is always called after requiredRowHeightWithFrameWidth:
     // so we take advantage of that by reusing _requiredBodyHeight
     CGRect textContentFrame;
-    textContentFrame.origin = CGPointMake(kCellPadding.left,
+    textContentFrame.origin = CGPointMake(kCellPadding.left + _leftOffset,
                                           kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
-    textContentFrame.size = CGSizeMake(rect.size.width - kCellPadding.left - kCellContentPaddingRight,
-                                       self.requiredBodyHeight);
+    textContentFrame.size = CGSizeMake(rect.size.width - kCellPadding.left - _leftOffset - kCellContentPaddingRight,
+                                       self.requiredBodyHeight - textContentFrame.origin.y);
     [self.bodyView setFrame:textContentFrame];
     
     // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds
@@ -509,6 +515,8 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
         _headerTitleView = nil;
         _contentDate = nil;
 
+        _leftOffset = 0.f;
+        
         [self setAccessoryType:UITableViewCellAccessoryNone];
         
         if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))

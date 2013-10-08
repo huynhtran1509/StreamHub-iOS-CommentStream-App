@@ -123,6 +123,7 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
 {
     static NSRegularExpression* regexHashtag = nil;
     static NSRegularExpression* regexHandle = nil;
+    static NSRegularExpression* regexStatus = nil;
     
     NSString *urlString = [linkInfo.URL absoluteString];
     
@@ -130,7 +131,7 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
     if (regexHashtag == nil) {
         NSError *error = nil;
         regexHashtag = [NSRegularExpression
-                        regularExpressionWithPattern:@"^(http|https)://twitter.com/(#!/?)search/realtime/([^/]*?)$"
+                        regularExpressionWithPattern:@"^(http|https)://twitter.com/(#!/)?search/realtime/([^/]*?)$"
                         options:0 error:&error];
         NSAssert(error == nil, @"Error creating regex: %@",
                  error.localizedDescription);
@@ -155,7 +156,7 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
     if (regexHandle == nil) {
         NSError *error = nil;
         regexHandle = [NSRegularExpression
-                       regularExpressionWithPattern:@"^(http|https)://twitter.com/(#!/?)([^/]*?)$"
+                       regularExpressionWithPattern:@"^(http|https)://twitter.com/(#!/)?([^/]*?)$"
                        options:0 error:&error];
         NSAssert(error == nil, @"Error creating regex: %@",
                  error.localizedDescription);
@@ -172,6 +173,32 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
                                   ? [NSString stringWithFormat:@"twitter://user?screen_name=%@", contentString]
                                   : [NSString stringWithFormat:@"%@://twitter.com/%@",
                                      schemaString, contentString]);
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:convertedURL]];
+        return NO;
+    }
+    
+    // if we are still here, check for status URI
+    if (regexStatus == nil) {
+        NSError *error = nil;
+        regexStatus = [NSRegularExpression
+                       regularExpressionWithPattern:@"^(http|https)://twitter.com/(#!/)?([^/]*?)/status/([^/]*?)$"
+                       options:0 error:&error];
+        NSAssert(error == nil, @"Error creating regex: %@",
+                 error.localizedDescription);
+    }
+    NSTextCheckingResult *statusMatch =
+    [regexStatus firstMatchInString:urlString
+                            options:0
+                              range:NSMakeRange(0, [urlString length])];
+    if (statusMatch != nil) {
+        // have match, now create Twitter URI, open Twitter app here, and return
+        NSString *schemaString = [urlString substringWithRange:[statusMatch rangeAtIndex:1u]];
+        NSString *accountString = [urlString substringWithRange:[statusMatch rangeAtIndex:3u]];
+        NSString *statusIdString = [urlString substringWithRange:[statusMatch rangeAtIndex:4u]];
+        NSString *convertedURL = ([self canOpenLinksInTwitterClient]
+                                  ? [NSString stringWithFormat:@"twitter://status?id=%@&account=%@", statusIdString, accountString]
+                                  : [NSString stringWithFormat:@"%@://twitter.com/%@/status/%@",
+                                     schemaString, accountString, statusIdString]);
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:convertedURL]];
         return NO;
     }

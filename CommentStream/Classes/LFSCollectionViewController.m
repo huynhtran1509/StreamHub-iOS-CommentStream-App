@@ -50,6 +50,8 @@
 static NSString* const kCellReuseIdentifier = @"LFSContentCell";
 static NSString* const kCellSelectSegue = @"detailView";
 const static char kContentCellHeightKey;
+const static CGFloat kGenerationOffset = 20.f;
+const static CGFloat kStatusBarHeight = 20.f;
 
 @implementation LFSCollectionViewController
 {
@@ -101,7 +103,8 @@ const static char kContentCellHeightKey;
         [self.streamClient setResultHandler:^(id responseObject) {
             //NSLog(@"%@", responseObject);
             [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
-                             withAuthors:[responseObject objectForKey:@"authors"]];
+                             withAuthors:[responseObject objectForKey:@"authors"]
+                              fromStream:YES];
             
         } success:nil failure:nil];
     }
@@ -148,7 +151,7 @@ const static char kContentCellHeightKey;
     
     // {{{ Toolbar
     
-    _scrollOffset = CGPointMake(0.f, 0.f);
+    _scrollOffset = CGPointZero;
     
     // in landscape mode, toolbar height is 32, in portrait, it is 44
     CGFloat textFieldWidth =
@@ -352,9 +355,9 @@ const static char kContentCellHeightKey;
                 CGRect frame = navigationBar.frame;
                 frame.origin.y = 0.f;
                 navigationBar.frame = frame;
-            } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
+            } else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight) {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 20.f;
+                frame.origin.y = kStatusBarHeight;
                 navigationBar.frame = frame;
             }
         }
@@ -400,7 +403,8 @@ const static char kContentCellHeightKey;
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
              [self addTopLevelContent:[headDocument objectForKey:@"content"]
-                          withAuthors:[headDocument objectForKey:@"authors"]];
+                          withAuthors:[headDocument objectForKey:@"authors"]
+                           fromStream:NO];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [collectionSettings objectForKey:@"event"];
@@ -426,22 +430,16 @@ const static char kContentCellHeightKey;
     }
 }
 
--(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors
+-(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors fromStream:(BOOL)fromStream
 {
-    // This method is responsible for both adding content from Bootstrap and
+    // This callback is responsible for both adding content from Bootstrap and
     // for streaming new updates.
     [_content addAuthorsCollection:authors];
-
-    // TODO: move filtering to model/collection object?
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"vis == 1 && type == 0"];
-    NSArray *filteredContent = [content filteredArrayUsingPredicate:p];
-    NSRange contentSpan;
-    contentSpan.location = 0u;
-    contentSpan.length = [filteredContent count];
-    [_content addObjectsFromArray:filteredContent];
+    [_content addObjectsFromArray:content];
     
-    // also cause table to redraw
-    if ([filteredContent count] == 1u) {
+    // TODO: only perform animated insertion of cells when the top of the
+    // viewport is the same as the top of the first cell
+    if (fromStream && [content count] == 1u) {
         // animate insertion
         [self.tableView beginUpdates];
         [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
@@ -469,9 +467,11 @@ const static char kContentCellHeightKey;
     CGFloat cellHeightValue;
     
     if (cellHeight == nil) {
+        CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
         cellHeightValue = [LFSAttributedTextCell
                            cellHeightForBoundsWidth:tableView.bounds.size.width
-                           withHTMLString:content.contentBodyHtml];
+                           withHTMLString:content.contentBodyHtml
+                           withLeftOffset:leftOffset];
         objc_setAssociatedObject(content, &kContentCellHeightKey,
                                  [NSNumber numberWithFloat:cellHeightValue],
                                  OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -513,6 +513,8 @@ const static char kContentCellHeightKey;
     [cell setHTMLString:content.contentBodyHtml];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
+    
+    [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
     
     NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
     [cell setRequiredBodyHeight:[cellHeight floatValue]];
@@ -621,7 +623,7 @@ const static char kContentCellHeightKey;
                 // assign model object(s)
                 LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
                 [vc setContentItem:contentItem];
-                [vc setAvatarImage:contentItem.author.avatarImage];
+                [vc setAvatarImage:contentItem.author.avatarImage ?: self.placeholderImage];
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
                 [vc setHideStatusBar:self.prefersStatusBarHidden];
