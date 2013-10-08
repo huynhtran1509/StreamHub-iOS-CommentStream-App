@@ -106,7 +106,7 @@ const static CGFloat kStatusBarHeight = 20.f;
             //NSLog(@"%@", responseObject);
             [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
                              withAuthors:[responseObject objectForKey:@"authors"]
-                              fromStream:YES];
+                            visualInsert:YES];
             
         } success:nil failure:nil];
     }
@@ -127,6 +127,7 @@ const static CGFloat kStatusBarHeight = 20.f;
         (LFSPostViewController*)[storyboard
                                  instantiateViewControllerWithIdentifier:
                                  kLFSPostCommentViewControllerId];
+        [_postCommentViewController setDelegate:self];
     }
     return _postCommentViewController;
 }
@@ -406,7 +407,7 @@ const static CGFloat kStatusBarHeight = 20.f;
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
              [self addTopLevelContent:[headDocument objectForKey:@"content"]
                           withAuthors:[headDocument objectForKey:@"authors"]
-                           fromStream:NO];
+                         visualInsert:NO];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [collectionSettings objectForKey:@"event"];
@@ -426,22 +427,24 @@ const static CGFloat kStatusBarHeight = 20.f;
          }];
     }
     else {
-        NSNumber *eventId = [[_content objectAtIndex:0u] eventId];
+        NSNumber *eventId = _content.lastEventId;
         [self.streamClient setCollectionId:self.collectionId];
         [self.streamClient startStreamWithEventId:eventId];
     }
 }
 
--(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors fromStream:(BOOL)fromStream
+-(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors visualInsert:(BOOL)visual
 {
     // This callback is responsible for both adding content from Bootstrap and
     // for streaming new updates.
     [_content addAuthorsCollection:authors];
+    
     [_content addObjectsFromArray:content];
     
+    /*
     // TODO: only perform animated insertion of cells when the top of the
     // viewport is the same as the top of the first cell
-    if (fromStream && [content count] == 1u) {
+    if (visual && [content count] == 1u) {
         // animate insertion
         [self.tableView beginUpdates];
         [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
@@ -449,6 +452,7 @@ const static CGFloat kStatusBarHeight = 20.f;
                               withRowAnimation:UITableViewRowAnimationNone];
         [self.tableView endUpdates];
     }
+     */
     
     [self.tableView reloadData];
 }
@@ -643,6 +647,13 @@ const static CGFloat kStatusBarHeight = 20.f;
     [self.postCommentViewController setCollectionId:self.collectionId];
     
     [self presentViewController:self.postCommentViewController animated:YES completion:nil];
+}
+
+-(void)didSucceedPostingContentWithResponse:(id)responseObject
+{
+    [self addTopLevelContent:[responseObject objectForKey:@"messages"]
+                 withAuthors:[responseObject objectForKey:@"authors"]
+                visualInsert:YES];
 }
 
 @end
