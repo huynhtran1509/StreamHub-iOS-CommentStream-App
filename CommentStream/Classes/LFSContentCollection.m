@@ -147,13 +147,12 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     // check if object is of appropriate type
     LFSContent *content = [[LFSContent alloc] initWithObject:object];
+    [self updateLastEventWithContent:content];
     if (content.visibility != LFSContentVisibilityEveryone
         || content.contentType != LFSContentTypeMessage)
     {
         return;
     }
-    
-    [self updateLastEventWithContent:content];
     
     LFSContent *oldContent = _mapping[key];
     if (oldContent)
@@ -176,14 +175,13 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     // check if object is of appropriate type
     LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
+    [self updateLastEventWithContent:content];
     if (content.visibility != LFSContentVisibilityEveryone
         || content.contentType != LFSContentTypeMessage)
     {
         return;
     }
-    
-    [self updateLastEventWithContent:content];
-    
+
     id<NSCopying> key = content.idString;
     LFSContent *oldContent = _mapping[key];
     if (oldContent)
