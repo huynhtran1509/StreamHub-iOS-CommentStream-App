@@ -40,8 +40,8 @@ static const CGFloat kCellHeaderAccessoryRightImageAlpha = 0.618f;
 static const CGSize  kCellHeaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
 
 static const CGFloat kCellImageCornerRadius = 4.f;
-static const CGFloat kCellImageMarginRight = 8.0f;
 
+static const CGFloat kCellMinorHorizontalSeparator = 8.0f;
 static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 
 // {{{ TODO: remove these?
@@ -218,7 +218,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (UILabel*)headerAttributeTopView
 {
     if (_headerAttributeTopView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
         CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kCellPadding.right,
                                       kCellHeaderAttributeTopHeight);
         CGRect frame;
@@ -245,7 +245,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (UILabel *)headerTitleView
 {
 	if (_headerTitleView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kCellPadding.top - kCellHeaderAdjust,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
@@ -270,7 +270,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (UILabel*)headerSubtitleView
 {
     if (_headerSubtitleView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kCellPadding.top - kCellHeaderAdjust,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
@@ -295,7 +295,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (UILabel *)headerAccessoryRightView
 {
 	if (_headerAccessoryRightView == nil) {
-        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
         CGRect frame = CGRectMake(leftColumnWidth,
                                   kCellPadding.top - kCellHeaderAccessoryRightAdjust,
                                   self.bounds.size.width - leftColumnWidth - kCellPadding.right,
@@ -367,17 +367,17 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     NSString *headerSubtitle = profileLocal.detailString;
     NSString *headerAccessory = profileLocal.attributeString;
     
-    CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+    CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
     
     if (headerTitle) {
         CGRect titleFrame = self.headerTitleView.frame;
-        titleFrame.origin.x = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+        titleFrame.origin.x = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
         titleFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
         [self.headerTitleView setFrame:titleFrame];
     }
     if (headerSubtitle) {
         CGRect subtitleFrame = self.headerSubtitleView.frame;
-        subtitleFrame.origin.x = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellImageMarginRight;
+        subtitleFrame.origin.x = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
         subtitleFrame.size.width = rect.size.width - leftColumnWidth - kCellPadding.right;
         [self.headerSubtitleView setFrame:subtitleFrame];
     }
@@ -406,7 +406,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
         CGRect headerAttributeTopFrame;
         headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
                                                      + headerTitleFrame.size.width
-                                                     + kCellImageMarginRight,
+                                                     + kCellMinorHorizontalSeparator,
                                                      headerTitleFrame.origin.y - kCellHeaderAttributeAdjust);
         headerAttributeTopFrame.size = CGSizeMake(rect.size.width
                                                   - headerTitleFrame.origin.x
@@ -431,7 +431,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
         CGRect headerAttributeTopFrame;
         headerAttributeTopFrame.origin = CGPointMake(headerTitleFrame.origin.x
                                                      + headerTitleFrame.size.width
-                                                     + kCellImageMarginRight,
+                                                     + kCellMinorHorizontalSeparator,
                                                      headerTitleFrame.origin.y - kCellHeaderAttributeAdjust);
         headerAttributeTopFrame.size = CGSizeMake(rect.size.width
                                                   - headerTitleFrame.origin.x
@@ -455,14 +455,19 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
      [[[self class] dateFormatter] relativeStringFromDate:self.contentDate]];
     [self.headerAccessoryRightView resizeVerticalTopLeftTrim];
     
+    [self.headerAccessoryRightImageView setImage:self.indicatorIcon];
     if (self.indicatorIcon != nil) {
-        CGFloat centerY = self.headerAccessoryRightView.center.y;
-        [self.headerAccessoryRightImageView setCenter:
-         CGPointMake(self.headerAccessoryRightView.frame.origin.x -
-                     self.headerAccessoryRightImageView.frame.size.width,
-                     centerY)];
+        CGRect headerAccessoryRightImageFrame = self.headerAccessoryRightImageView.frame;
+        headerAccessoryRightImageFrame.origin = CGPointMake(
+                                                            // x
+                                                            self.headerAccessoryRightView.frame.origin.x -
+                                                            headerAccessoryRightImageFrame.size.width - kCellMinorHorizontalSeparator,
+                                                            
+                                                            // y
+                                                            self.headerAccessoryRightView.center.y - (self.headerAccessoryRightImageView.frame.size.height / 2.f)
+                                                            );
+        [self.headerAccessoryRightImageView setFrame:headerAccessoryRightImageFrame];
     }
-    
 }
 
 -(void)layoutBodyWithBounds:(CGRect)rect

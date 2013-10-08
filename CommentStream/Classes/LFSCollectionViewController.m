@@ -8,7 +8,9 @@
 
 
 #define CACHE_SCALED_IMAGES
-#define LOG_ALL_HTTP_REQUESTS
+
+// uncomment the line below to use the awesome AFHTTPRequestOperationLogger
+//#define LOG_ALL_HTTP_REQUESTS
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
