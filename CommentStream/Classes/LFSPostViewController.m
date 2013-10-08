@@ -68,15 +68,17 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        // initialization code here
-        
-        _writeClient = nil;
-        _collection = nil;
-        _collectionId = nil;
-        _replyToContent = nil;
-        
+        [self resetEverything];
     }
     return self;
+}
+
+-(void)resetEverything {
+    _writeClient = nil;
+    _collection = nil;
+    _collectionId = nil;
+    _replyToContent = nil;
+    _delegate = nil;
 }
 
 - (void)viewDidLoad
@@ -109,10 +111,7 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 
 -(void)dealloc
 {
-    _writeClient = nil;
-    _collection = nil;
-    _collectionId = nil;
-    _replyToContent = nil;
+    [self resetEverything];
 }
 
 #pragma mark - Status bar
@@ -166,8 +165,9 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
                            inReplyTo:self.replyToContent.idString
                            onSuccess:^(NSOperation *operation, id responseObject)
      {
-         // do nothing
-         //NSLog(@"Success posting: %@", text);
+         if ([self.delegate respondsToSelector:@selector(didSucceedPostingContentWithResponse:)]) {
+            [self.delegate didSucceedPostingContentWithResponse:responseObject];
+         }
      }
                            onFailure:^(NSOperation *operation, NSError *error)
      {

@@ -16,6 +16,8 @@
 
 - (NSUInteger)indexOfObject:(id)anObject; // implemented using sorted range
 
+@property (nonatomic, readonly) NSNumber *lastEventId;
+
 @end
 
 /**

@@ -72,6 +72,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 @implementation LFSContentCollection
 
+@synthesize lastEventId = _lastEventId;
 @synthesize mapping = _mapping;
 @synthesize array = _array;
 
@@ -131,14 +132,29 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [_array insertObject:content atIndex:index];
 }
 
+-(void)updateLastEventWithContent:(LFSContent*)content
+{
+    // store last event id
+    if (_lastEventId == nil
+        || (content.eventId != nil && ![content.eventId isEqual:[NSNull null]]
+            && [content.eventId compare:_lastEventId] == NSOrderedDescending))
+    {
+        _lastEventId = content.eventId;
+    }
+}
+
 - (void)setObject:(id)object forKey:(id<NSCopying>)key
 {
+    // check if object is of appropriate type
     LFSContent *content = [[LFSContent alloc] initWithObject:object];
     if (content.visibility != LFSContentVisibilityEveryone
         || content.contentType != LFSContentTypeMessage)
     {
         return;
     }
+    
+    [self updateLastEventWithContent:content];
+    
     LFSContent *oldContent = _mapping[key];
     if (oldContent)
     {
@@ -158,12 +174,16 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (void)addObject:(id)anObject
 {
+    // check if object is of appropriate type
     LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
     if (content.visibility != LFSContentVisibilityEveryone
         || content.contentType != LFSContentTypeMessage)
     {
         return;
     }
+    
+    [self updateLastEventWithContent:content];
+    
     id<NSCopying> key = content.idString;
     LFSContent *oldContent = _mapping[key];
     if (oldContent)
@@ -254,6 +274,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // initialize stuff here
         _mapping = [[NSMutableDictionary alloc] initWithCapacity:cnt];
         _array = [[NSMutableArray alloc] initWithCapacity:cnt];
+        _lastEventId = nil;
         
         for (NSUInteger i = 0; i < cnt; i++)
         {
