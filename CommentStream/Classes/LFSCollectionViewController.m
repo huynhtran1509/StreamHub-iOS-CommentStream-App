@@ -649,7 +649,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     [self presentViewController:self.postCommentViewController animated:YES completion:nil];
 }
 
--(void)didSucceedPostingContentWithResponse:(id)responseObject
+-(void)operation:(NSOperation*)operation didPostContentWithResponse:(id)responseObject
 {
     [self addTopLevelContent:[responseObject objectForKey:@"messages"]
                  withAuthors:[responseObject objectForKey:@"authors"]
