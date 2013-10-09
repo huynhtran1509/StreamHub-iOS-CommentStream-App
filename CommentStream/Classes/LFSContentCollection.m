@@ -67,6 +67,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 @property (nonatomic, strong) NSMutableDictionary *mapping;
 @property (nonatomic, strong) NSMutableArray *array;
 
+@property (nonatomic, strong) NSMutableDictionary *likes;
+
 @end
 
 
@@ -75,6 +77,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 @synthesize lastEventId = _lastEventId;
 @synthesize mapping = _mapping;
 @synthesize array = _array;
+
+@synthesize likes = _likes;
 
 - (id)copyWithZone:(__unused NSZone *)zone
 {
@@ -149,32 +153,54 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
+- (void)registerOpineWithContent:(LFSContent*)content
+{
+    NSString *targetId = content.targetId;
+    NSMutableSet *authors = [_likes objectForKey:targetId];
+    if (authors == nil) {
+        authors = [[NSMutableSet alloc] init];
+        [_likes setObject:authors forKey:targetId];
+    }
+    if (content.visibility == LFSContentVisibilityNone) {
+        // unlike -- remove author id
+        [authors removeObject:content.contentAuthorId];
+    }
+    else if (content.visibility == LFSContentVisibilityEveryone) {
+        // like -- add author id
+        [authors addObject:content.contentAuthorId];
+    }
+}
+
 - (void)setObject:(id)object forKey:(id<NSCopying>)key
 {
     // check if object is of appropriate type
     LFSContent *content = [[LFSContent alloc] initWithObject:object];
     [self updateLastEventWithContent:content];
-    if (content.visibility != LFSContentVisibilityEveryone
-        || content.contentType != LFSContentTypeMessage)
-    {
-        return;
-    }
     
-    LFSContent *oldContent = _mapping[key];
-    if (oldContent)
+    if (content.contentType == LFSContentTypeMessage &&
+        content.visibility == LFSContentVisibilityEveryone)
     {
-        // update content
-        content = [[LFSContent alloc] initWithObject:oldContent];
-        [content setObject:object];
-        // not setting the array -- it should already contain the object
-    } else {
-        [self insertContentObject:content];
+        // dealing with regular content here
+        LFSContent *oldContent = _mapping[key];
+        if (oldContent) {
+            // update content
+            content = [[LFSContent alloc] initWithObject:oldContent];
+            [content setObject:object];
+            // not setting the array -- it should already contain the object
+        } else {
+            [self insertContentObject:content];
+        }
+        
+        // important: add child content *after* adding current object
+        // to the mapping structure
+        _mapping[key] = content;
+        [self addChildContent:content];
     }
-    
-    // important: add child content *after* adding current object
-    // to the mapping structure
-    _mapping[key] = content;
-    [self addChildContent:content];
+    else if (content.contentType == LFSContentTypeOpine)
+    {
+        // dealing with an opine
+        [self registerOpineWithContent:content];
+    }
 }
 
 - (void)addObject:(id)anObject
@@ -182,28 +208,33 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     // check if object is of appropriate type
     LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
     [self updateLastEventWithContent:content];
-    if (content.visibility != LFSContentVisibilityEveryone
-        || content.contentType != LFSContentTypeMessage)
-    {
-        return;
-    }
-
-    id<NSCopying> key = content.idString;
-    LFSContent *oldContent = _mapping[key];
-    if (oldContent)
-    {
-        // update content
-        content = [[LFSContent alloc] initWithObject:oldContent];
-        [content setObject:anObject];
-        // not setting the array -- it should already contain the object
-    } else {
-        [self insertContentObject:content];
-    }
     
-    // important: add child content *after* adding current object
-    // to the mapping structure
-    _mapping[key] = content;
-    [self addChildContent:content];
+    if (content.contentType == LFSContentTypeMessage &&
+        content.visibility == LFSContentVisibilityEveryone)
+    {
+        // dealing with regular content here
+        id<NSCopying> key = content.idString;
+        LFSContent *oldContent = _mapping[key];
+        if (oldContent)
+        {
+            // update content
+            content = [[LFSContent alloc] initWithObject:oldContent];
+            [content setObject:anObject];
+            // not setting the array -- it should already contain the object
+        } else {
+            [self insertContentObject:content];
+        }
+        
+        // important: add child content *after* adding current object
+        // to the mapping structure
+        _mapping[key] = content;
+        [self addChildContent:content];
+    }
+    else if (content.contentType == LFSContentTypeOpine)
+    {
+        // dealing with an opine
+        [self registerOpineWithContent:content];
+    }
 }
 
 - (void)addChildContent:(LFSContent*)content
@@ -278,6 +309,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // initialize stuff here
         _mapping = [[NSMutableDictionary alloc] initWithCapacity:cnt];
         _array = [[NSMutableArray alloc] initWithCapacity:cnt];
+        _likes = [[NSMutableDictionary alloc] init];
         _lastEventId = nil;
         
         for (NSUInteger i = 0; i < cnt; i++)
@@ -364,8 +396,15 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     LFSContent *content = [self.array objectAtIndex:index];
     if (content.author == nil && _authors != nil) {
+        // TODO: move setAuthorWithCollection out of LFSContent?
         [content setAuthorWithCollection:_authors];
     }
+    NSMutableSet *authors = [self.likes objectForKey:content.idString];
+    if (authors == nil) {
+        authors = [[NSMutableSet alloc] init];
+        [self.likes setObject:authors forKey:content.idString];
+    }
+    [content setLikes:authors];
     return self.array[index];
 }
 
@@ -388,6 +427,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // inherit from
         self.mapping = [[NSMutableDictionary alloc] initWithCapacity:capacity];
         self.array = [[NSMutableArray alloc] initWithCapacity:capacity];
+        self.likes = [[NSMutableDictionary alloc] init];
         
         // just checking that we didn't mess up attribute naming
         NSAssert(self.mapping != nil, @"self.mapping failed to initialize");

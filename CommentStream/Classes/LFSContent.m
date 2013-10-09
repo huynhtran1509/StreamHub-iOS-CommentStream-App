@@ -156,6 +156,17 @@ static NSString* const kLFSSourceImageMap[] = {
 }
 
 #pragma mark -
+@synthesize targetId = _targetId;
+-(NSString*)targetId
+{
+    const static NSString* const key = @"targetId";
+    if (_targetId == nil) {
+        _targetId = [self.content objectForKey:key];
+    }
+    return _targetId;
+}
+
+#pragma mark -
 @synthesize contentTwitterId = _contentTwitterId;
 -(NSString*)contentTwitterId
 {
