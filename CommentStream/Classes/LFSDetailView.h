@@ -16,7 +16,6 @@
 @interface LFSDetailView : UIView
 
 @property (nonatomic, weak) id<LFSDetailViewDelegate>delegate;
-@property (nonatomic, assign) BOOL isLikedByUser;
 
 @property (nonatomic, strong) LFSHeader* profileLocal;
 @property (nonatomic, strong) LFSTriple* profileRemote;
@@ -25,6 +24,9 @@
 @property (nonatomic, copy) NSString* contentBodyHtml;
 
 @property (nonatomic, strong) NSDate* contentDate;
+
+@property (readonly, nonatomic) UIButton *button1;
+@property (readonly, nonatomic) UIButton *button2;
 
 @end
 

@@ -67,9 +67,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @property (readonly, nonatomic) UILabel *footerLeftView;
 @property (readonly, nonatomic) LFSBasicHTMLLabel *footerRightView;
 
-@property (readonly, nonatomic) UIButton *likeButton;
-@property (readonly, nonatomic) UIButton *replyButton;
-
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
@@ -94,55 +91,64 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @synthesize delegate = _delegate;
 
 #pragma mark -
-@synthesize isLikedByUser = _isLikedByUser;
-- (void)setIsLikedByUser:(BOOL)liked
+@synthesize button1 = _button1;
+- (UIButton*)button1
 {
-    [_likeButton setImage:[self imageForLikedState:liked]
-                 forState:UIControlStateNormal];
-}
+    if (_button1 == nil) {
 
-#pragma mark -
-@synthesize likeButton = _likeButton;
-- (UIButton*)likeButton
-{
-    if (_likeButton == nil) {
-        UIImage *img = [self imageForLikedState:self.isLikedByUser];
         CGRect frame = CGRectMake(0.f, 0.f,
                                   kDetailBarButtonWidth,
                                   kDetailBarButtonHeight);
         // initialize
-        _likeButton = [[UIButton alloc] initWithFrame:frame];
+        _button1 = [[UIButton alloc] initWithFrame:frame];
         
         // configure
-        [_likeButton setImage:img forState:UIControlStateNormal];
-        [_likeButton addTarget:self action:@selector(didSelectLike:)
+        [_button1.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
+        [_button1 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]  forState:UIControlStateNormal];
+        [_button1 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f] forState:UIControlStateHighlighted];
+        
+        // Here kDetailContentLineSpacing is the amount of spacing to appear between image and title
+        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, kDetailContentLineSpacing);
+        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
+        
+        [_button1 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+        
+        [_button1 addTarget:self action:@selector(didSelectLike:)
               forControlEvents:UIControlEventTouchUpInside];
         
         // do not add to superview...
     }
-    return _likeButton;
+    return _button1;
 }
 
 #pragma mark -
-@synthesize replyButton = _replyButton;
-- (UIButton*)replyButton
+@synthesize button2 = _button2;
+- (UIButton*)button2
 {
-    if (_replyButton == nil) {
-        UIImage *img = [UIImage imageNamed:@"ActionReply"];
+    if (_button2 == nil) {
         CGRect frame = CGRectMake(0.f, 0.f,
                                   kDetailBarButtonWidth,
                                   kDetailBarButtonHeight);
         // initialize
-        _replyButton = [[UIButton alloc] initWithFrame:frame];
+        _button2 = [[UIButton alloc] initWithFrame:frame];
         
         // configure
-        [_replyButton setImage:img forState:UIControlStateNormal];
-        [_replyButton addTarget:self action:@selector(didSelectReply:)
+        [_button2.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
+        [_button2 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]  forState:UIControlStateNormal];
+        [_button2 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f] forState:UIControlStateHighlighted];
+        
+        // Here kDetailContentLineSpacing is the amount of spacing to appear between image and title
+        _button2.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, kDetailContentLineSpacing);
+        _button2.titleEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
+        
+        [_button2 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+        
+        [_button2 addTarget:self action:@selector(didSelectReply:)
                forControlEvents:UIControlEventTouchUpInside];
         
         // do not add to superview...
     }
-    return _replyButton;
+    return _button2;
 }
 
 #pragma mark -
@@ -392,14 +398,14 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
             target:self action:nil],
            
            [[UIBarButtonItem alloc]
-            initWithCustomView:self.likeButton],
+            initWithCustomView:self.button1],
            
            [[UIBarButtonItem alloc]
             initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
             target:self action:nil],
            
            [[UIBarButtonItem alloc]
-            initWithCustomView:self.replyButton],
+            initWithCustomView:self.button2],
            
            [[UIBarButtonItem alloc]
             initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
@@ -485,11 +491,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 }
 
 #pragma mark - Private methods
-
-- (UIImage*)imageForLikedState:(BOOL)liked
-{
-    return [UIImage imageNamed:(liked ? @"StateLiked" : @"StateNotLiked")];
-}
 
 -(void)layoutHeader
 {
@@ -620,8 +621,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _likeButton = nil;
-        _replyButton = nil;
+        _button1 = nil;
+        _button2 = nil;
         _bodyView = nil;
         _footerRightView = nil;
         _headerAccessoryRightView = nil;
@@ -630,10 +631,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         _headerTitleView = nil;
         
         _profileRemoteURL = nil;
-        
-        _isLikedByUser = NO;
-        
-        
+
         _profileLocal = nil;
         _profileRemote = nil;
         _contentRemote = nil;
@@ -649,8 +647,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
-        _likeButton = nil;
-        _replyButton = nil;
+        _button1 = nil;
+        _button2 = nil;
         _bodyView = nil;
         _footerRightView = nil;
         _headerAccessoryRightView = nil;
@@ -659,9 +657,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         _headerTitleView = nil;
         
         _profileRemoteURL = nil;
-        
-        _isLikedByUser = NO;
-        
+
         _profileLocal = nil;
         _profileRemote = nil;
         _contentRemote = nil;
@@ -674,8 +670,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 - (void)dealloc
 {
-    _likeButton = nil;
-    _replyButton = nil;
+    _button1 = nil;
+    _button2 = nil;
     _bodyView = nil;
     _footerRightView = nil;
     _headerAccessoryRightView = nil;

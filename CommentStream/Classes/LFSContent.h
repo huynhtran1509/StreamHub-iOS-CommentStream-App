@@ -50,6 +50,8 @@
 
 @property (nonatomic, copy) NSDictionary *content;
 @property (nonatomic, copy) NSString *idString;
+@property (nonatomic, copy) NSString *targetId;
+
 @property (nonatomic, copy) NSString *contentParentId;
 @property (nonatomic, copy) NSString *contentBodyHtml;
 @property (nonatomic, copy) NSDictionary *contentAnnotations;
@@ -63,6 +65,7 @@
 @property (nonatomic, assign) LFSContentType contentType;
 @property (nonatomic, assign) NSUInteger contentSource;
 
+@property (nonatomic, strong) NSMutableSet *likes;
 @property (nonatomic, copy) NSMutableArray *datePath;
 
 -(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;

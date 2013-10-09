@@ -7,12 +7,16 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
+#import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
+
 #import "LFSDetailViewController.h"
 #import "LFSPostViewController.h"
 #import "LFSContentToolbar.h"
 
 @interface LFSDetailViewController ()
+
+@property (nonatomic, readonly) LFSWriteClient *writeClient;
 
 @property (strong, nonatomic) LFSPostViewController *postCommentViewController;
 
@@ -23,9 +27,10 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet LFSDetailView *detailView;
 
-@property (assign, nonatomic) BOOL contentLikedByUser;
-
 @end
+
+// hardcode author id for now
+static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
 @implementation LFSDetailViewController
 
@@ -41,9 +46,20 @@
 @synthesize scrollView = _scrollView;
 @synthesize detailView = _detailView;
 
-@synthesize contentLikedByUser = _contentLikedByUser;
-
 @synthesize avatarImage = _avatarImage;
+
+@synthesize writeClient = _writeClient;
+- (LFSWriteClient*)writeClient
+{
+    if (_writeClient == nil) {
+        NSString *network = [self.collection objectForKey:@"network"];
+        NSString *environment = [self.collection objectForKey:@"environment"];
+        _writeClient = [LFSWriteClient
+                        clientWithNetwork:network
+                        environment:environment];
+    }
+    return _writeClient;
+}
 
 
 -(LFSPostViewController*)postCommentViewController
@@ -63,12 +79,43 @@
     return _postCommentViewController;
 }
 
--(void)setContentLikedByUser:(BOOL)contentLikedByUser
+#pragma mark - Private methods
+-(void)updateLikeButton
 {
-    _contentLikedByUser = contentLikedByUser;
-    
-    // mirror state to the detail view
-    [self.detailView setIsLikedByUser:_contentLikedByUser];
+    UIButton *likeButton = self.detailView.button1;
+    NSUInteger numberOfLikes = [self.contentItem.likes count];
+    if (numberOfLikes > 0u) {
+        if ([self.contentItem.likes containsObject:kCurrentUserId]) {
+            [likeButton setImage:[UIImage imageNamed:@"StateLiked"]
+                        forState:UIControlStateNormal];
+            [likeButton setTitle:[NSString stringWithFormat:@"%d", numberOfLikes]
+                        forState:UIControlStateNormal];
+            [likeButton setTitleColor:[UIColor colorWithRed:241.f/255.f green:92.f/255.f blue:56.f/255.f alpha:1.f]
+                             forState:UIControlStateNormal];
+            [likeButton setTitleColor:[UIColor colorWithRed:128.f/255.f green:49.f/255.f blue:29.f/255.f alpha:1.f]
+                             forState:UIControlStateHighlighted];
+        }
+        else {
+            [likeButton setImage:[UIImage imageNamed:@"StateNotLiked"]
+                        forState:UIControlStateNormal];
+            [likeButton setTitle:[NSString stringWithFormat:@"%d", numberOfLikes]
+                        forState:UIControlStateNormal];
+            [likeButton setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+                             forState:UIControlStateNormal];
+            [likeButton setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+                             forState:UIControlStateHighlighted];
+        }
+    }
+    else {
+        [likeButton setImage:[UIImage imageNamed:@"StateNotLiked"]
+                    forState:UIControlStateNormal];
+        [likeButton setTitle:@"Like"
+                    forState:UIControlStateNormal];
+        [likeButton setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+                         forState:UIControlStateNormal];
+        [likeButton setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+                         forState:UIControlStateHighlighted];
+    }
 }
 
 #pragma mark - Lifecycle
@@ -78,8 +125,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         _hideStatusBar = NO;
-        _contentLikedByUser = NO;
-        
+        _writeClient = nil;
         _postCommentViewController = nil;
     }
     return self;
@@ -90,8 +136,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _hideStatusBar = NO;
-        _contentLikedByUser = NO;
-        
+        _writeClient = nil;
         _postCommentViewController = nil;
     }
     return self;
@@ -112,6 +157,11 @@
     [detailView setDelegate:self];
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
+    
+    [self updateLikeButton];
+    
+    [detailView.button2 setTitle:@"Reply" forState:UIControlStateNormal];
+    [detailView.button2 setImage:[UIImage imageNamed:@"ActionReply"] forState:UIControlStateNormal];
     
     // only set an object if we have a remote (Twitter) url
     NSString *twitterUrlString = contentItem.contentTwitterUrlString;
@@ -192,8 +242,31 @@
 #pragma mark - LFSDetailViewDelegate
 - (void)didSelectLike:(id)sender
 {
-    // toggle liked state
-    [self setContentLikedByUser:!self.contentLikedByUser];
+    LFSMessageAction action;
+    if ([self.contentItem.likes containsObject:kCurrentUserId]) {
+        [self.contentItem.likes removeObject:kCurrentUserId];
+        action = LFSMessageUnlike;
+    } else {
+        [self.contentItem.likes addObject:kCurrentUserId];
+        action = LFSMessageLike;
+    }
+    [self updateLikeButton];
+    
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (userToken != nil) {
+        [self.writeClient postMessage:action
+                           forContent:self.contentItem.idString
+                         inCollection:self.collectionId
+                            userToken:[self.collection objectForKey:@"lftoken"]
+                           parameters:nil
+                            onSuccess:^(NSOperation *operation, id responseObject)
+        {
+            //NSLog(@"success posting opine");
+        }
+                            onFailure:^(NSOperation *operation, NSError *error) {
+            //NSLog(@"failed posting opine");
+        }];
+    }
 }
 
 - (void)didSelectReply:(id)sender

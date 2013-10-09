@@ -106,7 +106,13 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 @synthesize contentRemote = _contentRemote;
 @synthesize requiredBodyHeight = _requiredBodyHeight;
 
+#pragma mark -
 @synthesize leftOffset = _leftOffset;
+-(void)setLeftOffset:(CGFloat)leftOffset
+{
+    _leftOffset = leftOffset;
+    self.separatorInset = UIEdgeInsetsMake(0.f, kCellPadding.left + _leftOffset, 0.f, 0.f);
+}
 
 #pragma mark - UIAppearance properties
 @synthesize backgroundCellColor;
