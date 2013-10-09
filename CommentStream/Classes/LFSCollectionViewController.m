@@ -540,7 +540,7 @@ const static CGFloat kStatusBarHeight = 20.f;
 // Overriding this will enable "swipe to delete" gesture
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString* const kFailurePostTitle = @"Failed to post content";
+    static NSString* const kFailurePostTitle = @"Failed to delete content";
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         NSUInteger row = indexPath.row;
