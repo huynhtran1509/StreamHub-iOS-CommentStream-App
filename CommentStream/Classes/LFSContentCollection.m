@@ -101,6 +101,12 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             }];
 }
 
+- (NSUInteger)indexOfKey:(id<NSCopying>)key
+{
+    LFSContent *content = [self objectForKey:key];
+    return [self indexOfObject:content];
+}
+
 -(void)insertContentObject:(LFSContent*)content
 {
     // prepare our nested enumeration data

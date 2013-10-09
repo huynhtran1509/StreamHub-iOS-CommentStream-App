@@ -529,16 +529,20 @@ const static CGFloat kStatusBarHeight = 20.f;
     return cell;
 }
 
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return YES if you want the specified item to be editable.
-    return YES;
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // TODO: find out which content was created by current user
+    // and only return "YES" for cells displaying that content
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    return (userToken != nil);
 }
 
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        //add code here for when you hit delete
-        
+// Overriding this will enable "swipe to delete" gesture
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString* const kFailurePostTitle = @"Failed to post content";
+    if (editingStyle == UITableViewCellEditingStyleDelete)
+    {
         NSUInteger row = indexPath.row;
         LFSContent *content = [_content objectAtIndex:row];
         
@@ -547,12 +551,23 @@ const static CGFloat kStatusBarHeight = 20.f;
                          inCollection:self.collectionId
                             userToken:[self.collection objectForKey:@"lftoken"]
                            parameters:nil
-                            onSuccess:^(NSOperation *operation, id responseObject) {
-                                NSLog(@"success");
-                           }
-                            onFailure:^(NSOperation *operation, NSError *error) {
-                                NSLog(@"failure");
-                            }];
+                            onSuccess:nil
+                            onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             UIAlertView *alert = [[UIAlertView alloc]
+                                   initWithTitle:kFailurePostTitle
+                                   message:[error localizedDescription]
+                                   delegate:nil
+                                   cancelButtonTitle:@"OK"
+                                   otherButtonTitles:nil];
+             [alert show];
+         }];
+        
+        [_content removeObjectAtIndex:row];
+        [self.tableView
+         deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]
+         withRowAnimation:UITableViewRowAnimationTop];
     }
 }
 
