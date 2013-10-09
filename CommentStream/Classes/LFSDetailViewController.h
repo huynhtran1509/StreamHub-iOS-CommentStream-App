@@ -24,4 +24,6 @@
 @property (nonatomic, strong) UIImage *avatarImage;
 @property (nonatomic, strong) LFSContent *contentItem;
 
+@property (assign, nonatomic) NSUInteger numberOfLikes;
+
 @end

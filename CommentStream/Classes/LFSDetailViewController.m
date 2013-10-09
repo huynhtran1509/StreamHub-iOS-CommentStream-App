@@ -23,8 +23,6 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet LFSDetailView *detailView;
 
-@property (assign, nonatomic) BOOL contentLikedByUser;
-
 @end
 
 @implementation LFSDetailViewController
@@ -41,7 +39,7 @@
 @synthesize scrollView = _scrollView;
 @synthesize detailView = _detailView;
 
-@synthesize contentLikedByUser = _contentLikedByUser;
+@synthesize numberOfLikes = _numberOfLikes;
 
 @synthesize avatarImage = _avatarImage;
 
@@ -63,12 +61,26 @@
     return _postCommentViewController;
 }
 
--(void)setContentLikedByUser:(BOOL)contentLikedByUser
+-(void)setNumberOfLikes:(NSUInteger)numberOfLikes
 {
-    _contentLikedByUser = contentLikedByUser;
+    LFSDetailView *detailView = self.detailView;
+    _numberOfLikes = numberOfLikes;
     
-    // mirror state to the detail view
-    [self.detailView setIsLikedByUser:_contentLikedByUser];
+    if (_numberOfLikes == 0) {
+        [detailView.button1 setImage:[UIImage imageNamed:@"StateNotLiked"] forState:UIControlStateNormal];
+        [detailView.button1 setTitle:@"Like"
+                               forState:UIControlStateNormal];
+        [detailView.button1 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]  forState:UIControlStateNormal];
+        [detailView.button1 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f] forState:UIControlStateHighlighted];
+    } else {
+        [detailView.button1 setImage:[UIImage imageNamed:@"StateLiked"] forState:UIControlStateNormal];
+        [detailView.button1 setTitle:[NSString stringWithFormat:@"%d", _numberOfLikes]
+                               forState:UIControlStateNormal];
+        [detailView.button1 setTitleColor:[UIColor colorWithRed:241.f/255.f green:92.f/255.f blue:56.f/255.f alpha:1.f]
+                                    forState:UIControlStateNormal];
+        [detailView.button1 setTitleColor:[UIColor colorWithRed:128.f/255.f green:49.f/255.f blue:29.f/255.f alpha:1.f]
+                                    forState:UIControlStateHighlighted];
+    }
 }
 
 #pragma mark - Lifecycle
@@ -78,7 +90,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         _hideStatusBar = NO;
-        _contentLikedByUser = NO;
+        _numberOfLikes = 0u;
         
         _postCommentViewController = nil;
     }
@@ -90,7 +102,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _hideStatusBar = NO;
-        _contentLikedByUser = NO;
+        _numberOfLikes = 0u;
         
         _postCommentViewController = nil;
     }
@@ -112,6 +124,12 @@
     [detailView setDelegate:self];
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
+    
+    [detailView.button1 setTitle:@"Like" forState:UIControlStateNormal];
+    [detailView.button2 setTitle:@"Reply" forState:UIControlStateNormal];
+    [detailView.button1 setImage:[UIImage imageNamed:(self.numberOfLikes > 0u ? @"StateLiked" : @"StateNotLiked")]
+                        forState:UIControlStateNormal];
+    [detailView.button2 setImage:[UIImage imageNamed:@"ActionReply"] forState:UIControlStateNormal];
     
     // only set an object if we have a remote (Twitter) url
     NSString *twitterUrlString = contentItem.contentTwitterUrlString;
@@ -193,7 +211,7 @@
 - (void)didSelectLike:(id)sender
 {
     // toggle liked state
-    [self setContentLikedByUser:!self.contentLikedByUser];
+    [self setNumberOfLikes:(self.numberOfLikes > 0 ? 0 : 1)];
 }
 
 - (void)didSelectReply:(id)sender
