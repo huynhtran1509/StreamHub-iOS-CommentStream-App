@@ -261,10 +261,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                            parameters:nil
                             onSuccess:^(NSOperation *operation, id responseObject)
         {
-            //NSLog(@"success posting opine");
+            //NSLog(@"success posting opine %d", action);
         }
                             onFailure:^(NSOperation *operation, NSError *error) {
-            //NSLog(@"failed posting opine");
+            //NSLog(@"failed posting opine %d", action);
         }];
     }
 }

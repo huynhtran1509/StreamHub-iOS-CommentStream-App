@@ -9,16 +9,9 @@
 
 #define CACHE_SCALED_IMAGES
 
-// uncomment the line below to use the awesome AFHTTPRequestOperationLogger
-#define LOG_ALL_HTTP_REQUESTS
-
 #import <StreamHub-iOS-SDK/LFSClient.h>
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
-
-#ifdef LOG_ALL_HTTP_REQUESTS
-#import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
-#endif
 
 #import <objc/runtime.h>
 
@@ -152,7 +145,7 @@ const static CGFloat kStatusBarHeight = 20.f;
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+
     _content = [[LFSMutableContentCollection alloc] init];
     
     self.title = [_collection objectForKey:@"_name"];
@@ -236,11 +229,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     // hide status bar for iOS7 and later
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
-    
-#ifdef LOG_ALL_HTTP_REQUESTS
-    [[AFHTTPRequestOperationLogger sharedLogger] startLogging];
-#endif
-    
+
     [self startStreamWithBoostrap];
 }
 
@@ -260,11 +249,6 @@ const static CGFloat kStatusBarHeight = 20.f;
     [super viewWillDisappear:animated];
     [self.streamClient stopStream];
     [self.operationQueue cancelAllOperations];
-    
-#ifdef LOG_ALL_HTTP_REQUESTS
-    [[AFHTTPRequestOperationLogger sharedLogger] stopLogging];
-#endif
-    
     [self.navigationController setToolbarHidden:YES animated:animated];
 }
 
