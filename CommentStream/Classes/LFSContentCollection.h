@@ -15,6 +15,7 @@
 - (instancetype)initWithArray:(NSArray*)array;
 
 - (NSUInteger)indexOfObject:(id)anObject; // implemented using sorted range
+- (NSUInteger)indexOfKey:(id<NSCopying>)key;
 
 @property (nonatomic, readonly) NSNumber *lastEventId;
 

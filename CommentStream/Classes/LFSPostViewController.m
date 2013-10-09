@@ -9,8 +9,6 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import "LFSPostViewController.h"
 
-static NSString* const kFailureMessageTitle = @"U fail @ internetz";
-
 @interface LFSPostViewController ()
 
 // render iOS7 status bar methods as writable properties
@@ -157,23 +155,25 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 
 - (IBAction)postClicked:(UIBarButtonItem *)sender
 {
+    static NSString* const kFailureDeleteTitle = @"Failed to delete content";
     NSString *text = self.textView.text;
     [self.textView setText:@""];
-    [self.writeClient postNewContent:text
-                             forUser:[self.collection objectForKey:@"lftoken"]
-                       forCollection:self.collectionId
-                           inReplyTo:self.replyToContent.idString
-                           onSuccess:^(NSOperation *operation, id responseObject)
+    [self.writeClient postContent:text
+                     inCollection:self.collectionId
+                        userToken:[self.collection objectForKey:@"lftoken"]
+                        inReplyTo:self.replyToContent.idString
+                        onSuccess:^(NSOperation *operation, id responseObject)
      {
-         if ([self.delegate respondsToSelector:@selector(didSucceedPostingContentWithResponse:)]) {
-            [self.delegate didSucceedPostingContentWithResponse:responseObject];
+         if ([self.delegate respondsToSelector:@selector(operation:didPostContentWithResponse:)])
+         {
+             [self.delegate operation:operation didPostContentWithResponse:responseObject];
          }
      }
-                           onFailure:^(NSOperation *operation, NSError *error)
+                        onFailure:^(NSOperation *operation, NSError *error)
      {
          // show an error message
          UIAlertView *alert = [[UIAlertView alloc]
-                               initWithTitle:kFailureMessageTitle
+                               initWithTitle:kFailureDeleteTitle
                                message:[error localizedDescription]
                                delegate:nil
                                cancelButtonTitle:@"OK"

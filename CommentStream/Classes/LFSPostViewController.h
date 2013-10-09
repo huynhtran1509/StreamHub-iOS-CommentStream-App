@@ -26,6 +26,6 @@
 
 @protocol LFSPostNewControllerDelegate <NSObject>
 
--(void)didSucceedPostingContentWithResponse:(id)responseObject;
+-(void)operation:(NSOperation*)operation didPostContentWithResponse:(id)responseObject;
 
 @end
