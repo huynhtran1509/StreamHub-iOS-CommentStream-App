@@ -74,6 +74,8 @@
 			<string>303613</string>
 			<key>articleId</key>
 			<string>215</string>
+			<key>lftoken</key>
+            <string>eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAibGl2ZWZ5cmUuY29tIiwgImV4cGlyZXMiOiAxMzgyNTQzNTQ2LjEyMDA0MSwgInVzZXJfaWQiOiAiX3VwMTk0MzM2NjAifQ.zr-ekmwQF7Q9Ym6DtlMTMKcSdhM-Yur_Da4Hs4YJA-s</string>
 		</dict>
 		<dict>
 			<key>_name</key>

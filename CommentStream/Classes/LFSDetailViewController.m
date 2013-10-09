@@ -242,30 +242,42 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 #pragma mark - LFSDetailViewDelegate
 - (void)didSelectLike:(id)sender
 {
-    LFSMessageAction action;
-    if ([self.contentItem.likes containsObject:kCurrentUserId]) {
-        [self.contentItem.likes removeObject:kCurrentUserId];
-        action = LFSMessageUnlike;
-    } else {
-        [self.contentItem.likes addObject:kCurrentUserId];
-        action = LFSMessageLike;
-    }
-    [self updateLikeButton];
-    
+    static NSString* const kFailureModifyTitle = @"Failed to modify content";
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken != nil) {
+        LFSMessageAction action;
+        if ([self.contentItem.likes containsObject:kCurrentUserId]) {
+            [self.contentItem.likes removeObject:kCurrentUserId];
+            action = LFSMessageUnlike;
+        } else {
+            [self.contentItem.likes addObject:kCurrentUserId];
+            action = LFSMessageLike;
+        }
+        [self updateLikeButton];
+        
+        
         [self.writeClient postMessage:action
                            forContent:self.contentItem.idString
                          inCollection:self.collectionId
-                            userToken:[self.collection objectForKey:@"lftoken"]
+                            userToken:userToken
                            parameters:nil
                             onSuccess:^(NSOperation *operation, id responseObject)
-        {
-            //NSLog(@"success posting opine");
-        }
-                            onFailure:^(NSOperation *operation, NSError *error) {
-            //NSLog(@"failed posting opine");
-        }];
+         {
+             //NSLog(@"success posting opine %d", action);
+         }
+                            onFailure:^(NSOperation *operation, NSError *error)
+         {
+             //NSLog(@"failed posting opine %d", action);
+         }];
+    } else {
+        // userToken is nil -- show an error message
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:kFailureModifyTitle
+                              message:@"You do not have permission to like comments in this collection"
+                              delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil];
+        [alert show];
     }
 }
 

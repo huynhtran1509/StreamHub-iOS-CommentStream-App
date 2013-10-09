@@ -155,32 +155,45 @@
 
 - (IBAction)postClicked:(UIBarButtonItem *)sender
 {
-    static NSString* const kFailureDeleteTitle = @"Failed to delete content";
-    NSString *text = self.textView.text;
-    [self.textView setText:@""];
-    [self.writeClient postContent:text
-                     inCollection:self.collectionId
-                        userToken:[self.collection objectForKey:@"lftoken"]
-                        inReplyTo:self.replyToContent.idString
-                        onSuccess:^(NSOperation *operation, id responseObject)
-     {
-         if ([self.delegate respondsToSelector:@selector(operation:didPostContentWithResponse:)])
+    static NSString* const kFailurePostTitle = @"Failed to post content";
+    
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (userToken != nil) {
+        NSString *text = self.textView.text;
+        [self.textView setText:@""];
+        [self.writeClient postContent:text
+                         inCollection:self.collectionId
+                            userToken:userToken
+                            inReplyTo:self.replyToContent.idString
+                            onSuccess:^(NSOperation *operation, id responseObject)
          {
-             [self.delegate operation:operation didPostContentWithResponse:responseObject];
+             if ([self.delegate respondsToSelector:@selector(operation:didPostContentWithResponse:)])
+             {
+                 [self.delegate operation:operation didPostContentWithResponse:responseObject];
+             }
          }
-     }
-                        onFailure:^(NSOperation *operation, NSError *error)
-     {
-         // show an error message
-         UIAlertView *alert = [[UIAlertView alloc]
-                               initWithTitle:kFailureDeleteTitle
-                               message:[error localizedDescription]
-                               delegate:nil
-                               cancelButtonTitle:@"OK"
-                               otherButtonTitles:nil];
-         [alert show];
-         
-     }];
+                            onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             UIAlertView *alert = [[UIAlertView alloc]
+                                   initWithTitle:kFailurePostTitle
+                                   message:[error localizedDescription]
+                                   delegate:nil
+                                   cancelButtonTitle:@"OK"
+                                   otherButtonTitles:nil];
+             [alert show];
+             
+         }];
+    } else {
+        // userToken is nil -- show an error message
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:kFailurePostTitle
+                              message:@"You do not have permission to write to this collection"
+                              delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil];
+        [alert show];
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

@@ -9,16 +9,9 @@
 
 #define CACHE_SCALED_IMAGES
 
-// uncomment the line below to use the awesome AFHTTPRequestOperationLogger
-#define LOG_ALL_HTTP_REQUESTS
-
 #import <StreamHub-iOS-SDK/LFSClient.h>
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
-
-#ifdef LOG_ALL_HTTP_REQUESTS
-#import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
-#endif
 
 #import <objc/runtime.h>
 
@@ -152,7 +145,7 @@ const static CGFloat kStatusBarHeight = 20.f;
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+
     _content = [[LFSMutableContentCollection alloc] init];
     
     self.title = [_collection objectForKey:@"_name"];
@@ -236,11 +229,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     // hide status bar for iOS7 and later
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
-    
-#ifdef LOG_ALL_HTTP_REQUESTS
-    [[AFHTTPRequestOperationLogger sharedLogger] startLogging];
-#endif
-    
+
     [self startStreamWithBoostrap];
 }
 
@@ -260,11 +249,6 @@ const static CGFloat kStatusBarHeight = 20.f;
     [super viewWillDisappear:animated];
     [self.streamClient stopStream];
     [self.operationQueue cancelAllOperations];
-    
-#ifdef LOG_ALL_HTTP_REQUESTS
-    [[AFHTTPRequestOperationLogger sharedLogger] stopLogging];
-#endif
-    
     [self.navigationController setToolbarHidden:YES animated:animated];
 }
 
@@ -540,34 +524,49 @@ const static CGFloat kStatusBarHeight = 20.f;
 // Overriding this will enable "swipe to delete" gesture
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString* const kFailurePostTitle = @"Failed to delete content";
+    static NSString* const kFailureDeleteTitle = @"Failed to delete content";
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        NSUInteger row = indexPath.row;
-        LFSContent *content = [_content objectAtIndex:row];
-        
-        [self.writeClient postMessage:LFSMessageDelete
-                           forContent:content.idString
-                         inCollection:self.collectionId
-                            userToken:[self.collection objectForKey:@"lftoken"]
-                           parameters:nil
-                            onSuccess:nil
-                            onFailure:^(NSOperation *operation, NSError *error)
-         {
-             // show an error message
-             UIAlertView *alert = [[UIAlertView alloc]
-                                   initWithTitle:kFailurePostTitle
-                                   message:[error localizedDescription]
-                                   delegate:nil
-                                   cancelButtonTitle:@"OK"
-                                   otherButtonTitles:nil];
-             [alert show];
-         }];
-        
-        [_content removeObjectAtIndex:row];
-        [self.tableView
-         deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]
-         withRowAnimation:UITableViewRowAnimationTop];
+        NSString *userToken = [self.collection objectForKey:@"lftoken"];
+        if (userToken != nil) {
+            NSUInteger row = indexPath.row;
+            LFSContent *content = [_content objectAtIndex:row];
+            
+            [self.writeClient postMessage:LFSMessageDelete
+                               forContent:content.idString
+                             inCollection:self.collectionId
+                                userToken:userToken
+                               parameters:nil
+                                onSuccess:nil
+                                onFailure:^(NSOperation *operation, NSError *error)
+             {
+                 // show an error message
+                 UIAlertView *alert = [[UIAlertView alloc]
+                                       initWithTitle:kFailureDeleteTitle
+                                       message:[error localizedDescription]
+                                       delegate:nil
+                                       cancelButtonTitle:@"OK"
+                                       otherButtonTitles:nil];
+                 [alert show];
+             }];
+            
+            [_content removeObjectAtIndex:row];
+            [self.tableView
+             deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]
+             withRowAnimation:UITableViewRowAnimationTop];
+        } else {
+            // userToken is nil -- show an error message
+            //
+            // Note: Normally we never reach this block because we do not
+            // allow editing for cells if our user token is nil
+            UIAlertView *alert = [[UIAlertView alloc]
+                                  initWithTitle:kFailureDeleteTitle
+                                  message:@"You do not have permission to delete comments in this collection"
+                                  delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil];
+            [alert show];
+        }
     }
 }
 
