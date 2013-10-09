@@ -159,11 +159,11 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
 {
     NSString *text = self.textView.text;
     [self.textView setText:@""];
-    [self.writeClient postNewContent:text
-                             forUser:[self.collection objectForKey:@"lftoken"]
-                       forCollection:self.collectionId
-                           inReplyTo:self.replyToContent.idString
-                           onSuccess:^(NSOperation *operation, id responseObject)
+    [self.writeClient postContent:text
+                     inCollection:self.collectionId
+                             user:[self.collection objectForKey:@"lftoken"]
+                        inReplyTo:self.replyToContent.idString
+                        onSuccess:^(NSOperation *operation, id responseObject)
      {
          if ([self.delegate respondsToSelector:@selector(operation:didPostContentWithResponse:)]) {
             [self.delegate operation:operation didPostContentWithResponse:responseObject];
