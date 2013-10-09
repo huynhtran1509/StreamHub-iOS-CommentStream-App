@@ -63,23 +63,32 @@
 
 -(void)setNumberOfLikes:(NSUInteger)numberOfLikes
 {
-    LFSDetailView *detailView = self.detailView;
     _numberOfLikes = numberOfLikes;
-    
+    [self updateLikeButton];
+}
+
+#pragma mark - Private methods
+-(void)updateLikeButton
+{
+    UIButton *likeButton = self.detailView.button1;
     if (_numberOfLikes == 0) {
-        [detailView.button1 setImage:[UIImage imageNamed:@"StateNotLiked"] forState:UIControlStateNormal];
-        [detailView.button1 setTitle:@"Like"
-                               forState:UIControlStateNormal];
-        [detailView.button1 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]  forState:UIControlStateNormal];
-        [detailView.button1 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f] forState:UIControlStateHighlighted];
+        [likeButton setImage:[UIImage imageNamed:@"StateNotLiked"]
+                    forState:UIControlStateNormal];
+        [likeButton setTitle:@"Like"
+                    forState:UIControlStateNormal];
+        [likeButton setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+                         forState:UIControlStateNormal];
+        [likeButton setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+                         forState:UIControlStateHighlighted];
     } else {
-        [detailView.button1 setImage:[UIImage imageNamed:@"StateLiked"] forState:UIControlStateNormal];
-        [detailView.button1 setTitle:[NSString stringWithFormat:@"%d", _numberOfLikes]
-                               forState:UIControlStateNormal];
-        [detailView.button1 setTitleColor:[UIColor colorWithRed:241.f/255.f green:92.f/255.f blue:56.f/255.f alpha:1.f]
-                                    forState:UIControlStateNormal];
-        [detailView.button1 setTitleColor:[UIColor colorWithRed:128.f/255.f green:49.f/255.f blue:29.f/255.f alpha:1.f]
-                                    forState:UIControlStateHighlighted];
+        [likeButton setImage:[UIImage imageNamed:@"StateLiked"]
+                    forState:UIControlStateNormal];
+        [likeButton setTitle:[NSString stringWithFormat:@"%d", _numberOfLikes]
+                    forState:UIControlStateNormal];
+        [likeButton setTitleColor:[UIColor colorWithRed:241.f/255.f green:92.f/255.f blue:56.f/255.f alpha:1.f]
+                         forState:UIControlStateNormal];
+        [likeButton setTitleColor:[UIColor colorWithRed:128.f/255.f green:49.f/255.f blue:29.f/255.f alpha:1.f]
+                         forState:UIControlStateHighlighted];
     }
 }
 
@@ -125,10 +134,9 @@
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
     
-    [detailView.button1 setTitle:@"Like" forState:UIControlStateNormal];
+    [self updateLikeButton];
+    
     [detailView.button2 setTitle:@"Reply" forState:UIControlStateNormal];
-    [detailView.button1 setImage:[UIImage imageNamed:(self.numberOfLikes > 0u ? @"StateLiked" : @"StateNotLiked")]
-                        forState:UIControlStateNormal];
     [detailView.button2 setImage:[UIImage imageNamed:@"ActionReply"] forState:UIControlStateNormal];
     
     // only set an object if we have a remote (Twitter) url
