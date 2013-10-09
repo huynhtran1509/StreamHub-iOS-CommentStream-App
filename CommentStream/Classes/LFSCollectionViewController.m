@@ -10,9 +10,10 @@
 #define CACHE_SCALED_IMAGES
 
 // uncomment the line below to use the awesome AFHTTPRequestOperationLogger
-//#define LOG_ALL_HTTP_REQUESTS
+#define LOG_ALL_HTTP_REQUESTS
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
+#import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
 
 #ifdef LOG_ALL_HTTP_REQUESTS
@@ -37,6 +38,8 @@
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
 @property (nonatomic, readonly) LFSTextField *postCommentField;
+
+@property (nonatomic, readonly) LFSWriteClient *writeClient;
 
 // render iOS7 status bar methods to be readwrite properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
@@ -81,6 +84,18 @@ const static CGFloat kStatusBarHeight = 20.f;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
 @synthesize postCommentViewController = _postCommentViewController;
+
+@synthesize writeClient = _writeClient;
+
+- (LFSWriteClient*)writeClient
+{
+    if (_writeClient == nil) {
+        _writeClient = [LFSWriteClient
+                        clientWithNetwork:[self.collection objectForKey:@"network"]
+                        environment:[self.collection objectForKey:@"environment"]];
+    }
+    return _writeClient;
+}
 
 - (LFSBootstrapClient*)bootstrapClient
 {
@@ -192,6 +207,8 @@ const static CGFloat kStatusBarHeight = 20.f;
         //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
     _postCommentViewController = nil;
+    _writeClient = nil;
+    
     // }}}
     
 #ifdef CACHE_SCALED_IMAGES
@@ -268,6 +285,9 @@ const static CGFloat kStatusBarHeight = 20.f;
     self.tableView.delegate = nil;
     self.tableView.dataSource = nil;
 
+    _postCommentViewController = nil;
+    _writeClient = nil;
+    
     _postCommentField.delegate = nil;
     _postCommentField = nil;
     
@@ -509,21 +529,32 @@ const static CGFloat kStatusBarHeight = 20.f;
     return cell;
 }
 
-/*
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return YES if you want the specified item to be editable.
     return YES;
 }
 
-*/
-/*
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         //add code here for when you hit delete
+        
+        NSUInteger row = indexPath.row;
+        LFSContent *content = [_content objectAtIndex:row];
+        
+        [self.writeClient postMessage:LFSMessageDelete
+                           forContent:content.idString
+                         inCollection:self.collectionId
+                            userToken:[self.collection objectForKey:@"lftoken"]
+                           parameters:nil
+                            onSuccess:^(NSOperation *operation, id responseObject) {
+                                NSLog(@"success");
+                           }
+                            onFailure:^(NSOperation *operation, NSError *error) {
+                                NSLog(@"failure");
+                            }];
     }
 }
-*/
 
 #pragma mark - Table and cell helpers
 

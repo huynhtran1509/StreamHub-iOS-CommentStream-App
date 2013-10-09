@@ -161,15 +161,15 @@ static NSString* const kFailureMessageTitle = @"U fail @ internetz";
     [self.textView setText:@""];
     [self.writeClient postContent:text
                      inCollection:self.collectionId
-                             user:[self.collection objectForKey:@"lftoken"]
+                        userToken:[self.collection objectForKey:@"lftoken"]
                         inReplyTo:self.replyToContent.idString
                         onSuccess:^(NSOperation *operation, id responseObject)
      {
          if ([self.delegate respondsToSelector:@selector(operation:didPostContentWithResponse:)]) {
-            [self.delegate operation:operation didPostContentWithResponse:responseObject];
+             [self.delegate operation:operation didPostContentWithResponse:responseObject];
          }
      }
-                           onFailure:^(NSOperation *operation, NSError *error)
+                        onFailure:^(NSOperation *operation, NSError *error)
      {
          // show an error message
          UIAlertView *alert = [[UIAlertView alloc]
