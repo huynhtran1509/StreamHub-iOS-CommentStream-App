@@ -27,8 +27,6 @@
 
 @property (nonatomic, strong) id object;
 
-@property (nonatomic, strong) UIImage *avatarImage;
-
 // Note: use lazy instantiation here
 @property (nonatomic, copy) NSString *displayName;
 @property (nonatomic, copy) NSString *profileUrlString;

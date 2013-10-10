@@ -9,6 +9,7 @@
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
+#import <AFNetworking/UIImageView+AFNetworking.h>
 
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
@@ -611,8 +612,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     }
 
     // layout avatar view
-    [self.headerImageView setImage:profileLocal.iconImage];
-    
+    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconImageURL]
+                         placeholderImage:profileLocal.iconImage];
 }
 
 -(CGSize)contentSizeThatFits:(CGSize)size

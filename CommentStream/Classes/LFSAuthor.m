@@ -23,8 +23,6 @@
  */
 
 #pragma mark - Properties
-@synthesize avatarImage = _avatarImage;
-
 
 @synthesize object = _object;
 -(void)setObject:(id)object
@@ -208,7 +206,6 @@
     if (self ) {
         // initialization stuff here
         _object = object;
-        _avatarImage = nil;
         [self resetCached];
     }
     return self;
@@ -224,14 +221,12 @@
 -(void)dealloc
 {
     [self resetCached];
-    _avatarImage = nil;
     _object = nil;
 }
 
 -(void)resetCached
 {
     // reset all cached properties except _object
-    // and _avatarImage
     _displayName = nil;
     _idString = nil;
     _profileUrlString = nil;

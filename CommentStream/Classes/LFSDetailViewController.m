@@ -183,11 +183,13 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     
     NSNumber *moderator = [contentItem.contentAnnotations objectForKey:@"moderator"];
     BOOL hasModerator = (moderator != nil && [moderator boolValue] == YES);
-    detailView.profileLocal = [[LFSHeader alloc]
+    LFSHeader *headerInfo = [[LFSHeader alloc]
                                initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
                                attributeString:(hasModerator ? @"Moderator" : nil)
                                mainString:author.displayName
                                iconImage:self.avatarImage];
+    [headerInfo setIconImageURL:author.avatarUrlString75];
+    [detailView setProfileLocal:headerInfo];
 }
 
 - (void)viewWillAppear:(BOOL)animated
