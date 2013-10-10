@@ -101,6 +101,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 #pragma mark - Misc properties
 @synthesize htmlHash = _htmlHash;
 
+@synthesize indicatorIcon = _indicatorIcon;
 @synthesize profileLocal = _profileLocal;
 @synthesize profileRemote = _profileRemote;
 @synthesize contentRemote = _contentRemote;

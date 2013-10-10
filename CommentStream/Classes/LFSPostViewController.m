@@ -29,6 +29,8 @@
 
 #pragma mark - Properties
 
+@synthesize delegate = _delegate;
+
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;

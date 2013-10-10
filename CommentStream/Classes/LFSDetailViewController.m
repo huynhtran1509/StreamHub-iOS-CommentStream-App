@@ -46,6 +46,9 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 @synthesize scrollView = _scrollView;
 @synthesize detailView = _detailView;
 
+@synthesize collection = _collection;
+@synthesize collectionId = _collectionId;
+@synthesize contentItem = _contentItem;
 @synthesize avatarImage = _avatarImage;
 
 @synthesize writeClient = _writeClient;
@@ -88,7 +91,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         if ([self.contentItem.likes containsObject:kCurrentUserId]) {
             [likeButton setImage:[UIImage imageNamed:@"StateLiked"]
                         forState:UIControlStateNormal];
-            [likeButton setTitle:[NSString stringWithFormat:@"%d", numberOfLikes]
+            [likeButton setTitle:[NSString stringWithFormat:@"%zd", numberOfLikes]
                         forState:UIControlStateNormal];
             [likeButton setTitleColor:[UIColor colorWithRed:241.f/255.f green:92.f/255.f blue:56.f/255.f alpha:1.f]
                              forState:UIControlStateNormal];
@@ -98,7 +101,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         else {
             [likeButton setImage:[UIImage imageNamed:@"StateNotLiked"]
                         forState:UIControlStateNormal];
-            [likeButton setTitle:[NSString stringWithFormat:@"%d", numberOfLikes]
+            [likeButton setTitle:[NSString stringWithFormat:@"%zd", numberOfLikes]
                         forState:UIControlStateNormal];
             [likeButton setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
                              forState:UIControlStateNormal];

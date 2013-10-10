@@ -23,6 +23,9 @@
  */
 
 #pragma mark - Properties
+@synthesize avatarImage = _avatarImage;
+
+
 @synthesize object = _object;
 -(void)setObject:(id)object
 {

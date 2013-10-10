@@ -86,6 +86,9 @@ static NSString* const kLFSSourceImageMap[] = {
 
 #pragma mark - Properties
 
+@synthesize datePath = _datePath;
+@synthesize likes = _likes;
+
 @synthesize object = _object;
 -(void)setObject:(id)object
 {
