@@ -570,6 +570,13 @@ const static CGFloat kStatusBarHeight = 20.f;
     }
 }
 
+/*
+-(void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Optionally kill the image request operation here as the image is no longer needed
+}
+*/
+
 #pragma mark - Table and cell helpers
 
 // called every time a cell is configured
@@ -620,8 +627,17 @@ const static CGFloat kStatusBarHeight = 20.f;
                                                   [content.author setAvatarImage:image];
                                                   [self scaleImage:image forContent:content];
                                               }
-                                              failure:nil];
-        
+                                              failure:^(NSURLRequest *request,
+                                                        NSHTTPURLResponse *response,
+                                                        NSError *error)
+                                              {
+                                                  // cache placeholder image instead so we don't repeatedly
+                                                  // hit the server looking for stuff that doesn't exist
+                                                  if (self.placeholderImage) {
+                                                      [_imageCache setObject:self.placeholderImage
+                                                                      forKey:authorId];
+                                                  }
+                                              }];
         [self.operationQueue addOperation:operation];
 #ifdef CACHE_SCALED_IMAGES
     }
