@@ -12,6 +12,7 @@
 @interface LFSHeader : NSObject
 
 @property (strong, nonatomic) UIImage *iconImage;
+@property (copy, nonatomic) NSString *iconImageURL;
 @property (copy, nonatomic) NSString *attributeString;
 @property (copy, nonatomic) NSString *mainString;
 @property (copy, nonatomic) NSString *detailString;

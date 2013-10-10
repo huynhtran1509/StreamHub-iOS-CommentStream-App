@@ -38,6 +38,9 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 @implementation LFSContentKeyEnumerator
 
+@synthesize array = _array;
+@synthesize index = _index;
+
 - (id)initWithObjects:(NSArray *)array
 {
     self = [super init];
@@ -182,7 +185,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     {
         // dealing with regular content here
         LFSContent *oldContent = _mapping[key];
-        if (oldContent) {
+        if (oldContent)
+        {
             // update content
             content = [[LFSContent alloc] initWithObject:oldContent];
             [content setObject:object];
@@ -320,7 +324,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return self;
 }
 
-- (id)objectForKey:(id<NSCopying>)key
+- (id)objectForKey:(id)key
 {
     return _mapping[key];
 }

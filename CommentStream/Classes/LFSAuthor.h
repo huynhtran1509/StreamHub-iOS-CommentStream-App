@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface LFSAuthor : NSObject
 
@@ -25,8 +26,6 @@
 -(id)initWithObject:(id)object;
 
 @property (nonatomic, strong) id object;
-
-@property (nonatomic, strong) UIImage *avatarImage;
 
 // Note: use lazy instantiation here
 @property (nonatomic, copy) NSString *displayName;

@@ -14,6 +14,7 @@
 @synthesize detailString = _detailString;
 @synthesize iconImage = _iconImage;
 @synthesize mainString = _mainString;
+@synthesize iconImageURL = _iconImageURL;
 
 -(id)initWithDetailString:(NSString*)detailString
           attributeString:(NSString*)attributeString

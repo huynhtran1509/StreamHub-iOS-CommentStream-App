@@ -9,6 +9,7 @@
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
+#import <AFNetworking/UIImageView+AFNetworking.h>
 
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
@@ -89,6 +90,12 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 #pragma mark - Properties
 
 @synthesize delegate = _delegate;
+@synthesize profileLocal = _profileLocal;
+@synthesize profileRemote = _profileRemote;
+@synthesize contentRemote = _contentRemote;
+
+@synthesize contentBodyHtml = _contentBodyHtml;
+@synthesize contentDate = _contentDate;
 
 #pragma mark -
 @synthesize button1 = _button1;
@@ -605,8 +612,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     }
 
     // layout avatar view
-    [self.headerImageView setImage:profileLocal.iconImage];
-    
+    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconImageURL]
+                         placeholderImage:profileLocal.iconImage];
 }
 
 -(CGSize)contentSizeThatFits:(CGSize)size

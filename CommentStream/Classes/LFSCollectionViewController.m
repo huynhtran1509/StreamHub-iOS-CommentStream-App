@@ -570,6 +570,13 @@ const static CGFloat kStatusBarHeight = 20.f;
     }
 }
 
+/*
+-(void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Optionally kill the image request operation here as the image is no longer needed
+}
+*/
+
 #pragma mark - Table and cell helpers
 
 // called every time a cell is configured
@@ -610,67 +617,58 @@ const static CGFloat kStatusBarHeight = 20.f;
         [cell.imageView setImage:self.placeholderImage];
         NSURLRequest *request = [NSURLRequest requestWithURL:
                                  [NSURL URLWithString:author.avatarUrlString75]];
-        AFImageRequestOperation* operation = [AFImageRequestOperation
-                                              imageRequestOperationWithRequest:request
-                                              imageProcessingBlock:nil
-                                              success:^(NSURLRequest *req,
-                                                        NSHTTPURLResponse *response,
-                                                        UIImage *image)
-                                              {
-                                                  [content.author setAvatarImage:image];
-                                                  [self scaleImage:image forContent:content];
-                                              }
-                                              failure:nil];
         
+        // set up the NSOperation here
+        AFImageRequestOperation* operation =
+        [AFImageRequestOperation
+         imageRequestOperationWithRequest:request
+         imageProcessingBlock:^UIImage *(UIImage *image)
+         {
+             // scale down image
+             CGRect targetRect;
+             targetRect.origin = CGPointZero;
+             targetRect.size = kCellImageViewSize;
+             
+             // don't call UIGraphicsBeginImageContext when supporting Retina,
+             // instead call UIGraphicsBeginImageContextWithOptions with zero
+             // for scale
+             UIGraphicsBeginImageContextWithOptions(kCellImageViewSize, YES, 0.f);
+             [image drawInRect:targetRect];
+             UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
+             UIGraphicsEndImageContext();
+             [_imageCache setObject:processedImage forKey:authorId];
+             return processedImage;
+         }
+         success:^(NSURLRequest *req,
+                   NSHTTPURLResponse *response,
+                   UIImage *image)
+         {
+             // we are on the main thead here -- display the image
+             NSUInteger row = [_content indexOfObject:content];
+             
+             LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0u]];
+             if (cell) {
+                 [cell.imageView setImage:image];
+                 [cell setNeedsLayout];
+             }
+         }
+         failure:^(NSURLRequest *request,
+                   NSHTTPURLResponse *response,
+                   NSError *error)
+         {
+             // cache placeholder image instead so we don't repeatedly
+             // hit the server looking for stuff that doesn't exist
+             if (self.placeholderImage) {
+                 [_imageCache setObject:self.placeholderImage
+                                 forKey:authorId];
+             }
+         }];
+        
+        // add operation to queue
         [self.operationQueue addOperation:operation];
 #ifdef CACHE_SCALED_IMAGES
     }
 #endif
-}
-
-- (void)scaleImage:(UIImage*)image forContent:(LFSContent*)content
-{
-    CGRect targetRect;
-    targetRect.origin = CGPointZero;
-    targetRect.size = kCellImageViewSize;
-    
-#ifdef CACHE_SCALED_IMAGES
-    const NSString* const authorId = content.author.idString;
-#endif
-    
-    dispatch_queue_t queue =
-    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0.f);
-    dispatch_async(queue, ^{
-        
-        // scale image on a background thread
-        // Note: this will not preserve aspect ratio
-        UIImage *scaledImage;
-#ifdef CACHE_SCALED_IMAGES
-        scaledImage = [_imageCache objectForKey:authorId];
-        if (scaledImage == nil) {
-#endif
-            // don't call UIGraphicsBeginImageContext when supporting Retina,
-            // instead call UIGraphicsBeginImageContextWithOptions with zero for scale
-            UIGraphicsBeginImageContextWithOptions(kCellImageViewSize, YES, 0.f);
-            [image drawInRect:targetRect];
-            scaledImage = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            
-#ifdef CACHE_SCALED_IMAGES
-        }
-        [_imageCache setObject:scaledImage forKey:authorId];
-#endif
-        // display image on the main thread
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSUInteger row = [_content indexOfObject:content];
-            
-            LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0u]];
-            if (cell) {
-                [cell.imageView setImage:scaledImage];
-                [cell setNeedsLayout];
-            }
-        });
-    });
 }
 
 #pragma mark - Navigation
@@ -689,8 +687,10 @@ const static CGFloat kStatusBarHeight = 20.f;
                 
                 // assign model object(s)
                 LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
+                UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
+                                          ?: self.placeholderImage);
                 [vc setContentItem:contentItem];
-                [vc setAvatarImage:contentItem.author.avatarImage ?: self.placeholderImage];
+                [vc setAvatarImage:avatarPreview];
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
                 [vc setHideStatusBar:self.prefersStatusBarHidden];
