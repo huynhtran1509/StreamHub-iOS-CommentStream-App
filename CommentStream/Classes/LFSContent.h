@@ -61,6 +61,7 @@
 @property (nonatomic, strong) NSDate *contentCreatedAt;
 @property (nonatomic, strong) NSNumber *eventId;
 
+@property (nonatomic, assign) LFSContentVisibility lastVis;
 @property (nonatomic, assign) LFSContentVisibility visibility;
 @property (nonatomic, assign) LFSContentType contentType;
 @property (nonatomic, assign) NSUInteger contentSource;

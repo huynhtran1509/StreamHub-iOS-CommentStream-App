@@ -9,6 +9,7 @@
 #import "LFSContent.h"
 
 @implementation LFSContent {
+    BOOL _lastVisIsSet;
     BOOL _visibilityIsSet;
     BOOL _contentTypeIsSet;
     BOOL _contentSourceIsSet;
@@ -306,6 +307,17 @@ static NSString* const kLFSSourceImageMap[] = {
 }
 
 #pragma mark -
+@synthesize lastVis = _lastVis;
+-(LFSContentVisibility)lastVis
+{
+    const static NSString* const key = @"lastVis";
+    if (!_lastVisIsSet) {
+        _lastVis = [[_object objectForKey:key] unsignedIntegerValue];
+    }
+    return _lastVis;
+}
+
+#pragma mark -
 @synthesize visibility = _visibility;
 -(LFSContentVisibility)visibility
 {
@@ -459,6 +471,7 @@ static NSString* const kLFSSourceImageMap[] = {
     _contentType = LFSContentTypeMessage;
     _contentSource = 0u;
     
+    _lastVisIsSet = NO;
     _visibilityIsSet = NO;
     _contentSourceIsSet = NO;
     _contentTypeIsSet = NO;
