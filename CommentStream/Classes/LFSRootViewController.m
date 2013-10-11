@@ -20,7 +20,7 @@
 @end
 
 // some module-level constants
-static NSString* const kCellReuseIdentifier = @"Cell";
+static NSString* const kAttributedCellReuseIdentifier = @"Cell";
 static NSString* const kCellSelectSegue = @"collectionView";
 
 @implementation LFSRootViewController
@@ -118,12 +118,12 @@ static NSString* const kCellSelectSegue = @"collectionView";
 - (UITableViewCell *)tableView:(UITableView *)tableView
          cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellReuseIdentifier
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kAttributedCellReuseIdentifier
                                                             forIndexPath:indexPath];
     
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                      reuseIdentifier:kCellReuseIdentifier];
+                                      reuseIdentifier:kAttributedCellReuseIdentifier];
         
     }
     // Configure the cell...

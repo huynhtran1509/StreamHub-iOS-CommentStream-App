@@ -55,7 +55,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 - (id)nextObject
 {
     if (_index > 0) {
-        LFSContent *content = _array[--_index];
+        LFSContent *content = [_array objectAtIndex:--_index];
         return content.idString;
     } else {
         return nil;
@@ -114,27 +114,36 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return [self indexOfObject:content];
 }
 
--(void)insertContentObject:(LFSContent*)content
+-(NSInteger)insertObject:(LFSContent*)object
 {
+    return [self insertObject:object forKey:[(LFSContent*)object idString]];
+}
+
+-(NSInteger)insertObject:(LFSContent*)object forKey:(id<NSCopying>)key
+{
+    // first insert into the dictionary
+    NSAssert([_mapping objectForKey:key] == nil, @"Pre-existing object found");
+    [_mapping setObject:object forKey:key];
+    
     // prepare our nested enumeration data
-    if (content.contentParentId == nil
-        || [self objectForKey:content.contentParentId] == nil)
+    if (object.contentParentId == nil
+        || [self objectForKey:object.contentParentId] == nil)
     {
         // either no nesting or parent does not exist in memory
-        content.datePath = [[NSMutableArray alloc] initWithObjects:content.contentCreatedAt, nil];
+        object.datePath = [[NSMutableArray alloc] initWithObjects:object.contentCreatedAt, nil];
     }
     else
     {
         // have nesting
-        LFSContent *parent = [self objectForKey:content.contentParentId];
+        LFSContent *parent = [self objectForKey:object.contentParentId];
         NSAssert(parent.datePath != nil, @"evenPath cannot be nil");
         NSMutableArray *array = [parent.datePath mutableCopy];
-        [array addObject:content.contentCreatedAt];
-        [content setDatePath:array];
+        [array addObject:object.contentCreatedAt];
+        [object setDatePath:array];
     }
-
+    
     // determine the correct index to insert the object into
-    NSUInteger index = [_array indexOfObject:content
+    NSUInteger index = [_array indexOfObject:object
                                inSortedRange:NSMakeRange(0u, [_array count])
                                      options:NSBinarySearchingInsertionIndex
                              usingComparator:^NSComparisonResult(LFSContent *obj1,
@@ -142,7 +151,26 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
                         {
                             return [obj2 compare:obj1];
                         }];
-    [_array insertObject:content atIndex:index];
+    [_array insertObject:object atIndex:index];
+    return 1;
+}
+
+-(NSInteger)removeObject:(id)object
+{
+    return [self removeObject:object forKey:[(LFSContent*)object idString]];
+}
+
+-(NSInteger)removeObject:(id)object forKey:(id)key
+{
+    // this our own made-up method for cases when
+    // both the object and its key are known
+    
+    //NSAssert([[(LFSContent*)object idString] isEqualToString:key],
+    //         @"Object key must match parameter passed");
+    [_mapping removeObjectForKey:key];
+    NSUInteger index = [self indexOfObject:object];
+    [_array removeObjectAtIndex:index];
+    return -1;
 }
 
 -(void)updateLastEventWithContent:(LFSContent*)content
@@ -174,101 +202,126 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
-- (void)setObject:(id)object forKey:(id<NSCopying>)key
+- (NSInteger)setObject:(id)object forKey:(id<NSCopying>)key
 {
     // check if object is of appropriate type
-    LFSContent *content = [[LFSContent alloc] initWithObject:object];
+    LFSContent *content = ([object isKindOfClass:[LFSContent class]]
+                           ? object
+                           : [[LFSContent alloc] initWithObject:object]);
     [self updateLastEventWithContent:content];
     
-    if (content.contentType == LFSContentTypeMessage &&
-        content.visibility == LFSContentVisibilityEveryone)
+    NSUInteger count = 0;
+    LFSContentType contentType = content.contentType;
+    if (contentType == LFSContentTypeMessage)
     {
         // dealing with regular content here
-        LFSContent *oldContent = _mapping[key];
+        LFSContent *oldContent = [_mapping objectForKey:key];
         if (oldContent)
         {
-            // update content
-            content = [[LFSContent alloc] initWithObject:oldContent];
-            [content setObject:object];
-            // not setting the array -- it should already contain the object
-        } else {
-            [self insertContentObject:content];
+            // have pre-existing content
+            if (content.visibility == LFSContentVisibilityEveryone ||
+                (content.childContent != nil && [content.childContent count] > 0u))
+            {
+                // "deleted" comment are allowed in only if they have children
+                content = [[LFSContent alloc] initWithObject:oldContent];
+                [content setObject:object];
+                // not setting the array -- it should already contain the object
+                
+                // important: add child content *after* adding current object
+                // to the mapping structure
+                [_mapping setObject:content forKey:key];
+                count = [self addChildContent:content];
+                [self changeNodeCountOf:content byDelta:count];
+            }
+            else
+            {
+                // visibility is none and no children -- delete comment
+                count = -1;
+                [self changeNodeCountOf:oldContent byDelta:count];
+            }
         }
-        
-        // important: add child content *after* adding current object
-        // to the mapping structure
-        _mapping[key] = content;
-        [self addChildContent:content];
+        else if (content.visibility == LFSContentVisibilityEveryone ||
+                 (content.childContent != nil && [content.childContent count] > 0u))
+        {
+            // important: add child content *after* adding current object
+            // to the mapping structure
+            count = ([self insertObject:content forKey:key] +
+                     [self addChildContent:content]);
+            [self changeNodeCountOf:content byDelta:count];
+        }
+        // Note: "delete" objects are accepted and processed only in case of pre-existing
+        // objects or if the objects being added have child content
     }
-    else if (content.contentType == LFSContentTypeOpine)
+    else if (contentType == LFSContentTypeOpine)
     {
         // dealing with an opine
         [self registerOpineWithContent:content];
     }
+    return count;
 }
 
-- (void)addObject:(id)anObject
+-(void)changeNodeCountOf:(LFSContent*)content byDelta:(NSInteger)delta
+{
+    // recursively change (with optional removal) the node count of this node
+    // and of all parent nodes above it
+    if (delta == 0) {
+        return;
+    }
+    content.nodeCount += delta;
+    id<NSCopying> parentKey = content.contentParentId;
+    if (content.nodeCount < 1) {
+        [self removeObject:content];
+    }
+    while (parentKey) {
+        LFSContent *tmp = [_mapping objectForKey:parentKey];
+        if (tmp) {
+            tmp.nodeCount += delta;
+            parentKey = tmp.contentParentId;
+            if (tmp.nodeCount < 1) {
+                [self removeObject:tmp];
+            }
+        } else {
+            parentKey = nil;
+        }
+    }
+}
+
+- (NSInteger)addObject:(id)anObject
 {
     // check if object is of appropriate type
     LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
-    [self updateLastEventWithContent:content];
-    
-    if (content.contentType == LFSContentTypeMessage &&
-        content.visibility == LFSContentVisibilityEveryone)
-    {
-        // dealing with regular content here
-        id<NSCopying> key = content.idString;
-        LFSContent *oldContent = _mapping[key];
-        if (oldContent)
-        {
-            // update content
-            content = [[LFSContent alloc] initWithObject:oldContent];
-            [content setObject:anObject];
-            // not setting the array -- it should already contain the object
-        } else {
-            [self insertContentObject:content];
-        }
-        
-        // important: add child content *after* adding current object
-        // to the mapping structure
-        _mapping[key] = content;
-        [self addChildContent:content];
-    }
-    else if (content.contentType == LFSContentTypeOpine)
-    {
-        // dealing with an opine
-        [self registerOpineWithContent:content];
-    }
+    return [self setObject:content forKey:content.idString];
 }
 
-- (void)addChildContent:(LFSContent*)content
+- (NSInteger)addChildContent:(LFSContent*)content
 {
     // Purpose: recursively add all children
     //
-    // Note: there is no need to add children in deterministic order,
-    // so we use concurrent enumeration
-    //
     id childContent = content.childContent;
+    __block NSInteger count = 0;
     if (childContent != nil) {
         if ([childContent isKindOfClass:[NSArray class]]) {
             [childContent
              enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                 [self addObject:obj];
+                 count += [self addObject:obj];
              }];
         } else if ([childContent isKindOfClass:[NSDictionary class]]) {
             [childContent
              enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent
              usingBlock:^(id<NSCopying> key, id obj, BOOL *stop)
              {
-                 [self setObject:obj forKey:key];
+                 count += [self setObject:obj forKey:key];
              }];
         } else {
             [NSException raise:@"Uknown childContent type"
                         format:@"Child content type %@ while expected NSArray or NSDictionary",
              [childContent class]];
+            count = 0;
         }
     }
+    return count;
 }
+
 
 #pragma mark - Description
 
@@ -293,9 +346,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 }
 
 
-
 #pragma mark - NSDictionary primitives
-
 
 - (NSUInteger)count
 {
@@ -326,12 +377,12 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (id)objectForKey:(id)key
 {
-    return _mapping[key];
+    return [_mapping objectForKey:key];
 }
 
 - (id)objectAtIndex:(NSUInteger)index
 {
-    return _array[index];
+    return [_array objectAtIndex:index];
 }
 
 - (NSEnumerator *)keyEnumerator
@@ -409,7 +460,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [self.likes setObject:authors forKey:content.idString];
     }
     [content setLikes:authors];
-    return self.array[index];
+    return [self.array objectAtIndex:index];
 }
 
 
@@ -461,23 +512,27 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
      }];
 }
 
+-(void)removeObject:(id)object
+{
+    [super removeObject:object];
+}
+
 - (void)removeObjectAtIndex:(NSUInteger)index
 {
-    LFSContent *object = [self.array objectAtIndex:index];
-    [self.mapping removeObjectForKey:object.idString];
-    [self.array removeObjectAtIndex:index];
+    id object = [self.array objectAtIndex:index];
+    [super removeObject:object];
 }
 
 - (void)removeObjectForKey:(id<NSCopying>)key
 {
-    LFSContent *object = [self.mapping objectForKey:key];
-    [self.mapping removeObjectForKey:key];
-    [self.array removeObject:object];
+    [self removeObject:[self.mapping objectForKey:key]
+                forKey:key];
 }
 
 - (void)removeAllObjects
 {
-    [self removeObjectsForKeys:[self allKeys]];
+    [self.mapping removeAllObjects];
+    [self.array removeAllObjects];
 }
  
 - (void)removeObjectsForKeys:(NSArray *)keyArray
