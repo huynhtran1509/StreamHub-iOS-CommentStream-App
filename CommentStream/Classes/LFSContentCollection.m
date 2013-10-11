@@ -223,15 +223,11 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
                 (content.childContent != nil && [content.childContent count] > 0u))
             {
                 // "deleted" comment are allowed in only if they have children
-                content = [[LFSContent alloc] initWithObject:oldContent];
-                [content setObject:object];
+                [oldContent setObject:content.object];
                 // not setting the array -- it should already contain the object
                 
-                // important: add child content *after* adding current object
-                // to the mapping structure
-                [_mapping setObject:content forKey:key];
-                count = [self addChildContent:content];
-                [self changeNodeCountOf:content byDelta:count];
+                count = [self addChildContent:oldContent];
+                [self changeNodeCountOf:oldContent byDelta:count];
             }
             else
             {
