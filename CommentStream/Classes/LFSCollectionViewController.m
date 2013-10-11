@@ -610,6 +610,7 @@ const static CGFloat kStatusBarHeight = 20.f;
                                                                alpha:1.f]];
             [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
             [cell.imageView setContentMode:UIViewContentModeCenter];
+            [cell.textLabel setNumberOfLines:0]; // wrap text automatically
             [cell.textLabel setText:@"This comment has been removed"];
             [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
             [cell.textLabel setTextColor:[UIColor lightGrayColor]];
