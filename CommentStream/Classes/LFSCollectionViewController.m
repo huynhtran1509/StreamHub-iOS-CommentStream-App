@@ -19,6 +19,7 @@
 
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
+#import "LFSDeletedCell.h"
 #import "LFSCollectionViewController.h"
 #import "LFSDetailViewController.h"
 #import "LFSTextField.h"
@@ -45,7 +46,8 @@
 @end
 
 // some module-level constants
-static NSString* const kCellReuseIdentifier = @"LFSContentCell";
+static NSString* const kAttributedCellReuseIdentifier = @"LFSAttributedCell";
+static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 static NSString* const kCellSelectSegue = @"detailView";
 const static char kContentCellHeightKey;
 const static CGFloat kGenerationOffset = 20.f;
@@ -210,7 +212,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
-
+    
     _placeholderImage = [UIImage imageWithColor:
                          [UIColor colorWithRed:232.f / 255.f
                                          green:236.f / 255.f
@@ -463,32 +465,49 @@ const static CGFloat kStatusBarHeight = 20.f;
 
 #pragma mark - UITableViewControllerDelegate
 
+-(NSIndexPath*)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    return (content.visibility == LFSContentVisibilityEveryone) ? indexPath : nil;
+}
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    if (content.visibility == LFSContentVisibilityEveryone) {
+        
+        // TODO: no need to get cell from index and back if we are not using segues
+        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+        [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
+    }
 }
 
 // disable this method to get static height = better performance
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    LFSContent *content = [_content objectAtIndex:indexPath.row];
-    NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
     CGFloat cellHeightValue;
-    
-    if (cellHeight == nil) {
-        CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
-        cellHeightValue = [LFSAttributedTextCell
-                           cellHeightForBoundsWidth:tableView.bounds.size.width
-                           withHTMLString:content.contentBodyHtml
-                           withLeftOffset:leftOffset];
-        objc_setAssociatedObject(content, &kContentCellHeightKey,
-                                 [NSNumber numberWithFloat:cellHeightValue],
-                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
+    if (content.visibility == LFSContentVisibilityEveryone) {
+        NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
+        
+        
+        if (cellHeight == nil) {
+
+            cellHeightValue = [LFSAttributedTextCell
+                               cellHeightForBoundsWidth:tableView.bounds.size.width
+                               withHTMLString:content.contentBodyHtml
+                               withLeftOffset:leftOffset];
+            objc_setAssociatedObject(content, &kContentCellHeightKey,
+                                     [NSNumber numberWithFloat:cellHeightValue],
+                                     OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        } else {
+            cellHeightValue = [cellHeight floatValue];
+        }
     } else {
-        cellHeightValue = [cellHeight floatValue];
+        cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
+                                                    withLeftOffset:leftOffset];
     }
-    
     return cellHeightValue;
 }
 
@@ -497,28 +516,13 @@ const static CGFloat kStatusBarHeight = 20.f;
     return [_content count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    LFSAttributedTextCell *cell;
-
-    cell = (LFSAttributedTextCell *)[tableView dequeueReusableCellWithIdentifier:
-                                     kCellReuseIdentifier];
-    
-    if (!cell) {
-        cell = [[LFSAttributedTextCell alloc]
-                initWithReuseIdentifier:kCellReuseIdentifier];
-    }
-    
-    [self configureCell:cell atIndexPath:indexPath];
-    return cell;
-}
-
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // TODO: find out which content was created by current user
     // and only return "YES" for cells displaying that content
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
-    return (userToken != nil);
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    return (userToken != nil && content.visibility == LFSContentVisibilityEveryone);
 }
 
 // Overriding this will enable "swipe to delete" gesture
@@ -577,13 +581,52 @@ const static CGFloat kStatusBarHeight = 20.f;
 }
 */
 
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    LFSContent *content = [_content objectAtIndex:indexPath.row];
+    id returnedCell;
+    
+    if (content.visibility == LFSContentVisibilityEveryone) {
+        LFSAttributedTextCell *cell = (LFSAttributedTextCell*)[tableView dequeueReusableCellWithIdentifier:
+                                         kAttributedCellReuseIdentifier];
+        
+        if (!cell) {
+            cell = [[LFSAttributedTextCell alloc]
+                    initWithReuseIdentifier:kAttributedCellReuseIdentifier];
+        }
+        [self configureAttributedCell:cell forContent:content];
+        returnedCell = cell;
+    }
+    else
+    {
+        LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
+                                         kDeletedCellReuseIdentifier];
+        if (!cell) {
+            cell = [[LFSDeletedCell alloc]
+                    initWithReuseIdentifier:kDeletedCellReuseIdentifier];
+            [cell.imageView setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
+                                                               green:(217.f/255.f)
+                                                                blue:(217.f/255.f)
+                                                               alpha:1.f]];
+            [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
+            [cell.imageView setContentMode:UIViewContentModeCenter];
+            [cell.textLabel setText:@"This comment has been removed"];
+            [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
+            [cell.textLabel setTextColor:[UIColor lightGrayColor]];
+        }
+        // configure each cell
+        [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
+        returnedCell = cell;
+    }
+    
+    return returnedCell;
+}
+
 #pragma mark - Table and cell helpers
 
 // called every time a cell is configured
-- (void)configureCell:(LFSAttributedTextCell *)cell atIndexPath:(NSIndexPath *)indexPath
+- (void)configureAttributedCell:(LFSAttributedTextCell*)cell forContent:(LFSContent*)content
 {
-    LFSContent *content = [_content objectAtIndex:indexPath.row];
-    
     [cell setHTMLString:content.contentBodyHtml];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];

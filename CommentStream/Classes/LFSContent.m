@@ -89,6 +89,7 @@ static NSString* const kLFSSourceImageMap[] = {
 
 @synthesize datePath = _datePath;
 @synthesize likes = _likes;
+@synthesize nodeCount = _nodeCount;
 
 @synthesize object = _object;
 -(void)setObject:(id)object
@@ -428,6 +429,7 @@ static NSString* const kLFSSourceImageMap[] = {
             [self resetCached];
             _object = object;
             _datePath = nil;
+            _nodeCount = 0;
         }
     }
     return self;
@@ -466,10 +468,6 @@ static NSString* const kLFSSourceImageMap[] = {
     _contentCreatedAt = nil;
     _childContent = nil;
     _eventId = nil;
-    
-    _visibility = LFSContentVisibilityNone;
-    _contentType = LFSContentTypeMessage;
-    _contentSource = 0u;
     
     _lastVisIsSet = NO;
     _visibilityIsSet = NO;

@@ -46,7 +46,9 @@
 @property (nonatomic, readonly) NSString *contentTwitterUrlString;
 
 @property (nonatomic, strong) LFSAuthor *author;
+
 @property (nonatomic, strong) id childContent;
+@property (nonatomic, assign) NSInteger nodeCount;
 
 @property (nonatomic, copy) NSDictionary *content;
 @property (nonatomic, copy) NSString *idString;

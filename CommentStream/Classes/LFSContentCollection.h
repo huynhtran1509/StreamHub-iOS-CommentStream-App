@@ -29,15 +29,18 @@
 + (id)dictionaryWithCapacity:(NSUInteger)count;
 - (id)initWithCapacity:(NSUInteger)count;
 
-- (void)removeObjectAtIndex:(NSUInteger)index;
 - (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary;
-- (void)removeAllObjects;
 - (void)setDictionary:(NSDictionary *)otherDictionary;
 - (void)setObject:(id)object forKey:(id<NSCopying>)key;
-- (void)removeObjectForKey:(id<NSCopying>)key;
-- (void)removeObjectsForKeys:(NSArray *)keyArray;
+
 - (void)addObjectsFromArray:(NSArray*)array;
 - (void)addObject:(id)anObject;
+
+- (void)removeObject:(id)object;
+- (void)removeObjectAtIndex:(NSUInteger)index;
+- (void)removeObjectForKey:(id<NSCopying>)key;
+- (void)removeObjectsForKeys:(NSArray *)keyArray;
+- (void)removeAllObjects;
 
 /* other stuff */
 @property (nonatomic, strong) id authors;

@@ -11,6 +11,7 @@
 		EF1179D117B5BE3F00D59E54 /* LFSConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF1179D017B5BE3F00D59E54 /* LFSConfig.plist */; };
 		EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */; };
 		EF2251E417F21295006482BD /* LFSContent.m in Sources */ = {isa = PBXBuildFile; fileRef = EF2251E317F21295006482BD /* LFSContent.m */; };
+		EF4CC0A3180810470042DB40 /* LFSDeletedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF4CC0A2180810470042DB40 /* LFSDeletedCell.m */; };
 		EF529E3B17F39ECF00836ACE /* LFSContentToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */; };
 		EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED217E3C13000D5A7DF /* LFSDetailViewController.m */; };
 		EF5AFED617E3C2B900D5A7DF /* LFSPostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5AFED517E3C2B900D5A7DF /* LFSPostViewController.m */; };
@@ -47,6 +48,8 @@
 		EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSAttributedTextCell.m; path = Classes/LFSAttributedTextCell.m; sourceTree = "<group>"; };
 		EF2251E217F21295006482BD /* LFSContent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSContent.h; path = Classes/LFSContent.h; sourceTree = "<group>"; };
 		EF2251E317F21295006482BD /* LFSContent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSContent.m; path = Classes/LFSContent.m; sourceTree = "<group>"; };
+		EF4CC0A1180810470042DB40 /* LFSDeletedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDeletedCell.h; path = Classes/LFSDeletedCell.h; sourceTree = "<group>"; };
+		EF4CC0A2180810470042DB40 /* LFSDeletedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSDeletedCell.m; path = Classes/LFSDeletedCell.m; sourceTree = "<group>"; };
 		EF529E3917F39ECF00836ACE /* LFSContentToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSContentToolbar.h; path = Classes/LFSContentToolbar.h; sourceTree = "<group>"; };
 		EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSContentToolbar.m; path = Classes/LFSContentToolbar.m; sourceTree = "<group>"; };
 		EF5AFED117E3C13000D5A7DF /* LFSDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDetailViewController.h; path = Classes/LFSDetailViewController.h; sourceTree = "<group>"; };
@@ -234,6 +237,8 @@
 				EFD5BFD517EC604500C28880 /* LFSBasicHTMLLabel.m */,
 				EF200BCE17BBB63A007E5295 /* LFSAttributedTextCell.h */,
 				EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */,
+				EF4CC0A1180810470042DB40 /* LFSDeletedCell.h */,
+				EF4CC0A2180810470042DB40 /* LFSDeletedCell.m */,
 				EF62178017E8F76900700808 /* LFSTextField.h */,
 				EF62178117E8F76900700808 /* LFSTextField.m */,
 				EF529E3917F39ECF00836ACE /* LFSContentToolbar.h */,
@@ -368,6 +373,7 @@
 				EFCB940B17F141E500FB9384 /* LFSAuthor.m in Sources */,
 				EFE6FF2B180256E6008351DD /* UIImage+LFSColor.m in Sources */,
 				EFC4F61317DFC35C00E60F6F /* LFSRootViewController.m in Sources */,
+				EF4CC0A3180810470042DB40 /* LFSDeletedCell.m in Sources */,
 				EF7BB6E817B2B718009E2E70 /* main.m in Sources */,
 				EF62178217E8F76900700808 /* LFSTextField.m in Sources */,
 				EFC9574E17CE968B0033C858 /* LFSConfig.m in Sources */,
