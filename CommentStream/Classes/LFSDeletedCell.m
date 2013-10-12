@@ -60,19 +60,7 @@ static const CGFloat kDeletedCellHeaderTitleFontSize = 12.f;
     {
         // initialize subview references
         _leftOffset = 0.f;
-        
-        if (LFS_SYSTEM_VERSION_LESS_THAN(LFSSystemVersion70))
-        {
-            // iOS7-like selected background color
-            [self setSelectionStyle:UITableViewCellSelectionStyleGray];
-            UIView *selectionColor = [[UIView alloc] init];
-            [selectionColor setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
-                                                               green:(217.f/255.f)
-                                                                blue:(217.f/255.f)
-                                                               alpha:1.f]];
-            [self setSelectedBackgroundView:selectionColor];
-        }
-        
+        [self setSelectionStyle:UITableViewCellSelectionStyleNone];
         [self.imageView setContentMode:UIViewContentModeScaleToFill];
         [self.imageView.layer setCornerRadius:kDeletedCellImageCornerRadius];
         [self.imageView.layer setMasksToBounds:YES];
