@@ -468,14 +468,20 @@ const static CGFloat kStatusBarHeight = 20.f;
 -(NSIndexPath*)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    return (content.visibility == LFSContentVisibilityEveryone) ? indexPath : nil;
+    LFSContentVisibility visibility = content.visibility;
+    return ((visibility != LFSContentVisibilityNone &&
+             visibility != LFSContentVisibilityPendingDelete)
+            ? indexPath
+            : nil);
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    if (content.visibility == LFSContentVisibilityEveryone) {
-        
+    LFSContentVisibility visibility = content.visibility;
+    if (visibility != LFSContentVisibilityNone &&
+        visibility != LFSContentVisibilityPendingDelete)
+    {
         // TODO: no need to get cell from index and back if we are not using segues
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
         [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
@@ -488,12 +494,13 @@ const static CGFloat kStatusBarHeight = 20.f;
     CGFloat cellHeightValue;
     LFSContent *content = [_content objectAtIndex:indexPath.row];
     CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
-    if (content.visibility == LFSContentVisibilityEveryone) {
+    LFSContentVisibility visibility = content.visibility;
+    if (visibility != LFSContentVisibilityNone &&
+        visibility != LFSContentVisibilityPendingDelete)
+    {
         NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
-        
-        
-        if (cellHeight == nil) {
-
+        if (cellHeight == nil)
+        {
             cellHeightValue = [LFSAttributedTextCell
                                cellHeightForBoundsWidth:tableView.bounds.size.width
                                withHTMLString:content.contentBodyHtml
@@ -501,10 +508,14 @@ const static CGFloat kStatusBarHeight = 20.f;
             objc_setAssociatedObject(content, &kContentCellHeightKey,
                                      [NSNumber numberWithFloat:cellHeightValue],
                                      OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        } else {
+        }
+        else
+        {
             cellHeightValue = [cellHeight floatValue];
         }
-    } else {
+    }
+    else
+    {
         cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
                                                     withLeftOffset:leftOffset];
     }
@@ -522,7 +533,10 @@ const static CGFloat kStatusBarHeight = 20.f;
     // and only return "YES" for cells displaying that content
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    return (userToken != nil && content.visibility == LFSContentVisibilityEveryone);
+    LFSContentVisibility visibility = content.visibility;
+    return (userToken  != nil &&
+            visibility != LFSContentVisibilityNone &&
+            visibility != LFSContentVisibilityPendingDelete);
 }
 
 // Overriding this will enable "swipe to delete" gesture
