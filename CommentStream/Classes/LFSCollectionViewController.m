@@ -559,7 +559,26 @@ const static CGFloat kStatusBarHeight = 20.f;
                              inCollection:self.collectionId
                                 userToken:userToken
                                parameters:nil
-                                onSuccess:nil
+                                onSuccess:^(NSOperation *operation, id responseObject)
+             {
+                 NSString *newContentId = [responseObject objectForKey:@"comment_id"];
+                 NSAssert([newContentId isEqualToString:contentId], @"Wrong content Id received");
+                 LFSContent *newContent = [_content objectForKey:contentId];
+                 if (newContent != nil)
+                 {
+                     NSIndexPath *newIndexPath = [NSIndexPath
+                                                  indexPathForRow:[_content indexOfObject:newContent]
+                                                  inSection:0];
+                     
+                     [newContent setVisibility:LFSContentVisibilityNone];
+                     
+                     UITableView *tableView = self.tableView;
+                     [tableView beginUpdates];
+                     [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:newIndexPath, nil]
+                                      withRowAnimation:UITableViewRowAnimationFade];
+                     [tableView endUpdates];
+                 }
+             }
                                 onFailure:^(NSOperation *operation, NSError *error)
              {
                  // show an error message
@@ -575,13 +594,14 @@ const static CGFloat kStatusBarHeight = 20.f;
                  // because it is conceivable that the streaming client has already deleted
                  // the content object
                  LFSContent *newContent = [_content objectForKey:contentId];
-                 
-                 // obtain new index path since it could have changed during the time
-                 // it toook for the error response to come back
-                 NSIndexPath *newIndexPath = [NSIndexPath
-                                              indexPathForRow:[_content indexOfObject:newContent]
-                                              inSection:0];
-                 if (newContent != nil) {
+                 if (newContent != nil)
+                 {
+                     // obtain new index path since it could have changed during the time
+                     // it toook for the error response to come back
+                     NSIndexPath *newIndexPath = [NSIndexPath
+                                                  indexPathForRow:[_content indexOfObject:newContent]
+                                                  inSection:0];
+                     
                      [newContent setVisibility:visibility];
                      
                      UITableView *tableView = self.tableView;
