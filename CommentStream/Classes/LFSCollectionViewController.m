@@ -637,7 +637,7 @@ const static CGFloat kStatusBarHeight = 20.f;
         // configure each cell
         [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
         [cell.textLabel setText:(visibility == LFSContentVisibilityPendingDelete
-                                 ? @"This comment is being removed"
+                                 ? @"This comment is being removed…"
                                  : @"This comment has been removed")];
         returnedCell = cell;
     }
