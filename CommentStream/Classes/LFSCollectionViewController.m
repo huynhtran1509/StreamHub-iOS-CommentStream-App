@@ -580,7 +580,7 @@ const static CGFloat kStatusBarHeight = 20.f;
             
             // the block below will result in the standard content cell being replaced by a
             // "this comment has been removed" cell.
-            [content setVisibility:LFSContentVisibilityNone];
+            [content setVisibility:LFSContentVisibilityPendingDelete];
             
             UITableView *tableView = self.tableView;
             [tableView beginUpdates];
@@ -613,23 +613,14 @@ const static CGFloat kStatusBarHeight = 20.f;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
+    LFSContentVisibility visibility = content.visibility;
     id returnedCell;
     
-    if (content.visibility == LFSContentVisibilityEveryone) {
-        LFSAttributedTextCell *cell = (LFSAttributedTextCell*)[tableView dequeueReusableCellWithIdentifier:
-                                         kAttributedCellReuseIdentifier];
-        
-        if (!cell) {
-            cell = [[LFSAttributedTextCell alloc]
-                    initWithReuseIdentifier:kAttributedCellReuseIdentifier];
-        }
-        [self configureAttributedCell:cell forContent:content];
-        returnedCell = cell;
-    }
-    else
+    if (visibility == LFSContentVisibilityNone ||
+        visibility == LFSContentVisibilityPendingDelete)
     {
         LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
-                                         kDeletedCellReuseIdentifier];
+                                                  kDeletedCellReuseIdentifier];
         if (!cell) {
             cell = [[LFSDeletedCell alloc]
                     initWithReuseIdentifier:kDeletedCellReuseIdentifier];
@@ -640,12 +631,24 @@ const static CGFloat kStatusBarHeight = 20.f;
             [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
             [cell.imageView setContentMode:UIViewContentModeCenter];
             [cell.textLabel setNumberOfLines:0]; // wrap text automatically
-            [cell.textLabel setText:@"This comment has been removed"];
             [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
             [cell.textLabel setTextColor:[UIColor lightGrayColor]];
         }
         // configure each cell
         [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
+        [cell.textLabel setText:(visibility == LFSContentVisibilityPendingDelete
+                                 ? @"This comment is being removed"
+                                 : @"This comment has been removed")];
+        returnedCell = cell;
+    }
+    else {
+        LFSAttributedTextCell *cell = (LFSAttributedTextCell*)[tableView dequeueReusableCellWithIdentifier:kAttributedCellReuseIdentifier];
+        
+        if (!cell) {
+            cell = [[LFSAttributedTextCell alloc]
+                    initWithReuseIdentifier:kAttributedCellReuseIdentifier];
+        }
+        [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
     }
     
