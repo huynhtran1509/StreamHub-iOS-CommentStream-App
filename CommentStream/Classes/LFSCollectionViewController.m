@@ -536,6 +536,10 @@ const static CGFloat kStatusBarHeight = 20.f;
             NSUInteger row = indexPath.row;
             LFSContent *content = [_content objectAtIndex:row];
             
+            // cache current visibility state in case we need to revert
+            LFSContentVisibility visibility = content.visibility;
+            NSString *contentId = content.idString;
+            
             [self.writeClient postMessage:LFSMessageDelete
                                forContent:content.idString
                              inCollection:self.collectionId
@@ -545,33 +549,56 @@ const static CGFloat kStatusBarHeight = 20.f;
                                 onFailure:^(NSOperation *operation, NSError *error)
              {
                  // show an error message
-                 UIAlertView *alert = [[UIAlertView alloc]
-                                       initWithTitle:kFailureDeleteTitle
-                                       message:[error localizedDescription]
-                                       delegate:nil
-                                       cancelButtonTitle:@"OK"
-                                       otherButtonTitles:nil];
-                 [alert show];
+                 [[[UIAlertView alloc]
+                   initWithTitle:kFailureDeleteTitle
+                   message:[error localizedDescription]
+                   delegate:nil
+                   cancelButtonTitle:@"OK"
+                   otherButtonTitles:nil] show];
+                 
+                 // check if an object with the cached id still exists in the model
+                 // and if so, revert to its previous visibility state. This check is necessary
+                 // because it is conceivable that the streaming client has already deleted
+                 // the content object
+                 LFSContent *newContent = [_content objectForKey:contentId];
+                 
+                 // obtain new index path since it could have changed during the time
+                 // it toook for the error response to come back
+                 NSIndexPath *newIndexPath = [NSIndexPath
+                                              indexPathForRow:[_content indexOfObject:newContent]
+                                              inSection:0];
+                 if (newContent != nil) {
+                     [newContent setVisibility:visibility];
+                     
+                     UITableView *tableView = self.tableView;
+                     [tableView beginUpdates];
+                     [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:newIndexPath, nil]
+                                      withRowAnimation:UITableViewRowAnimationFade];
+                     [tableView endUpdates];
+                 }
              }];
             
+            // the block below will result in the standard content cell being replaced by a
+            // "this comment has been removed" cell.
             [content setVisibility:LFSContentVisibilityNone];
-            [self.tableView beginUpdates];
-            [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
-                                  withRowAnimation:UITableViewRowAnimationFade];
-            [self.tableView endUpdates];
+            
+            UITableView *tableView = self.tableView;
+            [tableView beginUpdates];
+            [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
+                             withRowAnimation:UITableViewRowAnimationFade];
+            [tableView endUpdates];
         }
         else {
             // userToken is nil -- show an error message
             //
             // Note: Normally we never reach this block because we do not
             // allow editing for cells if our user token is nil
-            UIAlertView *alert = [[UIAlertView alloc]
-                                  initWithTitle:kFailureDeleteTitle
-                                  message:@"You do not have permission to delete comments in this collection"
-                                  delegate:nil
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil];
-            [alert show];
+            [[[UIAlertView alloc]
+              initWithTitle:kFailureDeleteTitle
+              message:@"You do not have permission to delete comments in this collection"
+              delegate:nil
+              cancelButtonTitle:@"OK"
+              otherButtonTitles:nil] show];
         }
     }
 }

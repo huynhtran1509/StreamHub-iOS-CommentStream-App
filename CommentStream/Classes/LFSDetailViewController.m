@@ -276,13 +276,12 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
          }];
     } else {
         // userToken is nil -- show an error message
-        UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:kFailureModifyTitle
-                              message:@"You do not have permission to like comments in this collection"
-                              delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil];
-        [alert show];
+        [[[UIAlertView alloc]
+          initWithTitle:kFailureModifyTitle
+          message:@"You do not have permission to like comments in this collection"
+          delegate:nil
+          cancelButtonTitle:@"OK"
+          otherButtonTitles:nil] show];
     }
 }
 
