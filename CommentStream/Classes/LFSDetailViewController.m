@@ -11,7 +11,6 @@
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
 #import "LFSDetailViewController.h"
-#import "LFSPostViewController.h"
 #import "LFSContentToolbar.h"
 
 @interface LFSDetailViewController ()
@@ -78,6 +77,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         _postCommentViewController =
         (LFSPostViewController*)[storyboard
                                  instantiateViewControllerWithIdentifier:kLFSPostCommentViewControllerId];
+        [_postCommentViewController setDelegate:self];
     }
     return _postCommentViewController;
 }
@@ -295,6 +295,12 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [self presentViewController:self.postCommentViewController
                        animated:YES
                      completion:nil];
+}
+
+#pragma mark - LFSPostViewControllerDelegate
+-(void)operation:(NSOperation*)operation didPostContentWithResponse:(id)responseObject
+{
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 @end
