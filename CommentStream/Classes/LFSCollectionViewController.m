@@ -459,7 +459,7 @@ const static CGFloat kStatusBarHeight = 20.f;
         [self.tableView endUpdates];
     }
      */
-    
+
     [self.tableView reloadData];
 }
 
@@ -554,11 +554,13 @@ const static CGFloat kStatusBarHeight = 20.f;
                  [alert show];
              }];
             
-            [_content removeObjectAtIndex:row];
-            [self.tableView
-             deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]
-             withRowAnimation:UITableViewRowAnimationTop];
-        } else {
+            [content setVisibility:LFSContentVisibilityNone];
+            [self.tableView beginUpdates];
+            [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
+                                  withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView endUpdates];
+        }
+        else {
             // userToken is nil -- show an error message
             //
             // Note: Normally we never reach this block because we do not

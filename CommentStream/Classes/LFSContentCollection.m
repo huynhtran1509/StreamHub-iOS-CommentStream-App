@@ -69,7 +69,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 @property (nonatomic, strong) NSMutableDictionary *mapping;
 @property (nonatomic, strong) NSMutableArray *array;
-
 @property (nonatomic, strong) NSMutableDictionary *likes;
 
 @end
@@ -529,6 +528,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     [self.mapping removeAllObjects];
     [self.array removeAllObjects];
+    [self.likes removeAllObjects];
 }
  
 - (void)removeObjectsForKeys:(NSArray *)keyArray
