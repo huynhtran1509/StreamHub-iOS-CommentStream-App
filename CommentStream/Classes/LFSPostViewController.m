@@ -177,24 +177,21 @@
                             onFailure:^(NSOperation *operation, NSError *error)
          {
              // show an error message
-             UIAlertView *alert = [[UIAlertView alloc]
-                                   initWithTitle:kFailurePostTitle
-                                   message:[error localizedDescription]
-                                   delegate:nil
-                                   cancelButtonTitle:@"OK"
-                                   otherButtonTitles:nil];
-             [alert show];
-             
+             [[[UIAlertView alloc]
+               initWithTitle:kFailurePostTitle
+               message:[error localizedDescription]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
          }];
     } else {
         // userToken is nil -- show an error message
-        UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:kFailurePostTitle
-                              message:@"You do not have permission to write to this collection"
-                              delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil];
-        [alert show];
+        [[[UIAlertView alloc]
+          initWithTitle:kFailurePostTitle
+          message:@"You do not have permission to write to this collection"
+          delegate:nil
+          cancelButtonTitle:@"OK"
+          otherButtonTitles:nil] show];
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
