@@ -15,6 +15,7 @@
 #import "LFSPostViewController.h"
 
 @protocol LFSDetailViewDelegate;
+@protocol LFSDetailViewControllerDelegate;
 
 @interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFSPostViewControllerDelegate>
 
@@ -24,5 +25,13 @@
 @property (nonatomic, copy) NSString *collectionId;
 @property (nonatomic, strong) UIImage *avatarImage;
 @property (nonatomic, strong) LFSContent *contentItem;
+
+@property (nonatomic, weak) id<LFSDetailViewControllerDelegate> delegate;
+
+@end
+
+@protocol LFSDetailViewControllerDelegate <NSObject>
+
+-(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
 
 @end

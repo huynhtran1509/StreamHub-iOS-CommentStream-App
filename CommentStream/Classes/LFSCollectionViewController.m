@@ -810,6 +810,7 @@ const static CGFloat kStatusBarHeight = 20.f;
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
                 [vc setHideStatusBar:self.prefersStatusBarHidden];
+                [vc setDelegate:self];
             }
         }
     }

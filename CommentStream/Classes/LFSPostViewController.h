@@ -26,6 +26,9 @@
 
 @protocol LFSPostViewControllerDelegate <NSObject>
 
+@optional
+-(id)delegate; // super-delegate (LFSCollectionViewController)
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
+-(void)didSendPostRequestWithReplyTo:(NSString*)replyTo;
 
 @end

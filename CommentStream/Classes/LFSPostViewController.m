@@ -163,15 +163,25 @@
     if (userToken != nil) {
         NSString *text = self.textView.text;
         [self.textView setText:@""];
+        
+        // rather annoying work-around to obrain access to
+        // the LFSCollectionViewController instance
+        
+        // TODO: replace this workaround with notifications?
+        //
+        id delegate = self.delegate;
+        if ([self.delegate respondsToSelector:@selector(delegate)]) {
+            delegate = [self.delegate delegate];
+        }
         [self.writeClient postContent:text
                          inCollection:self.collectionId
                             userToken:userToken
                             inReplyTo:self.replyToContent.idString
                             onSuccess:^(NSOperation *operation, id responseObject)
          {
-             if ([self.delegate respondsToSelector:@selector(didPostContentWithOperation:response:)])
+             if ([delegate respondsToSelector:@selector(didPostContentWithOperation:response:)])
              {
-                 [self.delegate didPostContentWithOperation:operation response:responseObject];
+                 [delegate didPostContentWithOperation:operation response:responseObject];
              }
          }
                             onFailure:^(NSOperation *operation, NSError *error)
@@ -184,6 +194,9 @@
                cancelButtonTitle:@"OK"
                otherButtonTitles:nil] show];
          }];
+        if ([self.delegate respondsToSelector:@selector(didSendPostRequestWithReplyTo:)]) {
+            [self.delegate didSendPostRequestWithReplyTo:self.replyToContent.idString];
+        }
     } else {
         // userToken is nil -- show an error message
         [[[UIAlertView alloc]

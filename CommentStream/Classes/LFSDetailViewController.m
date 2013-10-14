@@ -298,7 +298,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 #pragma mark - LFSPostViewControllerDelegate
--(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject
+-(void)didSendPostRequestWithReplyTo:(NSString*)replyTo
 {
     [self.navigationController popViewControllerAnimated:YES];
 }
