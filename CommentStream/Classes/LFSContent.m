@@ -8,6 +8,96 @@
 
 #import "LFSContent.h"
 
+const static char kVisibleNodeCount;
+
+NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
+{
+    // return number of visible nodes, add all nodes that have at least
+    // one visible child to the stack
+    const static NSString* const visKey = @"vis";
+    const static NSString* const typeKey = @"type";
+    const static NSString* const childContentKey = @"childContent";
+    
+    LFSContentType type = (LFSContentType)[[root objectForKey:typeKey] unsignedIntegerValue];
+    if (type != LFSContentTypeMessage) {
+        return 0u;
+    }
+    
+    __block NSUInteger visibleNodeCount = ([[root objectForKey:visKey] unsignedIntegerValue] == LFSContentVisibilityNone ? 0u : 1u);
+    NSArray *childContent = [root objectForKey:childContentKey];
+    
+    [childContent enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                   usingBlock:^(id obj, NSUInteger idx, BOOL *stop)
+     {
+         // order does not matter here as all immediate children are on the
+         // same level in the tree
+         visibleNodeCount += addVisibleMessagesToStack(stack, obj);
+     }];
+    
+    // only visit a child if it or *any* of its children are visible
+    // (this creates a problem where we visit a child only after all of its own
+    // children have been visited. To remedy this, we build up a LIFO stack)
+    if (visibleNodeCount > 0u)
+    {
+        LFSContent *content = [[LFSContent alloc] initWithObject:root];
+        [content setNodeCount:visibleNodeCount];
+        [stack addObject:content];
+    }
+    return visibleNodeCount;
+}
+
+
+// For detailed info, see
+// https://github.com/Livefyre/lfdj/blob/production/lfcore/lfcore/v2/publishing/models.proto
+typedef NS_ENUM(NSUInteger, LFSContentSource) {
+    LFSContentSourceDefault = 0u,
+    LFSContentSourceTwitter,
+    LFSContentSourceFacebook,
+    LFSContentSourceGooglePlus,
+    LFSContentSourceFlickr,
+    LFSContentSourceYouTube,
+    LFSContentSourceRSS,
+    LFSContentSourceInstagram
+};
+
+#define CONTENT_SOURCE_DECODE_LENGTH 20u
+static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
+{
+    LFSContentSourceDefault,    //  0
+    LFSContentSourceTwitter,    //  1
+    LFSContentSourceTwitter,    //  2
+    LFSContentSourceFacebook,   //  3
+    LFSContentSourceDefault,    //  4
+    LFSContentSourceDefault,    //  5
+    LFSContentSourceFacebook,   //  6
+    LFSContentSourceTwitter,    //  7
+    LFSContentSourceDefault,    //  8
+    LFSContentSourceDefault,    //  9
+    LFSContentSourceGooglePlus, // 10
+    LFSContentSourceFlickr,     // 11
+    LFSContentSourceYouTube,    // 12
+    LFSContentSourceRSS,        // 13
+    LFSContentSourceFacebook,   // 14
+    LFSContentSourceTwitter,    // 15
+    LFSContentSourceYouTube,    // 16
+    LFSContentSourceDefault,    // 17
+    LFSContentSourceDefault,    // 18
+    LFSContentSourceInstagram,  // 19
+};
+
+#define SOURCE_IMAGE_MAP_LENGTH 8u
+static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
+    nil, // LFSContentSourceDefault (0)
+    @"SourceTwitter", //LFSContentSourceTwitter (1)
+    @"SourceFacebook", //LFSContentSourceFacebook (2)
+    nil, //LFSContentSourceGooglePlus (3)
+    nil, //LFSContentSourceFlickr (4)
+    nil, //LFSContentSourceYouTube (5)
+    @"SourceRSS", //LFSContentSourceRSS (6)
+    @"SourceInstagram", //LFSContentSourceInstagram (7)
+};
+
+#pragma mark - LFSContent implementaiton
 @implementation LFSContent {
     BOOL _lastVisIsSet;
     BOOL _visibilityIsSet;
@@ -35,61 +125,12 @@
  */
 
 
-// For detailed info, see
-// https://github.com/Livefyre/lfdj/blob/production/lfcore/lfcore/v2/publishing/models.proto
-typedef NS_ENUM(NSUInteger, LFSContentSource) {
-    LFSContentSourceDefault = 0u,
-    LFSContentSourceTwitter,
-    LFSContentSourceFacebook,
-    LFSContentSourceGooglePlus,
-    LFSContentSourceFlickr,
-    LFSContentSourceYouTube,
-    LFSContentSourceRSS,
-    LFSContentSourceInstagram
-};
-
-#define CONTENT_SOURCE_DECODE_LENGTH 20u
-
-static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
-{
-    LFSContentSourceDefault, // 0
-    LFSContentSourceTwitter,  // 1
-    LFSContentSourceTwitter,  // 2
-    LFSContentSourceFacebook, // 3
-    LFSContentSourceDefault, // 4
-    LFSContentSourceDefault, // 5
-    LFSContentSourceFacebook,  // 6
-    LFSContentSourceTwitter,  // 7
-    LFSContentSourceDefault,  // 8
-    LFSContentSourceDefault,  // 9
-    LFSContentSourceGooglePlus,  // 10
-    LFSContentSourceFlickr,  // 11
-    LFSContentSourceYouTube,  // 12
-    LFSContentSourceRSS,  // 13
-    LFSContentSourceFacebook,  // 14
-    LFSContentSourceTwitter,  // 15
-    LFSContentSourceYouTube,  // 16
-    LFSContentSourceDefault,  // 17
-    LFSContentSourceDefault,  // 18
-    LFSContentSourceInstagram,  // 19
-};
-
-static NSString* const kLFSSourceImageMap[] = {
-    nil, // LFSContentSourceDefault (0)
-    @"SourceTwitter", //LFSContentSourceTwitter (1)
-    @"SourceFacebook", //LFSContentSourceFacebook (2)
-    nil, //LFSContentSourceGooglePlus (3)
-    nil, //LFSContentSourceFlickr (4)
-    nil, //LFSContentSourceYouTube (5)
-    @"SourceRSS", //LFSContentSourceRSS (6)
-    @"SourceInstagram", //LFSContentSourceInstagram (7)
-};
-
 #pragma mark - Properties
 
 @synthesize datePath = _datePath;
 @synthesize likes = _likes;
 @synthesize nodeCount = _nodeCount;
+@synthesize parent = _parent;
 
 @synthesize object = _object;
 -(void)setObject:(id)object
@@ -358,6 +399,7 @@ static NSString* const kLFSSourceImageMap[] = {
 
 -(UIImage*)imageForContentSource:(LFSContentSource)contentSource
 {
+    NSParameterAssert((NSUInteger)contentSource < SOURCE_IMAGE_MAP_LENGTH);
     // do a simple range check for memory safety
     if (contentSource <= LFSContentSourceInstagram) {
         NSString* const imageName = kLFSSourceImageMap[contentSource];
@@ -369,6 +411,7 @@ static NSString* const kLFSSourceImageMap[] = {
 
 -(UIImage*)smallImageForContentSource:(LFSContentSource)contentSource
 {
+    NSParameterAssert((NSUInteger)contentSource < SOURCE_IMAGE_MAP_LENGTH);
     // do a simple range check for memory safety
     if (contentSource <= LFSContentSourceInstagram) {
         NSString* const imageName = kLFSSourceImageMap[contentSource];
@@ -410,6 +453,37 @@ static NSString* const kLFSSourceImageMap[] = {
     return result;
 }
 
+-(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block
+{
+    // returns number of visible children
+    
+    // one visible child to the stack
+    if (self.contentType != LFSContentTypeMessage) {
+        return;
+    }
+    
+    NSMutableArray *stack = [[NSMutableArray alloc] init];
+    __block NSUInteger visibleNodeCount = self.visibility == LFSContentVisibilityNone ? 0u : 1u;
+    [self.childContent enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                   usingBlock:^(id obj, NSUInteger idx, BOOL *stop)
+     {
+         // order does not matter here as all immediate children are on the
+         // same level in the tree
+         visibleNodeCount += addVisibleMessagesToStack(stack, obj);
+     }];
+    
+    self.nodeCount = visibleNodeCount;
+    if (visibleNodeCount > 0u) {
+        [stack addObject:self];
+    }
+    
+    [stack enumerateObjectsWithOptions:NSEnumerationReverse
+                            usingBlock:^(id obj, NSUInteger idx, BOOL *stop)
+     {
+         block(obj);
+     }];
+}
+
 #pragma mark - Lifecycle
 
 // designated initializer
@@ -429,6 +503,7 @@ static NSString* const kLFSSourceImageMap[] = {
             [self resetCached];
             _object = object;
             _datePath = nil;
+            _parent = nil;
             _nodeCount = 0;
         }
     }
@@ -447,6 +522,7 @@ static NSString* const kLFSSourceImageMap[] = {
     [self resetCached];
     _object = nil;
     _datePath = nil;
+    _parent = nil;
 }
 
 -(void)resetCached

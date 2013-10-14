@@ -468,14 +468,20 @@ const static CGFloat kStatusBarHeight = 20.f;
 -(NSIndexPath*)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    return (content.visibility == LFSContentVisibilityEveryone) ? indexPath : nil;
+    LFSContentVisibility visibility = content.visibility;
+    return ((visibility != LFSContentVisibilityNone &&
+             visibility != LFSContentVisibilityPendingDelete)
+            ? indexPath
+            : nil);
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    if (content.visibility == LFSContentVisibilityEveryone) {
-        
+    LFSContentVisibility visibility = content.visibility;
+    if (visibility != LFSContentVisibilityNone &&
+        visibility != LFSContentVisibilityPendingDelete)
+    {
         // TODO: no need to get cell from index and back if we are not using segues
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
         [self performSegueWithIdentifier:kCellSelectSegue sender:cell];
@@ -488,12 +494,13 @@ const static CGFloat kStatusBarHeight = 20.f;
     CGFloat cellHeightValue;
     LFSContent *content = [_content objectAtIndex:indexPath.row];
     CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
-    if (content.visibility == LFSContentVisibilityEveryone) {
+    LFSContentVisibility visibility = content.visibility;
+    if (visibility != LFSContentVisibilityNone &&
+        visibility != LFSContentVisibilityPendingDelete)
+    {
         NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
-        
-        
-        if (cellHeight == nil) {
-
+        if (cellHeight == nil)
+        {
             cellHeightValue = [LFSAttributedTextCell
                                cellHeightForBoundsWidth:tableView.bounds.size.width
                                withHTMLString:content.contentBodyHtml
@@ -501,10 +508,14 @@ const static CGFloat kStatusBarHeight = 20.f;
             objc_setAssociatedObject(content, &kContentCellHeightKey,
                                      [NSNumber numberWithFloat:cellHeightValue],
                                      OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        } else {
+        }
+        else
+        {
             cellHeightValue = [cellHeight floatValue];
         }
-    } else {
+    }
+    else
+    {
         cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
                                                     withLeftOffset:leftOffset];
     }
@@ -522,7 +533,10 @@ const static CGFloat kStatusBarHeight = 20.f;
     // and only return "YES" for cells displaying that content
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     LFSContent *content = [_content objectAtIndex:indexPath.row];
-    return (userToken != nil && content.visibility == LFSContentVisibilityEveryone);
+    LFSContentVisibility visibility = content.visibility;
+    return (userToken  != nil &&
+            visibility != LFSContentVisibilityNone &&
+            visibility != LFSContentVisibilityPendingDelete);
 }
 
 // Overriding this will enable "swipe to delete" gesture
@@ -545,7 +559,26 @@ const static CGFloat kStatusBarHeight = 20.f;
                              inCollection:self.collectionId
                                 userToken:userToken
                                parameters:nil
-                                onSuccess:nil
+                                onSuccess:^(NSOperation *operation, id responseObject)
+             {
+                 NSString *newContentId = [responseObject objectForKey:@"comment_id"];
+                 NSAssert([newContentId isEqualToString:contentId], @"Wrong content Id received");
+                 LFSContent *newContent = [_content objectForKey:contentId];
+                 if (newContent != nil)
+                 {
+                     NSIndexPath *newIndexPath = [NSIndexPath
+                                                  indexPathForRow:[_content indexOfObject:newContent]
+                                                  inSection:0];
+                     
+                     // no need to set visibility of newConent here as that is the
+                     // function of LFSContentCollection
+                     UITableView *tableView = self.tableView;
+                     [tableView beginUpdates];
+                     [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:newIndexPath, nil]
+                                      withRowAnimation:UITableViewRowAnimationFade];
+                     [tableView endUpdates];
+                 }
+             }
                                 onFailure:^(NSOperation *operation, NSError *error)
              {
                  // show an error message
@@ -561,13 +594,14 @@ const static CGFloat kStatusBarHeight = 20.f;
                  // because it is conceivable that the streaming client has already deleted
                  // the content object
                  LFSContent *newContent = [_content objectForKey:contentId];
-                 
-                 // obtain new index path since it could have changed during the time
-                 // it toook for the error response to come back
-                 NSIndexPath *newIndexPath = [NSIndexPath
-                                              indexPathForRow:[_content indexOfObject:newContent]
-                                              inSection:0];
-                 if (newContent != nil) {
+                 if (newContent != nil)
+                 {
+                     // obtain new index path since it could have changed during the time
+                     // it toook for the error response to come back
+                     NSIndexPath *newIndexPath = [NSIndexPath
+                                                  indexPathForRow:[_content indexOfObject:newContent]
+                                                  inSection:0];
+                     
                      [newContent setVisibility:visibility];
                      
                      UITableView *tableView = self.tableView;
@@ -634,11 +668,7 @@ const static CGFloat kStatusBarHeight = 20.f;
             [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
             [cell.textLabel setTextColor:[UIColor lightGrayColor]];
         }
-        // configure each cell
-        [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
-        [cell.textLabel setText:(visibility == LFSContentVisibilityPendingDelete
-                                 ? @"This comment is being removed…"
-                                 : @"This comment has been removed")];
+        [self configureDeletedCell:cell forContent:content];
         returnedCell = cell;
     }
     else {
@@ -656,6 +686,16 @@ const static CGFloat kStatusBarHeight = 20.f;
 }
 
 #pragma mark - Table and cell helpers
+
+-(void)configureDeletedCell:(LFSDeletedCell*)cell forContent:(LFSContent*)content
+{
+    LFSContentVisibility visibility = content.visibility;
+    [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
+    NSString *bodyText = (visibility == LFSContentVisibilityPendingDelete
+                          ? @"This comment is being removed…"
+                          : @"This comment has been removed");
+    [cell.textLabel setText:bodyText];
+}
 
 // called every time a cell is configured
 - (void)configureAttributedCell:(LFSAttributedTextCell*)cell forContent:(LFSContent*)content
