@@ -292,15 +292,26 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [self.postCommentViewController setCollectionId:self.collectionId];
     [self.postCommentViewController setReplyToContent:self.contentItem];
     
-    [self presentViewController:self.postCommentViewController
-                       animated:YES
-                     completion:nil];
+    [self.navigationController presentViewController:self.postCommentViewController
+                                            animated:YES
+                                          completion:nil];
 }
 
 #pragma mark - LFSPostViewControllerDelegate
--(void)operation:(NSOperation*)operation didPostContentWithResponse:(id)responseObject
+-(id<LFSPostViewControllerDelegate>)collectionViewController
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    // forward collection view controller here to insert messagesinto
+    // the content view as soon as the server gets back to us with 200 OK
+    id<LFSPostViewControllerDelegate> collectionViewController = (id<LFSPostViewControllerDelegate>)self.delegate;
+    return collectionViewController;
+}
+
+-(void)didSendPostRequestWithReplyTo:(NSString*)replyTo
+{
+    // simply forward to the collection view controller
+    id<LFSPostViewControllerDelegate> collectionViewController = (id<LFSPostViewControllerDelegate>)self.delegate;
+    [self.navigationController popViewControllerAnimated:NO];
+    [collectionViewController didSendPostRequestWithReplyTo:replyTo];
 }
 
 @end

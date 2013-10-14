@@ -163,15 +163,20 @@
     if (userToken != nil) {
         NSString *text = self.textView.text;
         [self.textView setText:@""];
+        
+        id<LFSPostViewControllerDelegate> collectionViewController = nil;
+        if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
+            collectionViewController = [self.delegate collectionViewController];
+        }
         [self.writeClient postContent:text
                          inCollection:self.collectionId
                             userToken:userToken
                             inReplyTo:self.replyToContent.idString
                             onSuccess:^(NSOperation *operation, id responseObject)
          {
-             if ([self.delegate respondsToSelector:@selector(operation:didPostContentWithResponse:)])
+             if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
              {
-                 [self.delegate operation:operation didPostContentWithResponse:responseObject];
+                 [collectionViewController didPostContentWithOperation:operation response:responseObject];
              }
          }
                             onFailure:^(NSOperation *operation, NSError *error)
@@ -184,6 +189,9 @@
                cancelButtonTitle:@"OK"
                otherButtonTitles:nil] show];
          }];
+        if ([self.delegate respondsToSelector:@selector(didSendPostRequestWithReplyTo:)]) {
+            [self.delegate didSendPostRequestWithReplyTo:self.replyToContent.idString];
+        }
     } else {
         // userToken is nil -- show an error message
         [[[UIAlertView alloc]

@@ -11,7 +11,7 @@
 
 #import "LFSContent.h"
 
-@protocol LFSPostNewControllerDelegate;
+@protocol LFSPostViewControllerDelegate;
 
 @interface LFSPostViewController : UIViewController
 
@@ -19,13 +19,16 @@
 @property (nonatomic, copy) NSString *collectionId;
 @property (nonatomic, strong) LFSContent *replyToContent;
 
-@property (nonatomic, assign) id<LFSPostNewControllerDelegate> delegate;
+@property (nonatomic, weak) id<LFSPostViewControllerDelegate> delegate;
 
 @end
 
 
-@protocol LFSPostNewControllerDelegate <NSObject>
+@protocol LFSPostViewControllerDelegate <NSObject>
 
--(void)operation:(NSOperation*)operation didPostContentWithResponse:(id)responseObject;
+@optional
+-(id<LFSPostViewControllerDelegate>)collectionViewController;
+-(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
+-(void)didSendPostRequestWithReplyTo:(NSString*)replyTo;
 
 @end
