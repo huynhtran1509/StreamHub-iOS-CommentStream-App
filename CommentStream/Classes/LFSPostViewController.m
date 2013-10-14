@@ -164,14 +164,9 @@
         NSString *text = self.textView.text;
         [self.textView setText:@""];
         
-        // rather annoying work-around to obrain access to
-        // the LFSCollectionViewController instance
-        
-        // TODO: replace this workaround with notifications?
-        //
-        id delegate = self.delegate;
-        if ([self.delegate respondsToSelector:@selector(delegate)]) {
-            delegate = [self.delegate delegate];
+        id<LFSPostViewControllerDelegate> collectionViewController = nil;
+        if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {
+            collectionViewController = [self.delegate collectionViewController];
         }
         [self.writeClient postContent:text
                          inCollection:self.collectionId
@@ -179,9 +174,9 @@
                             inReplyTo:self.replyToContent.idString
                             onSuccess:^(NSOperation *operation, id responseObject)
          {
-             if ([delegate respondsToSelector:@selector(didPostContentWithOperation:response:)])
+             if ([collectionViewController respondsToSelector:@selector(didPostContentWithOperation:response:)])
              {
-                 [delegate didPostContentWithOperation:operation response:responseObject];
+                 [collectionViewController didPostContentWithOperation:operation response:responseObject];
              }
          }
                             onFailure:^(NSOperation *operation, NSError *error)

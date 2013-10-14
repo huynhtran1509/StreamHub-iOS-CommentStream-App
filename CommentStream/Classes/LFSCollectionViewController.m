@@ -830,8 +830,29 @@ const static CGFloat kStatusBarHeight = 20.f;
 }
 
 #pragma mark - LFSPostViewControllerDelegate
+-(id<LFSPostViewControllerDelegate>)collectionViewController
+{
+    // forward collection view controller here to insert messagesinto
+    // the content view as soon as the server gets back to us with 200 OK
+    return self;
+}
+
+
+-(void)didSendPostRequestWithReplyTo:(NSString *)replyTo
+{
+    // this is triggered before we receive 200 OK from server
+    
+    // decide whether to scroll to the top row or to whichever row we are
+    // replying to
+    NSUInteger row = (replyTo != nil) ? [_content indexOfKey:replyTo] : 0;
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]
+                          atScrollPosition:UITableViewScrollPositionTop
+                                  animated:NO];
+}
+
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject
 {
+    // 200 OK received, post was successful
     [self addTopLevelContent:[responseObject objectForKey:@"messages"]
                  withAuthors:[responseObject objectForKey:@"authors"]
                 visualInsert:YES];

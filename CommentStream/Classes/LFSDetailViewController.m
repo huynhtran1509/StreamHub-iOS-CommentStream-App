@@ -298,9 +298,20 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 #pragma mark - LFSPostViewControllerDelegate
+-(id<LFSPostViewControllerDelegate>)collectionViewController
+{
+    // forward collection view controller here to insert messagesinto
+    // the content view as soon as the server gets back to us with 200 OK
+    id<LFSPostViewControllerDelegate> collectionViewController = (id<LFSPostViewControllerDelegate>)self.delegate;
+    return collectionViewController;
+}
+
 -(void)didSendPostRequestWithReplyTo:(NSString*)replyTo
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    // simply forward to the collection view controller
+    id<LFSPostViewControllerDelegate> collectionViewController = (id<LFSPostViewControllerDelegate>)self.delegate;
+    [self.navigationController popViewControllerAnimated:NO];
+    [collectionViewController didSendPostRequestWithReplyTo:replyTo];
 }
 
 @end
