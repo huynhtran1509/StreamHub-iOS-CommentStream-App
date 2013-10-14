@@ -292,13 +292,13 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [self.postCommentViewController setCollectionId:self.collectionId];
     [self.postCommentViewController setReplyToContent:self.contentItem];
     
-    [self presentViewController:self.postCommentViewController
-                       animated:YES
-                     completion:nil];
+    [self.navigationController presentViewController:self.postCommentViewController
+                                            animated:YES
+                                          completion:nil];
 }
 
 #pragma mark - LFSPostViewControllerDelegate
--(void)operation:(NSOperation*)operation didPostContentWithResponse:(id)responseObject
+-(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject
 {
     [self.navigationController popViewControllerAnimated:YES];
 }

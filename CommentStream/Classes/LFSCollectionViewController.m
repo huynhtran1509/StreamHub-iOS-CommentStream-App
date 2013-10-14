@@ -823,10 +823,13 @@ const static CGFloat kStatusBarHeight = 20.f;
     [self.postCommentViewController setCollection:self.collection];
     [self.postCommentViewController setCollectionId:self.collectionId];
     
-    [self presentViewController:self.postCommentViewController animated:YES completion:nil];
+    [self.navigationController presentViewController:self.postCommentViewController
+                                            animated:YES
+                                          completion:nil];
 }
 
--(void)operation:(NSOperation*)operation didPostContentWithResponse:(id)responseObject
+#pragma mark - LFSPostViewControllerDelegate
+-(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject
 {
     [self addTopLevelContent:[responseObject objectForKey:@"messages"]
                  withAuthors:[responseObject objectForKey:@"authors"]
