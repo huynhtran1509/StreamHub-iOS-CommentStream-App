@@ -738,61 +738,64 @@ const static CGFloat kStatusBarHeight = 20.f;
 #endif
         // load avatar images in a separate queue
         [cell.imageView setImage:self.placeholderImage];
-        NSURLRequest *request = [NSURLRequest requestWithURL:
-                                 [NSURL URLWithString:author.avatarUrlString75]];
-        
-        // set up the NSOperation here
-        AFImageRequestOperation* operation =
-        [AFImageRequestOperation
-         imageRequestOperationWithRequest:request
-         imageProcessingBlock:^UIImage *(UIImage *image)
-         {
-             // scale down image
-             CGRect targetRect;
-             targetRect.origin = CGPointZero;
-             targetRect.size = kCellImageViewSize;
-             
-             // don't call UIGraphicsBeginImageContext when supporting Retina,
-             // instead call UIGraphicsBeginImageContextWithOptions with zero
-             // for scale
-             UIGraphicsBeginImageContextWithOptions(kCellImageViewSize, YES, 0.f);
-             [image drawInRect:targetRect];
-             UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
-             UIGraphicsEndImageContext();
+        NSURL *avatarUrl = [NSURL URLWithString:author.avatarUrlString75];
+        // avatarUrl will be nil if URL string is nil or invalid
+        if (avatarUrl != nil) {
+            NSURLRequest *request = [NSURLRequest requestWithURL:avatarUrl];
+            
+            // set up the NSOperation here
+            AFImageRequestOperation* operation =
+            [AFImageRequestOperation
+             imageRequestOperationWithRequest:request
+             imageProcessingBlock:^UIImage *(UIImage *image)
+             {
+                 // scale down image
+                 CGRect targetRect;
+                 targetRect.origin = CGPointZero;
+                 targetRect.size = kCellImageViewSize;
+                 
+                 // don't call UIGraphicsBeginImageContext when supporting Retina,
+                 // instead call UIGraphicsBeginImageContextWithOptions with zero
+                 // for scale
+                 UIGraphicsBeginImageContextWithOptions(kCellImageViewSize, YES, 0.f);
+                 [image drawInRect:targetRect];
+                 UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
+                 UIGraphicsEndImageContext();
 #ifdef CACHE_SCALED_IMAGES
-             [_imageCache setObject:processedImage forKey:authorId];
+                 [_imageCache setObject:processedImage forKey:authorId];
 #endif
-             return processedImage;
-         }
-         success:^(NSURLRequest *req,
-                   NSHTTPURLResponse *response,
-                   UIImage *image)
-         {
-             // we are on the main thead here -- display the image
-             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfObject:content]
-                                                         inSection:0];
-             UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
-             if (cell) {
-                 [cell.imageView setImage:image];
-                 [cell setNeedsLayout];
+                 return processedImage;
              }
-         }
-         failure:^(NSURLRequest *request,
-                   NSHTTPURLResponse *response,
-                   NSError *error)
-         {
+             success:^(NSURLRequest *request,
+                       NSHTTPURLResponse *response,
+                       UIImage *image)
+             {
+                 // we are on the main thead here -- display the image
+                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfObject:content]
+                                                             inSection:0];
+                 UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
+                 if (cell) {
+                     [cell.imageView setImage:image];
+                     [cell setNeedsLayout];
+                 }
+             }
+             failure:^(NSURLRequest *request,
+                       NSHTTPURLResponse *response,
+                       NSError *error)
+             {
 #ifdef CACHE_SCALED_IMAGES
-             // cache placeholder image instead so we don't repeatedly
-             // hit the server looking for stuff that doesn't exist
-             if (self.placeholderImage) {
-                 [_imageCache setObject:self.placeholderImage
-                                 forKey:authorId];
-             }
+                 // cache placeholder image instead so we don't repeatedly
+                 // hit the server looking for stuff that doesn't exist
+                 if (self.placeholderImage) {
+                     [_imageCache setObject:self.placeholderImage
+                                     forKey:authorId];
+                 }
 #endif
-         }];
-        
-        // add operation to queue
-        [self.operationQueue addOperation:operation];
+             }];
+            
+            // add operation to queue
+            [self.operationQueue addOperation:operation];
+        }
 #ifdef CACHE_SCALED_IMAGES
     }
 #endif
