@@ -25,14 +25,11 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
     
     __block NSUInteger visibleNodeCount = ([[root objectForKey:visKey] unsignedIntegerValue] == LFSContentVisibilityNone ? 0u : 1u);
     NSArray *childContent = [root objectForKey:childContentKey];
-    
-    [childContent enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                   usingBlock:^(id obj, NSUInteger idx, BOOL *stop)
-     {
-         // order does not matter here as all immediate children are on the
-         // same level in the tree
-         visibleNodeCount += addVisibleMessagesToStack(stack, obj);
-     }];
+    if (childContent) {
+        for (id obj in childContent) {
+            visibleNodeCount += addVisibleMessagesToStack(stack, obj);
+        }
+    }
     
     // only visit a child if it or *any* of its children are visible
     // (this creates a problem where we visit a child only after all of its own
