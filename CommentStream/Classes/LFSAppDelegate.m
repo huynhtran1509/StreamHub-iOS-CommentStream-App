@@ -8,7 +8,7 @@
 
 
 // uncomment the line below to use the awesome AFHTTPRequestOperationLogger
-//#define LOG_ALL_HTTP_REQUESTS
+#define LOG_ALL_HTTP_REQUESTS
 
 #ifdef LOG_ALL_HTTP_REQUESTS
 #import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>

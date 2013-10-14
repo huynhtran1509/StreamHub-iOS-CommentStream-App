@@ -700,6 +700,10 @@ const static CGFloat kStatusBarHeight = 20.f;
 // called every time a cell is configured
 - (void)configureAttributedCell:(LFSAttributedTextCell*)cell forContent:(LFSContent*)content
 {
+    // load image first
+    [self loadImageForCell:cell withContent:content];
+    
+    // configure the rest of the cell
     [cell setHTMLString:content.contentBodyHtml];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
@@ -718,8 +722,11 @@ const static CGFloat kStatusBarHeight = 20.f;
                            attributeString:(hasModerator ? @"Moderator" : @"")
                            mainString:author.displayName
                            iconImage:nil]];
-    
+}
 
+-(void)loadImageForCell:(UITableViewCell*)cell withContent:(LFSContent*)content
+{
+    LFSAuthor *author = content.author;
 #ifdef CACHE_SCALED_IMAGES
     NSString *authorId = author.idString;
     UIImage *scaledImage = [_imageCache objectForKey:authorId];
@@ -752,7 +759,9 @@ const static CGFloat kStatusBarHeight = 20.f;
              [image drawInRect:targetRect];
              UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
              UIGraphicsEndImageContext();
+#ifdef CACHE_SCALED_IMAGES
              [_imageCache setObject:processedImage forKey:authorId];
+#endif
              return processedImage;
          }
          success:^(NSURLRequest *req,
@@ -760,9 +769,9 @@ const static CGFloat kStatusBarHeight = 20.f;
                    UIImage *image)
          {
              // we are on the main thead here -- display the image
-             NSUInteger row = [_content indexOfObject:content];
-             
-             LFSAttributedTextCell *cell = (LFSAttributedTextCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0u]];
+             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfObject:content]
+                                                         inSection:0];
+             UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
              if (cell) {
                  [cell.imageView setImage:image];
                  [cell setNeedsLayout];
@@ -772,12 +781,14 @@ const static CGFloat kStatusBarHeight = 20.f;
                    NSHTTPURLResponse *response,
                    NSError *error)
          {
+#ifdef CACHE_SCALED_IMAGES
              // cache placeholder image instead so we don't repeatedly
              // hit the server looking for stuff that doesn't exist
              if (self.placeholderImage) {
                  [_imageCache setObject:self.placeholderImage
                                  forKey:authorId];
              }
+#endif
          }];
         
         // add operation to queue
@@ -803,8 +814,12 @@ const static CGFloat kStatusBarHeight = 20.f;
                 
                 // assign model object(s)
                 LFSContent *contentItem = [_content objectAtIndex:indexPath.row];
+#ifdef CACHE_SCALED_IMAGES
                 UIImage *avatarPreview = ([_imageCache objectForKey:contentItem.author.idString]
                                           ?: self.placeholderImage);
+#else
+                UIImage *avatarPreview = self.placeholderImage;
+#endif
                 [vc setContentItem:contentItem];
                 [vc setAvatarImage:avatarPreview];
                 [vc setCollection:self.collection];
