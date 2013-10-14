@@ -13,7 +13,9 @@
 #import "LFSAuthorCollection.h"
 #import "LFSContentCollection.h"
 
-@class LFSContentCollection;
+@class LFSContent;
+
+typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @interface LFSContent : NSObject
 
@@ -46,9 +48,11 @@
 @property (nonatomic, readonly) NSString *contentTwitterUrlString;
 
 @property (nonatomic, strong) LFSAuthor *author;
+@property (nonatomic, strong) LFSContent *parent;
 
 @property (nonatomic, strong) id childContent;
 @property (nonatomic, assign) NSInteger nodeCount;
+-(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block;
 
 @property (nonatomic, copy) NSDictionary *content;
 @property (nonatomic, copy) NSString *idString;

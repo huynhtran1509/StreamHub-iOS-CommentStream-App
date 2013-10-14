@@ -570,8 +570,8 @@ const static CGFloat kStatusBarHeight = 20.f;
                                                   indexPathForRow:[_content indexOfObject:newContent]
                                                   inSection:0];
                      
-                     [newContent setVisibility:LFSContentVisibilityNone];
-                     
+                     // no need to set visibility of newConent here as that is the
+                     // function of LFSContentCollection
                      UITableView *tableView = self.tableView;
                      [tableView beginUpdates];
                      [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:newIndexPath, nil]
@@ -668,11 +668,7 @@ const static CGFloat kStatusBarHeight = 20.f;
             [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
             [cell.textLabel setTextColor:[UIColor lightGrayColor]];
         }
-        // configure each cell
-        [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
-        [cell.textLabel setText:(visibility == LFSContentVisibilityPendingDelete
-                                 ? @"This comment is being removed…"
-                                 : @"This comment has been removed")];
+        [self configureDeletedCell:cell forContent:content];
         returnedCell = cell;
     }
     else {
@@ -690,6 +686,16 @@ const static CGFloat kStatusBarHeight = 20.f;
 }
 
 #pragma mark - Table and cell helpers
+
+-(void)configureDeletedCell:(LFSDeletedCell*)cell forContent:(LFSContent*)content
+{
+    LFSContentVisibility visibility = content.visibility;
+    [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
+    NSString *bodyText = (visibility == LFSContentVisibilityPendingDelete
+                          ? @"This comment is being removed…"
+                          : @"This comment has been removed");
+    [cell.textLabel setText:bodyText];
+}
 
 // called every time a cell is configured
 - (void)configureAttributedCell:(LFSAttributedTextCell*)cell forContent:(LFSContent*)content
