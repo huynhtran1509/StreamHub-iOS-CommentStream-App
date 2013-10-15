@@ -35,7 +35,7 @@ extern const CGSize kCellImageViewSize;
 
 // Under iOS7, we can simply set backgroundColor of table cells via
 // UIAppearance protocol, but for iOS6 we need to do this workaround:
-@property (nonatomic, weak) UIColor *backgroundCellColor UI_APPEARANCE_SELECTOR;
+@property (nonatomic, weak) UIColor *cellContentViewColor UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, assign) CGFloat requiredBodyHeight;
 
