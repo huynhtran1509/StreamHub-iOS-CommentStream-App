@@ -469,8 +469,7 @@ const static CGFloat kStatusBarHeight = 20.f;
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
     LFSContentVisibility visibility = content.visibility;
-    return ((visibility != LFSContentVisibilityNone &&
-             visibility != LFSContentVisibilityPendingDelete)
+    return (visibility == LFSContentVisibilityEveryone
             ? indexPath
             : nil);
 }
@@ -479,8 +478,7 @@ const static CGFloat kStatusBarHeight = 20.f;
 {
     LFSContent *content = [_content objectAtIndex:indexPath.row];
     LFSContentVisibility visibility = content.visibility;
-    if (visibility != LFSContentVisibilityNone &&
-        visibility != LFSContentVisibilityPendingDelete)
+    if (visibility == LFSContentVisibilityEveryone)
     {
         // TODO: no need to get cell from index and back if we are not using segues
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
@@ -495,8 +493,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     LFSContent *content = [_content objectAtIndex:indexPath.row];
     CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
     LFSContentVisibility visibility = content.visibility;
-    if (visibility != LFSContentVisibilityNone &&
-        visibility != LFSContentVisibilityPendingDelete)
+    if (visibility == LFSContentVisibilityEveryone)
     {
         NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
         if (cellHeight == nil)
@@ -514,10 +511,14 @@ const static CGFloat kStatusBarHeight = 20.f;
             cellHeightValue = [cellHeight floatValue];
         }
     }
-    else
+    else if (visibility == LFSContentVisibilityNone ||
+             visibility == LFSContentVisibilityPendingDelete)
     {
         cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
                                                     withLeftOffset:leftOffset];
+    } else {
+        NSAssert(NO, @"Don't know how to display visibility class %d", visibility);
+        cellHeightValue = 0.f;
     }
     return cellHeightValue;
 }
@@ -535,8 +536,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     LFSContent *content = [_content objectAtIndex:indexPath.row];
     LFSContentVisibility visibility = content.visibility;
     return (userToken  != nil &&
-            visibility != LFSContentVisibilityNone &&
-            visibility != LFSContentVisibilityPendingDelete);
+            visibility == LFSContentVisibilityEveryone);
 }
 
 // Overriding this will enable "swipe to delete" gesture
@@ -650,8 +650,19 @@ const static CGFloat kStatusBarHeight = 20.f;
     LFSContentVisibility visibility = content.visibility;
     id returnedCell;
     
-    if (visibility == LFSContentVisibilityNone ||
-        visibility == LFSContentVisibilityPendingDelete)
+    if (visibility == LFSContentVisibilityEveryone)
+    {
+        LFSAttributedTextCell *cell = (LFSAttributedTextCell*)[tableView dequeueReusableCellWithIdentifier:kAttributedCellReuseIdentifier];
+        
+        if (!cell) {
+            cell = [[LFSAttributedTextCell alloc]
+                    initWithReuseIdentifier:kAttributedCellReuseIdentifier];
+        }
+        [self configureAttributedCell:cell forContent:content];
+        returnedCell = cell;
+    }
+    else if (visibility == LFSContentVisibilityNone ||
+             visibility == LFSContentVisibilityPendingDelete)
     {
         LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
                                                   kDeletedCellReuseIdentifier];
@@ -670,16 +681,9 @@ const static CGFloat kStatusBarHeight = 20.f;
         }
         [self configureDeletedCell:cell forContent:content];
         returnedCell = cell;
-    }
-    else {
-        LFSAttributedTextCell *cell = (LFSAttributedTextCell*)[tableView dequeueReusableCellWithIdentifier:kAttributedCellReuseIdentifier];
-        
-        if (!cell) {
-            cell = [[LFSAttributedTextCell alloc]
-                    initWithReuseIdentifier:kAttributedCellReuseIdentifier];
-        }
-        [self configureAttributedCell:cell forContent:content];
-        returnedCell = cell;
+    } else {
+        NSAssert(NO, @"Don't know how to display visibility class %d", visibility);
+        returnedCell = nil;
     }
     
     return returnedCell;
@@ -691,6 +695,7 @@ const static CGFloat kStatusBarHeight = 20.f;
 {
     LFSContentVisibility visibility = content.visibility;
     [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
+    
     NSString *bodyText = (visibility == LFSContentVisibilityPendingDelete
                           ? @"This comment is being removed…"
                           : @"This comment has been removed");
