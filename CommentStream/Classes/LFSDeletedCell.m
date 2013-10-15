@@ -47,7 +47,10 @@ static const CGFloat kDeletedCellHeaderTitleFontSize = 12.f;
 -(void)setLeftOffset:(CGFloat)leftOffset
 {
     _leftOffset = leftOffset;
-    self.separatorInset = UIEdgeInsetsMake(0.f, kDeletedCellPadding.left + _leftOffset, 0.f, 0.f);
+    if ([self respondsToSelector:@selector(setSeparatorInset:)]) {
+        // setSeparatorInset is iOS7-only feature
+        [self setSeparatorInset:UIEdgeInsetsMake(0.f, kDeletedCellPadding.left + _leftOffset, 0.f, 0.f)];
+    }
 }
 
 #pragma mark - Lifecycle

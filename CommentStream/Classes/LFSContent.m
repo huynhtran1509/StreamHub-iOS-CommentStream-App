@@ -10,6 +10,7 @@
 
 const static char kVisibleNodeCount;
 
+// TODO: return latest eventId, event for nodes that are not shown (hidden)
 NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
 {
     // return number of visible nodes, add all nodes that have at least

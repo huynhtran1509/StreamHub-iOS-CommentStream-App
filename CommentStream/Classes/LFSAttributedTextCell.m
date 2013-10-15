@@ -112,7 +112,10 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 -(void)setLeftOffset:(CGFloat)leftOffset
 {
     _leftOffset = leftOffset;
-    self.separatorInset = UIEdgeInsetsMake(0.f, kCellPadding.left + _leftOffset, 0.f, 0.f);
+    if ([self respondsToSelector:@selector(setSeparatorInset:)]) {
+        // setSeparatorInset is iOS7-only feature
+        [self setSeparatorInset:UIEdgeInsetsMake(0.f, kCellPadding.left + _leftOffset, 0.f, 0.f)];
+    }
 }
 
 #pragma mark - UIAppearance properties
@@ -131,7 +134,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     return self.headerTitleView.font;
 }
 -(void)setHeaderTitleFont:(UIFont *)headerTitleFont {
-    self.headerTitleView.font = headerTitleFont;
+    [self.headerTitleView setFont:headerTitleFont];
 }
 
 #pragma mark -
@@ -140,7 +143,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     return self.headerTitleView.textColor;
 }
 -(void)setHeaderTitleColor:(UIColor *)headerTitlecolor {
-    self.headerTitleView.textColor = headerTitlecolor;
+    [self.headerTitleView setTextColor:headerTitlecolor];
 }
 
 #pragma mark -
@@ -149,7 +152,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     return self.bodyView.font;
 }
 -(void)setBodyFont:(UIFont *)contentBodyFont {
-    self.bodyView.font = contentBodyFont;
+    [self.bodyView setFont:contentBodyFont];
 }
 
 #pragma mark -
@@ -158,7 +161,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     return self.bodyView.textColor;
 }
 -(void)setBodyColor:(UIColor *)contentBodyColor {
-    self.bodyView.textColor = contentBodyColor;
+    [self.bodyView setTextColor:contentBodyColor];
 }
 
 #pragma mark -
@@ -167,7 +170,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     return self.headerAccessoryRightView.font;
 }
 -(void)setHeaderAccessoryRightFont:(UIFont *)headerAccessoryRightFont {
-    self.headerAccessoryRightView.font = headerAccessoryRightFont;
+    [self.headerAccessoryRightView setFont:headerAccessoryRightFont];
 }
 
 #pragma mark -
@@ -176,7 +179,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     return self.headerAccessoryRightView.textColor;
 }
 -(void)setHeaderAccessoryRightColor:(UIColor *)headerAccessoryRightColor {
-    self.headerAccessoryRightView.textColor = headerAccessoryRightColor;
+    [self.headerAccessoryRightView setTextColor:headerAccessoryRightColor];
 }
 
 #pragma mark - Other properties
