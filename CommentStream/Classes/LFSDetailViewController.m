@@ -198,11 +198,21 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [self setStatusBarHidden:self.hideStatusBar withAnimation:UIStatusBarAnimationNone];
     //[self.navigationController setToolbarHidden:YES animated:animated];
     
+    UIScrollView *scrollView = self.scrollView;
+    UIView *detailView = self.detailView;
+    
     // calculate content size for scrolling
-    CGSize detailViewSize = [self.detailView sizeThatFits:
-                             CGSizeMake(self.scrollView.bounds.size.width, CGFLOAT_MAX)];
-    detailViewSize.width = self.scrollView.bounds.size.width;
-    [_scrollView setContentSize:detailViewSize];
+    CGFloat scrollViewWidth = scrollView.bounds.size.width;
+    CGSize detailViewSize = [detailView sizeThatFits:CGSizeMake(scrollViewWidth, CGFLOAT_MAX)];
+    detailViewSize.width = scrollViewWidth;
+    [scrollView setContentSize:detailViewSize];
+    
+    // set height of detailView to calculated height
+    // (otherwise the toolbar stops responding to tap events...)
+    CGRect detailViewFrame = detailView.frame;
+    detailViewFrame.size.width = scrollViewWidth;
+    detailViewFrame.size.height = detailViewSize.height;
+    [detailView setFrame:detailViewFrame];
 }
 
 - (void)didReceiveMemoryWarning
