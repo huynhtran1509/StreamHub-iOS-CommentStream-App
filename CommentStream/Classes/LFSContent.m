@@ -24,7 +24,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
         return 0u;
     }
     
-    __block NSUInteger visibleNodeCount = ([[root objectForKey:visKey] unsignedIntegerValue] == LFSContentVisibilityNone ? 0u : 1u);
+    __block NSUInteger visibleNodeCount = ([[root objectForKey:visKey] unsignedIntegerValue] == LFSContentVisibilityEveryone ? 1u : 0u);
     NSArray *childContent = [root objectForKey:childContentKey];
     if (childContent) {
         for (id obj in childContent) {
@@ -474,7 +474,7 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
     }
     
     NSMutableArray *stack = [[NSMutableArray alloc] init];
-    __block NSUInteger visibleNodeCount = self.visibility == LFSContentVisibilityNone ? 0u : 1u;
+    __block NSUInteger visibleNodeCount = self.visibility == LFSContentVisibilityEveryone ? 1u : 0u;
     [self.childContent enumerateObjectsWithOptions:NSEnumerationConcurrent
                                    usingBlock:^(id obj, NSUInteger idx, BOOL *stop)
      {
