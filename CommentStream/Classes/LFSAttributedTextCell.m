@@ -503,7 +503,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 - (void)setHTMLString:(NSString *)html
 {
 	// store hash isntead of HTML source
-	NSUInteger newHash = [html hash];
+	NSUInteger newHash = html ? [html hash] : 0u;
     
 	if (newHash == _htmlHash) {
 		return;
@@ -523,6 +523,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     if (self)
     {
         // initialize subview references
+        _htmlHash = 0u;
         _bodyView = nil;
         _indicatorIcon = nil;
         _headerAccessoryRightView = nil;

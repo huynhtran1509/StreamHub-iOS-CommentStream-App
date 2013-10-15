@@ -704,7 +704,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     [self loadImageForCell:cell withContent:content];
     
     // configure the rest of the cell
-    [cell setHTMLString:content.contentBodyHtml];
+    [cell setHTMLString:(content.contentBodyHtml ?: @"")];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
     
@@ -720,7 +720,7 @@ const static CGFloat kStatusBarHeight = 20.f;
     [cell setProfileLocal:[[LFSHeader alloc]
                            initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
                            attributeString:(hasModerator ? @"Moderator" : @"")
-                           mainString:author.displayName
+                           mainString:(author.displayName ?: @"")
                            iconImage:nil]];
 }
 

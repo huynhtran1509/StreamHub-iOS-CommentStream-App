@@ -257,7 +257,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 #pragma mark - LFSDetailViewDelegate
 - (void)didSelectLike:(id)sender
 {
-    static NSString* const kFailureModifyTitle = @"Failed to modify content";
+    static NSString* const kFailureModifyTitle = @"Action Failed";
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken != nil) {
         LFSMessageAction action;
