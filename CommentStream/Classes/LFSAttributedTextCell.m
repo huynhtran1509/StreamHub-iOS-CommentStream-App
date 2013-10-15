@@ -119,13 +119,14 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 }
 
 #pragma mark - UIAppearance properties
-@synthesize backgroundCellColor;
+@synthesize cellContentViewColor = _cellContentViewColor;
 -(UIColor*)backgroundCellColor
 {
-    return self.backgroundColor;
+    return self.contentView.backgroundColor;
 }
--(void)setBackgroundCellColor:(UIColor *)backgroundColor {
-    [super setBackgroundColor:backgroundColor];
+-(void)setCellContentViewColor:(UIColor *)backgroundColor {
+    [self setBackgroundColor:backgroundColor];
+    [self.contentView setBackgroundColor:backgroundColor];
 }
 
 #pragma mark -

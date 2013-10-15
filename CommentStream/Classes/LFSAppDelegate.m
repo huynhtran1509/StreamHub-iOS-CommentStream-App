@@ -30,7 +30,7 @@
     [[OHAttributedLabel appearance] setLinkColor:[UIColor grayColor]];
     [[OHAttributedLabel appearance] setLinkUnderlineStyle:kCTUnderlineStyleNone];
     
-    [[LFSAttributedTextCell appearance] setBackgroundCellColor:[UIColor whiteColor]];
+    [[LFSAttributedTextCell appearance] setCellContentViewColor:[UIColor whiteColor]];
 
     //[[LFSAttributedTextCell appearance] setHeaderTitleColor:[UIColor blackColor]];
     return YES;
