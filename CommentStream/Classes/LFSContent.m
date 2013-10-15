@@ -101,6 +101,7 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
     BOOL _visibilityIsSet;
     BOOL _contentTypeIsSet;
     BOOL _contentSourceIsSet;
+    BOOL _authorIsModeratorIsSet;
 }
 
 /* Sample content:
@@ -152,6 +153,18 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
 
 #pragma mark -
 @synthesize author = _author;
+
+#pragma mark -
+@synthesize authorIsModerator = _authorIsModerator;
+-(BOOL)authorIsModerator
+{
+    const static NSString* const key = @"moderator";
+    if (!_authorIsModeratorIsSet) {
+        NSNumber *moderator = [self.contentAnnotations objectForKey:key];
+        _authorIsModerator = (moderator != nil && [moderator boolValue]);
+    }
+    return _authorIsModerator;
+}
 
 #pragma mark -
 -(UIImage*)contentSourceIcon
@@ -547,6 +560,7 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
     _visibilityIsSet = NO;
     _contentSourceIsSet = NO;
     _contentTypeIsSet = NO;
+    _authorIsModeratorIsSet = NO;
 }
 
 @end

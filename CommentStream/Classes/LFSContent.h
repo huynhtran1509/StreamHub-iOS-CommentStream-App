@@ -42,6 +42,9 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @property (nonatomic, strong) id object;
 
+// convenience properties
+@property (nonatomic, readonly) BOOL authorIsModerator;
+
 @property (nonatomic, readonly) UIImage *contentSourceIconSmall;
 @property (nonatomic, readonly) UIImage *contentSourceIcon;
 @property (nonatomic, readonly) NSString *contentTwitterId;

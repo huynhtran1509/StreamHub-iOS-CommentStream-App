@@ -715,11 +715,9 @@ const static CGFloat kStatusBarHeight = 20.f;
     
     // always set an object
     LFSAuthor *author = content.author;
-    NSNumber *moderator = [content.contentAnnotations objectForKey:@"moderator"];
-    BOOL hasModerator = (moderator != nil && [moderator boolValue]);
     [cell setProfileLocal:[[LFSHeader alloc]
                            initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
-                           attributeString:(hasModerator ? @"Moderator" : @"")
+                           attributeString:(content.authorIsModerator ? @"Moderator" : @"")
                            mainString:(author.displayName ?: @"")
                            iconImage:nil]];
 }
