@@ -42,9 +42,15 @@ extern const CGSize kCellImageViewSize;
 @property (nonatomic, assign) CGFloat leftOffset;
 
 #pragma mark - Methods
-+ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html withLeftOffset:(CGFloat)offset;
+
++ (NSMutableAttributedString*)attributedStringFromHTMLString:(NSString*)html;
+
++ (CGFloat)cellHeightForAttributedString:(NSMutableAttributedString*)attributedText
+                                   width:(CGFloat)width
+                              leftOffset:(CGFloat)leftOffset;
 
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
-- (void)setHTMLString:(NSString *)html;
+
+- (void)setAttributedString:(NSMutableAttributedString *)attributedString;
 
 @end
