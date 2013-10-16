@@ -64,7 +64,7 @@ static const CGFloat kDeletedCellHeaderTitleFontSize = 12.f;
         // initialize subview references
         _leftOffset = 0.f;
         [self setSelectionStyle:UITableViewCellSelectionStyleNone];
-        [self.imageView setContentMode:UIViewContentModeScaleToFill];
+        [self.textLabel setNumberOfLines:0]; // wrap text automatically
         [self.imageView.layer setCornerRadius:kDeletedCellImageCornerRadius];
         [self.imageView.layer setMasksToBounds:YES];
     }
