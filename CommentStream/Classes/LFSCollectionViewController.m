@@ -10,7 +10,6 @@
 #define CACHE_SCALED_IMAGES
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
-#import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
 
 #import <objc/runtime.h>
@@ -30,10 +29,12 @@
 @property (nonatomic, strong) LFSMutableContentCollection *content;
 
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
+@property (nonatomic, readonly) LFSAdminClient *adminClient;
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
+@property (nonatomic, readonly) LFSWriteClient *writeClient;
+
 @property (nonatomic, readonly) LFSTextField *postCommentField;
 
-@property (nonatomic, readonly) LFSWriteClient *writeClient;
 
 // render iOS7 status bar methods to be readwrite properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
@@ -69,8 +70,12 @@ const static char kAttributedTextValueKey;
 
 #pragma mark - Properties
 @synthesize content = _content;
+
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
+@synthesize adminClient = _adminClient;
+@synthesize writeClient = _writeClient;
+
 @synthesize postCommentField = _postCommentField;
 @synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
@@ -83,7 +88,15 @@ const static char kAttributedTextValueKey;
 
 @synthesize postCommentViewController = _postCommentViewController;
 
-@synthesize writeClient = _writeClient;
+-(LFSAdminClient*)adminClient
+{
+    if (_adminClient == nil) {
+        _adminClient = [LFSAdminClient
+                        clientWithNetwork:[self.collection objectForKey:@"network"]
+                        environment:[self.collection objectForKey:@"environment"]];
+    }
+    return _adminClient;
+}
 
 - (LFSWriteClient*)writeClient
 {
@@ -205,7 +218,11 @@ const static char kAttributedTextValueKey;
         //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
     _postCommentViewController = nil;
+    
+    _streamClient = nil;
+    _bootstrapClient = nil;
     _writeClient = nil;
+    _adminClient = nil;
     
     // }}}
     
@@ -235,8 +252,10 @@ const static char kAttributedTextValueKey;
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
 
+    [self authenticateUser];
     [self startStreamWithBoostrap];
 }
+
 
 -(void)viewDidAppear:(BOOL)animated
 {
@@ -275,8 +294,12 @@ const static char kAttributedTextValueKey;
     self.tableView.dataSource = nil;
 
     _postCommentViewController = nil;
+
+    _streamClient = nil;
+    _bootstrapClient = nil;
     _writeClient = nil;
-    
+    _adminClient = nil;
+
     _postCommentField.delegate = nil;
     _postCommentField = nil;
     
@@ -285,9 +308,6 @@ const static char kAttributedTextValueKey;
     _imageCache = nil;
 #endif
 
-    _streamClient = nil;
-    _bootstrapClient = nil;
-    
     _content = nil;
     _container = nil;
     _activityIndicator = nil;
@@ -400,6 +420,26 @@ const static char kAttributedTextValueKey;
 }
 
 #pragma mark - Private methods
+
+- (void)authenticateUser
+{
+    if ([self.collection objectForKey:@"lftoken"] == nil) {
+        return;
+    }
+    
+    [self.adminClient authenticateUserWithToken:[self.collection objectForKey:@"lftoken"]
+                                           site:[self.collection objectForKey:@"siteId"]
+                                        article:[self.collection objectForKey:@"articleId"]
+                                      onSuccess:^(NSOperation *operation, id responseObject)
+     {
+         NSLog(@"response: %@", responseObject);
+     }
+                                      onFailure:^(NSOperation *operation, NSError *error)
+     {
+        NSLog(@"erro: %@", [error localizedDescription]);
+     }];
+}
+
 - (void)startStreamWithBoostrap
 {
     // If we have some data, do not clear it and do not run bootstrap.
@@ -522,14 +562,10 @@ const static char kAttributedTextValueKey;
             cellHeightValue = [cellHeight floatValue];
         }
     }
-    else if (visibility == LFSContentVisibilityNone ||
-             visibility == LFSContentVisibilityPendingDelete)
+    else
     {
         cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
                                                     withLeftOffset:leftOffset];
-    } else {
-        NSAssert(NO, @"Don't know how to display visibility class %d", visibility);
-        cellHeightValue = 0.f;
     }
     return cellHeightValue;
 }
@@ -672,8 +708,7 @@ const static char kAttributedTextValueKey;
         [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
     }
-    else if (visibility == LFSContentVisibilityNone ||
-             visibility == LFSContentVisibilityPendingDelete)
+    else
     {
         LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
                                                   kDeletedCellReuseIdentifier];
@@ -692,9 +727,6 @@ const static char kAttributedTextValueKey;
         }
         [self configureDeletedCell:cell forContent:content];
         returnedCell = cell;
-    } else {
-        NSAssert(NO, @"Don't know how to display visibility class %d", visibility);
-        returnedCell = nil;
     }
     
     return returnedCell;
@@ -732,7 +764,7 @@ const static char kAttributedTextValueKey;
     [cell setRequiredBodyHeight:[cellHeight floatValue]];
     
     // always set an object
-    LFSAuthor *author = content.author;
+    LFSAuthorProfile *author = content.author;
     [cell setProfileLocal:[[LFSHeader alloc]
                            initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
                            attributeString:(content.authorIsModerator ? @"Moderator" : @"")
@@ -742,7 +774,7 @@ const static char kAttributedTextValueKey;
 
 -(void)loadImageForCell:(UITableViewCell*)cell withContent:(LFSContent*)content
 {
-    LFSAuthor *author = content.author;
+    LFSAuthorProfile *author = content.author;
 #ifdef CACHE_SCALED_IMAGES
     NSString *authorId = author.idString;
     UIImage *scaledImage = [_imageCache objectForKey:authorId];

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "LFSAuthor.h"
+#import "LFSAuthorProfile.h"
 #import "LFSContent.h"
 
 #import "LFSDetailView.h"

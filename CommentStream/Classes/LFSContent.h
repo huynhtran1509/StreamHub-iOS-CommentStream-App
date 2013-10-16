@@ -50,7 +50,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 @property (nonatomic, readonly) NSString *contentTwitterId;
 @property (nonatomic, readonly) NSString *contentTwitterUrlString;
 
-@property (nonatomic, strong) LFSAuthor *author;
+@property (nonatomic, strong) LFSAuthorProfile *author;
 @property (nonatomic, strong) LFSContent *parent;
 
 @property (nonatomic, strong) id childContent;

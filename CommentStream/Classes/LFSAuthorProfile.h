@@ -1,5 +1,5 @@
 //
-//  LFSAuthor.h
+//  LFSAuthorProfile.h
 //  CommentStream
 //
 //  Created by Eugene Scherba on 9/23/13.
@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface LFSAuthor : NSObject
+@interface LFSAuthorProfile : NSObject
 
 /*
  * Sample JSON object:

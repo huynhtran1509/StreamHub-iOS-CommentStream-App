@@ -175,7 +175,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                       iconImage:nil]];
     }
     
-    LFSAuthor *author = contentItem.author;
+    LFSAuthorProfile *author = contentItem.author;
     [detailView setProfileRemote:[[LFSTriple alloc]
                                   initWithDetailString:author.profileUrlStringNoHashBang
                                   mainString:nil
