@@ -7,8 +7,12 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
+
+#import <OHAttributedLabel/NSAttributedString+Attributes.h>
+
 #import <StreamHub-iOS-SDK/LFSConstants.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
+
 #import "LFSBasicHTMLParser.h"
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
@@ -56,7 +60,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 
 @interface LFSAttributedTextCell ()
 // store hash to avoid relayout of same HTML
-@property (nonatomic, assign) NSUInteger htmlHash;
+@property (nonatomic, assign) NSUInteger contentHash;
 
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
@@ -73,19 +77,33 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 
 #pragma mark - class methods
 
-+ (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html withLeftOffset:(CGFloat)_offsetLeft
++ (NSMutableAttributedString*)attributedStringFromHTMLString:(NSString*)html
 {
-    static LFSBasicHTMLLabel *label = nil;
-    if (label == nil) {
-        label = [[LFSBasicHTMLLabel alloc] init];
-        [label setFont:[UIFont fontWithName:kCellBodyFontName
-                                       size:kCellBodyFontSize]];
-        [label setLineSpacing:kCellContentLineSpacing];
+    static UIFont *bodyFont = nil;
+    if (bodyFont == nil) {
+        bodyFont = [UIFont fontWithName:kCellBodyFontName size:kCellBodyFontSize];
     }
-    [label setHTMLString:html];
-    CGSize bodySize = [label sizeThatFits:
-                       CGSizeMake(width - kCellPadding.left - _offsetLeft - kCellContentPaddingRight,
-                                  CGFLOAT_MAX)];
+    static NSMutableParagraphStyle* paragraphStyle = nil;
+    if (paragraphStyle == nil) {
+        paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        [paragraphStyle setLineSpacing:kCellContentLineSpacing];
+    }
+    
+    NSMutableAttributedString *attributedText =
+    [LFSBasicHTMLParser attributedStringByProcessingMarkupInString:html];
+    [attributedText setFont:bodyFont];
+    [attributedText addAttribute:NSParagraphStyleAttributeName
+                           value:paragraphStyle
+                           range:NSMakeRange(0u, [attributedText length])];
+    
+    return attributedText;
+}
+
++ (CGFloat)cellHeightForAttributedString:(NSMutableAttributedString*)attributedText
+                                   width:(CGFloat)width
+                              leftOffset:(CGFloat)leftOffset
+{
+    CGSize bodySize = [attributedText sizeConstrainedToSize:CGSizeMake(width - kCellPadding.left - leftOffset - kCellContentPaddingRight, CGFLOAT_MAX)];
     
     return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
 }
@@ -99,7 +117,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 }
 
 #pragma mark - Misc properties
-@synthesize htmlHash = _htmlHash;
+@synthesize contentHash = _contentHash;
 
 @synthesize indicatorIcon = _indicatorIcon;
 @synthesize profileLocal = _profileLocal;
@@ -501,20 +519,21 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 }
 
 #pragma mark - Public methods
-- (void)setHTMLString:(NSString *)html
+
+- (void)setAttributedString:(NSMutableAttributedString *)attributedString
 {
-	// store hash isntead of HTML source
-	NSUInteger newHash = html ? [html hash] : 0u;
+	// store hash isntead of attributed string itself
+	NSUInteger newHash = attributedString ? [attributedString hash] : 0u;
     
-	if (newHash == _htmlHash) {
+	if (newHash == _contentHash) {
 		return;
 	}
+    
+	_contentHash = newHash;
 
-	_htmlHash = newHash;
-	[self.bodyView setHTMLString:html];
+    [self.bodyView setAttributedText:attributedString];
 	[self setNeedsLayout];
 }
-
 
 #pragma mark - Lifecycle
 -(id)initWithReuseIdentifier:(NSString *)reuseIdentifier
@@ -524,7 +543,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     if (self)
     {
         // initialize subview references
-        _htmlHash = 0u;
+        _contentHash = 0u;
         _bodyView = nil;
         _indicatorIcon = nil;
         _headerAccessoryRightView = nil;

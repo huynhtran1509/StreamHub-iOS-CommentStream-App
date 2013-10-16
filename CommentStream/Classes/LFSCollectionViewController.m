@@ -49,9 +49,12 @@
 static NSString* const kAttributedCellReuseIdentifier = @"LFSAttributedCell";
 static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 static NSString* const kCellSelectSegue = @"detailView";
-const static char kContentCellHeightKey;
+
 const static CGFloat kGenerationOffset = 20.f;
 const static CGFloat kStatusBarHeight = 20.f;
+
+const static char kAtttributedTextHeightKey;
+const static char kAttributedTextValueKey;
 
 @implementation LFSCollectionViewController
 {
@@ -495,14 +498,22 @@ const static CGFloat kStatusBarHeight = 20.f;
     LFSContentVisibility visibility = content.visibility;
     if (visibility == LFSContentVisibilityEveryone)
     {
-        NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
+        NSNumber *cellHeight = objc_getAssociatedObject(content, &kAtttributedTextHeightKey);
         if (cellHeight == nil)
         {
+            NSMutableAttributedString *attributedString =
+            [LFSAttributedTextCell attributedStringFromHTMLString:(content.contentBodyHtml ?: @"")];
+            
+            objc_setAssociatedObject(content, &kAttributedTextValueKey,
+                                     attributedString,
+                                     OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            
             cellHeightValue = [LFSAttributedTextCell
-                               cellHeightForBoundsWidth:tableView.bounds.size.width
-                               withHTMLString:content.contentBodyHtml
-                               withLeftOffset:leftOffset];
-            objc_setAssociatedObject(content, &kContentCellHeightKey,
+                               cellHeightForAttributedString:attributedString
+                               width:tableView.bounds.size.width
+                               leftOffset:leftOffset];
+
+            objc_setAssociatedObject(content, &kAtttributedTextHeightKey,
                                      [NSNumber numberWithFloat:cellHeightValue],
                                      OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
@@ -561,8 +572,8 @@ const static CGFloat kStatusBarHeight = 20.f;
                                parameters:nil
                                 onSuccess:^(NSOperation *operation, id responseObject)
              {
-                 NSString *newContentId = [responseObject objectForKey:@"comment_id"];
-                 NSAssert([newContentId isEqualToString:contentId], @"Wrong content Id received");
+                 NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
+                          @"Wrong content Id received");
                  LFSContent *newContent = [_content objectForKey:contentId];
                  if (newContent != nil)
                  {
@@ -709,13 +720,15 @@ const static CGFloat kStatusBarHeight = 20.f;
     [self loadImageForCell:cell withContent:content];
     
     // configure the rest of the cell
-    [cell setHTMLString:(content.contentBodyHtml ?: @"")];
     [cell setContentDate:content.contentCreatedAt];
     [cell setIndicatorIcon:content.contentSourceIconSmall];
     
     [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
     
-    NSNumber *cellHeight = objc_getAssociatedObject(content, &kContentCellHeightKey);
+    NSMutableAttributedString *attributedString = objc_getAssociatedObject(content, &kAttributedTextValueKey);
+    [cell setAttributedString:attributedString];
+    
+    NSNumber *cellHeight = objc_getAssociatedObject(content, &kAtttributedTextHeightKey);
     [cell setRequiredBodyHeight:[cellHeight floatValue]];
     
     // always set an object
