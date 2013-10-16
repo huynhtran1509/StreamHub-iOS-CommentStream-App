@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+#import "LFSUser.h"
 #import "LFSContent.h"
 
 @protocol LFSPostViewControllerDelegate;
@@ -18,6 +19,9 @@
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;
 @property (nonatomic, strong) LFSContent *replyToContent;
+
+@property (nonatomic, strong) LFSUser *user;
+@property (nonatomic, strong) UIImage *avatarImage;
 
 @property (nonatomic, weak) id<LFSPostViewControllerDelegate> delegate;
 

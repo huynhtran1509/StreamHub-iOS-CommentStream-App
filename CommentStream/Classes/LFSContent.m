@@ -135,8 +135,8 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
 -(void)setObject:(id)object
 {
     if (_object != nil && _object != object) {
-        id newObject = [[self.class alloc] initWithObject:object];
-        NSString *newId = [newObject idString];
+        typeof(self) newObject = [[self.class alloc] initWithObject:object];
+        NSString *newId = newObject.idString;
         if (![self.idString isEqualToString:newId]) {
             [NSException raise:@"Object rebase conflict"
                         format:@"Cannot rebase object with id %@ on top %@", self.idString, newId];
@@ -539,11 +539,10 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
 -(void)resetCached
 {
     // reset all cached properties except _object
+    _idString = nil;
     _author = nil;
     
     _content = nil;
-    
-    _idString = nil;
     
     _contentTwitterId = nil;
     _contentTwitterUrlString = nil;

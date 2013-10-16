@@ -41,6 +41,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 -(id)initWithObject:(id)object;
 
 @property (nonatomic, strong) id object;
+@property (nonatomic, copy) NSString *idString;
 
 // convenience properties
 @property (nonatomic, readonly) BOOL authorIsModerator;
@@ -58,7 +59,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 -(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block;
 
 @property (nonatomic, copy) NSDictionary *content;
-@property (nonatomic, copy) NSString *idString;
+
 @property (nonatomic, copy) NSString *targetId;
 
 @property (nonatomic, copy) NSString *contentParentId;

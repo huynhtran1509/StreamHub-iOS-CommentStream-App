@@ -8,8 +8,9 @@
 
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
-#import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 #import <AFNetworking/UIImageView+AFNetworking.h>
+
+#import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
@@ -628,23 +629,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _button1 = nil;
-        _button2 = nil;
-        _bodyView = nil;
-        _footerRightView = nil;
-        _headerAccessoryRightView = nil;
-        _headerImageView = nil;
-        _footerLeftView = nil;
-        _headerTitleView = nil;
-        
-        _profileRemoteURL = nil;
-
-        _profileLocal = nil;
-        _profileRemote = nil;
-        _contentRemote = nil;
-        _contentBodyHtml = nil;
-        
-        _contentDate = nil;
+        // Initialization code
+        [self resetFields];
     }
     return self;
 }
@@ -654,28 +640,17 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
-        _button1 = nil;
-        _button2 = nil;
-        _bodyView = nil;
-        _footerRightView = nil;
-        _headerAccessoryRightView = nil;
-        _headerImageView = nil;
-        _footerLeftView = nil;
-        _headerTitleView = nil;
-        
-        _profileRemoteURL = nil;
-
-        _profileLocal = nil;
-        _profileRemote = nil;
-        _contentRemote = nil;
-        _contentBodyHtml = nil;
-        
-        _contentDate = nil;
+        [self resetFields];
     }
     return self;
 }
 
 - (void)dealloc
+{
+    [self resetFields];
+}
+
+-(void)resetFields
 {
     _button1 = nil;
     _button2 = nil;

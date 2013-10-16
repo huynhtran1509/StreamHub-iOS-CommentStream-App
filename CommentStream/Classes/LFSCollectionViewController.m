@@ -23,6 +23,7 @@
 #import "LFSDetailViewController.h"
 #import "LFSTextField.h"
 
+#import "LFSUser.h"
 #import "LFSContentCollection.h"
 
 @interface LFSCollectionViewController ()
@@ -35,12 +36,13 @@
 
 @property (nonatomic, readonly) LFSTextField *postCommentField;
 
+@property (nonatomic, strong) LFSUser *user;
 
 // render iOS7 status bar methods to be readwrite properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
-@property (nonatomic, strong) LFSPostViewController *postCommentViewController;
+@property (nonatomic, strong) LFSPostViewController *postViewController;
 
 @property (nonatomic, strong) UIImage *placeholderImage;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
@@ -70,6 +72,7 @@ const static char kAttributedTextValueKey;
 
 #pragma mark - Properties
 @synthesize content = _content;
+@synthesize user = _user;
 
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
@@ -86,7 +89,7 @@ const static char kAttributedTextValueKey;
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
-@synthesize postCommentViewController = _postCommentViewController;
+@synthesize postViewController = _postViewController;
 
 -(LFSAdminClient*)adminClient
 {
@@ -139,23 +142,23 @@ const static char kAttributedTextValueKey;
     return _streamClient;
 }
 
--(LFSPostViewController*)postCommentViewController
+-(LFSPostViewController*)postViewController
 {
     // lazy-instantiate LFSPostViewController
     static NSString* const kLFSMainStoryboardId = @"Main";
     static NSString* const kLFSPostCommentViewControllerId = @"postComment";
     
-    if (_postCommentViewController == nil) {
+    if (_postViewController == nil) {
         UIStoryboard *storyboard = [UIStoryboard
                                     storyboardWithName:kLFSMainStoryboardId
                                     bundle:nil];
-        _postCommentViewController =
+        _postViewController =
         (LFSPostViewController*)[storyboard
                                  instantiateViewControllerWithIdentifier:
                                  kLFSPostCommentViewControllerId];
-        [_postCommentViewController setDelegate:self];
+        [_postViewController setDelegate:self];
     }
-    return _postCommentViewController;
+    return _postViewController;
 }
 
 #pragma mark - Lifecycle
@@ -217,13 +220,14 @@ const static char kAttributedTextValueKey;
         [toolbar setBarStyle:UIBarStyleDefault];
         //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
-    _postCommentViewController = nil;
+    _postViewController = nil;
     
     _streamClient = nil;
     _bootstrapClient = nil;
     _writeClient = nil;
     _adminClient = nil;
     
+    _user = nil;
     // }}}
     
 #ifdef CACHE_SCALED_IMAGES
@@ -293,7 +297,7 @@ const static char kAttributedTextValueKey;
     self.tableView.delegate = nil;
     self.tableView.dataSource = nil;
 
-    _postCommentViewController = nil;
+    _postViewController = nil;
 
     _streamClient = nil;
     _bootstrapClient = nil;
@@ -432,11 +436,11 @@ const static char kAttributedTextValueKey;
                                         article:[self.collection objectForKey:@"articleId"]
                                       onSuccess:^(NSOperation *operation, id responseObject)
      {
-         NSLog(@"response: %@", responseObject);
+         self.user = [[LFSUser alloc] initWithObject:responseObject];
      }
                                       onFailure:^(NSOperation *operation, NSError *error)
      {
-        NSLog(@"erro: %@", [error localizedDescription]);
+         NSLog(@"Could not authenticate user against collection");
      }];
 }
 
@@ -876,6 +880,7 @@ const static char kAttributedTextValueKey;
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
                 [vc setHideStatusBar:self.prefersStatusBarHidden];
+                [vc setUser:self.user];
                 [vc setDelegate:self];
             }
         }
@@ -887,10 +892,12 @@ const static char kAttributedTextValueKey;
 -(IBAction)createComment:(id)sender
 {
     // configure destination controller
-    [self.postCommentViewController setCollection:self.collection];
-    [self.postCommentViewController setCollectionId:self.collectionId];
+    [self.postViewController setCollection:self.collection];
+    [self.postViewController setCollectionId:self.collectionId];
+    [self.postViewController setAvatarImage:self.placeholderImage];
+    [self.postViewController setUser:self.user];
     
-    [self.navigationController presentViewController:self.postCommentViewController
+    [self.navigationController presentViewController:self.postViewController
                                             animated:YES
                                           completion:nil];
 }
