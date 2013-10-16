@@ -7,8 +7,12 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
+
+#import <OHAttributedLabel/NSAttributedString+Attributes.h>
+
 #import <StreamHub-iOS-SDK/LFSConstants.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
+
 #import "LFSBasicHTMLParser.h"
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
@@ -75,17 +79,24 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 
 + (CGFloat)cellHeightForBoundsWidth:(CGFloat)width withHTMLString:(NSString*)html withLeftOffset:(CGFloat)_offsetLeft
 {
-    static LFSBasicHTMLLabel *label = nil;
-    if (label == nil) {
-        label = [[LFSBasicHTMLLabel alloc] init];
-        [label setFont:[UIFont fontWithName:kCellBodyFontName
-                                       size:kCellBodyFontSize]];
-        [label setLineSpacing:kCellContentLineSpacing];
+    static UIFont *bodyFont = nil;
+    if (bodyFont == nil) {
+        bodyFont = [UIFont fontWithName:kCellBodyFontName size:kCellBodyFontSize];
     }
-    [label setHTMLString:html];
-    CGSize bodySize = [label sizeThatFits:
-                       CGSizeMake(width - kCellPadding.left - _offsetLeft - kCellContentPaddingRight,
-                                  CGFLOAT_MAX)];
+    static NSMutableParagraphStyle* paragraphStyle = nil;
+    if (paragraphStyle == nil) {
+        paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        [paragraphStyle setLineSpacing:kCellContentLineSpacing];
+    }
+    
+    NSMutableAttributedString *attributedText =
+    [LFSBasicHTMLParser attributedStringByProcessingMarkupInString:html];
+    [attributedText setFont:bodyFont];
+    [attributedText addAttribute:NSParagraphStyleAttributeName
+                           value:paragraphStyle
+                           range:NSMakeRange(0, [attributedText length])];
+    
+    CGSize bodySize = [attributedText sizeConstrainedToSize:CGSizeMake(width - kCellPadding.left - _offsetLeft - kCellContentPaddingRight, CGFLOAT_MAX)];
     
     return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
 }
