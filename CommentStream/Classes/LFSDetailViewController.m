@@ -171,24 +171,24 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     // only set an object if we have a remote (Twitter) url
     NSString *twitterUrlString = contentItem.contentTwitterUrlString;
     if (twitterUrlString != nil) {
-        [detailView setContentRemote:[[LFSTriple alloc]
-                                      initWithDetailString:twitterUrlString
-                                      mainString:@"View on Twitter >"
-                                      iconImage:nil]];
+        [detailView setContentRemote:[[LFSResource alloc]
+                                      initWithIdentifier:twitterUrlString
+                                      displayString:@"View on Twitter >"
+                                      icon:nil]];
     }
     
     LFSAuthorProfile *author = contentItem.author;
-    [detailView setProfileRemote:[[LFSTriple alloc]
-                                  initWithDetailString:author.profileUrlStringNoHashBang
-                                  mainString:nil
-                                  iconImage:contentItem.contentSourceIcon]];
+    [detailView setProfileRemote:[[LFSResource alloc]
+                                  initWithIdentifier:author.profileUrlStringNoHashBang
+                                  displayString:nil
+                                  icon:contentItem.contentSourceIcon]];
     
-    LFSHeader *headerInfo = [[LFSHeader alloc]
-                             initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
-                             attributeString:(contentItem.authorIsModerator ? @"Moderator" : nil)
-                             mainString:author.displayName
-                             iconImage:self.avatarImage];
-    [headerInfo setIconImageURL:author.avatarUrlString75];
+    LFSResource *headerInfo = [[LFSResource alloc]
+                               initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
+                               attributeString:(contentItem.authorIsModerator ? @"Moderator" : nil)
+                               displayString:author.displayName
+                               icon:self.avatarImage];
+    [headerInfo setIconURLString:author.avatarUrlString75];
     [detailView setProfileLocal:headerInfo];
 }
 

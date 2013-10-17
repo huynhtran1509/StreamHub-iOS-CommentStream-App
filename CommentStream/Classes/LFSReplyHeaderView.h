@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-#import "LFSHeader.h"
+#import "LFSResource.h"
 
 @interface LFSReplyHeaderView : UIView
 
-@property (nonatomic, strong) LFSHeader* profileLocal;
+@property (nonatomic, strong) LFSResource* profileLocal;
 
 @end

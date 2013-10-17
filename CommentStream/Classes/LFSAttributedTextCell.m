@@ -391,9 +391,9 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     imageViewFrame.size = kCellImageViewSize;
     [self.imageView setFrame:imageViewFrame];
     
-    LFSHeader *profileLocal = self.profileLocal;
-    NSString *headerTitle = profileLocal.mainString;
-    NSString *headerSubtitle = profileLocal.detailString;
+    LFSResource *profileLocal = self.profileLocal;
+    NSString *headerTitle = profileLocal.displayString;
+    NSString *headerSubtitle = profileLocal.identifier;
     NSString *headerAccessory = profileLocal.attributeString;
     
     CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;

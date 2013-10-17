@@ -203,9 +203,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // Note: preciese layout depends on whether we have subtitle field
     // (i.e. twitter handle)
     
-    LFSHeader *profileLocal = self.profileLocal;
-    NSString *headerTitle = profileLocal.mainString;
-    NSString *headerSubtitle = profileLocal.detailString;
+    LFSResource *profileLocal = self.profileLocal;
+    NSString *headerTitle = profileLocal.displayString;
+    NSString *headerSubtitle = profileLocal.identifier;
     NSString *headerAccessory = profileLocal.attributeString;
     
     if (headerTitle && !headerSubtitle && !headerAccessory)
@@ -309,8 +309,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     }
     
     // layout avatar view
-    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconImageURL]
-                         placeholderImage:profileLocal.iconImage];
+    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
+                         placeholderImage:profileLocal.icon];
 }
 
 #pragma mark - Lifecycle

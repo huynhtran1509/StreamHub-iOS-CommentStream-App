@@ -8,8 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "LFSTriple.h"
-#import "LFSHeader.h"
+#import "LFSResource.h"
 
 @protocol LFSDetailViewDelegate;
 
@@ -17,9 +16,9 @@
 
 @property (nonatomic, weak) id<LFSDetailViewDelegate>delegate;
 
-@property (nonatomic, strong) LFSHeader* profileLocal;
-@property (nonatomic, strong) LFSTriple* profileRemote;
-@property (nonatomic, strong) LFSTriple* contentRemote;
+@property (nonatomic, strong) LFSResource* profileLocal;
+@property (nonatomic, strong) LFSResource* profileRemote;
+@property (nonatomic, strong) LFSResource* contentRemote;
 
 @property (nonatomic, copy) NSString* contentBodyHtml;
 

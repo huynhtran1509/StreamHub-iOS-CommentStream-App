@@ -9,17 +9,16 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "LFSBasicHTMLLabel.h"
-#import "LFSTriple.h"
-#import "LFSHeader.h"
+#import "LFSResource.h"
 
 extern const CGSize kCellImageViewSize;
 
 @interface LFSAttributedTextCell : UITableViewCell <UIAppearance>
 
 #pragma mark - Properties
-@property (nonatomic, strong) LFSHeader* profileLocal;
-@property (nonatomic, strong) LFSTriple* profileRemote;
-@property (nonatomic, strong) LFSTriple* contentRemote;
+@property (nonatomic, strong) LFSResource* profileLocal;
+@property (nonatomic, strong) LFSResource* profileRemote;
+@property (nonatomic, strong) LFSResource* contentRemote;
 
 @property (nonatomic, strong) NSDate* contentDate;
 
