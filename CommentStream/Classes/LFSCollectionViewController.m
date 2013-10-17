@@ -745,6 +745,8 @@ const static char kAttributedTextValueKey;
     NSString *bodyText = (visibility == LFSContentVisibilityPendingDelete
                           ? @"This comment is being removed…"
                           : @"This comment has been removed");
+    
+    //[cell.textLabel setText:[NSString stringWithFormat:@"%@ (%d)", bodyText, content.nodeCount]];
     [cell.textLabel setText:bodyText];
 }
 
@@ -768,10 +770,14 @@ const static char kAttributedTextValueKey;
     
     // always set an object
     LFSAuthorProfile *author = content.author;
+    
+    NSString *title = author.displayName ?: @"";
+    
     [cell setProfileLocal:[[LFSHeader alloc]
                            initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
                            attributeString:(content.authorIsModerator ? @"Moderator" : @"")
-                           mainString:(author.displayName ?: @"")
+                           //mainString:[NSString stringWithFormat:@"%@ (%d)", title, content.nodeCount]
+                           mainString:title
                            iconImage:nil]];
 }
 

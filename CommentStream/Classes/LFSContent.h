@@ -53,6 +53,9 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @property (nonatomic, strong) LFSAuthorProfile *author;
 @property (nonatomic, strong) LFSContent *parent;
+@property (nonatomic, strong) NSHashTable *children;
+
+- (NSUInteger)nodeCountSumOfChildren;
 
 @property (nonatomic, strong) id childContent;
 @property (nonatomic, assign) NSInteger nodeCount;

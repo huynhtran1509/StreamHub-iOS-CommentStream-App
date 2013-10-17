@@ -120,6 +120,9 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 -(void)insertObject:(LFSContent*)object forKey:(id<NSCopying>)key
 {
+    // this is our insert primitive -- all other methods with similar functionality
+    // ultimately redirect here
+    //
     // first insert into the dictionary
     NSAssert([_mapping objectForKey:key] == nil, @"Pre-existing object found");
     [_mapping setObject:object forKey:key];
@@ -135,6 +138,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [array addObject:object.contentCreatedAt];
         [object setDatePath:array];
         [object setParent:parent];
+        [parent.children addObject:object];
     }
     else
     {
@@ -161,6 +165,10 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 -(void)removeObject:(id)object forKey:(id)key
 {
+    // this is our remove primitive -- all other methods with similar functionality
+    // ultimately redirect here
+    //
+    [[[object parent] children] removeObject:object];
     [object setParent:nil];
     [_mapping removeObjectForKey:key];
     NSUInteger index = [self indexOfObject:object];
@@ -203,6 +211,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [self setObject:content forKey:content.idString];
 }
 
+
 - (void)setObject:(id)object forKey:(id<NSCopying>)key
 {
     // check if object is of appropriate type
@@ -211,19 +220,22 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
                            : [[LFSContent alloc] initWithObject:object]);
     [self updateLastEventWithContent:content];
     
-    //NSUInteger count = 0;
     NSAssert([content.idString isEqualToString:(NSString*)key], @"Key not equal to content id");
     
     LFSContent *oldContent = [_mapping objectForKey:key];
     if (oldContent != nil)
     {
         // pre-existing object found (should never happen with bootstrap data)
-        LFSContentVisibility oldVisibility = oldContent.visibility;
         [oldContent setObject:content.object];
-        if (oldVisibility != LFSContentVisibilityNone &&
-            content.visibility == LFSContentVisibilityNone)
-        {
-            [self changeNodeCountOf:oldContent withDelta:-1];
+        
+        NSInteger expectedNodeCount = ((oldContent.visibility == LFSContentVisibilityEveryone ? 1 : 0) +
+                                      oldContent.nodeCountSumOfChildren);
+        NSInteger delta = (NSInteger)expectedNodeCount - oldContent.nodeCount;
+        if (delta < 0) {
+            // checking if delta is negative here because it is possible that we receive content
+            // after delete event
+            NSAssert(delta == -1, @"No support for deleting more than one comment at once");
+            [self changeNodeCountOf:oldContent withDelta:delta];
         }
     }
     else

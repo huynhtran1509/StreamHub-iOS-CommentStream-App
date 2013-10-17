@@ -58,10 +58,23 @@
     _object = object;
 }
 
-
 -(NSString*)description
 {
     return [_object description];
+}
+
+-(NSUInteger)hash
+{
+    return [self.idString hash];
+}
+
+-(BOOL)isEqual:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        return [self.idString isEqualToString:[object idString]];
+    } else {
+        return NO;
+    }
 }
 
 #pragma mark -
