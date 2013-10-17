@@ -444,23 +444,23 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     [self layoutHeader];
     
     // layout url link
-    LFSTriple *contentRemote = self.contentRemote;
+    LFSResource *contentRemote = self.contentRemote;
     if (contentRemote != nil) {
         [self.footerRightView setHTMLString:
          [NSString stringWithFormat:@"<a href=\"%@\">%@</a>",
-          [contentRemote detailString],
-          [contentRemote mainString]]];
+          [contentRemote identifier],
+          [contentRemote displayString]]];
         CGRect remoteUrlFrame = self.footerRightView.frame;
         remoteUrlFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
         [self.footerRightView setFrame:remoteUrlFrame];
     }
     
     // layout source icon
-    LFSTriple *profileRemote = self.profileRemote;
+    LFSResource *profileRemote = self.profileRemote;
     if (profileRemote != nil) {
-        [self.headerAccessoryRightView setImage:profileRemote.iconImage
+        [self.headerAccessoryRightView setImage:profileRemote.icon
                                   forState:UIControlStateNormal];
-        _profileRemoteURL = [NSURL URLWithString:profileRemote.detailString];
+        _profileRemoteURL = [NSURL URLWithString:profileRemote.identifier];
     }
 
     // layout date label
@@ -507,9 +507,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // Note: preciese layout depends on whether we have subtitle field
     // (i.e. twitter handle)
     
-    LFSHeader *profileLocal = self.profileLocal;
-    NSString *headerTitle = profileLocal.mainString;
-    NSString *headerSubtitle = profileLocal.detailString;
+    LFSResource *profileLocal = self.profileLocal;
+    NSString *headerTitle = profileLocal.displayString;
+    NSString *headerSubtitle = profileLocal.identifier;
     NSString *headerAccessory = profileLocal.attributeString;
     
     if (headerTitle && !headerSubtitle && !headerAccessory)
@@ -613,8 +613,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     }
 
     // layout avatar view
-    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconImageURL]
-                         placeholderImage:profileLocal.iconImage];
+    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
+                         placeholderImage:profileLocal.icon];
 }
 
 -(CGSize)contentSizeThatFits:(CGSize)size

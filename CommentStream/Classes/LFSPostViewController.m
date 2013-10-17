@@ -11,7 +11,7 @@
 
 #import "LFSReplyHeaderView.h"
 #import "LFSAuthorProfile.h"
-#import "LFSHeader.h"
+#import "LFSResource.h"
 
 @interface LFSPostViewController ()
 
@@ -94,12 +94,12 @@
     
     LFSAuthorProfile *author = self.user.profile;
     NSString *detailString = (author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil);
-    LFSHeader *headerInfo = [[LFSHeader alloc]
-                             initWithDetailString:detailString
-                             attributeString:nil
-                             mainString:author.displayName
-                             iconImage:self.avatarImage];
-    [headerInfo setIconImageURL:author.avatarUrlString75];
+    LFSResource *headerInfo = [[LFSResource alloc]
+                               initWithIdentifier:detailString
+                               attributeString:nil
+                               displayString:author.displayName
+                               icon:self.avatarImage];
+    [headerInfo setIconURLString:author.avatarUrlString75];
     [self.headerView setProfileLocal:headerInfo];
 }
 

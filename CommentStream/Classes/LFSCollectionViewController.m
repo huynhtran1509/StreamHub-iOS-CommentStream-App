@@ -773,12 +773,12 @@ const static char kAttributedTextValueKey;
     
     NSString *title = author.displayName ?: @"";
     
-    [cell setProfileLocal:[[LFSHeader alloc]
-                           initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
+    [cell setProfileLocal:[[LFSResource alloc]
+                           initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
                            attributeString:(content.authorIsModerator ? @"Moderator" : @"")
                            //mainString:[NSString stringWithFormat:@"%@ (%d)", title, content.nodeCount]
-                           mainString:title
-                           iconImage:nil]];
+                           displayString:title
+                           icon:nil]];
 }
 
 -(void)loadImageForCell:(UITableViewCell*)cell withContent:(LFSContent*)content
