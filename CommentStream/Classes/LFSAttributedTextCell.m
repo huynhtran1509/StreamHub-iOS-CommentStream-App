@@ -567,7 +567,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
             [self setSelectedBackgroundView:selectionColor];
         }
         
-        [self.imageView setContentMode:UIViewContentModeScaleToFill];
+        [self.imageView setContentMode:UIViewContentModeTopLeft];
         [self.imageView.layer setCornerRadius:kCellImageCornerRadius];
         [self.imageView.layer setMasksToBounds:YES];
     }

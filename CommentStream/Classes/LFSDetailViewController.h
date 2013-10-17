@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "LFSAuthor.h"
+#import "LFSAuthorProfile.h"
 #import "LFSContent.h"
+#import "LFSUser.h"
 
 #import "LFSDetailView.h"
 #import "LFSPostViewController.h"
@@ -25,6 +26,8 @@
 @property (nonatomic, copy) NSString *collectionId;
 @property (nonatomic, strong) UIImage *avatarImage;
 @property (nonatomic, strong) LFSContent *contentItem;
+
+@property (nonatomic, strong) LFSUser *user;
 
 @property (nonatomic, weak) id<LFSDetailViewControllerDelegate> delegate;
 

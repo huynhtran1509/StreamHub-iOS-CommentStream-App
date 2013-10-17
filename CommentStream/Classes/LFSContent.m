@@ -135,8 +135,8 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
 -(void)setObject:(id)object
 {
     if (_object != nil && _object != object) {
-        id newObject = [[self.class alloc] initWithObject:object];
-        NSString *newId = [newObject idString];
+        typeof(self) newObject = [[self.class alloc] initWithObject:object];
+        NSString *newId = newObject.idString;
         if (![self.idString isEqualToString:newId]) {
             [NSException raise:@"Object rebase conflict"
                         format:@"Cannot rebase object with id %@ on top %@", self.idString, newId];
@@ -151,8 +151,42 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
     return [_object description];
 }
 
+-(NSUInteger)hash
+{
+    return [self.idString hash];
+}
+
+-(BOOL)isEqual:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        return [self.idString isEqualToString:[object idString]];
+    } else {
+        return NO;
+    }
+}
+
 #pragma mark -
 @synthesize author = _author;
+
+#pragma mark -
+- (NSUInteger)nodeCountSumOfChildren
+{
+    NSUInteger count = 0u;
+    for (typeof(self) child in self.children) {
+        count += child.nodeCount;
+    }
+    return count;
+}
+
+#pragma mark -
+@synthesize children = _children;
+-(NSHashTable*)children
+{
+    if (_children == nil) {
+        _children = [NSHashTable weakObjectsHashTable];
+    }
+    return _children;
+}
 
 #pragma mark -
 @synthesize authorIsModerator = _authorIsModerator;
@@ -515,6 +549,7 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
             _object = object;
             _datePath = nil;
             _parent = nil;
+            _children = nil;
             _nodeCount = 0;
         }
     }
@@ -534,16 +569,16 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
     _object = nil;
     _datePath = nil;
     _parent = nil;
+    _children = nil;
 }
 
 -(void)resetCached
 {
     // reset all cached properties except _object
+    _idString = nil;
     _author = nil;
     
     _content = nil;
-    
-    _idString = nil;
     
     _contentTwitterId = nil;
     _contentTwitterUrlString = nil;

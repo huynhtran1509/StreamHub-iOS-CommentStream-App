@@ -41,6 +41,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 -(id)initWithObject:(id)object;
 
 @property (nonatomic, strong) id object;
+@property (nonatomic, copy) NSString *idString;
 
 // convenience properties
 @property (nonatomic, readonly) BOOL authorIsModerator;
@@ -50,15 +51,18 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 @property (nonatomic, readonly) NSString *contentTwitterId;
 @property (nonatomic, readonly) NSString *contentTwitterUrlString;
 
-@property (nonatomic, strong) LFSAuthor *author;
+@property (nonatomic, strong) LFSAuthorProfile *author;
 @property (nonatomic, strong) LFSContent *parent;
+@property (nonatomic, strong) NSHashTable *children;
+
+- (NSUInteger)nodeCountSumOfChildren;
 
 @property (nonatomic, strong) id childContent;
 @property (nonatomic, assign) NSInteger nodeCount;
 -(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block;
 
 @property (nonatomic, copy) NSDictionary *content;
-@property (nonatomic, copy) NSString *idString;
+
 @property (nonatomic, copy) NSString *targetId;
 
 @property (nonatomic, copy) NSString *contentParentId;

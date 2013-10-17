@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "LFSAuthor.h"
+#import "LFSAuthorProfile.h"
 
 @interface LFSAuthorCollection : NSMutableDictionary
 

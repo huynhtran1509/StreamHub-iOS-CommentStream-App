@@ -52,8 +52,8 @@
 {
     // only update object data if the two
     // objects turn out to have the same key
-    if ([anObject isKindOfClass:[LFSAuthor class]]) {
-        LFSAuthor *author = [_dictionary objectForKey:aKey];
+    if ([anObject isKindOfClass:[LFSAuthorProfile class]]) {
+        LFSAuthorProfile *author = [_dictionary objectForKey:aKey];
         if (author == nil) {
             [_dictionary setObject:anObject forKey:aKey];
         } else {
@@ -61,9 +61,9 @@
         }
         [_dictionary setObject:anObject forKey:aKey];
     } else {
-        LFSAuthor *author = [_dictionary objectForKey:aKey];
+        LFSAuthorProfile *author = [_dictionary objectForKey:aKey];
         if (author == nil) {
-            [_dictionary setObject:[[LFSAuthor alloc]
+            [_dictionary setObject:[[LFSAuthorProfile alloc]
                                     initWithObject:anObject]
                             forKey:aKey];
         } else {
@@ -95,14 +95,14 @@
         
         // create an NSDictionary from a C array of object pointers
         // and a C array of key pointers
-        Class classOfLFSAuthor = [LFSAuthor class];
-        LFSAuthor *__strong *array =
-        (LFSAuthor *__strong *)malloc(sizeof(LFSAuthor*) * cnt);
+        Class classOfLFSAuthor = [LFSAuthorProfile class];
+        LFSAuthorProfile *__strong *array =
+        (LFSAuthorProfile *__strong *)malloc(sizeof(LFSAuthorProfile*) * cnt);
         for (NSUInteger i = 0; i < cnt; i++) {
             id object = objects[i];
-            LFSAuthor *author = ([object isKindOfClass:classOfLFSAuthor]
-                                 ? (LFSAuthor*)object
-                                 : [[LFSAuthor alloc]
+            LFSAuthorProfile *author = ([object isKindOfClass:classOfLFSAuthor]
+                                 ? (LFSAuthorProfile*)object
+                                 : [[LFSAuthorProfile alloc]
                                     initWithObject:object]);
             array[i] = author;
         }

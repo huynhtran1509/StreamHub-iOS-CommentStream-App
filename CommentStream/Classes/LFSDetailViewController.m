@@ -10,6 +10,7 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
+#import "UIImage+LFSColor.h"
 #import "LFSDetailViewController.h"
 #import "LFSContentToolbar.h"
 
@@ -17,7 +18,7 @@
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
 
-@property (strong, nonatomic) LFSPostViewController *postCommentViewController;
+@property (strong, nonatomic) LFSPostViewController *postViewController;
 
 // render iOS7 status bar methods as writable properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
@@ -39,7 +40,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
-@synthesize postCommentViewController = _postCommentViewController;
+@synthesize postViewController = _postViewController;
+@synthesize user = _user;
 
 @synthesize hideStatusBar = _hideStatusBar;
 @synthesize scrollView = _scrollView;
@@ -64,22 +66,22 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 
--(LFSPostViewController*)postCommentViewController
+-(LFSPostViewController*)postViewController
 {
     // lazy-instantiate LFSPostViewController
     static NSString* const kLFSMainStoryboardId = @"Main";
     static NSString* const kLFSPostCommentViewControllerId = @"postComment";
     
-    if (_postCommentViewController == nil) {
+    if (_postViewController == nil) {
         UIStoryboard *storyboard = [UIStoryboard
                                     storyboardWithName:kLFSMainStoryboardId
                                     bundle:nil];
-        _postCommentViewController =
+        _postViewController =
         (LFSPostViewController*)[storyboard
                                  instantiateViewControllerWithIdentifier:kLFSPostCommentViewControllerId];
-        [_postCommentViewController setDelegate:self];
+        [_postViewController setDelegate:self];
     }
-    return _postCommentViewController;
+    return _postViewController;
 }
 
 #pragma mark - Private methods
@@ -129,7 +131,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if (self) {
         _hideStatusBar = NO;
         _writeClient = nil;
-        _postCommentViewController = nil;
+        _postViewController = nil;
     }
     return self;
 }
@@ -140,14 +142,14 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if (self) {
         _hideStatusBar = NO;
         _writeClient = nil;
-        _postCommentViewController = nil;
+        _postViewController = nil;
     }
     return self;
 }
 
 - (void)dealloc
 {
-    _postCommentViewController = nil;
+    _postViewController = nil;
 }
 
 - (void)viewDidLoad
@@ -175,7 +177,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                       iconImage:nil]];
     }
     
-    LFSAuthor *author = contentItem.author;
+    LFSAuthorProfile *author = contentItem.author;
     [detailView setProfileRemote:[[LFSTriple alloc]
                                   initWithDetailString:author.profileUrlStringNoHashBang
                                   mainString:nil
@@ -296,11 +298,18 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)didSelectReply:(id)sender
 {
     // configure destination controller
-    [self.postCommentViewController setCollection:self.collection];
-    [self.postCommentViewController setCollectionId:self.collectionId];
-    [self.postCommentViewController setReplyToContent:self.contentItem];
+    [self.postViewController setCollection:self.collection];
+    [self.postViewController setCollectionId:self.collectionId];
+    [self.postViewController setReplyToContent:self.contentItem];
     
-    [self.navigationController presentViewController:self.postCommentViewController
+    [self.postViewController setUser:self.user];
+    [self.postViewController setAvatarImage:[UIImage imageWithColor:
+                                             [UIColor colorWithRed:232.f / 255.f
+                                                             green:236.f / 255.f
+                                                              blue:239.f / 255.f
+                                                             alpha:1.f]]];
+    
+    [self.navigationController presentViewController:self.postViewController
                                             animated:YES
                                           completion:nil];
 }

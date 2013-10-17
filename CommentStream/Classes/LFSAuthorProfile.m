@@ -1,14 +1,14 @@
 //
-//  LFSAuthor.m
+//  LFSAuthorProfile.m
 //  CommentStream
 //
 //  Created by Eugene Scherba on 9/23/13.
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
-#import "LFSAuthor.h"
+#import "LFSAuthorProfile.h"
 
-@implementation LFSAuthor
+@implementation LFSAuthorProfile
 /*
  * Sample JSON object:
  {
@@ -28,8 +28,8 @@
 -(void)setObject:(id)object
 {
     if (_object != nil && _object != object) {
-        id newObject = [[self.class alloc] initWithObject:object];
-        NSString *newId = [newObject idString];
+        typeof(self) newObject = [[self.class alloc] initWithObject:object];
+        NSString *newId = newObject.idString;
         if (![self.idString isEqualToString:newId]) {
             [NSException raise:@"Object rebase conflict"
                         format:@"Cannot rebase object with id %@ on top %@", self.idString, newId];
@@ -37,6 +37,20 @@
         [self resetCached];
     }
     _object = object;
+}
+
+-(NSUInteger)hash
+{
+    return [self.idString hash];
+}
+
+-(BOOL)isEqual:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        return [self.idString isEqualToString:[object idString]];
+    } else {
+        return NO;
+    }
 }
 
 -(NSString*)description
@@ -73,8 +87,25 @@
     const static NSString* const key = @"profileUrl";
     if (_profileUrlString == nil) {
         _profileUrlString = [_object objectForKey:key];
+        if (_profileUrlString == (NSString*)[NSNull null]) {
+            _profileUrlString = nil;
+        }
     }
     return _profileUrlString;
+}
+
+#pragma mark -
+@synthesize settingsUrlString = _settingsUrlString;
+-(NSString*)settingsUrlString
+{
+    const static NSString* const key = @"settingsUrl";
+    if (_settingsUrlString == nil) {
+        _settingsUrlString = [_object objectForKey:key];
+        if (_settingsUrlString == (NSString*)[NSNull null]) {
+            _settingsUrlString = nil;
+        }
+    }
+    return _settingsUrlString;
 }
 
 #pragma mark -
@@ -94,11 +125,15 @@
                      @"Error creating regex: %@",
                      regexError1.localizedDescription);
         }
-        _profileUrlStringNoHashBang =
-        [regex1 stringByReplacingMatchesInString:self.profileUrlString
-                                         options:0
-                                           range:NSMakeRange(0, [self.profileUrlString length])
-                                    withTemplate:regexTemplate1];
+        NSString *profileUrlString = self.profileUrlString;
+        if (profileUrlString != nil) {
+            NSRange range = NSMakeRange(0, [profileUrlString length]);
+            _profileUrlStringNoHashBang =
+            [regex1 stringByReplacingMatchesInString:profileUrlString
+                                             options:0
+                                               range:range
+                                        withTemplate:regexTemplate1];
+        }
     }
     return _profileUrlStringNoHashBang;
 }
@@ -227,8 +262,9 @@
 -(void)resetCached
 {
     // reset all cached properties except _object
-    _displayName = nil;
     _idString = nil;
+    
+    _displayName = nil;
     _profileUrlString = nil;
     _profileUrlStringNoHashBang = nil;
     _avatarUrlString = nil;

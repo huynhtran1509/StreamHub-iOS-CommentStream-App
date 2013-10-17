@@ -9,6 +9,10 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import "LFSPostViewController.h"
 
+#import "LFSReplyHeaderView.h"
+#import "LFSAuthorProfile.h"
+#import "LFSHeader.h"
+
 @interface LFSPostViewController ()
 
 // render iOS7 status bar methods as writable properties
@@ -16,6 +20,7 @@
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
+@property (weak, nonatomic) IBOutlet LFSReplyHeaderView *headerView;
 
 @property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
 @property (weak, nonatomic) IBOutlet UITextView *textView;
@@ -37,6 +42,7 @@
 
 @synthesize postNavbar = _postNavbar;
 @synthesize textView = _textView;
+@synthesize user = _user;
 
 @synthesize writeClient = _writeClient;
 @synthesize collection = _collection;
@@ -85,6 +91,16 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
+    LFSAuthorProfile *author = self.user.profile;
+    NSString *detailString = (author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil);
+    LFSHeader *headerInfo = [[LFSHeader alloc]
+                             initWithDetailString:detailString
+                             attributeString:nil
+                             mainString:author.displayName
+                             iconImage:self.avatarImage];
+    [headerInfo setIconImageURL:author.avatarUrlString75];
+    [self.headerView setProfileLocal:headerInfo];
 }
 
 - (void)viewWillAppear:(BOOL)animated

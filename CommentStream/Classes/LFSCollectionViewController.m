@@ -10,7 +10,6 @@
 #define CACHE_SCALED_IMAGES
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
-#import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <AFNetworking/AFImageRequestOperation.h>
 
 #import <objc/runtime.h>
@@ -24,22 +23,26 @@
 #import "LFSDetailViewController.h"
 #import "LFSTextField.h"
 
+#import "LFSUser.h"
 #import "LFSContentCollection.h"
 
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSMutableContentCollection *content;
 
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
+@property (nonatomic, readonly) LFSAdminClient *adminClient;
 @property (nonatomic, readonly) LFSStreamClient *streamClient;
+@property (nonatomic, readonly) LFSWriteClient *writeClient;
+
 @property (nonatomic, readonly) LFSTextField *postCommentField;
 
-@property (nonatomic, readonly) LFSWriteClient *writeClient;
+@property (nonatomic, strong) LFSUser *user;
 
 // render iOS7 status bar methods to be readwrite properties
 @property (nonatomic, assign) BOOL prefersStatusBarHidden;
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
-@property (nonatomic, strong) LFSPostViewController *postCommentViewController;
+@property (nonatomic, strong) LFSPostViewController *postViewController;
 
 @property (nonatomic, strong) UIImage *placeholderImage;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
@@ -69,8 +72,13 @@ const static char kAttributedTextValueKey;
 
 #pragma mark - Properties
 @synthesize content = _content;
+@synthesize user = _user;
+
 @synthesize bootstrapClient = _bootstrapClient;
 @synthesize streamClient = _streamClient;
+@synthesize adminClient = _adminClient;
+@synthesize writeClient = _writeClient;
+
 @synthesize postCommentField = _postCommentField;
 @synthesize collection = _collection;
 @synthesize collectionId = _collectionId;
@@ -81,9 +89,17 @@ const static char kAttributedTextValueKey;
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
-@synthesize postCommentViewController = _postCommentViewController;
+@synthesize postViewController = _postViewController;
 
-@synthesize writeClient = _writeClient;
+-(LFSAdminClient*)adminClient
+{
+    if (_adminClient == nil) {
+        _adminClient = [LFSAdminClient
+                        clientWithNetwork:[self.collection objectForKey:@"network"]
+                        environment:[self.collection objectForKey:@"environment"]];
+    }
+    return _adminClient;
+}
 
 - (LFSWriteClient*)writeClient
 {
@@ -126,23 +142,23 @@ const static char kAttributedTextValueKey;
     return _streamClient;
 }
 
--(LFSPostViewController*)postCommentViewController
+-(LFSPostViewController*)postViewController
 {
     // lazy-instantiate LFSPostViewController
     static NSString* const kLFSMainStoryboardId = @"Main";
     static NSString* const kLFSPostCommentViewControllerId = @"postComment";
     
-    if (_postCommentViewController == nil) {
+    if (_postViewController == nil) {
         UIStoryboard *storyboard = [UIStoryboard
                                     storyboardWithName:kLFSMainStoryboardId
                                     bundle:nil];
-        _postCommentViewController =
+        _postViewController =
         (LFSPostViewController*)[storyboard
                                  instantiateViewControllerWithIdentifier:
                                  kLFSPostCommentViewControllerId];
-        [_postCommentViewController setDelegate:self];
+        [_postViewController setDelegate:self];
     }
-    return _postCommentViewController;
+    return _postViewController;
 }
 
 #pragma mark - Lifecycle
@@ -204,9 +220,14 @@ const static char kAttributedTextValueKey;
         [toolbar setBarStyle:UIBarStyleDefault];
         //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
-    _postCommentViewController = nil;
-    _writeClient = nil;
+    _postViewController = nil;
     
+    _streamClient = nil;
+    _bootstrapClient = nil;
+    _writeClient = nil;
+    _adminClient = nil;
+    
+    _user = nil;
     // }}}
     
 #ifdef CACHE_SCALED_IMAGES
@@ -235,8 +256,10 @@ const static char kAttributedTextValueKey;
     [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
                withAnimation:UIStatusBarAnimationNone];
 
+    [self authenticateUser];
     [self startStreamWithBoostrap];
 }
+
 
 -(void)viewDidAppear:(BOOL)animated
 {
@@ -274,9 +297,13 @@ const static char kAttributedTextValueKey;
     self.tableView.delegate = nil;
     self.tableView.dataSource = nil;
 
-    _postCommentViewController = nil;
+    _postViewController = nil;
+
+    _streamClient = nil;
+    _bootstrapClient = nil;
     _writeClient = nil;
-    
+    _adminClient = nil;
+
     _postCommentField.delegate = nil;
     _postCommentField = nil;
     
@@ -285,9 +312,6 @@ const static char kAttributedTextValueKey;
     _imageCache = nil;
 #endif
 
-    _streamClient = nil;
-    _bootstrapClient = nil;
-    
     _content = nil;
     _container = nil;
     _activityIndicator = nil;
@@ -400,6 +424,26 @@ const static char kAttributedTextValueKey;
 }
 
 #pragma mark - Private methods
+
+- (void)authenticateUser
+{
+    if ([self.collection objectForKey:@"lftoken"] == nil) {
+        return;
+    }
+    
+    [self.adminClient authenticateUserWithToken:[self.collection objectForKey:@"lftoken"]
+                                           site:[self.collection objectForKey:@"siteId"]
+                                        article:[self.collection objectForKey:@"articleId"]
+                                      onSuccess:^(NSOperation *operation, id responseObject)
+     {
+         self.user = [[LFSUser alloc] initWithObject:responseObject];
+     }
+                                      onFailure:^(NSOperation *operation, NSError *error)
+     {
+         NSLog(@"Could not authenticate user against collection");
+     }];
+}
+
 - (void)startStreamWithBoostrap
 {
     // If we have some data, do not clear it and do not run bootstrap.
@@ -522,14 +566,10 @@ const static char kAttributedTextValueKey;
             cellHeightValue = [cellHeight floatValue];
         }
     }
-    else if (visibility == LFSContentVisibilityNone ||
-             visibility == LFSContentVisibilityPendingDelete)
+    else
     {
         cellHeightValue = [LFSDeletedCell cellHeightForBoundsWidth:tableView.bounds.size.width
                                                     withLeftOffset:leftOffset];
-    } else {
-        NSAssert(NO, @"Don't know how to display visibility class %d", visibility);
-        cellHeightValue = 0.f;
     }
     return cellHeightValue;
 }
@@ -672,8 +712,7 @@ const static char kAttributedTextValueKey;
         [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
     }
-    else if (visibility == LFSContentVisibilityNone ||
-             visibility == LFSContentVisibilityPendingDelete)
+    else
     {
         LFSDeletedCell *cell = (LFSDeletedCell *)[tableView dequeueReusableCellWithIdentifier:
                                                   kDeletedCellReuseIdentifier];
@@ -686,15 +725,11 @@ const static char kAttributedTextValueKey;
                                                                alpha:1.f]];
             [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
             [cell.imageView setContentMode:UIViewContentModeCenter];
-            [cell.textLabel setNumberOfLines:0]; // wrap text automatically
             [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
             [cell.textLabel setTextColor:[UIColor lightGrayColor]];
         }
         [self configureDeletedCell:cell forContent:content];
         returnedCell = cell;
-    } else {
-        NSAssert(NO, @"Don't know how to display visibility class %d", visibility);
-        returnedCell = nil;
     }
     
     return returnedCell;
@@ -710,6 +745,8 @@ const static char kAttributedTextValueKey;
     NSString *bodyText = (visibility == LFSContentVisibilityPendingDelete
                           ? @"This comment is being removed…"
                           : @"This comment has been removed");
+    
+    //[cell.textLabel setText:[NSString stringWithFormat:@"%@ (%d)", bodyText, content.nodeCount]];
     [cell.textLabel setText:bodyText];
 }
 
@@ -732,17 +769,21 @@ const static char kAttributedTextValueKey;
     [cell setRequiredBodyHeight:[cellHeight floatValue]];
     
     // always set an object
-    LFSAuthor *author = content.author;
+    LFSAuthorProfile *author = content.author;
+    
+    NSString *title = author.displayName ?: @"";
+    
     [cell setProfileLocal:[[LFSHeader alloc]
                            initWithDetailString:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
                            attributeString:(content.authorIsModerator ? @"Moderator" : @"")
-                           mainString:(author.displayName ?: @"")
+                           //mainString:[NSString stringWithFormat:@"%@ (%d)", title, content.nodeCount]
+                           mainString:title
                            iconImage:nil]];
 }
 
 -(void)loadImageForCell:(UITableViewCell*)cell withContent:(LFSContent*)content
 {
-    LFSAuthor *author = content.author;
+    LFSAuthorProfile *author = content.author;
 #ifdef CACHE_SCALED_IMAGES
     NSString *authorId = author.idString;
     UIImage *scaledImage = [_imageCache objectForKey:authorId];
@@ -844,6 +885,7 @@ const static char kAttributedTextValueKey;
                 [vc setCollection:self.collection];
                 [vc setCollectionId:self.collectionId];
                 [vc setHideStatusBar:self.prefersStatusBarHidden];
+                [vc setUser:self.user];
                 [vc setDelegate:self];
             }
         }
@@ -855,10 +897,12 @@ const static char kAttributedTextValueKey;
 -(IBAction)createComment:(id)sender
 {
     // configure destination controller
-    [self.postCommentViewController setCollection:self.collection];
-    [self.postCommentViewController setCollectionId:self.collectionId];
+    [self.postViewController setCollection:self.collection];
+    [self.postViewController setCollectionId:self.collectionId];
+    [self.postViewController setAvatarImage:self.placeholderImage];
+    [self.postViewController setUser:self.user];
     
-    [self.navigationController presentViewController:self.postCommentViewController
+    [self.navigationController presentViewController:self.postViewController
                                             animated:YES
                                           completion:nil];
 }
