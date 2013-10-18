@@ -46,5 +46,7 @@
 @property (nonatomic, strong) id authors;
 -(void)addAuthorsCollection:(id)collection;
 
+-(NSArray*)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility;
+
 @end
 

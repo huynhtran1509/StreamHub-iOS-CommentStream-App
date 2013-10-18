@@ -20,12 +20,12 @@
 @property (copy, nonatomic) NSString *displayString;
 @property (copy, nonatomic) NSString *identifier;
 
--(id)initWithIdentifier:(NSString*)detailString
+-(id)initWithIdentifier:(NSString*)identifierString
         attributeString:(NSString*)attributeString
-          displayString:(NSString*)mainString
+          displayString:(NSString*)displayString
                    icon:(UIImage*)iconImage;
 
--(id)initWithIdentifier:(NSString*)urlString
+-(id)initWithIdentifier:(NSString*)identifierString
           displayString:(NSString*)displayString
                    icon:(UIImage*)iconImage;
 @end

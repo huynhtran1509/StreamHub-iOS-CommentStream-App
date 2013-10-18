@@ -110,7 +110,11 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 - (NSUInteger)indexOfKey:(id<NSCopying>)key
 {
     LFSContent *content = [self objectForKey:key];
-    return [self indexOfObject:content];
+    if (content == nil) {
+        return NSNotFound;
+    } else {
+        return [self indexOfObject:content];
+    }
 }
 
 -(void)insertObject:(LFSContent*)object
@@ -163,6 +167,12 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [self removeObject:object forKey:[(LFSContent*)object idString]];
 }
 
+- (void)removeObjectAtIndex:(NSUInteger)index
+{
+    id object = [self.array objectAtIndex:index];
+    [self removeObject:object];
+}
+
 -(void)removeObject:(id)object forKey:(id)key
 {
     // this is our remove primitive -- all other methods with similar functionality
@@ -211,7 +221,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [self setObject:content forKey:content.idString];
 }
 
-
 - (void)setObject:(id)object forKey:(id<NSCopying>)key
 {
     // check if object is of appropriate type
@@ -228,15 +237,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // pre-existing object found (should never happen with bootstrap data)
         [oldContent setObject:content.object];
         
-        NSInteger expectedNodeCount = ((oldContent.visibility == LFSContentVisibilityEveryone ? 1 : 0) +
-                                      oldContent.nodeCountSumOfChildren);
-        NSInteger delta = (NSInteger)expectedNodeCount - oldContent.nodeCount;
-        if (delta < 0) {
-            // checking if delta is negative here because it is possible that we receive content
-            // after delete event
-            NSAssert(delta == -1, @"No support for deleting more than one comment at once");
-            [self changeNodeCountOf:oldContent withDelta:delta];
-        }
+        [self handleVisibilityChangeForContent:oldContent];
     }
     else
     {
@@ -262,18 +263,40 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
--(void)changeNodeCountOf:(LFSContent*)content withDelta:(NSInteger)delta
+-(NSArray*)handleVisibilityChangeForContent:(LFSContent*)content
 {
+    NSInteger expectedNodeCount = ((content.visibility == LFSContentVisibilityEveryone ? 1 : 0) +
+                                   content.nodeCountSumOfChildren);
+    NSInteger delta = (NSInteger)expectedNodeCount - content.nodeCount;
+    if (delta < 0) {
+        // checking if delta is negative here because it is possible that we receive content
+        // after delete event
+        NSAssert(delta == -1, @"No support for deleting more than one comment at once");
+        return [self changeNodeCountOf:content withDelta:delta];
+    }
+    return nil;
+}
+
+-(NSArray*)changeNodeCountOf:(LFSContent*)content withDelta:(NSInteger)delta
+{
+    // return indexes of nodes that has been deleted
+    //
     // recursively change (with optional removal) the node count of this node
     // and of all parent nodes above it
+    
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    
     NSParameterAssert(content != nil);
     if (delta == 0) {
-        return;
+        return array;
     }
+
     content.nodeCount += delta;
     LFSContent *parent = content.parent;
     if (content.nodeCount < 1) {
-        [self removeObject:content];
+        NSUInteger contentIndex = [self indexOfObject:content];
+        [self removeObjectAtIndex:contentIndex];
+        [array addObject:[NSIndexPath indexPathForRow:contentIndex inSection:0]];
     }
 
     while (parent != nil) {
@@ -281,9 +304,12 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         LFSContent *prev = parent;
         parent = parent.parent;
         if (prev.nodeCount < 1) {
-            [self removeObject:prev];
+            NSUInteger prevIndex = [self indexOfObject:prev];
+            [self removeObjectAtIndex:prevIndex];
+            [array addObject:[NSIndexPath indexPathForRow:prevIndex inSection:0]];
         }
     }
+    return array;
 }
  
 #pragma mark - Description
@@ -482,8 +508,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (void)removeObjectAtIndex:(NSUInteger)index
 {
-    id object = [self.array objectAtIndex:index];
-    [super removeObject:object];
+    [super removeObjectAtIndex:index];
 }
 
 - (void)removeObjectForKey:(id<NSCopying>)key
@@ -532,5 +557,16 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [self addObject:object];
     }
 }
+
+#pragma mark - Other
+
+//TODO: consider using notifications for this
+-(NSArray*)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility
+{
+    LFSContent *content = [self objectForKey:contentId];
+    [content setVisibility:visibility];
+    return [self handleVisibilityChangeForContent:content];
+}
+
 
 @end

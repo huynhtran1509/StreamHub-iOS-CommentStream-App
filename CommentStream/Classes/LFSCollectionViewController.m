@@ -614,21 +614,21 @@ const static char kAttributedTextValueKey;
              {
                  NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
                           @"Wrong content Id received");
-                 LFSContent *newContent = [_content objectForKey:contentId];
-                 if (newContent != nil)
+                 NSUInteger row = [_content indexOfKey:contentId];
+                 if (row != NSNotFound)
                  {
-                     NSIndexPath *newIndexPath = [NSIndexPath
-                                                  indexPathForRow:[_content indexOfObject:newContent]
-                                                  inSection:0];
-                     
-                     // no need to set visibility of newConent here as that is the
-                     // function of LFSContentCollection
+                     NSArray *removedIndePaths = [_content
+                                                  updateContentForContentId:contentId
+                                                  setVisibility:LFSContentVisibilityNone];
                      UITableView *tableView = self.tableView;
-                     [tableView beginUpdates];
-                     [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:newIndexPath, nil]
-                                      withRowAnimation:UITableViewRowAnimationFade];
-                     [tableView endUpdates];
+                     if (removedIndePaths != nil && [removedIndePaths count] > 0u) {
+                         [tableView beginUpdates];
+                         [tableView deleteRowsAtIndexPaths:removedIndePaths
+                                          withRowAnimation:UITableViewRowAnimationFade];
+                         [tableView endUpdates];
+                     }
                  }
+                 
              }
                                 onFailure:^(NSOperation *operation, NSError *error)
              {
@@ -657,7 +657,7 @@ const static char kAttributedTextValueKey;
                      
                      UITableView *tableView = self.tableView;
                      [tableView beginUpdates];
-                     [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:newIndexPath, nil]
+                     [tableView reloadRowsAtIndexPaths:@[newIndexPath]
                                       withRowAnimation:UITableViewRowAnimationFade];
                      [tableView endUpdates];
                  }
