@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "LFSAuthorCollection.h"
+
 @interface LFSContentCollection : NSDictionary
 
 - (id)objectAtIndex:(NSUInteger)index;
@@ -21,9 +23,7 @@
 
 @end
 
-/**
- * The design goal is to have a similar interface to NSMutableDictionary
- */
+// NSMutableDictionary-like methods
 @interface LFSMutableContentCollection : LFSContentCollection
 
 + (id)dictionaryWithCapacity:(NSUInteger)count;
@@ -33,18 +33,19 @@
 - (void)setDictionary:(NSDictionary *)otherDictionary;
 - (void)setObject:(id)object forKey:(id<NSCopying>)key;
 
-- (void)addObjectsFromArray:(NSArray*)array;
-- (void)addObject:(id)anObject;
-
 - (void)removeObject:(id)object;
 - (void)removeObjectAtIndex:(NSUInteger)index;
 - (void)removeObjectForKey:(id<NSCopying>)key;
 - (void)removeObjectsForKeys:(NSArray *)keyArray;
 - (void)removeAllObjects;
 
-/* other stuff */
-@property (nonatomic, strong) id authors;
--(void)addAuthorsCollection:(id)collection;
+- (void)insertObject:(id)anObject;
+- (void)insertObjectsFromArray:(NSArray*)array;
+
+// other
+@property (nonatomic, readonly) LFSAuthorCollection *authors;
+
+-(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors;
 
 -(NSArray*)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility;
 

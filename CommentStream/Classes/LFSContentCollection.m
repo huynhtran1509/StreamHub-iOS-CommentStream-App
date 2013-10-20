@@ -117,12 +117,20 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
--(void)insertObject:(LFSContent*)object
+-(void)insertNewObject:(LFSContent*)object
 {
-    [self insertObject:object forKey:[(LFSContent*)object idString]];
+    [self insertNewObject:object forKey:[(LFSContent*)object idString]];
 }
 
--(void)insertObject:(LFSContent*)object forKey:(id<NSCopying>)key
+
+- (void)insertObject:(id)anObject
+{
+    // check if object is of appropriate type
+    LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
+    [self setObject:content forKey:content.idString];
+}
+
+-(void)insertNewObject:(LFSContent*)object forKey:(id<NSCopying>)key
 {
     // this is our insert primitive -- all other methods with similar functionality
     // ultimately redirect here
@@ -214,13 +222,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
-- (void)addObject:(id)anObject
-{
-    // check if object is of appropriate type
-    LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
-    [self setObject:content forKey:content.idString];
-}
-
 - (void)setObject:(id)object forKey:(id<NSCopying>)key
 {
     // check if object is of appropriate type
@@ -244,7 +245,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // no pre-existing object found
         [content enumerateVisiblePathsUsingBlock:^(LFSContent *obj) {
             // insert all objects listed here in that order
-            [self insertObject:obj];
+            [self insertNewObject:obj];
         }];
         
         if (content.nodeCount > 0 && content.contentParentId != nil) {
@@ -386,7 +387,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return [_array objectEnumerator];
 }
 
-#pragma mark - NSArray
+#pragma mark - NSArray (public)
 - (NSEnumerator *)reverseObjectEnumerator
 {
     return [_array reverseObjectEnumerator];
@@ -396,11 +397,18 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     self = [super init];
     if (self != nil) {
-        for (id object in array) {
-            [self addObject:object];
-        }
+        [self insertObjectsFromArray:array];
     }
     return self;
+}
+
+#pragma mark - NSMutableArray (private)
+-(void)insertObjectsFromArray:(NSArray*)array
+{
+    for (id object in array)
+    {
+        [self insertObject:object];
+    }
 }
 
 @end
@@ -420,38 +428,32 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return _authors;
 }
 
--(void)setAuthors:(id)authors
+-(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors
 {
-    if ([authors isKindOfClass:[LFSAuthorCollection class]]) {
-        // everything is clear
-        _authors = authors;
-    } else {
-        _authors = [[LFSAuthorCollection alloc] initWithDictionary:authors];
-    }
+    [self.authors addEntriesFromDictionary:authors];
+    [self insertObjectsFromArray:content];
+    
 }
 
--(void)addAuthorsCollection:(id)collection
+//TODO: consider using notifications for this
+-(NSArray*)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility
 {
-    [self.authors addEntriesFromDictionary:collection];
+    LFSContent *content = [self objectForKey:contentId];
+    [content setVisibility:visibility];
+    return [self handleVisibilityChangeForContent:content];
 }
 
+#pragma mark - generic collection methods
 
-- (id)objectAtIndex:(NSUInteger)index
+- (void)insertObject:(id)anObject
 {
-    LFSContent *content = [self.array objectAtIndex:index];
-    if (content.author == nil && _authors != nil) {
-        // TODO: move setAuthorWithCollection out of LFSContent?
-        [content setAuthorWithCollection:_authors];
-    }
-    NSMutableSet *authors = [self.likes objectForKey:content.idString];
-    if (authors == nil) {
-        authors = [[NSMutableSet alloc] init];
-        [self.likes setObject:authors forKey:content.idString];
-    }
-    [content setLikes:authors];
-    return [self.array objectAtIndex:index];
+    [super insertObject:anObject];
 }
 
+-(void)insertObjectsFromArray:(NSArray*)array
+{
+    [super insertObjectsFromArray:array];
+}
 
 #pragma mark - NSMutableDictionary methods
 + (id)dictionaryWithCapacity:(NSUInteger)count
@@ -506,11 +508,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [super removeObject:object];
 }
 
-- (void)removeObjectAtIndex:(NSUInteger)index
-{
-    [super removeObjectAtIndex:index];
-}
-
 - (void)removeObjectForKey:(id<NSCopying>)key
 {
     [self removeObject:[self.mapping objectForKey:key]
@@ -545,28 +542,25 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 #pragma mark - NSMutableArray
 
-- (void)addObject:(id)anObject
+- (id)objectAtIndex:(NSUInteger)index
 {
-    [super addObject:anObject];
-}
-
--(void)addObjectsFromArray:(NSArray*)array
-{
-    for (id object in array)
-    {
-        [self addObject:object];
+    LFSContent *content = [self.array objectAtIndex:index];
+    if (content.author == nil && _authors != nil) {
+        // TODO: move setAuthorWithCollection out of LFSContent?
+        [content setAuthorWithCollection:_authors];
     }
+    NSMutableSet *authors = [self.likes objectForKey:content.idString];
+    if (authors == nil) {
+        authors = [[NSMutableSet alloc] init];
+        [self.likes setObject:authors forKey:content.idString];
+    }
+    [content setLikes:authors];
+    return [self.array objectAtIndex:index];
 }
 
-#pragma mark - Other
-
-//TODO: consider using notifications for this
--(NSArray*)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility
+- (void)removeObjectAtIndex:(NSUInteger)index
 {
-    LFSContent *content = [self objectForKey:contentId];
-    [content setVisibility:visibility];
-    return [self handleVisibilityChangeForContent:content];
+    [super removeObjectAtIndex:index];
 }
-
 
 @end

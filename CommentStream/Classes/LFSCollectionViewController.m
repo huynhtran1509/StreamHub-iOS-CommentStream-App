@@ -133,9 +133,9 @@ const static char kAttributedTextValueKey;
         __weak typeof(self) weakSelf = self;
         [self.streamClient setResultHandler:^(id responseObject) {
             //NSLog(@"%@", responseObject);
-            [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
-                             withAuthors:[responseObject objectForKey:@"authors"]
-                            visualInsert:YES];
+            [weakSelf addContent:[[responseObject objectForKey:@"states"] allValues]
+                     withAuthors:[responseObject objectForKey:@"authors"]
+                        animated:YES];
             
         } success:nil failure:nil];
     }
@@ -458,9 +458,9 @@ const static char kAttributedTextValueKey;
                                    onSuccess:^(NSOperation *operation, id responseObject)
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
-             [self addTopLevelContent:[headDocument objectForKey:@"content"]
-                          withAuthors:[headDocument objectForKey:@"authors"]
-                         visualInsert:NO];
+             [self addContent:[headDocument objectForKey:@"content"]
+                  withAuthors:[headDocument objectForKey:@"authors"]
+                     animated:NO];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [collectionSettings objectForKey:@"event"];
@@ -486,13 +486,11 @@ const static char kAttributedTextValueKey;
     }
 }
 
--(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors visualInsert:(BOOL)visual
+-(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors animated:(BOOL)animated
 {
     // This callback is responsible for both adding content from Bootstrap and
     // for streaming new updates.
-    [_content addAuthorsCollection:authors];
-    
-    [_content addObjectsFromArray:content];
+    [_content addContent:content withAuthors:authors];
     
     /*
     // TODO: only perform animated insertion of cells when the top of the
@@ -931,9 +929,9 @@ const static char kAttributedTextValueKey;
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject
 {
     // 200 OK received, post was successful
-    [self addTopLevelContent:[responseObject objectForKey:@"messages"]
-                 withAuthors:[responseObject objectForKey:@"authors"]
-                visualInsert:YES];
+    [self addContent:[responseObject objectForKey:@"messages"]
+         withAuthors:[responseObject objectForKey:@"authors"]
+            animated:YES];
 }
 
 @end
