@@ -14,6 +14,8 @@
 #import "LFSDetailViewController.h"
 #import "LFSContentToolbar.h"
 
+#import "LFSAppDelegate.h"
+
 @interface LFSDetailViewController ()
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
@@ -65,19 +67,14 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     return _writeClient;
 }
 
-
 -(LFSPostViewController*)postViewController
 {
     // lazy-instantiate LFSPostViewController
-    static NSString* const kLFSMainStoryboardId = @"Main";
     static NSString* const kLFSPostCommentViewControllerId = @"postComment";
     
     if (_postViewController == nil) {
-        UIStoryboard *storyboard = [UIStoryboard
-                                    storyboardWithName:kLFSMainStoryboardId
-                                    bundle:nil];
         _postViewController =
-        (LFSPostViewController*)[storyboard
+        (LFSPostViewController*)[[AppDelegate mainStoryboard]
                                  instantiateViewControllerWithIdentifier:kLFSPostCommentViewControllerId];
         [_postViewController setDelegate:self];
     }

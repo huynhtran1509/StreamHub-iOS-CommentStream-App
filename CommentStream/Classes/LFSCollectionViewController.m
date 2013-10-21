@@ -25,6 +25,8 @@
 
 #import "LFSUser.h"
 #import "LFSContentCollection.h"
+#import "LFSAppDelegate.h"
+
 
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSMutableContentCollection *content;
@@ -43,6 +45,7 @@
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 @property (nonatomic, strong) LFSPostViewController *postViewController;
+@property (nonatomic, strong) UIViewController *webViewController;
 
 @property (nonatomic, strong) UIImage *placeholderImage;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
@@ -90,6 +93,7 @@ const static char kAttributedTextValueKey;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
 @synthesize postViewController = _postViewController;
+@synthesize webViewController = _webViewController;
 
 -(LFSAdminClient*)adminClient
 {
@@ -141,18 +145,24 @@ const static char kAttributedTextValueKey;
     return _streamClient;
 }
 
+-(UIViewController*)webViewController
+{
+    if (_webViewController == nil) {
+        _webViewController = [[UIViewController alloc] init];
+        UIWebView *webView = [[UIWebView alloc] init];
+        [webView setDelegate:self];
+        [_webViewController setView:webView];
+    }
+    return _webViewController;
+}
+
 -(LFSPostViewController*)postViewController
 {
-    // lazy-instantiate LFSPostViewController
-    static NSString* const kLFSMainStoryboardId = @"Main";
     static NSString* const kLFSPostCommentViewControllerId = @"postComment";
     
     if (_postViewController == nil) {
-        UIStoryboard *storyboard = [UIStoryboard
-                                    storyboardWithName:kLFSMainStoryboardId
-                                    bundle:nil];
         _postViewController =
-        (LFSPostViewController*)[storyboard
+        (LFSPostViewController*)[[AppDelegate mainStoryboard]
                                  instantiateViewControllerWithIdentifier:
                                  kLFSPostCommentViewControllerId];
         [_postViewController setDelegate:self];
@@ -221,6 +231,7 @@ const static char kAttributedTextValueKey;
         //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
     _postViewController = nil;
+    _webViewController = nil;
     
     _streamClient = nil;
     _bootstrapClient = nil;
@@ -683,6 +694,7 @@ const static char kAttributedTextValueKey;
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc]
                     initWithReuseIdentifier:kAttributedCellReuseIdentifier];
+            cell.bodyView.delegate = self;
         }
         [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
@@ -880,6 +892,46 @@ const static char kAttributedTextValueKey;
     [self.navigationController presentViewController:self.postViewController
                                             animated:YES
                                           completion:nil];
+}
+
+#pragma mark - OHAttributedLabelDelegate
+-(BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel
+      shouldFollowLink:(NSTextCheckingResult*)linkInfo
+{
+    if (![AppDelegate openInTwitterApp:[linkInfo.URL absoluteString]]) {
+         [(UIWebView*)self.webViewController.view loadRequest:[NSURLRequest requestWithURL:linkInfo.URL]];
+         [self.navigationController pushViewController:self.webViewController animated:YES];
+    }
+    return NO;
+}
+
+-(UIColor*)attributedLabel:(OHAttributedLabel*)attributedLabel
+              colorForLink:(NSTextCheckingResult*)linkInfo
+            underlineStyle:(int32_t*)underlineStyle
+{
+    static NSString* const kTwitterSearchPrefix = @"https://twitter.com/#!/search/realtime/";
+    NSString *linkString = [linkInfo.URL absoluteString];
+    if ([linkString hasPrefix:kTwitterSearchPrefix])
+    {
+        // Twitter hashtag
+        return [UIColor grayColor];
+    }
+    else
+    {
+        // regular link
+        return [UIColor blueColor];
+    }
+}
+
+#pragma mark - UIWebViewDelegate
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+}
+
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 }
 
 #pragma mark - LFSPostViewControllerDelegate

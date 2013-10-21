@@ -45,6 +45,17 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
     return (twitterState == kTwitterAppStateTwitter);
 }
 
+@synthesize mainStoryboard = _mainStoryboard;
+-(UIStoryboard*)mainStoryboard {
+    static NSString* const kLFSMainStoryboardId = @"Main";
+    if (_mainStoryboard == nil) {
+        _mainStoryboard = [UIStoryboard
+                           storyboardWithName:kLFSMainStoryboardId
+                           bundle:nil];
+    }
+    return _mainStoryboard;
+}
+
 #pragma mark - Public methods
 
 -(BOOL)openInTwitterApp:(NSString*)urlString

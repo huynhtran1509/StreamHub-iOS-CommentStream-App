@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong) UIWindow *window;
 @property (nonatomic, readonly) BOOL canOpenLinksInTwitterClient;
+@property (nonatomic, strong) UIStoryboard *mainStoryboard;
 
 -(BOOL)openInTwitterApp:(NSString*)urlString;
 

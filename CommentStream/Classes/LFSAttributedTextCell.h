@@ -24,6 +24,8 @@ extern const CGSize kCellImageViewSize;
 
 @property (nonatomic, strong) UIImage *indicatorIcon;
 
+@property (nonatomic, readonly) LFSBasicHTMLLabel *bodyView;
+
 #pragma mark - UIApperance properties
 @property (nonatomic, strong) UIFont *headerTitleFont UI_APPEARANCE_SELECTOR;
 @property (nonatomic, strong) UIColor *headerTitleColor UI_APPEARANCE_SELECTOR;

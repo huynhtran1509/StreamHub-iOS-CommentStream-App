@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <OHAttributedLabel/OHAttributedLabel.h>
 
-@interface LFSBasicHTMLLabel : OHAttributedLabel <OHAttributedLabelDelegate>
+@interface LFSBasicHTMLLabel : OHAttributedLabel
 
 - (void)setHTMLString:(NSString *)html;
 @property (nonatomic, assign) CGFloat lineSpacing;
