@@ -491,13 +491,14 @@ const static char kAttributedTextValueKey;
     // viewport is the same as the top of the first cell
     
     UITableView *tableView = self.tableView;
+    
     [tableView beginUpdates];
     [tableView deleteRowsAtIndexPaths:deletes withRowAnimation:UITableViewRowAnimationNone];
     [tableView reloadRowsAtIndexPaths:updates withRowAnimation:UITableViewRowAnimationNone];
     [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
     [tableView endUpdates];
     
-    //[self.tableView reloadData];
+    //[tableView reloadData];
 }
 
 #pragma mark - UITableViewControllerDelegate
@@ -624,23 +625,16 @@ const static char kAttributedTextValueKey;
                  // and if so, revert to its previous visibility state. This check is necessary
                  // because it is conceivable that the streaming client has already deleted
                  // the content object
-                 LFSContent *newContent = [_content objectForKey:contentId];
-                 if (newContent != nil)
+                 NSUInteger newContentIndex = [_content indexOfKey:contentId];
+                 if (newContentIndex != NSNotFound)
                  {
+                     [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
+                     
                      // obtain new index path since it could have changed during the time
                      // it toook for the error response to come back
-                     NSIndexPath *newIndexPath = [NSIndexPath
-                                                  indexPathForRow:[_content indexOfObject:newContent]
-                                                  inSection:0];
-                     
-                     // TODO: move this to content collection
-                     [newContent setVisibility:visibility];
-                     
-                     UITableView *tableView = self.tableView;
-                     [tableView beginUpdates];
-                     [tableView reloadRowsAtIndexPaths:@[newIndexPath]
-                                      withRowAnimation:UITableViewRowAnimationFade];
-                     [tableView endUpdates];
+                     [self didUpdateModelWithDeletes:nil
+                                             updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
+                                             inserts:nil];
                  }
              }];
             

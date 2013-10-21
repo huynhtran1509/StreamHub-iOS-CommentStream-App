@@ -576,7 +576,9 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:obj.index inSection:0]];
         }
         // backward enumeration to preserve indexes
-        [self.deleteStack enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
+        [self.deleteStack
+         enumerateObjectsWithOptions:NSEnumerationReverse
+         usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
             [self.array removeObjectAtIndex:obj.index];
         }];
     }
@@ -587,7 +589,9 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             insertOffset++;
         }
         // backward enumeration to preserve indexes
-        [self.insertStack enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
+        [self.insertStack
+         enumerateObjectsWithOptions:NSEnumerationReverse
+         usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
             [self.array insertObject:obj atIndex:obj.index];
             obj.index = NSNotFound;
         }];
@@ -612,7 +616,9 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:obj.index inSection:0]];
         }
         // backward enumeration to preserve indexes
-        [self.deleteStack enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
+        [self.deleteStack
+         enumerateObjectsWithOptions:NSEnumerationReverse
+         usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
             [self.array removeObjectAtIndex:obj.index];
         }];
         
@@ -624,7 +630,9 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             insertOffset++;
         }
         // backward enumeration to preserve indexes
-        [self.insertStack enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
+        [self.insertStack
+         enumerateObjectsWithOptions:NSEnumerationReverse
+         usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
             [self.array insertObject:obj atIndex:obj.index];
             obj.index = NSNotFound;
         }];

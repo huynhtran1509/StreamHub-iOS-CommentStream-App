@@ -49,9 +49,11 @@
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
                 NSRange innerRange = [match rangeAtIndex:2];
-                if (innerRange.length>0)
-                {
-                    return MRC_AUTORELEASE([str attributedSubstringFromRange:innerRange]);
+                if (innerRange.length>0) {
+                    // make paragraphs (in Core Text, the newline character ends a paragraph)
+                    NSMutableAttributedString *result = [[str attributedSubstringFromRange:innerRange] mutableCopy];
+                    [result appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
+                    return MRC_AUTORELEASE(result);
                 } else {
                     return nil;
                 }
@@ -61,8 +63,7 @@
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
                 NSRange innerRange = [match rangeAtIndex:2];
-                if (innerRange.length>0)
-                {
+                if (innerRange.length>0) {
                     return MRC_AUTORELEASE([str attributedSubstringFromRange:innerRange]);
                 } else {
                     return nil;
@@ -74,11 +75,10 @@
             {
                 NSRange hrefRange = [match rangeAtIndex:2];
                 NSRange innerRange = [match rangeAtIndex:3];
-                if (hrefRange.length > 0 && innerRange.length > 0)
-                {
+                if (hrefRange.length > 0 && innerRange.length > 0) {
                     NSString* href = [str attributedSubstringFromRange:hrefRange].string;
                     NSMutableAttributedString* innerText = [[str attributedSubstringFromRange:innerRange] mutableCopy];
-                    [innerText setLink:[NSURL URLWithString:href] range:NSMakeRange(0,innerRange.length)];
+                    [innerText setLink:[NSURL URLWithString:href] range:NSMakeRange(0, innerRange.length)];
                     return MRC_AUTORELEASE(innerText);
                 } else {
                     return nil;
