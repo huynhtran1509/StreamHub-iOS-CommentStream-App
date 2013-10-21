@@ -11,10 +11,10 @@
 @implementation LFSResource
 
 @synthesize attributeString = _attributeString;
-@synthesize displayString = _displayString;
-@synthesize iconURLString = _iconURLString;
 @synthesize identifier = _identifier;
 @synthesize icon = _icon;
+@synthesize displayString = _displayString;
+@synthesize iconURLString = _iconURLString;
 
 // designated initializer
 -(id)initWithIdentifier:(NSString*)identifierString

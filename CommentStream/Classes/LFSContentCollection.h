@@ -41,8 +41,8 @@
 - (void)removeObjectsForKeys:(NSArray *)keyArray;
 - (void)removeAllObjects;
 
-- (void)insertObject:(id)anObject;
-- (void)insertObjectsFromArray:(NSArray*)array;
+- (void)addObject:(id)anObject;
+- (void)addObjectsFromArray:(NSArray*)array;
 
 // other
 @property (nonatomic, readonly) LFSAuthorCollection *authors;

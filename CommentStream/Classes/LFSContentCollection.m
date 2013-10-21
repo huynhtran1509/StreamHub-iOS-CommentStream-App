@@ -176,20 +176,20 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
--(void)insertNewObject:(LFSContent*)object
+-(void)insertObject:(LFSContent*)object
 {
-    [self insertNewObject:object forKey:[(LFSContent*)object idString]];
+    [self insertObject:object forKey:[(LFSContent*)object idString]];
 }
 
 
-- (void)insertObject:(id)anObject
+- (void)addObject:(id)anObject
 {
     // check if object is of appropriate type
     LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
     [self setObject:content forKey:content.idString];
 }
 
--(void)insertNewObject:(LFSContent*)object forKey:(id<NSCopying>)key
+-(void)insertObject:(LFSContent*)object forKey:(id<NSCopying>)key
 {
     // this is our insert primitive -- all other methods with similar functionality
     // ultimately redirect here
@@ -319,7 +319,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // said object)
         [content enumerateVisiblePathsUsingBlock:^(LFSContent *obj) {
             // insert all objects listed here in that order
-            [self insertNewObject:obj];
+            [self insertObject:obj];
         }];
         
         if (content.nodeCount > 0 && content.contentParentId != nil) {
@@ -382,8 +382,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 -(void)changeNodeCountOf:(LFSContent*)content withDelta:(NSInteger)delta
 {
-    // return indexes of nodes that has been deleted
-    //
     // recursively change (with optional removal) the node count of this node
     // and of all parent nodes above it
     
@@ -507,17 +505,17 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         _updateSet = nil;
         _insertStack = nil;
         
-        [self insertObjectsFromArray:array];
+        [self addObjectsFromArray:array];
     }
     return self;
 }
 
 #pragma mark - NSMutableArray (private)
--(void)insertObjectsFromArray:(NSArray*)array
+-(void)addObjectsFromArray:(NSArray*)array
 {
     for (id object in array)
     {
-        [self insertObject:object];
+        [self addObject:object];
     }
 }
 
@@ -542,7 +540,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     [self beginUpdating];
     [self.authors addEntriesFromDictionary:authors];
-    [self insertObjectsFromArray:content];
+    [self addObjectsFromArray:content];
     [self endUpdating];
 }
 
@@ -640,14 +638,14 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 #pragma mark - generic collection methods
 
-- (void)insertObject:(id)anObject
+- (void)addObject:(id)anObject
 {
-    [super insertObject:anObject];
+    [super addObject:anObject];
 }
 
--(void)insertObjectsFromArray:(NSArray*)array
+-(void)addObjectsFromArray:(NSArray*)array
 {
-    [super insertObjectsFromArray:array];
+    [super addObjectsFromArray:array];
 }
 
 #pragma mark - NSMutableDictionary methods
