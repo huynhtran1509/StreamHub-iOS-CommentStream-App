@@ -130,12 +130,11 @@ const static char kAttributedTextValueKey;
                          clientWithNetwork:[_collection objectForKey:@"network"]
                          environment:[_collection objectForKey:@"environment"] ];
         
-        __weak typeof(self) weakSelf = self;
+        __weak typeof(_content) _weakContent = _content;
         [self.streamClient setResultHandler:^(id responseObject) {
             //NSLog(@"%@", responseObject);
-            [weakSelf addContent:[[responseObject objectForKey:@"states"] allValues]
-                     withAuthors:[responseObject objectForKey:@"authors"]
-                        animated:YES];
+            [_weakContent addContent:[[responseObject objectForKey:@"states"] allValues]
+                         withAuthors:[responseObject objectForKey:@"authors"]];
             
         } success:nil failure:nil];
     }
@@ -168,6 +167,7 @@ const static char kAttributedTextValueKey;
     // Do any additional setup after loading the view, typically from a nib.
 
     _content = [[LFSMutableContentCollection alloc] init];
+    [_content setDelegate:self];
     
     self.title = [_collection objectForKey:@"_name"];
     
@@ -458,9 +458,8 @@ const static char kAttributedTextValueKey;
                                    onSuccess:^(NSOperation *operation, id responseObject)
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
-             [self addContent:[headDocument objectForKey:@"content"]
-                  withAuthors:[headDocument objectForKey:@"authors"]
-                     animated:NO];
+             [_content addContent:[headDocument objectForKey:@"content"]
+                      withAuthors:[headDocument objectForKey:@"authors"]];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [collectionSettings objectForKey:@"event"];
@@ -486,26 +485,19 @@ const static char kAttributedTextValueKey;
     }
 }
 
--(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors animated:(BOOL)animated
+-(void)didUpdateModelWithDeletes:(NSArray*)deletes updates:(NSArray*)updates inserts:(NSArray*)inserts
 {
-    // This callback is responsible for both adding content from Bootstrap and
-    // for streaming new updates.
-    [_content addContent:content withAuthors:authors];
-    
-    /*
     // TODO: only perform animated insertion of cells when the top of the
     // viewport is the same as the top of the first cell
-    if (visual && [content count] == 1u) {
-        // animate insertion
-        [self.tableView beginUpdates];
-        [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
-                                                [NSIndexPath indexPathForRow:0 inSection:0]]
-                              withRowAnimation:UITableViewRowAnimationNone];
-        [self.tableView endUpdates];
-    }
-     */
-
-    [self.tableView reloadData];
+    
+    UITableView *tableView = self.tableView;
+    [tableView beginUpdates];
+    [tableView deleteRowsAtIndexPaths:deletes withRowAnimation:UITableViewRowAnimationNone];
+    [tableView reloadRowsAtIndexPaths:updates withRowAnimation:UITableViewRowAnimationNone];
+    [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
+    [tableView endUpdates];
+    
+    //[self.tableView reloadData];
 }
 
 #pragma mark - UITableViewControllerDelegate
@@ -613,18 +605,8 @@ const static char kAttributedTextValueKey;
                  NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
                           @"Wrong content Id received");
                  NSUInteger row = [_content indexOfKey:contentId];
-                 if (row != NSNotFound)
-                 {
-                     NSArray *removedIndePaths = [_content
-                                                  updateContentForContentId:contentId
-                                                  setVisibility:LFSContentVisibilityNone];
-                     UITableView *tableView = self.tableView;
-                     if (removedIndePaths != nil && [removedIndePaths count] > 0u) {
-                         [tableView beginUpdates];
-                         [tableView deleteRowsAtIndexPaths:removedIndePaths
-                                          withRowAnimation:UITableViewRowAnimationFade];
-                         [tableView endUpdates];
-                     }
+                 if (row != NSNotFound) {
+                     [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
                  }
                  
              }
@@ -651,6 +633,7 @@ const static char kAttributedTextValueKey;
                                                   indexPathForRow:[_content indexOfObject:newContent]
                                                   inSection:0];
                      
+                     // TODO: move this to content collection
                      [newContent setVisibility:visibility];
                      
                      UITableView *tableView = self.tableView;
@@ -929,9 +912,8 @@ const static char kAttributedTextValueKey;
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject
 {
     // 200 OK received, post was successful
-    [self addContent:[responseObject objectForKey:@"messages"]
-         withAuthors:[responseObject objectForKey:@"authors"]
-            animated:YES];
+    [_content addContent:[responseObject objectForKey:@"messages"]
+             withAuthors:[responseObject objectForKey:@"authors"]];
 }
 
 @end

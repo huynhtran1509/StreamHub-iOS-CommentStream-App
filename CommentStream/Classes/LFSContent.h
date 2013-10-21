@@ -43,6 +43,8 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 @property (nonatomic, strong) id object;
 @property (nonatomic, copy) NSString *idString;
 
+@property (nonatomic, assign) NSUInteger index;
+
 // convenience properties
 @property (nonatomic, readonly) BOOL authorIsModerator;
 

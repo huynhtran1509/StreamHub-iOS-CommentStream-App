@@ -10,6 +10,8 @@
 
 #import "LFSAuthorCollection.h"
 
+@protocol LFSContentCollectionDelegate;
+
 @interface LFSContentCollection : NSDictionary
 
 - (id)objectAtIndex:(NSUInteger)index;
@@ -20,7 +22,7 @@
 - (NSUInteger)indexOfKey:(id<NSCopying>)key;
 
 @property (nonatomic, readonly) NSNumber *lastEventId;
-
+@property (nonatomic, weak) id<LFSContentCollectionDelegate> delegate;
 @end
 
 // NSMutableDictionary-like methods
@@ -47,7 +49,12 @@
 
 -(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors;
 
--(NSArray*)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility;
+-(void)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility;
 
 @end
 
+@protocol LFSContentCollectionDelegate <NSObject>
+
+-(void)didUpdateModelWithDeletes:(NSArray*)deleteSet updates:(NSArray*)updateSet inserts:(NSArray*)insertStack;
+
+@end
