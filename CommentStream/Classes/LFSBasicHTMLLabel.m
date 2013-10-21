@@ -8,14 +8,7 @@
 
 #import "LFSBasicHTMLLabel.h"
 #import "LFSBasicHTMLParser.h"
-
-typedef NS_ENUM(NSUInteger, kTwitterAppState) {
-    kTwitterAppStateUnknown = 0u,
-    kTwitterAppStateTwitter,
-    kTwitterAppStateBrowser
-};
-static kTwitterAppState twitterState = kTwitterAppStateUnknown;
-
+#import "LFSAppDelegate.h"
 
 @interface LFSBasicHTMLLabel ()
 @property (nonatomic, strong) NSMutableParagraphStyle *paragraphStyle;
@@ -30,16 +23,6 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
 -(CGFloat)lineSpacing
 {
     return [self.paragraphStyle lineSpacing];
-}
-
--(BOOL)canOpenLinksInTwitterClient {
-    if (twitterState == kTwitterAppStateUnknown) {
-        NSURL *twitterUrl = [NSURL URLWithString:@"twitter://"];
-        twitterState = ([[UIApplication sharedApplication] canOpenURL:twitterUrl]
-                        ? kTwitterAppStateTwitter
-                        : kTwitterAppStateBrowser);
-    }
-    return (twitterState == kTwitterAppStateTwitter);
 }
 
 -(void)setLineSpacing:(CGFloat)points
@@ -144,7 +127,7 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
         // have match, now create Twitter URI, open Twitter app here, and return
         NSString *schemaString = [urlString substringWithRange:[hashtagMatch rangeAtIndex:1u]];
         NSString *contentString = [urlString substringWithRange:[hashtagMatch rangeAtIndex:3u]];
-        NSString *convertedURL = ([self canOpenLinksInTwitterClient]
+        NSString *convertedURL = ([AppDelegate canOpenLinksInTwitterClient]
                                   ? [NSString stringWithFormat:@"twitter://search?query=%@", contentString]
                                   : [NSString stringWithFormat:@"%@://twitter.com/search/realtime/%@",
                                      schemaString, contentString]);
@@ -169,7 +152,7 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
         // have match, now create Twitter URI, open Twitter app here, and return
         NSString *schemaString = [urlString substringWithRange:[handleMatch rangeAtIndex:1u]];
         NSString *contentString = [urlString substringWithRange:[handleMatch rangeAtIndex:3u]];
-        NSString *convertedURL = ([self canOpenLinksInTwitterClient]
+        NSString *convertedURL = ([AppDelegate canOpenLinksInTwitterClient]
                                   ? [NSString stringWithFormat:@"twitter://user?screen_name=%@", contentString]
                                   : [NSString stringWithFormat:@"%@://twitter.com/%@",
                                      schemaString, contentString]);
@@ -195,7 +178,7 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
         NSString *schemaString = [urlString substringWithRange:[statusMatch rangeAtIndex:1u]];
         NSString *accountString = [urlString substringWithRange:[statusMatch rangeAtIndex:3u]];
         NSString *statusIdString = [urlString substringWithRange:[statusMatch rangeAtIndex:4u]];
-        NSString *convertedURL = ([self canOpenLinksInTwitterClient]
+        NSString *convertedURL = ([AppDelegate canOpenLinksInTwitterClient]
                                   ? [NSString stringWithFormat:@"twitter://status?id=%@&account=%@", statusIdString, accountString]
                                   : [NSString stringWithFormat:@"%@://twitter.com/%@/status/%@",
                                      schemaString, accountString, statusIdString]);

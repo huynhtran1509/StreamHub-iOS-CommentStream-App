@@ -19,10 +19,33 @@
 #import "LFSAppDelegate.h"
 #import "LFSAttributedTextCell.h"
 
+typedef NS_ENUM(NSUInteger, kTwitterAppState) {
+    kTwitterAppStateUnknown = 0u,
+    kTwitterAppStateTwitter,
+    kTwitterAppStateBrowser
+};
+
+static kTwitterAppState twitterState = kTwitterAppStateUnknown;
+
 @implementation LFSAppDelegate
+
+#pragma mark - Public properties
 
 @synthesize window = _window;
 
+@dynamic canOpenLinksInTwitterClient;
+-(BOOL)canOpenLinksInTwitterClient {
+    static NSString* const twitterSchema = @"twitter://";
+    if (twitterState == kTwitterAppStateUnknown) {
+        NSURL *twitterUrl = [NSURL URLWithString:twitterSchema];
+        twitterState = ([[UIApplication sharedApplication] canOpenURL:twitterUrl]
+                        ? kTwitterAppStateTwitter
+                        : kTwitterAppStateBrowser);
+    }
+    return (twitterState == kTwitterAppStateTwitter);
+}
+
+#pragma mark - Lifecycle
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
