@@ -57,6 +57,8 @@ static NSString* const kAttributedCellReuseIdentifier = @"LFSAttributedCell";
 static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 static NSString* const kCellSelectSegue = @"detailView";
 
+static NSString* const kFailureDeleteTitle = @"Failed to delete content";
+
 const static CGFloat kGenerationOffset = 20.f;
 const static CGFloat kStatusBarHeight = 20.f;
 
@@ -594,82 +596,87 @@ const static char kAttributedTextValueKey;
 // Overriding this will enable "swipe to delete" gesture
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString* const kFailureDeleteTitle = @"Failed to delete content";
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        NSString *userToken = [self.collection objectForKey:@"lftoken"];
-        if (userToken != nil) {
-            NSUInteger row = indexPath.row;
-            LFSContent *content = [_content objectAtIndex:row];
-            
-            // cache current visibility state in case we need to revert
-            LFSContentVisibility visibility = content.visibility;
-            NSString *contentId = content.idString;
-            
-            [self.writeClient postMessage:LFSMessageDelete
-                               forContent:content.idString
-                             inCollection:self.collectionId
-                                userToken:userToken
-                               parameters:nil
-                                onSuccess:^(NSOperation *operation, id responseObject)
-             {
-                 NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
-                          @"Wrong content Id received");
-                 NSUInteger row = [_content indexOfKey:contentId];
-                 if (row != NSNotFound) {
-                     [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
-                 }
-                 
+        [self deleteContentForIndexPath:indexPath];
+    }
+}
+
+-(void)deleteContentForIndexPath:(NSIndexPath*)indexPath
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (userToken != nil) {
+        
+        // cache current visibility state in case we need to revert
+        NSUInteger row = indexPath.row;
+        LFSContent *content = [_content objectAtIndex:row];
+        
+        LFSContentVisibility visibility = content.visibility;
+        NSString *contentId = content.idString;
+        
+        [self.writeClient postMessage:LFSMessageDelete
+                           forContent:content.idString
+                         inCollection:self.collectionId
+                            userToken:userToken
+                           parameters:nil
+                            onSuccess:^(NSOperation *operation, id responseObject)
+         {
+             NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
+                      @"Wrong content Id received");
+             NSUInteger row = [_content indexOfKey:contentId];
+             if (row != NSNotFound) {
+                 [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
              }
-                                onFailure:^(NSOperation *operation, NSError *error)
+             
+         }
+                            onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureDeleteTitle
+               message:[error localizedDescription]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+             
+             // check if an object with the cached id still exists in the model
+             // and if so, revert to its previous visibility state. This check is necessary
+             // because it is conceivable that the streaming client has already deleted
+             // the content object
+             NSUInteger newContentIndex = [_content indexOfKey:contentId];
+             if (newContentIndex != NSNotFound)
              {
-                 // show an error message
-                 [[[UIAlertView alloc]
-                   initWithTitle:kFailureDeleteTitle
-                   message:[error localizedDescription]
-                   delegate:nil
-                   cancelButtonTitle:@"OK"
-                   otherButtonTitles:nil] show];
+                 [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
                  
-                 // check if an object with the cached id still exists in the model
-                 // and if so, revert to its previous visibility state. This check is necessary
-                 // because it is conceivable that the streaming client has already deleted
-                 // the content object
-                 NSUInteger newContentIndex = [_content indexOfKey:contentId];
-                 if (newContentIndex != NSNotFound)
-                 {
-                     [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
-                     
-                     // obtain new index path since it could have changed during the time
-                     // it toook for the error response to come back
-                     [self didUpdateModelWithDeletes:nil
-                                             updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
-                                             inserts:nil];
-                 }
-             }];
-            
-            // the block below will result in the standard content cell being replaced by a
-            // "this comment has been removed" cell.
-            [content setVisibility:LFSContentVisibilityPendingDelete];
-            
-            UITableView *tableView = self.tableView;
-            [tableView beginUpdates];
-            [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
-                             withRowAnimation:UITableViewRowAnimationFade];
-            [tableView endUpdates];
-        }
-        else {
-            // userToken is nil -- show an error message
-            //
-            // Note: Normally we never reach this block because we do not
-            // allow editing for cells if our user token is nil
-            [[[UIAlertView alloc]
-              initWithTitle:kFailureDeleteTitle
-              message:@"You do not have permission to delete comments in this collection"
-              delegate:nil
-              cancelButtonTitle:@"OK"
-              otherButtonTitles:nil] show];
-        }
+                 // obtain new index path since it could have changed during the time
+                 // it toook for the error response to come back
+                 [self didUpdateModelWithDeletes:nil
+                                         updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
+                                         inserts:nil];
+             }
+         }];
+        
+        // the block below will result in the standard content cell being replaced by a
+        // "this comment has been removed" cell.
+        [content setVisibility:LFSContentVisibilityPendingDelete];
+        
+        UITableView *tableView = self.tableView;
+        [tableView beginUpdates];
+        [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
+                         withRowAnimation:UITableViewRowAnimationFade];
+        [tableView endUpdates];
+    }
+    else {
+        // userToken is nil -- show an error message
+        //
+        // Note: Normally we never reach this block because we do not
+        // allow editing for cells if our user token is nil
+        [[[UIAlertView alloc]
+          initWithTitle:kFailureDeleteTitle
+          message:@"You do not have permission to delete comments in this collection"
+          delegate:nil
+          cancelButtonTitle:@"OK"
+          otherButtonTitles:nil] show];
     }
 }
 
@@ -894,6 +901,27 @@ const static char kAttributedTextValueKey;
                                           completion:nil];
 }
 
+#pragma mark - LFSDetailViewControllerDelegate
+-(void)deleteContent:(LFSContent*)content;
+{
+    if (content != nil) {
+        NSUInteger row = [_content indexOfObject:content];
+        [self deleteContentForIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+    }
+}
+
+-(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (content != nil && userToken != nil && self.collectionId != nil) {
+        [self.writeClient postFlag:flag
+                        forContent:content.idString
+                      inCollection:self.collectionId
+                         userToken:userToken
+                        parameters:nil onSuccess:nil onFailure:nil];
+    }
+}
+
 #pragma mark - LFSPostViewControllerDelegate
 -(id<LFSPostViewControllerDelegate>)collectionViewController
 {
@@ -901,7 +929,6 @@ const static char kAttributedTextValueKey;
     // the content view as soon as the server gets back to us with 200 OK
     return self;
 }
-
 
 -(void)didSendPostRequestWithReplyTo:(NSString *)replyTo
 {

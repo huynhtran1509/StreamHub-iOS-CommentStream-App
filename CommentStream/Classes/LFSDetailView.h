@@ -27,6 +27,7 @@
 
 @property (readonly, nonatomic) UIButton *button1;
 @property (readonly, nonatomic) UIButton *button2;
+@property (readonly, nonatomic) UIButton *button3;
 
 @property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
@@ -37,8 +38,9 @@
 @protocol LFSDetailViewDelegate <NSObject>
 
 // actions
-- (void)didSelectLike:(id)sender;
-- (void)didSelectReply:(id)sender;
+- (void)didSelectButton1:(id)sender;
+- (void)didSelectButton2:(id)sender;
+- (void)didSelectButton3:(id)sender;
 
 @optional
 - (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url;
