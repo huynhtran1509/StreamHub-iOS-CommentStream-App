@@ -36,14 +36,20 @@
     return self;
 }
 
+#pragma mark - Public methods
+-(void)followURL:(NSURL*)url
+{
+    if (![AppDelegate openInTwitterApp:[url absoluteString]]) {
+        [(UIWebView*)self.webViewController.view loadRequest:[NSURLRequest requestWithURL:url]];
+        [self.navigationController pushViewController:self.webViewController animated:YES];
+    }
+}
+
 #pragma mark - OHAttributedLabelDelegate
 -(BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel
       shouldFollowLink:(NSTextCheckingResult*)linkInfo
 {
-    if (![AppDelegate openInTwitterApp:[linkInfo.URL absoluteString]]) {
-        [(UIWebView*)self.webViewController.view loadRequest:[NSURLRequest requestWithURL:linkInfo.URL]];
-        [self.navigationController pushViewController:self.webViewController animated:YES];
-    }
+    [self followURL:linkInfo.URL];
     return NO;
 }
 

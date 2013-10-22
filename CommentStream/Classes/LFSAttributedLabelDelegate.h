@@ -11,8 +11,11 @@
 
 #import "LFSBasicHTMLLabel.h"
 
+// TODO: rename LFSAttributedLabelDelegate to something more generic as we
+// use it not only as a delegate of said protocol
 @interface LFSAttributedLabelDelegate : NSObject <OHAttributedLabelDelegate, UIWebViewDelegate>
 
+-(void)followURL:(NSURL*)url;
 @property (nonatomic, strong) UIViewController *webViewController;
 @property (nonatomic, strong) UINavigationController *navigationController;
 

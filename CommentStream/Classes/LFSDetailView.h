@@ -40,4 +40,8 @@
 - (void)didSelectLike:(id)sender;
 - (void)didSelectReply:(id)sender;
 
+@optional
+- (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url;
+- (void)didSelectContentRemote:(id)sender wihtURL:(NSURL*)url;
+
 @end

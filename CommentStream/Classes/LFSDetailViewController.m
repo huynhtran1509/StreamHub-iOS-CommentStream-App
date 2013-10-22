@@ -177,7 +177,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if (twitterUrlString != nil) {
         [detailView setContentRemote:[[LFSResource alloc]
                                       initWithIdentifier:twitterUrlString
-                                      displayString:@"View on Twitter >"
+                                      displayString:@"View on Twitter"
                                       icon:nil]];
     }
     
@@ -316,6 +316,20 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [self.navigationController presentViewController:self.postViewController
                                             animated:YES
                                           completion:nil];
+}
+
+- (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url
+{
+    if (url != nil) {
+        [self.attributedLabelDelegate followURL:url];
+    }
+}
+
+- (void)didSelectContentRemote:(id)sender wihtURL:(NSURL*)url
+{
+    if (url != nil) {
+        [self.attributedLabelDelegate followURL:url];
+    }
 }
 
 #pragma mark - LFSPostViewControllerDelegate
