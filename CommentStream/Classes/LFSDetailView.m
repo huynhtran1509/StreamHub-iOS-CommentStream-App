@@ -111,8 +111,10 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         
         // configure
         [_button1.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
-        [_button1 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]  forState:UIControlStateNormal];
-        [_button1 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f] forState:UIControlStateHighlighted];
+        [_button1 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+                       forState:UIControlStateNormal];
+        [_button1 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+                       forState:UIControlStateHighlighted];
         
         // Here kDetailContentLineSpacing is the amount of spacing to appear between image and title
         _button1.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, kDetailContentLineSpacing);
@@ -141,8 +143,10 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         
         // configure
         [_button2.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
-        [_button2 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]  forState:UIControlStateNormal];
-        [_button2 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f] forState:UIControlStateHighlighted];
+        [_button2 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+                       forState:UIControlStateNormal];
+        [_button2 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+                       forState:UIControlStateHighlighted];
         
         // Here kDetailContentLineSpacing is the amount of spacing to appear between image and title
         _button2.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, kDetailContentLineSpacing);
@@ -290,11 +294,13 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         _footerRightView = [[LFSRightAlignedButton alloc] initWithFrame:frame];
         
         // configure
-        [_footerRightView.titleLabel setFont:[UIFont systemFontOfSize:13.f]];
+        [_footerRightView.titleLabel setFont:[UIFont boldSystemFontOfSize:13.f]];
         [_footerRightView.titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
         [_footerRightView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin)];
-        [_footerRightView setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f] forState:UIControlStateNormal];
-        [_footerRightView setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f] forState:UIControlStateHighlighted];
+        [_footerRightView setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+                               forState:UIControlStateNormal];
+        [_footerRightView setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+                               forState:UIControlStateHighlighted];
         [_footerRightView setContentHorizontalAlignment:UIControlContentHorizontalAlignmentRight];
         [_footerRightView setImageEdgeInsets:UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0)];
         [_footerRightView setTitleEdgeInsets:UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0)];
