@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "LFSResource.h"
+#import "LFSBasicHTMLLabel.h"
 
 @protocol LFSDetailViewDelegate;
 
@@ -26,6 +27,8 @@
 
 @property (readonly, nonatomic) UIButton *button1;
 @property (readonly, nonatomic) UIButton *button2;
+
+@property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
 @end
 

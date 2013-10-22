@@ -16,6 +16,8 @@
 
 #import "LFSAppDelegate.h"
 
+#import "LFSAttributedLabelDelegate.h"
+
 @interface LFSDetailViewController ()
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
@@ -42,6 +44,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
+@synthesize attributedLabelDelegate = _attributedLabelDelegate;
 @synthesize postViewController = _postViewController;
 @synthesize user = _user;
 
@@ -153,12 +156,16 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 {
     [super viewDidLoad];
     
+    _postViewController = nil;
+
+    
     LFSDetailView *detailView = self.detailView;
     LFSContent *contentItem = self.contentItem;
     
     [detailView setDelegate:self];
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
+    [detailView.bodyView setDelegate:self.attributedLabelDelegate];
     
     [self updateLikeButton];
     

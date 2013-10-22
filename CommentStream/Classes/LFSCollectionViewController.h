@@ -12,15 +12,12 @@
 #import "LFSDetailViewController.h"
 #import "LFSPostViewController.h"
 #import "LFSContentCollection.h"
-#import "LFSBasicHTMLLabel.h"
 
 @interface LFSCollectionViewController : UITableViewController
 <UITextFieldDelegate,
 LFSPostViewControllerDelegate,
 LFSDetailViewControllerDelegate,
-LFSContentCollectionDelegate,
-OHAttributedLabelDelegate,
-UIWebViewDelegate>
+LFSContentCollectionDelegate>
 
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;

@@ -14,7 +14,6 @@
 
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
-#import "LFSBasicHTMLLabel.h"
 #import "UILabel+Trim.h"
 
 static const UIEdgeInsets kDetailPadding = {
@@ -61,7 +60,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 // UIView-specific
 @property (readonly, nonatomic) LFSContentToolbar *toolbar;
-@property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
 @property (readonly, nonatomic) UIButton *headerAccessoryRightView;
 @property (readonly, nonatomic) UIImageView *headerImageView;

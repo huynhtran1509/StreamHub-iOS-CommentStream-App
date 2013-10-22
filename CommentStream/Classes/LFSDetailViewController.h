@@ -15,6 +15,8 @@
 #import "LFSDetailView.h"
 #import "LFSPostViewController.h"
 
+#import "LFSAttributedLabelDelegate.h"
+
 @protocol LFSDetailViewDelegate;
 @protocol LFSDetailViewControllerDelegate;
 
@@ -28,6 +30,8 @@
 @property (nonatomic, strong) LFSContent *contentItem;
 
 @property (nonatomic, strong) LFSUser *user;
+
+@property (nonatomic, strong) LFSAttributedLabelDelegate *attributedLabelDelegate;
 
 @property (nonatomic, weak) id<LFSDetailViewControllerDelegate> delegate;
 
