@@ -8,6 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+#import "LFSAuthorCollection.h"
+
+@protocol LFSContentCollectionDelegate;
+
 @interface LFSContentCollection : NSDictionary
 
 - (id)objectAtIndex:(NSUInteger)index;
@@ -18,12 +22,10 @@
 - (NSUInteger)indexOfKey:(id<NSCopying>)key;
 
 @property (nonatomic, readonly) NSNumber *lastEventId;
-
+@property (nonatomic, weak) id<LFSContentCollectionDelegate> delegate;
 @end
 
-/**
- * The design goal is to have a similar interface to NSMutableDictionary
- */
+// NSMutableDictionary-like methods
 @interface LFSMutableContentCollection : LFSContentCollection
 
 + (id)dictionaryWithCapacity:(NSUInteger)count;
@@ -33,18 +35,26 @@
 - (void)setDictionary:(NSDictionary *)otherDictionary;
 - (void)setObject:(id)object forKey:(id<NSCopying>)key;
 
-- (void)addObjectsFromArray:(NSArray*)array;
-- (void)addObject:(id)anObject;
-
 - (void)removeObject:(id)object;
 - (void)removeObjectAtIndex:(NSUInteger)index;
 - (void)removeObjectForKey:(id<NSCopying>)key;
 - (void)removeObjectsForKeys:(NSArray *)keyArray;
 - (void)removeAllObjects;
 
-/* other stuff */
-@property (nonatomic, strong) id authors;
--(void)addAuthorsCollection:(id)collection;
+- (void)addObject:(id)anObject;
+- (void)addObjectsFromArray:(NSArray*)array;
+
+// other
+@property (nonatomic, readonly) LFSAuthorCollection *authors;
+
+-(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors;
+
+-(void)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility;
 
 @end
 
+@protocol LFSContentCollectionDelegate <NSObject>
+
+-(void)didUpdateModelWithDeletes:(NSArray*)deleteSet updates:(NSArray*)updateSet inserts:(NSArray*)insertStack;
+
+@end

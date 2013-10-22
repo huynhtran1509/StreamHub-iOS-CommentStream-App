@@ -9,8 +9,14 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+#define AppDelegate (LFSAppDelegate *)[[UIApplication sharedApplication] delegate]
+
 @interface LFSAppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (strong, nonatomic) UIWindow *window;
+@property (nonatomic, strong) UIWindow *window;
+@property (nonatomic, readonly) BOOL canOpenLinksInTwitterClient;
+@property (nonatomic, strong) UIStoryboard *mainStoryboard;
+
+-(BOOL)openInTwitterApp:(NSString*)urlString;
 
 @end

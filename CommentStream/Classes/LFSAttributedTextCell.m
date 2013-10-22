@@ -66,7 +66,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
-@property (nonatomic, readonly) LFSBasicHTMLLabel *bodyView;
 @property (nonatomic, readonly) UILabel *headerAccessoryRightView;
 
 @property (nonatomic, strong) UIImageView *headerAccessoryRightImageView;
@@ -573,7 +572,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
     }
     return self;
 }
-
 -(void)dealloc
 {
     _bodyView = nil;

@@ -25,6 +25,9 @@
 
 #import "LFSUser.h"
 #import "LFSContentCollection.h"
+#import "LFSAppDelegate.h"
+
+#import "LFSAttributedLabelDelegate.h"
 
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSMutableContentCollection *content;
@@ -43,6 +46,7 @@
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 @property (nonatomic, strong) LFSPostViewController *postViewController;
+@property (nonatomic, strong) LFSAttributedLabelDelegate *attributedLabelDelegate;
 
 @property (nonatomic, strong) UIImage *placeholderImage;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
@@ -84,6 +88,7 @@ const static char kAttributedTextValueKey;
 @synthesize collectionId = _collectionId;
 @synthesize placeholderImage = _placeholderImage;
 @synthesize operationQueue = _operationQueue;
+@synthesize attributedLabelDelegate = _attributedLabelDelegate;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -130,12 +135,11 @@ const static char kAttributedTextValueKey;
                          clientWithNetwork:[_collection objectForKey:@"network"]
                          environment:[_collection objectForKey:@"environment"] ];
         
-        __weak typeof(self) weakSelf = self;
+        __weak typeof(_content) _weakContent = _content;
         [self.streamClient setResultHandler:^(id responseObject) {
             //NSLog(@"%@", responseObject);
-            [weakSelf addTopLevelContent:[[responseObject objectForKey:@"states"] allValues]
-                             withAuthors:[responseObject objectForKey:@"authors"]
-                            visualInsert:YES];
+            [_weakContent addContent:[[responseObject objectForKey:@"states"] allValues]
+                         withAuthors:[responseObject objectForKey:@"authors"]];
             
         } success:nil failure:nil];
     }
@@ -144,21 +148,25 @@ const static char kAttributedTextValueKey;
 
 -(LFSPostViewController*)postViewController
 {
-    // lazy-instantiate LFSPostViewController
-    static NSString* const kLFSMainStoryboardId = @"Main";
     static NSString* const kLFSPostCommentViewControllerId = @"postComment";
     
     if (_postViewController == nil) {
-        UIStoryboard *storyboard = [UIStoryboard
-                                    storyboardWithName:kLFSMainStoryboardId
-                                    bundle:nil];
         _postViewController =
-        (LFSPostViewController*)[storyboard
+        (LFSPostViewController*)[[AppDelegate mainStoryboard]
                                  instantiateViewControllerWithIdentifier:
                                  kLFSPostCommentViewControllerId];
         [_postViewController setDelegate:self];
     }
     return _postViewController;
+}
+
+-(LFSAttributedLabelDelegate*)attributedLabelDelegate
+{
+    if (_attributedLabelDelegate == nil) {
+        _attributedLabelDelegate = [[LFSAttributedLabelDelegate alloc] init];
+        _attributedLabelDelegate.navigationController = self.navigationController;
+    }
+    return _attributedLabelDelegate;
 }
 
 #pragma mark - Lifecycle
@@ -168,6 +176,7 @@ const static char kAttributedTextValueKey;
     // Do any additional setup after loading the view, typically from a nib.
 
     _content = [[LFSMutableContentCollection alloc] init];
+    [_content setDelegate:self];
     
     self.title = [_collection objectForKey:@"_name"];
     
@@ -221,6 +230,7 @@ const static char kAttributedTextValueKey;
         //[toolbar setTintColor:[UIColor lightGrayColor]];
     }
     _postViewController = nil;
+    _attributedLabelDelegate = nil;
     
     _streamClient = nil;
     _bootstrapClient = nil;
@@ -458,9 +468,8 @@ const static char kAttributedTextValueKey;
                                    onSuccess:^(NSOperation *operation, id responseObject)
          {
              NSDictionary *headDocument = [responseObject objectForKey:@"headDocument"];
-             [self addTopLevelContent:[headDocument objectForKey:@"content"]
-                          withAuthors:[headDocument objectForKey:@"authors"]
-                         visualInsert:NO];
+             [_content addContent:[headDocument objectForKey:@"content"]
+                      withAuthors:[headDocument objectForKey:@"authors"]];
              NSDictionary *collectionSettings = [responseObject objectForKey:@"collectionSettings"];
              NSString *collectionId = [collectionSettings objectForKey:@"collectionId"];
              NSNumber *eventId = [collectionSettings objectForKey:@"event"];
@@ -486,28 +495,20 @@ const static char kAttributedTextValueKey;
     }
 }
 
--(void)addTopLevelContent:(NSArray*)content withAuthors:(NSDictionary*)authors visualInsert:(BOOL)visual
+-(void)didUpdateModelWithDeletes:(NSArray*)deletes updates:(NSArray*)updates inserts:(NSArray*)inserts
 {
-    // This callback is responsible for both adding content from Bootstrap and
-    // for streaming new updates.
-    [_content addAuthorsCollection:authors];
-    
-    [_content addObjectsFromArray:content];
-    
-    /*
     // TODO: only perform animated insertion of cells when the top of the
     // viewport is the same as the top of the first cell
-    if (visual && [content count] == 1u) {
-        // animate insertion
-        [self.tableView beginUpdates];
-        [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:
-                                                [NSIndexPath indexPathForRow:0 inSection:0]]
-                              withRowAnimation:UITableViewRowAnimationNone];
-        [self.tableView endUpdates];
-    }
-     */
-
-    [self.tableView reloadData];
+    
+    UITableView *tableView = self.tableView;
+    
+    [tableView beginUpdates];
+    [tableView deleteRowsAtIndexPaths:deletes withRowAnimation:UITableViewRowAnimationNone];
+    [tableView reloadRowsAtIndexPaths:updates withRowAnimation:UITableViewRowAnimationNone];
+    [tableView insertRowsAtIndexPaths:inserts withRowAnimation:UITableViewRowAnimationNone];
+    [tableView endUpdates];
+    
+    //[tableView reloadData];
 }
 
 #pragma mark - UITableViewControllerDelegate
@@ -614,21 +615,11 @@ const static char kAttributedTextValueKey;
              {
                  NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
                           @"Wrong content Id received");
-                 LFSContent *newContent = [_content objectForKey:contentId];
-                 if (newContent != nil)
-                 {
-                     NSIndexPath *newIndexPath = [NSIndexPath
-                                                  indexPathForRow:[_content indexOfObject:newContent]
-                                                  inSection:0];
-                     
-                     // no need to set visibility of newConent here as that is the
-                     // function of LFSContentCollection
-                     UITableView *tableView = self.tableView;
-                     [tableView beginUpdates];
-                     [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:newIndexPath, nil]
-                                      withRowAnimation:UITableViewRowAnimationFade];
-                     [tableView endUpdates];
+                 NSUInteger row = [_content indexOfKey:contentId];
+                 if (row != NSNotFound) {
+                     [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
                  }
+                 
              }
                                 onFailure:^(NSOperation *operation, NSError *error)
              {
@@ -644,22 +635,16 @@ const static char kAttributedTextValueKey;
                  // and if so, revert to its previous visibility state. This check is necessary
                  // because it is conceivable that the streaming client has already deleted
                  // the content object
-                 LFSContent *newContent = [_content objectForKey:contentId];
-                 if (newContent != nil)
+                 NSUInteger newContentIndex = [_content indexOfKey:contentId];
+                 if (newContentIndex != NSNotFound)
                  {
+                     [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
+                     
                      // obtain new index path since it could have changed during the time
                      // it toook for the error response to come back
-                     NSIndexPath *newIndexPath = [NSIndexPath
-                                                  indexPathForRow:[_content indexOfObject:newContent]
-                                                  inSection:0];
-                     
-                     [newContent setVisibility:visibility];
-                     
-                     UITableView *tableView = self.tableView;
-                     [tableView beginUpdates];
-                     [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:newIndexPath, nil]
-                                      withRowAnimation:UITableViewRowAnimationFade];
-                     [tableView endUpdates];
+                     [self didUpdateModelWithDeletes:nil
+                                             updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
+                                             inserts:nil];
                  }
              }];
             
@@ -708,6 +693,7 @@ const static char kAttributedTextValueKey;
         if (!cell) {
             cell = [[LFSAttributedTextCell alloc]
                     initWithReuseIdentifier:kAttributedCellReuseIdentifier];
+            [cell.bodyView setDelegate:self.attributedLabelDelegate];
         }
         [self configureAttributedCell:cell forContent:content];
         returnedCell = cell;
@@ -887,6 +873,7 @@ const static char kAttributedTextValueKey;
                 [vc setHideStatusBar:self.prefersStatusBarHidden];
                 [vc setUser:self.user];
                 [vc setDelegate:self];
+                [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
             }
         }
     }
@@ -931,9 +918,8 @@ const static char kAttributedTextValueKey;
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject
 {
     // 200 OK received, post was successful
-    [self addTopLevelContent:[responseObject objectForKey:@"messages"]
-                 withAuthors:[responseObject objectForKey:@"authors"]
-                visualInsert:YES];
+    [_content addContent:[responseObject objectForKey:@"messages"]
+             withAuthors:[responseObject objectForKey:@"authors"]];
 }
 
 @end

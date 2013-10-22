@@ -10,6 +10,38 @@
 #import "LFSContentCollection.h"
 #import "LFSAuthorCollection.h"
 
+
+#pragma mark - convenience methods for maintaining sorted order
+@interface NSMutableArray (SortedArray)
+
+-(NSUInteger)indexOfObject:(id)anObject options:(NSBinarySearchingOptions)options usingReverseOrder:(BOOL)reverse;
+-(void)insertObject:(id)anObject usingReverseOrder:(BOOL)reverse;
+
+@end
+
+@implementation NSMutableArray (SortedArray)
+
+-(NSUInteger)indexOfObject:(id)anObject options:(NSBinarySearchingOptions)options usingReverseOrder:(BOOL)reverse
+{
+    return [self indexOfObject:anObject
+                 inSortedRange:NSMakeRange(0u, [self count])
+                       options:options
+               usingComparator:(reverse
+                                ? ^NSComparisonResult(id obj1, id obj2)
+                                { return [obj2 compare:obj1]; }
+                                : ^NSComparisonResult(id obj1, id obj2)
+                                { return [obj1 compare:obj2]; })];
+}
+
+-(void)insertObject:(id)anObject usingReverseOrder:(BOOL)reverse
+{
+    NSUInteger index = [self indexOfObject:anObject options:NSBinarySearchingInsertionIndex usingReverseOrder:reverse];
+    [self insertObject:anObject atIndex:index];
+}
+
+@end
+
+
 NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     if ([object respondsToSelector:@selector(descriptionWithLocale:indent:)])
@@ -71,16 +103,50 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 @property (nonatomic, strong) NSMutableArray *array;
 @property (nonatomic, strong) NSMutableDictionary *likes;
 
+@property (nonatomic, strong) NSMutableArray *deleteStack;
+@property (nonatomic, strong) NSMutableSet *updateSet;
+@property (nonatomic, strong) NSMutableArray *insertStack;
+
 @end
 
 
 @implementation LFSContentCollection
 
+@synthesize delegate = _delegate;
 @synthesize lastEventId = _lastEventId;
 @synthesize mapping = _mapping;
 @synthesize array = _array;
 
 @synthesize likes = _likes;
+
+#pragma mark - some lazy-instantiated properties
+@synthesize deleteStack = _deleteStack;
+-(NSMutableArray*)deleteStack
+{
+    if (_deleteStack == nil) {
+        _deleteStack = [[NSMutableArray alloc] init];
+    }
+    return _deleteStack;
+}
+
+@synthesize updateSet = _updateSet;
+-(NSMutableSet*)updateSet
+{
+    if (_updateSet == nil) {
+        _updateSet = [[NSMutableSet alloc] init];
+    }
+    return _updateSet;
+}
+
+@synthesize insertStack = _insertStack;
+-(NSMutableArray*)insertStack
+{
+    if (_insertStack == nil) {
+        _insertStack = [[NSMutableArray alloc] init];
+    }
+    return _insertStack;
+}
+
 
 - (id)copyWithZone:(__unused NSZone *)zone
 {
@@ -97,25 +163,30 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (NSUInteger)indexOfObject:(id)anObject
 {
-    return [_array indexOfObject:anObject
-                   inSortedRange:NSMakeRange(0u, [_array count])
-                         options:NSBinarySearchingFirstEqual
-                 usingComparator:^NSComparisonResult(LFSContent *obj1,
-                                                     LFSContent *obj2)
-            {
-                return [obj2 compare:obj1];
-            }];
+    return [_array indexOfObject:anObject options:NSBinarySearchingFirstEqual usingReverseOrder:YES];
 }
 
 - (NSUInteger)indexOfKey:(id<NSCopying>)key
 {
     LFSContent *content = [self objectForKey:key];
-    return [self indexOfObject:content];
+    if (content == nil) {
+        return NSNotFound;
+    } else {
+        return [self indexOfObject:content];
+    }
 }
 
 -(void)insertObject:(LFSContent*)object
 {
     [self insertObject:object forKey:[(LFSContent*)object idString]];
+}
+
+
+- (void)addObject:(id)anObject
+{
+    // check if object is of appropriate type
+    LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
+    [self setObject:content forKey:content.idString];
 }
 
 -(void)insertObject:(LFSContent*)object forKey:(id<NSCopying>)key
@@ -146,21 +217,22 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         object.datePath = [[NSMutableArray alloc] initWithObjects:object.contentCreatedAt, nil];
     }
     
-    // determine the correct index to insert the object into
-    NSUInteger index = [_array indexOfObject:object
-                               inSortedRange:NSMakeRange(0u, [_array count])
-                                     options:NSBinarySearchingInsertionIndex
-                             usingComparator:^NSComparisonResult(LFSContent *obj1,
-                                                                 LFSContent *obj2)
-                        {
-                            return [obj2 compare:obj1];
-                        }];
-    [_array insertObject:object atIndex:index];
+    // at this point, we actually want to know the insertion index
+    // (index to maintain a sorted array)
+    NSUInteger index = [_array indexOfObject:object options:NSBinarySearchingInsertionIndex usingReverseOrder:YES];
+    object.index = index;
+    [self.insertStack insertObject:object usingReverseOrder:YES];
 }
 
 -(void)removeObject:(id)object
 {
     [self removeObject:object forKey:[(LFSContent*)object idString]];
+}
+
+- (void)removeObjectAtIndex:(NSUInteger)index
+{
+    id object = [self.array objectAtIndex:index];
+    [self removeObject:object];
 }
 
 -(void)removeObject:(id)object forKey:(id)key
@@ -204,14 +276,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
-- (void)addObject:(id)anObject
-{
-    // check if object is of appropriate type
-    LFSContent *content = [[LFSContent alloc] initWithObject:anObject];
-    [self setObject:content forKey:content.idString];
-}
-
-
 - (void)setObject:(id)object forKey:(id<NSCopying>)key
 {
     // check if object is of appropriate type
@@ -228,19 +292,31 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // pre-existing object found (should never happen with bootstrap data)
         [oldContent setObject:content.object];
         
-        NSInteger expectedNodeCount = ((oldContent.visibility == LFSContentVisibilityEveryone ? 1 : 0) +
-                                      oldContent.nodeCountSumOfChildren);
-        NSInteger delta = (NSInteger)expectedNodeCount - oldContent.nodeCount;
-        if (delta < 0) {
-            // checking if delta is negative here because it is possible that we receive content
-            // after delete event
-            NSAssert(delta == -1, @"No support for deleting more than one comment at once");
-            [self changeNodeCountOf:oldContent withDelta:delta];
+        if (oldContent.index == NSNotFound) {
+            // not in the set of updated, deleted, or removed objects
+            // (reasoning is that it makes no sense to reload rows that will
+            // be deleted or inserted)
+            oldContent.index = [self indexOfObject:oldContent];
+            [self.updateSet addObject:oldContent];
         }
+        else {
+            NSUInteger oldContentIndex = [self indexOfObject:oldContent];
+            NSAssert(oldContent.index == oldContentIndex, @"indexes must match");
+            
+            NSUInteger deletedIndex = [self.deleteStack indexOfObject:oldContent options:NSBinarySearchingFirstEqual usingReverseOrder:YES];
+            NSAssert(deletedIndex == NSNotFound, @"object cannot be present in deleted set since it is present in mapping");
+            
+            NSUInteger index = [self.insertStack indexOfObject:oldContent options:NSBinarySearchingFirstEqual usingReverseOrder:YES];
+            NSAssert(index == NSNotFound, @"object cannot be present in insert set since it is present in mapping");
+        }
+        
+        [self handleVisibilityChangeForContent:oldContent];
     }
     else
     {
         // no pre-existing object found
+        // (this means that the insert/update/delete stacks also do not contain
+        // said object)
         [content enumerateVisiblePathsUsingBlock:^(LFSContent *obj) {
             // insert all objects listed here in that order
             [self insertObject:obj];
@@ -262,18 +338,62 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
+-(void)handleVisibilityChangeForContent:(LFSContent*)content
+{
+    NSInteger expectedNodeCount = ((content.visibility == LFSContentVisibilityEveryone ? 1 : 0) + content.nodeCountSumOfChildren);
+    NSInteger delta = (NSInteger)expectedNodeCount - content.nodeCount;
+    if (delta < 0) {
+        // checking if delta is negative here because it is possible that we receive content
+        // after delete event
+        NSAssert(delta == -1, @"No support for deleting more than one comment at once");
+        [self changeNodeCountOf:content withDelta:delta];
+    }
+}
+
+-(void)transactionalDeleteObject:(LFSContent*)content
+{
+    // remove object from mapping
+    [content.parent.children removeObject:content];
+    [content setParent:nil];
+    [_mapping removeObjectForKey:content.idString];
+    
+    NSUInteger contentIndex = [self indexOfObject:content];
+    if (contentIndex == NSNotFound) {
+        // try to remove object from the insert stack if it exists there
+        NSUInteger index = [self.insertStack indexOfObject:content options:NSBinarySearchingFirstEqual usingReverseOrder:YES];
+        if (index != NSNotFound) {
+            [self.insertStack removeObjectAtIndex:index];
+        }
+    } else {
+        if (content.index != NSNotFound) {
+            // remove object from update sets if it exists there
+            [self.updateSet removeObject:content];
+        }
+        
+        // add found object to deleted set
+        content.index = contentIndex;
+        [self.deleteStack insertObject:content usingReverseOrder:YES];
+
+        // TODO: consider deleting this optional check
+        NSUInteger index = [self.insertStack indexOfObject:content options:NSBinarySearchingFirstEqual usingReverseOrder:YES];
+        NSAssert(index == NSNotFound, @"object cannot be present in both existing and insert stacks");
+    }
+}
+
 -(void)changeNodeCountOf:(LFSContent*)content withDelta:(NSInteger)delta
 {
     // recursively change (with optional removal) the node count of this node
     // and of all parent nodes above it
+    
     NSParameterAssert(content != nil);
     if (delta == 0) {
         return;
     }
+
     content.nodeCount += delta;
     LFSContent *parent = content.parent;
     if (content.nodeCount < 1) {
-        [self removeObject:content];
+        [self transactionalDeleteObject:content];
     }
 
     while (parent != nil) {
@@ -281,7 +401,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         LFSContent *prev = parent;
         parent = parent.parent;
         if (prev.nodeCount < 1) {
-            [self removeObject:prev];
+            [self transactionalDeleteObject:prev];
         }
     }
 }
@@ -317,7 +437,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 }
 
 // designated initializer
-
 -(id)initWithObjects:(const __unsafe_unretained id [])objects
              forKeys:(const __unsafe_unretained id<NSCopying> [])keys
                count:(NSUInteger)cnt
@@ -329,6 +448,11 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         _array = [[NSMutableArray alloc] initWithCapacity:cnt];
         _likes = [[NSMutableDictionary alloc] init];
         _lastEventId = nil;
+        _delegate = nil;
+        
+        _deleteStack = nil;
+        _updateSet = nil;
+        _insertStack = nil;
         
         for (NSUInteger i = 0; i < cnt; i++)
         {
@@ -360,7 +484,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return [_array objectEnumerator];
 }
 
-#pragma mark - NSArray
+#pragma mark - NSArray (public)
 - (NSEnumerator *)reverseObjectEnumerator
 {
     return [_array reverseObjectEnumerator];
@@ -370,11 +494,29 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 {
     self = [super init];
     if (self != nil) {
-        for (id object in array) {
-            [self addObject:object];
-        }
+        // initialize stuff here
+        _mapping = [[NSMutableDictionary alloc] init];
+        _array = [[NSMutableArray alloc] init];
+        _likes = [[NSMutableDictionary alloc] init];
+        _lastEventId = nil;
+        _delegate = nil;
+        
+        _deleteStack = nil;
+        _updateSet = nil;
+        _insertStack = nil;
+        
+        [self addObjectsFromArray:array];
     }
     return self;
+}
+
+#pragma mark - NSMutableArray (private)
+-(void)addObjectsFromArray:(NSArray*)array
+{
+    for (id object in array)
+    {
+        [self addObject:object];
+    }
 }
 
 @end
@@ -394,38 +536,125 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return _authors;
 }
 
--(void)setAuthors:(id)authors
+-(void)addContent:(NSArray*)content withAuthors:(NSDictionary*)authors
 {
-    if ([authors isKindOfClass:[LFSAuthorCollection class]]) {
-        // everything is clear
-        _authors = authors;
-    } else {
-        _authors = [[LFSAuthorCollection alloc] initWithDictionary:authors];
-    }
+    [self beginUpdating];
+    [self.authors addEntriesFromDictionary:authors];
+    [self addObjectsFromArray:content];
+    [self endUpdating];
 }
 
--(void)addAuthorsCollection:(id)collection
+-(void)updateContentForContentId:(id<NSCopying>)contentId setVisibility:(LFSContentVisibility)visibility
 {
-    [self.authors addEntriesFromDictionary:collection];
+    [self beginUpdating];
+    LFSContent *content = [self objectForKey:contentId];
+    [content setVisibility:visibility];
+    [self handleVisibilityChangeForContent:content];
+    [self endUpdating];
 }
 
-
-- (id)objectAtIndex:(NSUInteger)index
+-(void)beginUpdating
 {
-    LFSContent *content = [self.array objectAtIndex:index];
-    if (content.author == nil && _authors != nil) {
-        // TODO: move setAuthorWithCollection out of LFSContent?
-        [content setAuthorWithCollection:_authors];
-    }
-    NSMutableSet *authors = [self.likes objectForKey:content.idString];
-    if (authors == nil) {
-        authors = [[NSMutableSet alloc] init];
-        [self.likes setObject:authors forKey:content.idString];
-    }
-    [content setLikes:authors];
-    return [self.array objectAtIndex:index];
+    self.deleteStack = nil;
+    self.updateSet = nil;
+    self.insertStack = nil;
 }
 
+-(void)endUpdating
+{
+    NSMutableArray *deletedIndexPaths = [[NSMutableArray alloc] init];
+    NSMutableArray *updatedIndexPaths = [[NSMutableArray alloc] init];
+    NSMutableArray *insertedIndexPaths = [[NSMutableArray alloc] init];
+    
+    for (LFSContent *obj in self.updateSet) {
+        [updatedIndexPaths
+         addObject:[NSIndexPath indexPathForRow:obj.index inSection:0]];
+    }
+    
+    if (self.deleteStack.count && !self.insertStack.count) {
+        for (LFSContent *obj in self.deleteStack) {
+            [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:obj.index inSection:0]];
+        }
+        // backward enumeration to preserve indexes
+        [self.deleteStack
+         enumerateObjectsWithOptions:NSEnumerationReverse
+         usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
+            [self.array removeObjectAtIndex:obj.index];
+        }];
+    }
+    else if (!self.deleteStack.count && self.insertStack.count) {
+        NSUInteger insertOffset = 0u;
+        for (LFSContent *obj in self.insertStack) {
+            [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:(obj.index + insertOffset) inSection:0]];
+            insertOffset++;
+        }
+        // backward enumeration to preserve indexes
+        [self.insertStack
+         enumerateObjectsWithOptions:NSEnumerationReverse
+         usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
+            [self.array insertObject:obj atIndex:obj.index];
+            obj.index = NSNotFound;
+        }];
+    }
+    else {
+        
+        //////////////////////////////////////////////
+        // correct for deletions
+        NSUInteger i = 0u, imax = [self.deleteStack count];
+        for (LFSContent *ins in self.insertStack) {
+            // count how many deletions are before a given index of inserted object
+            for (LFSContent *rem = [self.deleteStack objectAtIndex:i];
+                 i < imax && rem.index < ins.index;
+                 rem = [self.deleteStack objectAtIndex:i], i++)
+            { }
+            ins.index -= i;
+        }
+        
+        //////////////////////////////////////////////
+        // perform and record deletions
+        for (LFSContent *obj in self.deleteStack) {
+            [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:obj.index inSection:0]];
+        }
+        // backward enumeration to preserve indexes
+        [self.deleteStack
+         enumerateObjectsWithOptions:NSEnumerationReverse
+         usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
+            [self.array removeObjectAtIndex:obj.index];
+        }];
+        
+        //////////////////////////////////////////////
+        // perform and record insertions
+        NSUInteger insertOffset = 0u;
+        for (LFSContent *obj in self.insertStack) {
+            [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:(obj.index + insertOffset) inSection:0]];
+            insertOffset++;
+        }
+        // backward enumeration to preserve indexes
+        [self.insertStack
+         enumerateObjectsWithOptions:NSEnumerationReverse
+         usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
+            [self.array insertObject:obj atIndex:obj.index];
+            obj.index = NSNotFound;
+        }];
+
+    }
+
+    [self.delegate didUpdateModelWithDeletes:deletedIndexPaths
+                                     updates:updatedIndexPaths
+                                     inserts:insertedIndexPaths];
+}
+
+#pragma mark - generic collection methods
+
+- (void)addObject:(id)anObject
+{
+    [super addObject:anObject];
+}
+
+-(void)addObjectsFromArray:(NSArray*)array
+{
+    [super addObjectsFromArray:array];
+}
 
 #pragma mark - NSMutableDictionary methods
 + (id)dictionaryWithCapacity:(NSUInteger)count
@@ -440,7 +669,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     if (self)
     {
         _authors = nil;
-        
+
         // values and keys are private to LFSOrderedDictionary that we
         // inherit from
         self.mapping = [[NSMutableDictionary alloc] initWithCapacity:capacity];
@@ -480,12 +709,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [super removeObject:object];
 }
 
-- (void)removeObjectAtIndex:(NSUInteger)index
-{
-    id object = [self.array objectAtIndex:index];
-    [super removeObject:object];
-}
-
 - (void)removeObjectForKey:(id<NSCopying>)key
 {
     [self removeObject:[self.mapping objectForKey:key]
@@ -520,17 +743,25 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 #pragma mark - NSMutableArray
 
-- (void)addObject:(id)anObject
+- (id)objectAtIndex:(NSUInteger)index
 {
-    [super addObject:anObject];
+    LFSContent *content = [self.array objectAtIndex:index];
+    if (content.author == nil && _authors != nil) {
+        // TODO: move setAuthorWithCollection out of LFSContent?
+        [content setAuthorWithCollection:_authors];
+    }
+    NSMutableSet *authors = [self.likes objectForKey:content.idString];
+    if (authors == nil) {
+        authors = [[NSMutableSet alloc] init];
+        [self.likes setObject:authors forKey:content.idString];
+    }
+    [content setLikes:authors];
+    return [self.array objectAtIndex:index];
 }
 
--(void)addObjectsFromArray:(NSArray*)array
+- (void)removeObjectAtIndex:(NSUInteger)index
 {
-    for (id object in array)
-    {
-        [self addObject:object];
-    }
+    [super removeObjectAtIndex:index];
 }
 
 @end

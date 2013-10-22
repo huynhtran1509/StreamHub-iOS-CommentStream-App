@@ -130,6 +130,7 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
 @synthesize likes = _likes;
 @synthesize nodeCount = _nodeCount;
 @synthesize parent = _parent;
+@synthesize index = _index;
 
 @synthesize object = _object;
 -(void)setObject:(id)object
@@ -551,6 +552,7 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
             _parent = nil;
             _children = nil;
             _nodeCount = 0;
+            _index = NSNotFound;
         }
     }
     return self;

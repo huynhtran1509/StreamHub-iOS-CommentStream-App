@@ -14,8 +14,8 @@
 
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
-#import "LFSBasicHTMLLabel.h"
 #import "UILabel+Trim.h"
+#import "LFSRightAlignedButton.h"
 
 static const UIEdgeInsets kDetailPadding = {
     .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
@@ -61,13 +61,12 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 // UIView-specific
 @property (readonly, nonatomic) LFSContentToolbar *toolbar;
-@property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
 @property (readonly, nonatomic) UIButton *headerAccessoryRightView;
 @property (readonly, nonatomic) UIImageView *headerImageView;
 
 @property (readonly, nonatomic) UILabel *footerLeftView;
-@property (readonly, nonatomic) LFSBasicHTMLLabel *footerRightView;
+@property (readonly, nonatomic) LFSRightAlignedButton *footerRightView;
 
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
@@ -278,7 +277,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 #pragma mark -
 @synthesize footerRightView = _footerRightView;
-- (LFSBasicHTMLLabel*)footerRightView
+- (LFSRightAlignedButton*)footerRightView
 {
     if (_footerRightView == nil) {
         CGSize labelSize = CGSizeMake(floorf((self.bounds.size.width - kDetailPadding.left - kDetailPadding.right) / 2.f), kDetailFooterHeight);
@@ -288,17 +287,19 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                                    0.f); // size.y will be changed in layoutSubviews
         
         // initialize
-        _footerRightView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
+        _footerRightView = [[LFSRightAlignedButton alloc] initWithFrame:frame];
         
         // configure
-        [_footerRightView
-         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin)];
-
-        [_footerRightView setCenterVertically:YES]; // necessary for iOS6
-        [_footerRightView setFont:[UIFont systemFontOfSize:13.f]];
-        [_footerRightView setTextAlignment:NSTextAlignmentRight];
-        [_footerRightView setLineBreakMode:NSLineBreakByWordWrapping];
-        [_footerRightView setTextAlignment:NSTextAlignmentRight];
+        [_footerRightView.titleLabel setFont:[UIFont systemFontOfSize:13.f]];
+        [_footerRightView.titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
+        [_footerRightView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin)];
+        [_footerRightView setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f] forState:UIControlStateNormal];
+        [_footerRightView setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f] forState:UIControlStateHighlighted];
+        [_footerRightView setContentHorizontalAlignment:UIControlContentHorizontalAlignmentRight];
+        [_footerRightView setImageEdgeInsets:UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0)];
+        [_footerRightView setTitleEdgeInsets:UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0)];
+        [_footerRightView addTarget:self action:@selector(didSelectContentRemote:) forControlEvents:UIControlEventTouchUpInside];
+        [_footerRightView setImage:[UIImage imageNamed:@"ChevronRight"] forState:UIControlStateNormal];
         
         // add to superview
         [self addSubview:_footerRightView];
@@ -446,10 +447,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // layout url link
     LFSResource *contentRemote = self.contentRemote;
     if (contentRemote != nil) {
-        [self.footerRightView setHTMLString:
-         [NSString stringWithFormat:@"<a href=\"%@\">%@</a>",
-          [contentRemote identifier],
-          [contentRemote displayString]]];
+        [self.footerRightView setTitle:contentRemote.displayString
+                              forState:UIControlStateNormal];
         CGRect remoteUrlFrame = self.footerRightView.frame;
         remoteUrlFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
         [self.footerRightView setFrame:remoteUrlFrame];
@@ -467,7 +466,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     CGRect dateFrame = self.footerLeftView.frame;
     dateFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
     [self.footerLeftView setFrame:dateFrame];
-    [self.footerLeftView setText:[[[self class] dateFormatter] extendedRelativeStringFromDate:self.contentDate]];
+    [self.footerLeftView setText:[[[self class] dateFormatter]
+                                  extendedRelativeStringFromDate:self.contentDate]];
     
     // layout toolbar frame
     CGRect toolbarFrame = self.toolbar.frame;
@@ -686,9 +686,19 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 - (IBAction)didSelectProfile:(id)sender
 {
-    // this action we handle ourselves
-    if (_profileRemoteURL != nil) {
-        [[UIApplication sharedApplication] openURL:_profileRemoteURL];
+    // call optional selector
+    if ([self.delegate respondsToSelector:@selector(didSelectProfile:wihtURL:)]) {
+        [self.delegate didSelectProfile:sender
+                                wihtURL:_profileRemoteURL];
+    }
+}
+
+- (IBAction)didSelectContentRemote:(id)sender
+{
+    // call optional selector
+    if ([self.delegate respondsToSelector:@selector(didSelectContentRemote:wihtURL:)]) {
+        [self.delegate didSelectContentRemote:sender
+                                      wihtURL:[NSURL URLWithString:self.contentRemote.identifier]];
     }
 }
 

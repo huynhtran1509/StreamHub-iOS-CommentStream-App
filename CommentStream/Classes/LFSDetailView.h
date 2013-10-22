@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "LFSResource.h"
+#import "LFSBasicHTMLLabel.h"
 
 @protocol LFSDetailViewDelegate;
 
@@ -27,6 +28,8 @@
 @property (readonly, nonatomic) UIButton *button1;
 @property (readonly, nonatomic) UIButton *button2;
 
+@property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
+
 @end
 
 // thanks to this protocol, LFSDetailView does not need
@@ -36,5 +39,9 @@
 // actions
 - (void)didSelectLike:(id)sender;
 - (void)didSelectReply:(id)sender;
+
+@optional
+- (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url;
+- (void)didSelectContentRemote:(id)sender wihtURL:(NSURL*)url;
 
 @end
