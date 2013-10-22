@@ -49,7 +49,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 static const CGFloat kDetailBarButtonHeight = 44.0f;
-static const CGFloat kDetailBarButtonWidth = 88.0f;
+static const CGFloat kDetailBarButtonWidth = 80.0f;
 
 static const CGFloat kDetailMinorVerticalSeparator = 12.0f;
 static const CGFloat kDetailMajorVerticalSeparator = 20.0f;
@@ -116,13 +116,13 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         [_button1 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
                        forState:UIControlStateHighlighted];
         
-        // Here kDetailContentLineSpacing is the amount of spacing to appear between image and title
-        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, kDetailContentLineSpacing);
-        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
+        // Set the amount of space to appear between image and title
+        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
+        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kDetailContentLineSpacing, 0, 0);
         
         [_button1 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
         
-        [_button1 addTarget:self action:@selector(didSelectLike:)
+        [_button1 addTarget:self action:@selector(didSelectButton1:)
               forControlEvents:UIControlEventTouchUpInside];
         
         // do not add to superview...
@@ -148,18 +148,50 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         [_button2 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
                        forState:UIControlStateHighlighted];
         
-        // Here kDetailContentLineSpacing is the amount of spacing to appear between image and title
-        _button2.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, kDetailContentLineSpacing);
-        _button2.titleEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
+        // Set the amount of space to appear between image and title
+        _button2.imageEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
+        _button2.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kDetailContentLineSpacing, 0, 0);
         
         [_button2 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
         
-        [_button2 addTarget:self action:@selector(didSelectReply:)
+        [_button2 addTarget:self action:@selector(didSelectButton2:)
                forControlEvents:UIControlEventTouchUpInside];
         
         // do not add to superview...
     }
     return _button2;
+}
+
+#pragma mark -
+@synthesize button3 = _button3;
+- (UIButton*)button3
+{
+    if (_button3 == nil) {
+        CGRect frame = CGRectMake(0.f, 0.f,
+                                  kDetailBarButtonWidth,
+                                  kDetailBarButtonHeight);
+        // initialize
+        _button3 = [[UIButton alloc] initWithFrame:frame];
+        
+        // configure
+        [_button3.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
+        [_button3 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+                       forState:UIControlStateNormal];
+        [_button3 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+                       forState:UIControlStateHighlighted];
+        
+        // Set the amount of space to appear between image and title
+        _button3.imageEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
+        _button3.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kDetailContentLineSpacing, 0, 0);
+        
+        [_button3 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+        
+        [_button3 addTarget:self action:@selector(didSelectButton3:)
+           forControlEvents:UIControlEventTouchUpInside];
+        
+        // do not add to superview...
+    }
+    return _button3;
 }
 
 #pragma mark -
@@ -302,8 +334,11 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         [_footerRightView setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
                                forState:UIControlStateHighlighted];
         [_footerRightView setContentHorizontalAlignment:UIControlContentHorizontalAlignmentRight];
+        
+        // Set the amount of space to appear between image and title
         [_footerRightView setImageEdgeInsets:UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0)];
-        [_footerRightView setTitleEdgeInsets:UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0)];
+        [_footerRightView setTitleEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+        
         [_footerRightView addTarget:self action:@selector(didSelectContentRemote:) forControlEvents:UIControlEventTouchUpInside];
         [_footerRightView setImage:[UIImage imageNamed:@"ChevronRight"] forState:UIControlStateNormal];
         
@@ -421,6 +456,13 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
            
            [[UIBarButtonItem alloc]
             initWithCustomView:self.button2],
+           
+           [[UIBarButtonItem alloc]
+            initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+            target:self action:nil],
+           
+           [[UIBarButtonItem alloc]
+            initWithCustomView:self.button3],
            
            [[UIBarButtonItem alloc]
             initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
@@ -678,16 +720,19 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 }
 
 #pragma mark - Actions
-- (IBAction)didSelectLike:(id)sender
+- (IBAction)didSelectButton1:(id)sender
 {
-    // simply pass the action to the delegate
-    [self.delegate didSelectLike:sender];
+    [self.delegate didSelectButton1:sender];
 }
 
-- (IBAction)didSelectReply:(id)sender
+- (IBAction)didSelectButton2:(id)sender
 {
-    // simply pass the action to the delegate
-    [self.delegate didSelectReply:sender];
+    [self.delegate didSelectButton2:sender];
+}
+
+- (IBAction)didSelectButton3:(id)sender
+{
+    [self.delegate didSelectButton3:sender];
 }
 
 - (IBAction)didSelectProfile:(id)sender

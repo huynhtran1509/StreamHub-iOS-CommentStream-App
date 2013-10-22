@@ -18,7 +18,14 @@
 
 #import "LFSAttributedLabelDelegate.h"
 
-@interface LFSDetailViewController ()
+typedef NS_ENUM(NSUInteger, LFSActionType) {
+    kLFSActionTypeFlag = 0u,
+    kLFSActionTypeDelete
+};
+
+@interface LFSDetailViewController () {
+    LFSActionType actionType;
+}
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
 
@@ -172,6 +179,16 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView.button2 setTitle:@"Reply" forState:UIControlStateNormal];
     [detailView.button2 setImage:[UIImage imageNamed:@"ActionReply"] forState:UIControlStateNormal];
     
+    if ([self.user.profile isEqual:self.contentItem.author]) {
+        actionType = kLFSActionTypeDelete;
+        [detailView.button3 setTitle:@"Delete" forState:UIControlStateNormal];
+        [detailView.button3 setImage:[UIImage imageNamed:@"ActionTrash"] forState:UIControlStateNormal];
+    } else {
+        actionType = kLFSActionTypeFlag;
+        [detailView.button3 setTitle:@"Flag" forState:UIControlStateNormal];
+        [detailView.button3 setImage:[UIImage imageNamed:@"ActionFlag"] forState:UIControlStateNormal];
+    }
+    
     // only set an object if we have a remote (Twitter) url
     NSString *twitterUrlString = contentItem.contentTwitterUrlString;
     if (twitterUrlString != nil) {
@@ -259,8 +276,9 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 #pragma mark - LFSDetailViewDelegate
-- (void)didSelectLike:(id)sender
+- (void)didSelectButton1:(id)sender
 {
+    // Like button selected
     static NSString* const kFailureModifyTitle = @"Action Failed";
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken != nil) {
@@ -299,9 +317,9 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
 }
 
-- (void)didSelectReply:(id)sender
+- (void)didSelectButton2:(id)sender
 {
-    // configure destination controller
+    // Reply selected
     [self.postViewController setCollection:self.collection];
     [self.postViewController setCollectionId:self.collectionId];
     [self.postViewController setReplyToContent:self.contentItem];
@@ -318,6 +336,18 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                           completion:nil];
 }
 
+- (void)didSelectButton3:(id)sender
+{
+    // Either "Flag" or "Delete" selected
+    if (actionType == kLFSActionTypeDelete && [self.user.profile isEqual:self.contentItem.author]) {
+        [self.delegate deleteContent:self.contentItem];
+        [self.navigationController popViewControllerAnimated:NO];
+    }
+    else if (actionType == kLFSActionTypeFlag) {
+        [self showActionSheet:sender];
+    }
+}
+
 - (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url
 {
     if (url != nil) {
@@ -329,6 +359,56 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 {
     if (url != nil) {
         [self.attributedLabelDelegate followURL:url];
+    }
+}
+
+#pragma mark - Private methods
+-(void)showActionSheet:(id)sender
+{
+    UIActionSheet *actionSheet = [[UIActionSheet alloc]
+                                  initWithTitle:@"Flag Comment"
+                                  delegate:self
+                                  cancelButtonTitle:@"Cancel"
+                                  destructiveButtonTitle:nil
+                                  otherButtonTitles:
+                                  [LFSContentFlags[LFSFlagSpam] capitalizedString],
+                                  [LFSContentFlags[LFSFlagOffensive] capitalizedString],
+                                  [LFSContentFlags[LFSFlagOfftopic] capitalizedString],
+                                  [LFSContentFlags[LFSFlagDisagree] capitalizedString],
+                                  nil];
+    
+    [actionSheet showInView:self.view];
+}
+
+#pragma mark - UIActionSheetDelegate
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    //Get the name of the current pressed button
+    BOOL animatedPop = NO;
+    NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
+    if  ([action isEqualToString:[LFSContentFlags[LFSFlagSpam] capitalizedString]])
+    {
+        [self.delegate flagContent:self.contentItem withFlag:LFSFlagSpam];
+        [self.navigationController popViewControllerAnimated:animatedPop];
+    }
+    else if ([action isEqualToString:[LFSContentFlags[LFSFlagOffensive] capitalizedString]])
+    {
+        [self.delegate flagContent:self.contentItem withFlag:LFSFlagOffensive];
+        [self.navigationController popViewControllerAnimated:animatedPop];
+    }
+    else if ([action isEqualToString:[LFSContentFlags[LFSFlagOfftopic] capitalizedString]])
+    {
+        [self.delegate flagContent:self.contentItem withFlag:LFSFlagOfftopic];
+        [self.navigationController popViewControllerAnimated:animatedPop];
+    }
+    else if ([action isEqualToString:[LFSContentFlags[LFSFlagDisagree] capitalizedString]])
+    {
+        [self.delegate flagContent:self.contentItem withFlag:LFSFlagDisagree];
+        [self.navigationController popViewControllerAnimated:animatedPop];
+    }
+    else if ([action isEqualToString:@"Cancel"])
+    {
+        // do nothing
     }
 }
 

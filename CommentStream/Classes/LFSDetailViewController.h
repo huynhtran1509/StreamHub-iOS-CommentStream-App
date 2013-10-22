@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <StreamHub-iOS-SDK/LFSConstants.h>
+
 #import "LFSAuthorProfile.h"
 #import "LFSContent.h"
 #import "LFSUser.h"
@@ -20,7 +22,7 @@
 @protocol LFSDetailViewDelegate;
 @protocol LFSDetailViewControllerDelegate;
 
-@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFSPostViewControllerDelegate>
+@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFSPostViewControllerDelegate, UIActionSheetDelegate>
 
 @property (nonatomic, assign) BOOL hideStatusBar;
 
@@ -40,5 +42,7 @@
 @protocol LFSDetailViewControllerDelegate <NSObject>
 
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
+-(void)deleteContent:(LFSContent*)content;
+-(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag;
 
 @end
