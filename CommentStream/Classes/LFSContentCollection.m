@@ -595,9 +595,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     self.insertStack = nil;
 }
 
-
-
-
 -(void)endUpdating
 {
     NSMutableArray *deletedIndexPaths = [[NSMutableArray alloc] init];
