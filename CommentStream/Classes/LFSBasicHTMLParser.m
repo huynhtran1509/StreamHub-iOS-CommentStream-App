@@ -45,7 +45,7 @@
                 return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@"\n"]);
             }, @"<br/?>",
             
-            // Ignoring <p></p>
+            // Display inner content of <p></p>
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
                 NSRange innerRange = [match rangeAtIndex:2];
@@ -55,12 +55,12 @@
                 return MRC_AUTORELEASE(innerText);
             }, @"<(p)\\b[^>]*>(.*?)</\\1>",
             
-            // Ignoring <span>, <em>, <strong>, <i>, <b>, and <u>
+            // Ignoring <div>, <span>, <em>, <strong>, <i>, <b>, and <u>
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
                 NSRange innerRange = [match rangeAtIndex:2];
                 return MRC_AUTORELEASE([str attributedSubstringFromRange:innerRange]);
-            }, @"<(span|b|strong|i|em|u)\\b[^>]*>(.*?)</\\1>",
+            }, @"<(div|span|b|strong|i|em|u)\\b[^>]*>(.*?)</\\1>",
             
             // Hyperlinks
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
