@@ -55,12 +55,12 @@
                 return MRC_AUTORELEASE(innerText);
             }, @"<(p)\\b[^>]*>(.*?)</\\1>",
             
-            // Ignoring <div>, <span>, <em>, <strong>, <i>, <b>, and <u>
+            // Ignoring <iframe>, <div>, <span>, <em>, <strong>, <i>, <b>, and <u>
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
                 NSRange innerRange = [match rangeAtIndex:2];
                 return MRC_AUTORELEASE([str attributedSubstringFromRange:innerRange]);
-            }, @"<(div|span|b|strong|i|em|u)\\b[^>]*>(.*?)</\\1>",
+            }, @"<(iframe|div|span|b|strong|i|em|u)\\b[^>]*>(.*?)</\\1>",
             
             // Hyperlinks
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
