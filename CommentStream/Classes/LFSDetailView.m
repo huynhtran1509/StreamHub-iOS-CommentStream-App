@@ -212,7 +212,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         [_bodyView setFont:[UIFont fontWithName:kDetailContentFontName size:kDetailContentFontSize]];
         [_bodyView setLineSpacing:kDetailContentLineSpacing];
         [_bodyView setLineBreakMode:NSLineBreakByWordWrapping];
-        [_bodyView setTextAlignment:NSTextAlignmentLeft];
+        // Note: do not force text alignment here as that will break
+        // right-alignment for Arabic text
         
         // add to superview
         [self addSubview:_bodyView];
