@@ -14,15 +14,8 @@
 #import "UILabel+Trim.h"
 
 static const UIEdgeInsets kDetailPadding = {
-    .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
+    .top=15.0f, .left=15.0f, .bottom=15.0f, .right=15.0f
 };
-
-static const CGFloat kDetailContentPaddingRight = 12.0f;
-
-// content font settings
-static NSString* const kDetailContentFontName = @"Georgia";
-static const CGFloat kDetailContentFontSize = 16.0f;
-static const CGFloat kDetailContentLineSpacing = 8.0f;
 
 // header font settings
 static const CGFloat kDetailHeaderAttributeTopFontSize = 11.f;
@@ -39,18 +32,8 @@ static const CGSize  kDetailImageViewSize = { .width=38.0f, .height=38.0f };
 static const CGFloat kDetailImageCornerRadius = 4.f;
 static const CGFloat kDetailImageMarginRight = 8.0f;
 
-static const CGFloat kDetailFooterHeight = 21.0f;
-
 static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 static const CGFloat kDetailRemoteButtonHeight = 20.0f;
-
-static const CGFloat kDetailBarButtonHeight = 44.0f;
-static const CGFloat kDetailBarButtonWidth = 88.0f;
-
-static const CGFloat kDetailMinorVerticalSeparator = 12.0f;
-static const CGFloat kDetailMajorVerticalSeparator = 20.0f;
-
-static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 
 @interface LFSReplyHeaderView ()
@@ -187,11 +170,33 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     return _headerSubtitleView;
 }
 
+#pragma mark -
+@synthesize textView = _textView;
+-(UITextView*)textView
+{
+    if (_textView == nil) {
+        CGRect frame = self.bounds;
+        CGFloat verticalOffset = kDetailImageViewSize.height + kDetailPadding.bottom + kDetailPadding.top;
+        frame.origin.y += verticalOffset;
+        frame.size.height -= verticalOffset;
+        _textView = [[UITextView alloc] initWithFrame:frame];
+        [_textView  setTextContainerInset:UIEdgeInsetsMake(7, 7, 5, 5)];
+        [self addSubview:_textView];
+    }
+    return _textView;
+}
+
 #pragma mark - Private overrides
 -(void)layoutSubviews
 {
-    // start with the header
     [self layoutHeader];
+
+    // now layout main view (text view)
+    CGFloat verticalOffset = kDetailImageViewSize.height + kDetailPadding.bottom + kDetailPadding.top;
+    CGRect frame = self.bounds;
+    frame.origin.y += verticalOffset;
+    frame.size.height -= verticalOffset;
+    [self.textView setFrame:frame];
 }
 
 #pragma mark - Private methods
