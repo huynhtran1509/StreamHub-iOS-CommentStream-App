@@ -128,7 +128,17 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
     return _deleteStack;
 }
+-(void)setDeleteStack:(NSMutableArray *)deleteStack
+{
+    if (_deleteStack != nil) {
+        for (LFSContent *obj in _deleteStack) {
+            obj.index = NSNotFound;
+        }
+    }
+    _deleteStack = deleteStack;
+}
 
+#pragma mark - 
 @synthesize updateSet = _updateSet;
 -(NSMutableSet*)updateSet
 {
@@ -137,7 +147,17 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
     return _updateSet;
 }
+-(void)setUpdateSet:(NSMutableSet *)updateSet
+{
+    if (_updateSet != nil) {
+        for (LFSContent *obj in _updateSet) {
+            obj.index = NSNotFound;
+        }
+    }
+    _updateSet = updateSet;
+}
 
+#pragma mark -
 @synthesize insertStack = _insertStack;
 -(NSMutableArray*)insertStack
 {
@@ -146,8 +166,17 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
     return _insertStack;
 }
+-(void)setInsertStack:(NSMutableArray *)insertStack
+{
+    if (_insertStack != nil) {
+        for (LFSContent *obj in _insertStack) {
+            obj.index = NSNotFound;
+        }
+    }
+    _insertStack = insertStack;
+}
 
-
+#pragma mark -
 - (id)copyWithZone:(__unused NSZone *)zone
 {
     return self;
@@ -220,8 +249,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     // at this point, we actually want to know the insertion index
     // (index to maintain a sorted array)
     NSUInteger index = [_array indexOfObject:object options:NSBinarySearchingInsertionIndex usingReverseOrder:YES];
-    [object setIndex:index];
     [self.insertStack insertObject:object usingReverseOrder:YES];
+    [object setIndex:index];
 }
 
 -(void)removeObject:(id)object
@@ -296,13 +325,14 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             // not in the set of updated, deleted, or removed objects
             // (reasoning is that it makes no sense to reload rows that will
             // be deleted or inserted)
-            [oldContent setIndex:[self indexOfObject:oldContent]];
             [self.updateSet addObject:oldContent];
+            [oldContent setIndex:[self indexOfObject:oldContent]];
         }
         else {
-            NSAssert(self.deleteStack.count > 0 ||
+            NSAssert(oldContent.index == NSNotFound ||
+                     (self.deleteStack.count > 0 ||
                      self.insertStack.count > 0 ||
-                     self.updateSet.count > 0, @"have index but not in any of the stacks");
+                     self.updateSet.count > 0), @"have index but not in any of the stacks");
             
             NSUInteger oldContentIndex = [self indexOfObject:oldContent];
             NSAssert(oldContent.index == oldContentIndex, @"indexes must match");
@@ -328,6 +358,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         
         if (content.nodeCount > 0 && content.contentParentId != nil) {
             LFSContent *parent = [self objectForKey:content.contentParentId];
+            
             // update parents
             if (parent != nil) {
                 [self changeNodeCountOf:parent withDelta:content.nodeCount];
@@ -375,8 +406,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         }
         
         // add found object to deleted set
-        [content setIndex:contentIndex];
         [self.deleteStack insertObject:content usingReverseOrder:YES];
+        [content setIndex:contentIndex];
 
         // TODO: consider deleting this optional check
         NSUInteger index = [self.insertStack indexOfObject:content options:NSBinarySearchingFirstEqual usingReverseOrder:YES];
@@ -563,6 +594,9 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     self.updateSet = nil;
     self.insertStack = nil;
 }
+
+
+
 
 -(void)endUpdating
 {
