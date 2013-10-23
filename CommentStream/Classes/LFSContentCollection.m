@@ -220,7 +220,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     // at this point, we actually want to know the insertion index
     // (index to maintain a sorted array)
     NSUInteger index = [_array indexOfObject:object options:NSBinarySearchingInsertionIndex usingReverseOrder:YES];
-    object.index = index;
+    [object setIndex:index];
     [self.insertStack insertObject:object usingReverseOrder:YES];
 }
 
@@ -296,10 +296,14 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             // not in the set of updated, deleted, or removed objects
             // (reasoning is that it makes no sense to reload rows that will
             // be deleted or inserted)
-            oldContent.index = [self indexOfObject:oldContent];
+            [oldContent setIndex:[self indexOfObject:oldContent]];
             [self.updateSet addObject:oldContent];
         }
         else {
+            NSAssert(self.deleteStack.count > 0 ||
+                     self.insertStack.count > 0 ||
+                     self.updateSet.count > 0, @"have index but not in any of the stacks");
+            
             NSUInteger oldContentIndex = [self indexOfObject:oldContent];
             NSAssert(oldContent.index == oldContentIndex, @"indexes must match");
             
@@ -371,7 +375,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         }
         
         // add found object to deleted set
-        content.index = contentIndex;
+        [content setIndex:contentIndex];
         [self.deleteStack insertObject:content usingReverseOrder:YES];
 
         // TODO: consider deleting this optional check
@@ -593,7 +597,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
          enumerateObjectsWithOptions:NSEnumerationReverse
          usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
             [self.array insertObject:obj atIndex:obj.index];
-            obj.index = NSNotFound;
+            [obj setIndex:NSNotFound];
         }];
     }
     else {
@@ -634,7 +638,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
          enumerateObjectsWithOptions:NSEnumerationReverse
          usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
             [self.array insertObject:obj atIndex:obj.index];
-            obj.index = NSNotFound;
+            [obj setIndex:NSNotFound];
         }];
 
     }

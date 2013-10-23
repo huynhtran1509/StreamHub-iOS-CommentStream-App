@@ -87,4 +87,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 -(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;
 -(NSComparisonResult)compare:(LFSContent*)content;
 
+-(NSMutableDictionary*)authorHandles;
+-(NSOrderedSet*)conversationParticipants;
+
 @end

@@ -30,7 +30,9 @@
 
 @end
 
-@implementation LFSPostViewController
+@implementation LFSPostViewController {
+    NSDictionary *_authorHandles;
+}
 
 #pragma mark - Properties
 
@@ -116,7 +118,32 @@
     
     if (self.replyToContent != nil) {
         [self.postNavbar.topItem setTitle:@"Reply"];
+        
+        _authorHandles = nil;
+        NSString *replyPrefix = [self replyPrefixFromContent:self.replyToContent];
+        if (replyPrefix != nil) {
+            [self.textView setText:replyPrefix];
+        }
     }
+}
+
+- (NSString*)replyPrefixFromContent:(LFSContent*)content
+{
+    // remove self (own user handle) from list
+    NSMutableDictionary *dictionary = [content authorHandles];
+    NSString *currentHandle = self.user.profile.authorHandle;
+    if (currentHandle != nil) {
+        [dictionary removeObjectForKey:[currentHandle lowercaseString]];
+    }
+    
+    _authorHandles = dictionary;
+    NSArray *handles = [_authorHandles allKeys];
+    NSString *prefix = nil;
+    if (handles.count  > 0) {
+        NSString *joinedParticipants = [handles componentsJoinedByString:@" @"];
+        prefix = [NSString stringWithFormat:@"@%@ ", joinedParticipants];
+    }
+    return prefix;
 }
 
 - (void)didReceiveMemoryWarning
@@ -166,6 +193,48 @@
     }
 }
 
+#pragma mark - Utility methods
+
+-(NSString*)processReplyText:(NSString*)replyText
+{
+    if (_authorHandles == nil) {
+        return replyText;
+    }
+    
+    // process replyText such that all cases of handles get replaced with anchors
+    NSError *error;
+    NSRegularExpression *regex = [NSRegularExpression
+                                  regularExpressionWithPattern:@"@(\\w+)\\b"
+                                  options:NSRegularExpressionCaseInsensitive
+                                  error:&error];
+    
+    NSArray *matches = [regex matchesInString:replyText
+                                      options:0
+                                        range:NSMakeRange(0, replyText.length)];
+    
+    // enumerate in reverse order because that way we can preserve location
+    // in our mutable string
+    NSMutableString *mutableReply = [replyText mutableCopy];
+    [matches enumerateObjectsWithOptions:NSEnumerationReverse
+                              usingBlock:
+     ^(NSTextCheckingResult *match, NSUInteger idx, BOOL *stop)
+    {
+        NSRange handleRange = [match rangeAtIndex:1];
+        NSString *candidate = [replyText substringWithRange:match.range];
+        
+        NSString *urlString = [_authorHandles objectForKey:[[replyText substringWithRange:handleRange] lowercaseString]];
+        if (urlString != nil) {
+            // candidate found in dictionary
+            NSString *replacement = [NSString
+                                     stringWithFormat:@"<a href=\"%@\">%@</a>",
+                                     urlString, candidate];
+            [mutableReply replaceCharactersInRange:match.range withString:replacement];
+        }
+    }];
+
+    return [mutableReply copy];
+}
+
 #pragma mark - Actions
 - (IBAction)cancelClicked:(UIBarButtonItem *)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -177,7 +246,10 @@
     
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken != nil) {
-        NSString *text = self.textView.text;
+        NSString *text = (self.replyToContent
+                          ? [self processReplyText:self.textView.text]
+                          : self.textView.text);
+        
         [self.textView setText:@""];
         
         id<LFSPostViewControllerDelegate> collectionViewController = nil;

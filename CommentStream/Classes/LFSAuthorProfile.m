@@ -24,6 +24,42 @@
 
 #pragma mark - Properties
 
+@synthesize authorHandle = _authorHandle;
+-(NSString*)authorHandle
+{
+    static NSRegularExpression *regex = nil;
+    
+    if (_authorHandle == nil) {
+        // either twitter handle or display name, in that order
+        NSString *twitterHandle = self.twitterHandle;
+        NSString *displayName = self.displayName;
+        if (twitterHandle != nil)
+        {
+            _authorHandle = twitterHandle;
+        }
+        else if (displayName != nil)
+        {
+            if (regex == nil) {
+                // match word characters only, from beginning to end
+                NSError *error;
+                regex = [NSRegularExpression
+                         regularExpressionWithPattern:@"^\\w+$"
+                         options:NSRegularExpressionCaseInsensitive
+                         error:&error];
+            }
+            
+            NSArray *matches = [regex matchesInString:displayName
+                                              options:0
+                                                range:NSMakeRange(0, displayName.length)];
+            if (matches.count == 1u) {
+                // expecting exactly one match
+                _authorHandle = displayName;
+            }
+        }
+    }
+    return _authorHandle;
+}
+
 @synthesize object = _object;
 -(void)setObject:(id)object
 {
@@ -272,6 +308,7 @@
     _userType = nil;
     _userTags = nil;
     _twitterHandle = nil;
+    _authorHandle = nil;
 }
 
 @end

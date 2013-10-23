@@ -471,6 +471,37 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
 
 #pragma mark - Public methods
 
+-(NSOrderedSet*)conversationParticipants
+{
+    // return profiles of all members of a conversation
+    NSMutableOrderedSet *members = [[NSMutableOrderedSet alloc] init];
+    for (LFSContent *object = self; object != nil; object = object.parent)
+    {
+        LFSAuthorProfile *member = object.author;
+        if (member != nil) {
+            [members addObject:member];
+        }
+    }
+    return members;
+}
+
+-(NSMutableDictionary*)authorHandles
+{
+    // return a dictionary of { authorHandle -> authorProfileURL }
+    // where authorHandle is a lowercase string
+    NSOrderedSet *members = self.conversationParticipants;
+    NSMutableDictionary *handles = [[NSMutableDictionary alloc] init];
+    for (LFSAuthorProfile *member in members)
+    {
+        if (member.profileUrlString != nil && member.authorHandle != nil)
+        {
+            [handles setObject:member.profileUrlString
+                        forKey:[member.authorHandle lowercaseString]];
+        }
+    }
+    return handles;
+}
+
 -(void)setAuthorWithCollection:(LFSAuthorCollection *)authorCollection
 {
     self.author = [authorCollection objectForKey:self.contentAuthorId];
