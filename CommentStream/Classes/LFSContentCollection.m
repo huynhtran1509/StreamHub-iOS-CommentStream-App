@@ -489,8 +489,9 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         _updateSet = nil;
         _insertStack = nil;
         
-        for (NSUInteger i = 0; i < cnt; i++)
+        for (NSUInteger i = cnt; i > 0u;)
         {
+            i--;
             [self setObject:objects[i] forKey:keys[i]];
         }
     }
@@ -548,10 +549,11 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 #pragma mark - NSMutableArray (private)
 -(void)addObjectsFromArray:(NSArray*)array
 {
-    for (id object in array)
+    [array enumerateObjectsWithOptions:NSEnumerationReverse
+                            usingBlock:^(id obj, NSUInteger idx, BOOL *stop)
     {
-        [self addObject:object];
-    }
+        [self addObject:obj];
+    }];
 }
 
 @end
@@ -732,8 +734,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 - (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary
 {
     [otherDictionary
-     enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent
-     usingBlock:^(id<NSCopying> key, id value, BOOL *stop)
+     enumerateKeysAndObjectsUsingBlock:^(id<NSCopying> key, id value, BOOL *stop)
      {
          [self setObject:value forKey:key];
      }];
