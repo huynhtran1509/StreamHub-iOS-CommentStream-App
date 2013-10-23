@@ -23,7 +23,7 @@
 @property (weak, nonatomic) IBOutlet LFSReplyHeaderView *headerView;
 
 @property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
-@property (weak, nonatomic) IBOutlet UITextView *textView;
+
 
 - (IBAction)cancelClicked:(UIBarButtonItem *)sender;
 - (IBAction)postClicked:(UIBarButtonItem *)sender;
@@ -43,7 +43,6 @@
 @synthesize preferredStatusBarUpdateAnimation = _preferredStatusBarUpdateAnimation;
 
 @synthesize postNavbar = _postNavbar;
-@synthesize textView = _textView;
 @synthesize user = _user;
 
 @synthesize writeClient = _writeClient;
@@ -114,7 +113,7 @@
                withAnimation:UIStatusBarAnimationNone];
     
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
-    [self.textView becomeFirstResponder];
+    [self.headerView.textView becomeFirstResponder];
     
     if (self.replyToContent != nil) {
         [self.postNavbar.topItem setTitle:@"Reply"];
@@ -122,7 +121,7 @@
         _authorHandles = nil;
         NSString *replyPrefix = [self replyPrefixFromContent:self.replyToContent];
         if (replyPrefix != nil) {
-            [self.textView setText:replyPrefix];
+            [self.headerView.textView setText:replyPrefix];
         }
     }
 }
@@ -246,11 +245,12 @@
     
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken != nil) {
+        UITextView *textView = self.headerView.textView;
         NSString *text = (self.replyToContent
-                          ? [self processReplyText:self.textView.text]
-                          : self.textView.text);
+                          ? [self processReplyText:textView.text]
+                          : textView.text);
         
-        [self.textView setText:@""];
+        [textView setText:@""];
         
         id<LFSPostViewControllerDelegate> collectionViewController = nil;
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {

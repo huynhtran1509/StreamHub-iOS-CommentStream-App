@@ -13,5 +13,6 @@
 @interface LFSReplyHeaderView : UIView
 
 @property (nonatomic, strong) LFSResource* profileLocal;
+@property (nonatomic, strong) UITextView *textView;
 
 @end
