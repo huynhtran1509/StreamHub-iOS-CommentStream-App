@@ -38,6 +38,8 @@
 @property (nonatomic, copy) NSString *twitterHandle;
 @property (nonatomic, copy) NSString *profileUrlStringNoHashBang;
 
+@property (nonatomic, readonly) NSString *authorHandle;
+
 @property (nonatomic, copy) NSArray *userTags;
 
 @property (nonatomic, strong) NSNumber *userType;

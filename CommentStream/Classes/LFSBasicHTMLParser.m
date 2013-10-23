@@ -45,7 +45,7 @@
                 return MRC_AUTORELEASE([[NSAttributedString alloc] initWithString:@"\n"]);
             }, @"<br/?>",
             
-            // Ignoring <p></p>
+            // Display inner content of <p></p> and <iframe> with a new line at the end
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)
             {
                 NSRange innerRange = [match rangeAtIndex:2];
@@ -53,7 +53,7 @@
                 NSMutableAttributedString *innerText = [[str attributedSubstringFromRange:innerRange] mutableCopy];
                 [innerText appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
                 return MRC_AUTORELEASE(innerText);
-            }, @"<(p)\\b[^>]*>(.*?)</\\1>",
+            }, @"<(iframe|p)\\b[^>]*>(.*?)</\\1>",
             
             // Ignoring <span>, <em>, <strong>, <i>, <b>, and <u>
             ^NSAttributedString*(NSAttributedString* str, NSTextCheckingResult* match)

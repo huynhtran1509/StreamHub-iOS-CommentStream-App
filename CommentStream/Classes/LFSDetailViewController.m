@@ -369,9 +369,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                   initWithTitle:@"Flag Comment"
                                   delegate:self
                                   cancelButtonTitle:@"Cancel"
-                                  destructiveButtonTitle:nil
+                                  destructiveButtonTitle:[LFSContentFlags[LFSFlagSpam] capitalizedString]
                                   otherButtonTitles:
-                                  [LFSContentFlags[LFSFlagSpam] capitalizedString],
                                   [LFSContentFlags[LFSFlagOffensive] capitalizedString],
                                   [LFSContentFlags[LFSFlagOfftopic] capitalizedString],
                                   [LFSContentFlags[LFSFlagDisagree] capitalizedString],
