@@ -17,6 +17,10 @@ static const UIEdgeInsets kDetailPadding = {
     .top=15.0f, .left=15.0f, .bottom=15.0f, .right=15.0f
 };
 
+static const UIEdgeInsets kPostContentInset = {
+    .top=7.f, .left=7.f, .bottom=20.f, .right=5.f
+};
+
 // header font settings
 static const CGFloat kDetailHeaderAttributeTopFontSize = 11.f;
 static const CGFloat kDetailHeaderTitleFontSize = 15.f;
@@ -31,7 +35,7 @@ static const CGFloat kDetailHeaderAttributeTopHeight = 10.0f;
 static const CGFloat kDetailHeaderTitleHeight = 18.0f;
 static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
-static const CGFloat kPostKeyboardMarginTop = 10.0f;
+static const CGFloat kPostKeyboardMarginTop = 0.0f;
 
 // TODO: calculate avatar size based on pixel image size
 static const CGSize  kDetailImageViewSize = { .width=38.0f, .height=38.0f };
@@ -323,7 +327,12 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         _textView = [[UITextView alloc] initWithFrame:frame];
         
         [_textView setBackgroundColor:[UIColor whiteColor]];
-        [_textView setTextContainerInset:UIEdgeInsetsMake(7, 7, 20.0f, 5)];
+        
+        if ([_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            [_textView setTextContainerInset:kPostContentInset];
+        } else {
+            [_textView setContentInset:kPostContentInset];
+        }
         [_textView setFont:[UIFont fontWithName:kPostContentFontName size:kPostContentFontSize]];
         [_textView setUserInteractionEnabled:YES];
         [_textView setScrollEnabled:YES];
@@ -402,7 +411,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
     [UIView commitAnimations];
 }
 
-- (void)keyboardWillShown:(NSNotification*)aNotification
+- (void)keyboardWillShow:(NSNotification*)aNotification
 {
     [self moveTextViewForKeyboard:aNotification up:YES];
 }
@@ -418,7 +427,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
     if (self) {
         // Initialization code
         [self resetFields];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShown:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
@@ -430,7 +439,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
     if (self) {
         // Initialization code
         [self resetFields];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShown:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
         _previousViewHeight = frame.size.height;
     }
@@ -440,6 +449,13 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 - (void)dealloc
 {
     [self resetFields];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillShowNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillHideNotification
+                                                  object:nil];
 }
 
 -(void)resetFields
