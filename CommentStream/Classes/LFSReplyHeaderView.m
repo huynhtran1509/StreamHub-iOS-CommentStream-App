@@ -17,15 +17,25 @@ static const UIEdgeInsets kDetailPadding = {
     .top=15.0f, .left=15.0f, .bottom=15.0f, .right=15.0f
 };
 
+static const UIEdgeInsets kPostContentInset = {
+    .top=7.f, .left=7.f, .bottom=20.f, .right=5.f
+};
+
 // header font settings
 static const CGFloat kDetailHeaderAttributeTopFontSize = 11.f;
 static const CGFloat kDetailHeaderTitleFontSize = 15.f;
 static const CGFloat kDetailHeaderSubtitleFontSize = 12.f;
 
+// content font settings
+static NSString* const kPostContentFontName = @"Georgia";
+static const CGFloat kPostContentFontSize = 16.0f;
+
 // header label heights
 static const CGFloat kDetailHeaderAttributeTopHeight = 10.0f;
 static const CGFloat kDetailHeaderTitleHeight = 18.0f;
 static const CGFloat kHeaderSubtitleHeight = 10.0f;
+
+static const CGFloat kPostKeyboardMarginTop = 0.0f;
 
 // TODO: calculate avatar size based on pixel image size
 static const CGSize  kDetailImageViewSize = { .width=38.0f, .height=38.0f };
@@ -46,7 +56,9 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 @end
 
-@implementation LFSReplyHeaderView
+@implementation LFSReplyHeaderView {
+    CGFloat _previousViewHeight;
+}
 
 #pragma mark - Properties
 
@@ -168,22 +180,6 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         [self addSubview:_headerSubtitleView];
     }
     return _headerSubtitleView;
-}
-
-#pragma mark -
-@synthesize textView = _textView;
--(UITextView*)textView
-{
-    if (_textView == nil) {
-        CGRect frame = self.bounds;
-        CGFloat verticalOffset = kDetailImageViewSize.height + kDetailPadding.bottom + kDetailPadding.top;
-        frame.origin.y += verticalOffset;
-        frame.size.height -= verticalOffset;
-        _textView = [[UITextView alloc] initWithFrame:frame];
-        [_textView  setTextContainerInset:UIEdgeInsetsMake(7, 7, 5, 5)];
-        [self addSubview:_textView];
-    }
-    return _textView;
 }
 
 #pragma mark - Private overrides
@@ -318,7 +314,112 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
                          placeholderImage:profileLocal.icon];
 }
 
+#pragma mark -
+@synthesize textView = _textView;
+-(UITextView*)textView
+{
+    if (_textView == nil) {
+        CGRect frame = self.bounds;
+        CGFloat verticalOffset = kDetailImageViewSize.height + kDetailPadding.bottom + kDetailPadding.top;
+        frame.origin.y += verticalOffset;
+        frame.size.height -= verticalOffset;
+        
+        _textView = [[UITextView alloc] initWithFrame:frame];
+        
+        [_textView setBackgroundColor:[UIColor whiteColor]];
+        
+        if ([_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            [_textView setTextContainerInset:kPostContentInset];
+        } else {
+            [_textView setContentInset:kPostContentInset];
+        }
+        [_textView setFont:[UIFont fontWithName:kPostContentFontName size:kPostContentFontSize]];
+        [_textView setUserInteractionEnabled:YES];
+        [_textView setScrollEnabled:YES];
+        [_textView setDelegate:self];
+        
+        [_textView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin)];
+        
+        [self addSubview:_textView];
+    }
+    return _textView;
+}
+
+
+#pragma mark - UITextViewDelegate
+-(void)textViewDidChange:(UITextView *)textView
+{
+    [textView scrollRangeToVisible:[textView selectedRange]];
+}
+
 #pragma mark - Lifecycle
+
++(CGRect)screenBounds
+{
+    UIScreen *screen = [UIScreen mainScreen];
+    CGRect screenRect = screen.bounds;
+    
+    if (UIDeviceOrientationIsLandscape([[UIDevice currentDevice] orientation])) {
+        CGRect temp;
+        temp.size.width = screenRect.size.height;
+        temp.size.height = screenRect.size.width;
+        screenRect = temp;
+    }
+    return screenRect;
+}
+
+- (void)moveTextViewForKeyboard:(NSNotification*)aNotification up:(BOOL)up
+{
+    NSDictionary* userInfo = [aNotification userInfo];
+    NSTimeInterval animationDuration;
+    UIViewAnimationCurve animationCurve;
+    CGRect keyboardEndFrame;
+    
+    [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    [[userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardEndFrame];
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    [UIView setAnimationCurve:animationCurve];
+    
+    CGRect viewFrame = self.frame;
+    
+    // convert to window base coordinates
+    CGRect keyboardFrame = [self convertRect:keyboardEndFrame toView:nil];
+    
+    // calculate overlap height
+    CGRect screenBounds = [[self class] screenBounds];
+    
+    // view frame bottom minus keyboard top
+    CGFloat overlapHeight = viewFrame.origin.y + viewFrame.size.height - (screenBounds.size.height - keyboardFrame.size.height);
+    if (overlapHeight > 0.f && overlapHeight < viewFrame.size.height)
+    {
+        // need to take action (there is an overlap and it does not cover the whole view)
+        if (up) {
+            // shrink the view
+            _previousViewHeight = viewFrame.size.height;
+            viewFrame.size.height = _previousViewHeight - overlapHeight - kPostKeyboardMarginTop;
+        } else {
+            // restore the previous view height
+            viewFrame.size.height = _previousViewHeight;
+        }
+        [self setFrame:viewFrame];
+    }
+    
+    [UIView commitAnimations];
+}
+
+- (void)keyboardWillShow:(NSNotification*)aNotification
+{
+    [self moveTextViewForKeyboard:aNotification up:YES];
+}
+
+- (void)keyboardWillHide:(NSNotification*)aNotification
+{
+    [self moveTextViewForKeyboard:aNotification up:NO];
+}
 
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
@@ -326,6 +427,8 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
     if (self) {
         // Initialization code
         [self resetFields];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
 }
@@ -336,6 +439,9 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
     if (self) {
         // Initialization code
         [self resetFields];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+        _previousViewHeight = frame.size.height;
     }
     return self;
 }
@@ -343,6 +449,13 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 - (void)dealloc
 {
     [self resetFields];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillShowNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillHideNotification
+                                                  object:nil];
 }
 
 -(void)resetFields

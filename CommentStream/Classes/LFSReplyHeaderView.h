@@ -10,7 +10,7 @@
 
 #import "LFSResource.h"
 
-@interface LFSReplyHeaderView : UIView
+@interface LFSReplyHeaderView : UIView <UITextViewDelegate>
 
 @property (nonatomic, strong) LFSResource* profileLocal;
 @property (nonatomic, strong) UITextView *textView;
