@@ -543,7 +543,7 @@ const static char kAttributedTextValueKey;
     LFSContent *content = [_content objectAtIndex:indexPath.row];
     CGFloat leftOffset = (CGFloat)([content.datePath count] - 1) * kGenerationOffset;
     LFSContentVisibility visibility = content.visibility;
-    if (visibility == LFSContentVisibilityEveryone)
+    if (visibility == LFSContentVisibilityEveryone || visibility == LFSContentVisibilityPendingDelete)
     {
         NSNumber *cellHeight = objc_getAssociatedObject(content, &kAtttributedTextHeightKey);
         if (cellHeight == nil)
@@ -736,7 +736,7 @@ const static char kAttributedTextValueKey;
     [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
     
     NSString *bodyText = (visibility == LFSContentVisibilityPendingDelete
-                          ? @"This comment is being removed…"
+                          ? @""
                           : @"This comment has been removed");
     
     //[cell.textLabel setText:[NSString stringWithFormat:@"%@ (%d)", bodyText, content.nodeCount]];
