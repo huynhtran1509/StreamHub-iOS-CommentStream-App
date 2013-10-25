@@ -1,5 +1,5 @@
 //
-//  LFSReplyHeaderView.h
+//  LFSWriteCommentView.h
 //  CommentStream
 //
 //  Created by Eugene Scherba on 10/16/13.
@@ -10,7 +10,7 @@
 
 #import "LFSResource.h"
 
-@interface LFSReplyHeaderView : UIView <UITextViewDelegate>
+@interface LFSWriteCommentView : UIView <UITextViewDelegate>
 
 @property (nonatomic, strong) LFSResource* profileLocal;
 @property (nonatomic, strong) UITextView *textView;

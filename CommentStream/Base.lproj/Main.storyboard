@@ -136,7 +136,7 @@
                                     </navigationItem>
                                 </items>
                             </navigationBar>
-                            <view contentMode="scaleToFill" id="Hhd-ca-ybF" customClass="LFSReplyHeaderView">
+                            <view contentMode="scaleToFill" id="Hhd-ca-ybF" customClass="LFSWriteCommentView">
                                 <rect key="frame" x="0.0" y="44" width="320" height="524"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -146,8 +146,8 @@
                     </view>
                     <navigationItem key="navigationItem" title="New Comment" id="zhQ-MG-dr8"/>
                     <connections>
-                        <outlet property="headerView" destination="Hhd-ca-ybF" id="Dch-Ch-vek"/>
                         <outlet property="postNavbar" destination="j6e-ZQ-bLg" id="ctM-9c-cuI"/>
+                        <outlet property="writeCommentView" destination="Hhd-ca-ybF" id="KOj-E4-cn1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KV4-cx-MgF" userLabel="First Responder" sceneMemberID="firstResponder"/>

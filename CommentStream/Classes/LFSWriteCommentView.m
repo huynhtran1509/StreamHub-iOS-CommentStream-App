@@ -1,5 +1,5 @@
 //
-//  LFSReplyHeaderView.m
+//  LFSWriteCommentView.m
 //  CommentStream
 //
 //  Created by Eugene Scherba on 10/16/13.
@@ -10,7 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <AFNetworking/UIImageView+AFNetworking.h>
 
-#import "LFSReplyHeaderView.h"
+#import "LFSWriteCommentView.h"
 #import "UILabel+Trim.h"
 
 static const UIEdgeInsets kDetailPadding = {
@@ -46,7 +46,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 
-@interface LFSReplyHeaderView ()
+@interface LFSWriteCommentView ()
 
 // UIView-specific
 @property (readonly, nonatomic) UIImageView *headerImageView;
@@ -56,7 +56,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 @end
 
-@implementation LFSReplyHeaderView {
+@implementation LFSWriteCommentView {
     CGFloat _previousViewHeight;
 }
 
