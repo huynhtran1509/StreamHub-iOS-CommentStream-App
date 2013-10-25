@@ -9,7 +9,7 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import "LFSPostViewController.h"
 
-#import "LFSReplyHeaderView.h"
+#import "LFSWriteCommentView.h"
 #import "LFSAuthorProfile.h"
 #import "LFSResource.h"
 
@@ -20,7 +20,7 @@
 @property (nonatomic, assign) UIStatusBarAnimation preferredStatusBarUpdateAnimation;
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
-@property (weak, nonatomic) IBOutlet LFSReplyHeaderView *headerView;
+@property (weak, nonatomic) IBOutlet LFSWriteCommentView *writeCommentView;
 
 @property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
 
@@ -101,7 +101,7 @@
                                displayString:author.displayName
                                icon:self.avatarImage];
     [headerInfo setIconURLString:author.avatarUrlString75];
-    [self.headerView setProfileLocal:headerInfo];
+    [self.writeCommentView setProfileLocal:headerInfo];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -113,7 +113,7 @@
                withAnimation:UIStatusBarAnimationNone];
     
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
-    [self.headerView.textView becomeFirstResponder];
+    [self.writeCommentView.textView becomeFirstResponder];
     
     if (self.replyToContent != nil) {
         [self.postNavbar.topItem setTitle:@"Reply"];
@@ -121,7 +121,7 @@
         _authorHandles = nil;
         NSString *replyPrefix = [self replyPrefixFromContent:self.replyToContent];
         if (replyPrefix != nil) {
-            [self.headerView.textView setText:replyPrefix];
+            [self.writeCommentView.textView setText:replyPrefix];
         }
     }
 }
@@ -245,7 +245,7 @@
     
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken != nil) {
-        UITextView *textView = self.headerView.textView;
+        UITextView *textView = self.writeCommentView.textView;
         NSString *text = (self.replyToContent
                           ? [self processReplyText:textView.text]
                           : textView.text);

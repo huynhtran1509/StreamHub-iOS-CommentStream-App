@@ -1,5 +1,5 @@
 //
-//  LFSReplyHeaderView.m
+//  LFSWriteCommentView.m
 //  CommentStream
 //
 //  Created by Eugene Scherba on 10/16/13.
@@ -10,7 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <AFNetworking/UIImageView+AFNetworking.h>
 
-#import "LFSReplyHeaderView.h"
+#import "LFSWriteCommentView.h"
 #import "UILabel+Trim.h"
 
 static const UIEdgeInsets kDetailPadding = {
@@ -46,7 +46,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 
-@interface LFSReplyHeaderView ()
+@interface LFSWriteCommentView ()
 
 // UIView-specific
 @property (readonly, nonatomic) UIImageView *headerImageView;
@@ -56,7 +56,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 @end
 
-@implementation LFSReplyHeaderView {
+@implementation LFSWriteCommentView {
     CGFloat _previousViewHeight;
 }
 
@@ -332,7 +332,16 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 #pragma mark - UITextViewDelegate
 -(void)textViewDidChange:(UITextView *)textView
 {
-    [textView scrollRangeToVisible:[textView selectedRange]];
+    CGRect caret_rect = [textView caretRectForPosition:textView.selectedTextRange.end];
+    UIEdgeInsets insets = textView.contentInset;
+    CGRect visible_rect = textView.bounds;
+    visible_rect.size.height -= (insets.top + insets.bottom);
+    visible_rect.origin.y = textView.contentOffset.y;
+    
+    if (!CGRectContainsRect(visible_rect, caret_rect)) {
+        CGFloat new_offset = MAX((caret_rect.origin.y + caret_rect.size.height) - visible_rect.size.height - textView.contentInset.top,  -textView.contentInset.top);
+        [textView setContentOffset:CGPointMake(0, new_offset) animated:NO];
+    }
 }
 
 #pragma mark - Lifecycle

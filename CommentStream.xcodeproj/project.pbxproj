@@ -39,7 +39,7 @@
 		EFCB9F8C17EBED3B00797BCE /* LFSBasicHTMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EFCB9F8B17EBED3B00797BCE /* LFSBasicHTMLParser.m */; };
 		EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = EFD5BFD517EC604500C28880 /* LFSBasicHTMLLabel.m */; };
 		EFE0A2EB180E7307006F0AB3 /* LFSUser.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE0A2EA180E7307006F0AB3 /* LFSUser.m */; };
-		EFE0A2EE180E8B6E006F0AB3 /* LFSReplyHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE0A2ED180E8B6E006F0AB3 /* LFSReplyHeaderView.m */; };
+		EFE0A2EE180E8B6E006F0AB3 /* LFSWriteCommentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE0A2ED180E8B6E006F0AB3 /* LFSWriteCommentView.m */; };
 		EFE6FF2B180256E6008351DD /* UIImage+LFSColor.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE6FF2A180256E6008351DD /* UIImage+LFSColor.m */; };
 /* End PBXBuildFile section */
 
@@ -102,8 +102,8 @@
 		EFD5BFD517EC604500C28880 /* LFSBasicHTMLLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSBasicHTMLLabel.m; path = Classes/LFSBasicHTMLLabel.m; sourceTree = "<group>"; };
 		EFE0A2E9180E7307006F0AB3 /* LFSUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSUser.h; path = Classes/LFSUser.h; sourceTree = "<group>"; };
 		EFE0A2EA180E7307006F0AB3 /* LFSUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSUser.m; path = Classes/LFSUser.m; sourceTree = "<group>"; };
-		EFE0A2EC180E8B6E006F0AB3 /* LFSReplyHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSReplyHeaderView.h; path = Classes/LFSReplyHeaderView.h; sourceTree = "<group>"; };
-		EFE0A2ED180E8B6E006F0AB3 /* LFSReplyHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSReplyHeaderView.m; path = Classes/LFSReplyHeaderView.m; sourceTree = "<group>"; };
+		EFE0A2EC180E8B6E006F0AB3 /* LFSWriteCommentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSWriteCommentView.h; path = Classes/LFSWriteCommentView.h; sourceTree = "<group>"; };
+		EFE0A2ED180E8B6E006F0AB3 /* LFSWriteCommentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSWriteCommentView.m; path = Classes/LFSWriteCommentView.m; sourceTree = "<group>"; };
 		EFE6FF29180256E6008351DD /* UIImage+LFSColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+LFSColor.h"; path = "Classes/UIImage+LFSColor.h"; sourceTree = "<group>"; };
 		EFE6FF2A180256E6008351DD /* UIImage+LFSColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+LFSColor.m"; path = "Classes/UIImage+LFSColor.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -256,8 +256,8 @@
 				EF62178117E8F76900700808 /* LFSTextField.m */,
 				EF529E3917F39ECF00836ACE /* LFSContentToolbar.h */,
 				EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */,
-				EFE0A2EC180E8B6E006F0AB3 /* LFSReplyHeaderView.h */,
-				EFE0A2ED180E8B6E006F0AB3 /* LFSReplyHeaderView.m */,
+				EFE0A2EC180E8B6E006F0AB3 /* LFSWriteCommentView.h */,
+				EFE0A2ED180E8B6E006F0AB3 /* LFSWriteCommentView.m */,
 				EFACF83517F4EC19003B3FF6 /* LFSDetailView.h */,
 				EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */,
 			);
@@ -383,7 +383,7 @@
 				EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */,
 				EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */,
 				EFACF83717F4EC19003B3FF6 /* LFSDetailView.m in Sources */,
-				EFE0A2EE180E8B6E006F0AB3 /* LFSReplyHeaderView.m in Sources */,
+				EFE0A2EE180E8B6E006F0AB3 /* LFSWriteCommentView.m in Sources */,
 				EFCB940817F1119600FB9384 /* LFSAuthorCollection.m in Sources */,
 				EFC5CED617FE1FC800936EBD /* LFSContentCollection.m in Sources */,
 				EFCB940B17F141E500FB9384 /* LFSAuthorProfile.m in Sources */,
