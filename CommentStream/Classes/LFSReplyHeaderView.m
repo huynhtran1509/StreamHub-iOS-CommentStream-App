@@ -332,7 +332,16 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 #pragma mark - UITextViewDelegate
 -(void)textViewDidChange:(UITextView *)textView
 {
-    [textView scrollRangeToVisible:[textView selectedRange]];
+    CGRect caret_rect = [textView caretRectForPosition:textView.selectedTextRange.end];
+    UIEdgeInsets insets = textView.contentInset;
+    CGRect visible_rect = textView.bounds;
+    visible_rect.size.height -= (insets.top + insets.bottom);
+    visible_rect.origin.y = textView.contentOffset.y;
+    
+    if (!CGRectContainsRect(visible_rect, caret_rect)) {
+        CGFloat new_offset = MAX((caret_rect.origin.y + caret_rect.size.height) - visible_rect.size.height - textView.contentInset.top,  -textView.contentInset.top);
+        [textView setContentOffset:CGPointMake(0, new_offset) animated:NO];
+    }
 }
 
 #pragma mark - Lifecycle
