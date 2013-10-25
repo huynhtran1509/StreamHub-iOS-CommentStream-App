@@ -18,7 +18,7 @@ static const UIEdgeInsets kDetailPadding = {
 };
 
 static const UIEdgeInsets kPostContentInset = {
-    .top=7.f, .left=7.f, .bottom=20.f, .right=5.f
+    .top=75.f, .left=7.f, .bottom=20.f, .right=5.f
 };
 
 // header font settings
@@ -97,7 +97,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         _headerImageView.layer.masksToBounds = YES;
         
         // add to superview
-        [self addSubview:_headerImageView];
+        [self.textView addSubview:_headerImageView];
     }
     return _headerImageView;
 }
@@ -124,7 +124,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         [_headerAttributeTopView setTextColor:[UIColor blueColor]];
         
         // add to superview
-        [self addSubview:_headerAttributeTopView];
+        [self.textView addSubview:_headerAttributeTopView];
     }
     return _headerAttributeTopView;
 }
@@ -150,7 +150,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         [_headerTitleView setFont:[UIFont boldSystemFontOfSize:kDetailHeaderTitleFontSize]];
         
         // add to superview
-        [self addSubview:_headerTitleView];
+        [self.textView addSubview:_headerTitleView];
     }
     return _headerTitleView;
 }
@@ -177,27 +177,13 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         [_headerSubtitleView setTextColor:[UIColor grayColor]];
         
         // add to superview
-        [self addSubview:_headerSubtitleView];
+        [self.textView addSubview:_headerSubtitleView];
     }
     return _headerSubtitleView;
 }
 
 #pragma mark - Private overrides
 -(void)layoutSubviews
-{
-    [self layoutHeader];
-
-    // now layout main view (text view)
-    CGFloat verticalOffset = kDetailImageViewSize.height + kDetailPadding.bottom + kDetailPadding.top;
-    CGRect frame = self.bounds;
-    frame.origin.y += verticalOffset;
-    frame.size.height -= verticalOffset;
-    [self.textView setFrame:frame];
-}
-
-#pragma mark - Private methods
-
--(void)layoutHeader
 {
     // layout header title label
     //
@@ -320,10 +306,6 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 {
     if (_textView == nil) {
         CGRect frame = self.bounds;
-        CGFloat verticalOffset = kDetailImageViewSize.height + kDetailPadding.bottom + kDetailPadding.top;
-        frame.origin.y += verticalOffset;
-        frame.size.height -= verticalOffset;
-        
         _textView = [[UITextView alloc] initWithFrame:frame];
         
         [_textView setBackgroundColor:[UIColor whiteColor]];
