@@ -29,34 +29,26 @@ static const CGFloat kCellContentLineSpacing = 6.f;
 static NSString* const kCellBodyFontName = @"Georgia";
 static const CGFloat kCellBodyFontSize = 13.f;
 
-static const CGFloat kCellHeaderAcessoryRightFontSize = 11.f;
-
 static const CGFloat kCellHeaderTitleFontSize = 12.f;
 static const CGFloat kCellHeaderSubtitleFontSize = 11.f;
-static const CGFloat kCellHeaderAttributeTopFontSize = 10.f;
 
 static const CGFloat kCellHeaderAdjust = 2.f;
+
 static const CGFloat kCellHeaderAttributeAdjust = -1.f;
+static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
+static const CGFloat kCellHeaderAttributeTopFontSize = 10.f;
+
 static const CGFloat kCellHeaderAccessoryRightAdjust = 1.f;
-
+static const CGFloat kCellHeaderAccessoryRightFontSize = 11.f;
 static const CGFloat kCellHeaderAccessoryRightImageAlpha = 0.618f;
-
-static const CGSize  kCellHeaderAccessoryRightIconSize = { .width=21.f, .height=21.f };
+static const CGSize  kCellHeaderAccessoryRightImageMaxSize = { .width = 12, .height = 10 };
 
 static const CGFloat kCellImageCornerRadius = 4.f;
 
 static const CGFloat kCellMinorHorizontalSeparator = 8.0f;
 static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 
-// {{{ TODO: remove these?
-//static const CGFloat kHeaderAcessoryRightHeight = 21.f;
 
-//static const CGFloat kMajorVerticalSeparator = 7.0f;
-
-static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
-//static const CGFloat kHeaderTitleHeight = 18.0f;
-//static const CGFloat kHeaderSubtitleHeight = 10.0f;
-// }}}
 
 @interface LFSAttributedTextCell ()
 // store hash to avoid relayout of same HTML
@@ -67,8 +59,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
 @property (nonatomic, readonly) UILabel *headerAccessoryRightView;
-
-@property (nonatomic, strong) UIImageView *headerAccessoryRightImageView;
 
 @end
 
@@ -118,7 +108,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 #pragma mark - Misc properties
 @synthesize contentHash = _contentHash;
 
-@synthesize indicatorIcon = _indicatorIcon;
 @synthesize profileLocal = _profileLocal;
 @synthesize profileRemote = _profileRemote;
 @synthesize contentRemote = _contentRemote;
@@ -333,7 +322,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
         _headerAccessoryRightView = [[UILabel alloc] initWithFrame:frame];
         
         // configure
-        [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:kCellHeaderAcessoryRightFontSize]];
+        [_headerAccessoryRightView setFont:[UIFont systemFontOfSize:kCellHeaderAccessoryRightFontSize]];
         [_headerAccessoryRightView setTextColor:[UIColor lightGrayColor]];
         //[_headerAccessoryRightView setTextAlignment:NSTextAlignmentRight];
         
@@ -349,10 +338,14 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 {
 	if (_headerAccessoryRightImageView == nil) {
         // initialize
-        UIImage *icon = self.indicatorIcon;
-        _headerAccessoryRightImageView = [[UIImageView alloc] initWithImage:icon];
+        CGRect frame;
+        frame.origin = CGPointZero;
+        frame.size = kCellHeaderAccessoryRightImageMaxSize;
+        _headerAccessoryRightImageView = [[UIImageView alloc] initWithFrame:frame];
+        
         // configure
         [_headerAccessoryRightImageView setAlpha:kCellHeaderAccessoryRightImageAlpha];
+        [_headerAccessoryRightImageView setContentMode:UIViewContentModeRight];
         
         // add to superview
 		[self.contentView addSubview:_headerAccessoryRightImageView];
@@ -483,8 +476,7 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
      [[[self class] dateFormatter] relativeStringFromDate:self.contentDate]];
     [self.headerAccessoryRightView resizeVerticalTopLeftTrim];
     
-    [self.headerAccessoryRightImageView setImage:self.indicatorIcon];
-    if (self.indicatorIcon != nil) {
+    if (self.headerAccessoryRightImageView.image != nil) {
         CGRect headerAccessoryRightImageFrame = self.headerAccessoryRightImageView.frame;
         headerAccessoryRightImageFrame.origin = CGPointMake(
                                                             // x
@@ -544,7 +536,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
         // initialize subview references
         _contentHash = 0u;
         _bodyView = nil;
-        _indicatorIcon = nil;
         _headerAccessoryRightView = nil;
         _headerAccessoryRightImageView = nil;
         _headerTitleView = nil;
@@ -576,7 +567,6 @@ static const CGFloat kCellHeaderAttributeTopHeight = 10.0f;
 {
     _bodyView = nil;
     _headerTitleView = nil;
-    _indicatorIcon = nil;
     _headerAccessoryRightView = nil;
     _headerAccessoryRightImageView = nil;
     

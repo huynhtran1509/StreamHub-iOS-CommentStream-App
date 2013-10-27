@@ -751,7 +751,7 @@ const static char kAttributedTextValueKey;
     
     // configure the rest of the cell
     [cell setContentDate:content.contentCreatedAt];
-    [cell setIndicatorIcon:content.contentSourceIconSmall];
+    [cell.headerAccessoryRightImageView setImage:content.contentSourceIconSmall];
     
     [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
     
@@ -769,7 +769,6 @@ const static char kAttributedTextValueKey;
     [cell setProfileLocal:[[LFSResource alloc]
                            initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
                            attributeString:(content.authorIsModerator ? @"Moderator" : @"")
-                           //mainString:[NSString stringWithFormat:@"%@ (%d)", title, content.nodeCount]
                            displayString:title
                            icon:nil]];
 }

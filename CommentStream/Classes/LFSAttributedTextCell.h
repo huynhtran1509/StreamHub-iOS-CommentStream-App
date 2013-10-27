@@ -22,8 +22,6 @@ extern const CGSize kCellImageViewSize;
 
 @property (nonatomic, strong) NSDate* contentDate;
 
-@property (nonatomic, strong) UIImage *indicatorIcon;
-
 @property (nonatomic, readonly) LFSBasicHTMLLabel *bodyView;
 
 #pragma mark - UIApperance properties
@@ -41,6 +39,8 @@ extern const CGSize kCellImageViewSize;
 @property (nonatomic, assign) CGFloat requiredBodyHeight;
 
 @property (nonatomic, assign) CGFloat leftOffset;
+
+@property (nonatomic, strong) UIImageView *headerAccessoryRightImageView;
 
 #pragma mark - Methods
 
