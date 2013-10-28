@@ -249,6 +249,15 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView setFrame:detailViewFrame];
 }
 
+- (void)didChangeContentSize
+{
+    UIScrollView *scrollView = self.scrollView;
+    CGFloat scrollViewWidth = scrollView.bounds.size.width;
+    CGSize detailViewSize = [self.detailView sizeThatFits:CGSizeMake(scrollViewWidth, CGFLOAT_MAX)];
+    detailViewSize.width = scrollViewWidth;
+    [scrollView setContentSize:detailViewSize];
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

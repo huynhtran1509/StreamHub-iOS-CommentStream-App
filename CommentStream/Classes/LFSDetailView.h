@@ -46,6 +46,8 @@
 - (void)didSelectButton2:(id)sender;
 - (void)didSelectButton3:(id)sender;
 
+- (void)didChangeContentSize;
+
 @optional
 - (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url;
 - (void)didSelectContentRemote:(id)sender wihtURL:(NSURL*)url;

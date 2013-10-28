@@ -73,10 +73,12 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
 @property (assign, nonatomic) CGSize attachmentImageSize;
+
 @end
 
 @implementation LFSDetailView {
     NSURL *_profileRemoteURL;
+    UIViewContentMode _attachmentContentMode;
 }
 
 #pragma mark - Class methods
@@ -90,7 +92,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 #pragma mark - Properties
 
-@synthesize attachmentImageSize = _attachmentImageSize;
 @synthesize delegate = _delegate;
 @synthesize profileLocal = _profileLocal;
 @synthesize profileRemote = _profileRemote;
@@ -98,6 +99,28 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 @synthesize contentBodyHtml = _contentBodyHtml;
 @synthesize contentDate = _contentDate;
+
+#pragma mark - 
+@synthesize attachmentImageSize = _attachmentImageSize;
+-(void)setAttachmentImageSize:(CGSize)attachmentImageSize
+{
+    CGFloat availableWidth =
+    self.bounds.size.width - kDetailPadding.left - kDetailPadding.right;
+    
+    if (attachmentImageSize.width > availableWidth) {
+        // recalculate
+        CGFloat scale = availableWidth / attachmentImageSize.width;
+        CGSize newSize;
+        newSize.height = attachmentImageSize.height * scale;
+        newSize.width = availableWidth;
+        _attachmentImageSize = newSize;
+        _attachmentContentMode = UIViewContentModeScaleAspectFit;
+    } else {
+        // use defaults
+        _attachmentImageSize = attachmentImageSize;
+        _attachmentContentMode = UIViewContentModeTopLeft;
+    }
+}
 
 #pragma mark -
 @synthesize attachmentImageView = _attachmentImageView;
@@ -519,9 +542,10 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         CGRect attachmentFrame;
         attachmentFrame.origin.x = kDetailPadding.left;
         attachmentFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
+        
         attachmentFrame.size = self.attachmentImageSize;
         [self.attachmentImageView setFrame:attachmentFrame];
-        
+        [self.attachmentImageView setContentMode:_attachmentContentMode];
         bottom += self.attachmentImageSize.height + kDetailMinorVerticalSeparator;
     }
 
@@ -566,9 +590,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
      * |  |                  |            |
      * |  |                  |            |
      * |  |                  |            |
-     * |  |                  |            |
-     * |  |                  |            |
-     * |  |                  |            |
      * |  |__________________|            |
      * |                                  |
      * |  Posted 27s ago                  |
@@ -581,6 +602,11 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
      * |< - - - - size.width  - - - - - ->|
      */
     
+    CGFloat extraHeight = 0.f;
+    if (self.attachmentImageView.hidden == NO) {
+        extraHeight = self.attachmentImageSize.height + kDetailMinorVerticalSeparator;
+    }
+    
     CGFloat totalWidthInset = kDetailPadding.left + kDetailContentPaddingRight;
     CGFloat totalHeightInset = (kDetailPadding.bottom
                                 + kDetailBarButtonHeight
@@ -588,9 +614,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                                 + kDetailFooterHeight
                                 + kDetailMinorVerticalSeparator
                                 
-                                + (_attachmentImageView.hidden == NO
-                                   ? self.attachmentImageSize.height + kDetailMinorVerticalSeparator
-                                   : 0.f)
+                                + extraHeight
                                 
                                 + kDetailMajorVerticalSeparator
                                 + kDetailImageViewSize.height
@@ -607,12 +631,32 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 -(void)setAttachmentImageWithURL:(NSURL*)url size:(CGSize)size placeholderImage:(UIImage*)placeholder
 {
     if (url != nil) {
-         [self.attachmentImageView setImageWithURL:url
-                                 placeholderImage:placeholder];
+        __weak typeof(self) weakSelf = self;
+        [self.attachmentImageView setImageWithURLRequest:[NSURLRequest requestWithURL:url]
+                                        placeholderImage:placeholder
+                                                 success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
+         {
+             // find out image size here and re-layout view
+             [weakSelf.attachmentImageView setImage:image];
+             if (weakSelf.attachmentImageSize.height != image.size.height || weakSelf.attachmentImageSize.width != image.size.width)
+             {
+                 [weakSelf setAttachmentImageSize:image.size];
+                 [weakSelf.delegate didChangeContentSize];
+                 [weakSelf setNeedsLayout];
+             }
+         }
+                                                 failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
+         {
+             // TODO: image failed to download -- ask JS about desired behavior
+         }];
         
         // toggle image view visibility:
         [self.attachmentImageView setHidden:NO];
-        self.attachmentImageSize = size;
+        if (self.attachmentImageView.image != nil) {
+            [self setAttachmentImageSize:self.attachmentImageView.image.size];
+        } else {
+            [self setAttachmentImageSize:size];
+        }
     } else {
         [self.attachmentImageView setHidden:YES];
     }
@@ -781,6 +825,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 -(void)resetFields
 {
     _attachmentImageSize = CGSizeZero;
+    _attachmentContentMode = UIViewContentModeTopLeft;
     
     _button1 = nil;
     _button2 = nil;
