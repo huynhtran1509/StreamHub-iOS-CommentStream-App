@@ -11,7 +11,7 @@
 
 static const CGFloat kDeletedCellImageCornerRadius = 4.f;
 
-const CGSize kDeletedCellImageViewSize = { .width=25.f, .height=25.f };
+static const CGSize kDeletedCellImageViewSize = { .width=25.f, .height=25.f };
 
 static const CGFloat kDeletedCellHeaderAdjust = 2.f;
 
@@ -31,6 +31,8 @@ static const CGFloat kDeletedCellHeaderTitleFontSize = 12.f;
 @end
 
 @implementation LFSDeletedCell
+
+@synthesize headerTitleView = _headerTitleView;
 
 #pragma mark - Class methods
 

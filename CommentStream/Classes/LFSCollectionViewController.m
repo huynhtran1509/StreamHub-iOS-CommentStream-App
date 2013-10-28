@@ -943,7 +943,7 @@ const static char kAttributedTextValueKey;
 }
 
 #pragma mark - LFSDetailViewControllerDelegate
--(void)deleteContent:(LFSContent*)content;
+-(void)deleteContent:(LFSContent*)content
 {
     if (content != nil) {
         NSUInteger row = [_content indexOfObject:content];
