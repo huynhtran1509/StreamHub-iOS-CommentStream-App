@@ -105,24 +105,55 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
 }
 
 /* Sample content:
- {
- childContent: [ ],
- vis: 1,
- content: {
- parentId: "",
- bodyHtml: "Can anyone tell me what Vila Velha in Brazil is like? <a href="https://twitter.com/#!/search/realtime/%23WorldCup" class="fyre-hashtag" hashtag="WorldCup" rel="tag" target="_blank">#WorldCup</a> <a href="https://twitter.com/#!/search/realtime/%23carnival" class="fyre-hashtag" hashtag="carnival" rel="tag" target="_blank">#carnival</a>",
- annotations: { },
- authorId: "391303630@twitter.com",
- updatedAt: 1374902038,
- id: "tweet-360991428312186880@twitter.com",
- createdAt: 1374902038
- },
- source: 1,
- type: 0,
- event: 1374902038279948
- }
- */
 
+{
+    childContent =     (
+                        {
+                            content =             {
+                                authorId = "-";
+                                id = "tweet-393797235068002304@twitter.com.http://twitter.com/qajoker/status/393797235068002304/photo/1";
+                                link = "http://twitter.com/qajoker/status/393797235068002304/photo/1";
+                                oembed =                 {
+                                    "author_name" = qajoker;
+                                    "author_url" = "http://twitter.com/qajoker";
+                                    height = 225;
+                                    link = "http://twitter.com/qajoker/status/393797235068002304/photo/1";
+                                    "provider_name" = Twitter;
+                                    "provider_url" = "http://twitter.com";
+                                    "thumbnail_height" = 150;
+                                    "thumbnail_url" = "https://pbs.twimg.com/media/BXcMf7YCYAEFdCc.jpg:thumb";
+                                    "thumbnail_width" = 150;
+                                    title = "Twitter / qajoker: SF 49ers logo http://t.co/qF5bn5arBp";
+                                    type = photo;
+                                    url = "https://pbs.twimg.com/media/BXcMf7YCYAEFdCc.jpg:large";
+                                    version = "1.0";
+                                    width = 225;
+                                };
+                                position = 0;
+                                targetId = "tweet-393797235068002304@twitter.com";
+                            };
+                            event = 1382723577264480;
+                            source = 0;
+                            type = 3;
+                            vis = 1;
+                        }
+                        );
+    content =     {
+        annotations =         {
+        };
+        authorId = "802889209@twitter.com";
+        bodyHtml = "SF 49ers logo <a href=\"http://t.co/qF5bn5arBp\" target=\"_blank\" rel=\"nofollow\">pic.twitter.com/qF5bn5arBp</a>";
+        createdAt = 1382723552;
+        id = "tweet-393797235068002304@twitter.com";
+        parentId = "";
+        updatedAt = 1382723554;
+    };
+    event = 1382723577264480;
+    source = 1;
+    type = 0;
+    vis = 1;
+}
+*/
 
 #pragma mark - Properties
 
@@ -170,7 +201,32 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
 @synthesize author = _author;
 
 #pragma mark -
-- (NSUInteger)nodeCountSumOfChildren
+@synthesize firstPhotoOembed = _firstPhotoOembed;
+-(LFSOembed*)firstPhotoOembed
+{
+    // return first attachment of type "photo" if it exists
+    if (_firstPhotoOembed == nil) {
+        if (self.childContent != nil) {
+            for (NSDictionary *obj in self.childContent) {
+                NSDictionary *content = [obj objectForKey:@"content"];
+                if (content != nil) {
+                    id oembedObject = [content objectForKey:@"oembed"];
+                    if (oembedObject != nil) {
+                        LFSOembed *oembed = [[LFSOembed alloc] initWithObject:oembedObject];
+                        if (oembed.oembedType == LFSOembedTypePhoto) {
+                            _firstPhotoOembed = oembed;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return _firstPhotoOembed;
+}
+
+#pragma mark -
+-(NSUInteger)nodeCountSumOfChildren
 {
     NSUInteger count = 0u;
     for (typeof(self) child in self.children) {
@@ -612,6 +668,7 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
     _author = nil;
     
     _content = nil;
+    _firstPhotoOembed = nil;
     
     _contentTwitterId = nil;
     _contentTwitterUrlString = nil;

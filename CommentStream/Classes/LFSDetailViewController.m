@@ -16,6 +16,7 @@
 
 #import "LFSAppDelegate.h"
 
+#import "LFSOembed.h"
 #import "LFSAttributedLabelDelegate.h"
 
 typedef NS_ENUM(NSUInteger, LFSActionType) {
@@ -174,6 +175,18 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView setContentDate:contentItem.contentCreatedAt];
     [detailView.bodyView setDelegate:self.attributedLabelDelegate];
     
+    
+    LFSOembed *oembed = self.contentItem.firstPhotoOembed;
+    if (oembed != nil) {
+        [detailView setAttachmentImageWithURL:[NSURL URLWithString:oembed.urlSring]
+                                         size:oembed.size
+                             placeholderImage:nil];
+    } else {
+        [detailView setAttachmentImageWithURL:nil
+                                         size:CGSizeZero
+                             placeholderImage:nil];
+    }
+    
     [self updateLikeButton];
     
     [detailView.button2 setTitle:@"Reply" forState:UIControlStateNormal];
@@ -234,6 +247,15 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     detailViewFrame.size.width = scrollViewWidth;
     detailViewFrame.size.height = detailViewSize.height;
     [detailView setFrame:detailViewFrame];
+}
+
+- (void)didChangeContentSize
+{
+    UIScrollView *scrollView = self.scrollView;
+    CGFloat scrollViewWidth = scrollView.bounds.size.width;
+    CGSize detailViewSize = [self.detailView sizeThatFits:CGSizeMake(scrollViewWidth, CGFLOAT_MAX)];
+    detailViewSize.width = scrollViewWidth;
+    [scrollView setContentSize:detailViewSize];
 }
 
 - (void)didReceiveMemoryWarning

@@ -557,8 +557,8 @@ const static char kAttributedTextValueKey;
             
             cellHeightValue = [LFSAttributedTextCell
                                cellHeightForAttributedString:attributedString
-                               width:tableView.bounds.size.width
-                               leftOffset:leftOffset];
+                               hasAttachment:(content.firstPhotoOembed != nil)
+                               width:(tableView.bounds.size.width - leftOffset)];
 
             objc_setAssociatedObject(content, &kAtttributedTextHeightKey,
                                      [NSNumber numberWithFloat:cellHeightValue],
@@ -747,11 +747,11 @@ const static char kAttributedTextValueKey;
 - (void)configureAttributedCell:(LFSAttributedTextCell*)cell forContent:(LFSContent*)content
 {
     // load image first
-    [self loadImageForCell:cell withContent:content];
+    [self loadImagesForAttributedCell:cell withContent:content];
     
     // configure the rest of the cell
     [cell setContentDate:content.contentCreatedAt];
-    [cell setIndicatorIcon:content.contentSourceIconSmall];
+    [cell.headerAccessoryRightImageView setImage:content.contentSourceIconSmall];
     
     [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
     
@@ -769,86 +769,127 @@ const static char kAttributedTextValueKey;
     [cell setProfileLocal:[[LFSResource alloc]
                            initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
                            attributeString:(content.authorIsModerator ? @"Moderator" : @"")
-                           //mainString:[NSString stringWithFormat:@"%@ (%d)", title, content.nodeCount]
                            displayString:title
                            icon:nil]];
 }
 
--(void)loadImageForCell:(UITableViewCell*)cell withContent:(LFSContent*)content
+-(void)loadImageWithURL:(NSURL*)url
+            scaleToSize:(CGSize)size
+                success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image))success
+                failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error))failure
 {
-    LFSAuthorProfile *author = content.author;
+    // handle actual downloading and scaling of the image
+    if (url == nil) {
+        return;
+    }
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    
+    // set up the NSOperation here
+    AFImageRequestOperation* operation =
+    [AFImageRequestOperation
+     imageRequestOperationWithRequest:request
+     imageProcessingBlock:^UIImage *(UIImage *image)
+     {
+         // scale down image
+         CGRect targetRect;
+         targetRect.origin = CGPointZero;
+         targetRect.size = size;
+         
+         // don't call UIGraphicsBeginImageContext when supporting Retina,
+         // instead call UIGraphicsBeginImageContextWithOptions with zero
+         // for scale
+         UIGraphicsBeginImageContextWithOptions(size, YES, 0.f);
+         [image drawInRect:targetRect];
+         UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
+         UIGraphicsEndImageContext();
+         return processedImage;
+     }
+     success:success
+     failure:failure];
+    
+    // add operation to queue
+    [self.operationQueue addOperation:operation];
+}
+
+-(void)loadImageWithURL:(NSURL*)url
+      forAttributedCell:(LFSAttributedTextCell*)cell
+              contentId:(NSString*)contentId
+               cacheKey:(NSString*)key
+            scaleToSize:(CGSize)size
+              loadBlock:(void (^)(LFSAttributedTextCell *cell, UIImage *image))loadBlock
+{
 #ifdef CACHE_SCALED_IMAGES
-    NSString *authorId = author.idString;
-    UIImage *scaledImage = [_imageCache objectForKey:authorId];
+    UIImage *scaledImage = [_imageCache objectForKey:key];
     if (scaledImage) {
-        [_imageCache setObject:scaledImage forKey:authorId];
-        [cell.imageView setImage:scaledImage];
+        [_imageCache setObject:scaledImage forKey:key];
+        loadBlock(cell, scaledImage);
     }
     else {
 #endif
         // load avatar images in a separate queue
-        [cell.imageView setImage:self.placeholderImage];
-        NSURL *avatarUrl = [NSURL URLWithString:author.avatarUrlString75];
+        loadBlock(cell, self.placeholderImage);
+        
         // avatarUrl will be nil if URL string is nil or invalid
-        if (avatarUrl != nil) {
-            NSURLRequest *request = [NSURLRequest requestWithURL:avatarUrl];
-            
-            // set up the NSOperation here
-            AFImageRequestOperation* operation =
-            [AFImageRequestOperation
-             imageRequestOperationWithRequest:request
-             imageProcessingBlock:^UIImage *(UIImage *image)
-             {
-                 // scale down image
-                 CGRect targetRect;
-                 targetRect.origin = CGPointZero;
-                 targetRect.size = kCellImageViewSize;
-                 
-                 // don't call UIGraphicsBeginImageContext when supporting Retina,
-                 // instead call UIGraphicsBeginImageContextWithOptions with zero
-                 // for scale
-                 UIGraphicsBeginImageContextWithOptions(kCellImageViewSize, YES, 0.f);
-                 [image drawInRect:targetRect];
-                 UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
-                 UIGraphicsEndImageContext();
+        [self loadImageWithURL:url
+                   scaleToSize:size
+                       success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
 #ifdef CACHE_SCALED_IMAGES
-                 [_imageCache setObject:processedImage forKey:authorId];
+                           [_imageCache setObject:image forKey:key];
 #endif
-                 return processedImage;
-             }
-             success:^(NSURLRequest *request,
-                       NSHTTPURLResponse *response,
-                       UIImage *image)
-             {
-                 // we are on the main thead here -- display the image
-                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfObject:content]
-                                                             inSection:0];
-                 UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
-                 if (cell) {
-                     [cell.imageView setImage:image];
-                     [cell setNeedsLayout];
-                 }
-             }
-             failure:^(NSURLRequest *request,
-                       NSHTTPURLResponse *response,
-                       NSError *error)
-             {
+                           // we are on the main thead here -- display the image
+                           NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
+                                                                       inSection:0];
+                           UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
+                           if (cell != nil && [cell isKindOfClass:[LFSAttributedTextCell class]])
+                           {
+                               // check for cell class (as it could have been deleted)
+                               // `cell' is true here only when cell is visible
+                               loadBlock((LFSAttributedTextCell*)cell, image);
+                               [cell setNeedsLayout];
+                           }
+                       }
+                       failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
 #ifdef CACHE_SCALED_IMAGES
-                 // cache placeholder image instead so we don't repeatedly
-                 // hit the server looking for stuff that doesn't exist
-                 if (self.placeholderImage) {
-                     [_imageCache setObject:self.placeholderImage
-                                     forKey:authorId];
-                 }
+                           // cache placeholder image instead so we don't repeatedly
+                           // hit the server looking for stuff that doesn't exist
+                           if (self.placeholderImage) {
+                               [_imageCache setObject:self.placeholderImage forKey:key];
+                           }
 #endif
-             }];
-            
-            // add operation to queue
-            [self.operationQueue addOperation:operation];
-        }
+                       }];
 #ifdef CACHE_SCALED_IMAGES
     }
 #endif
+}
+
+-(void)loadImagesForAttributedCell:(LFSAttributedTextCell*)cell withContent:(LFSContent*)content
+{
+    LFSAuthorProfile *author = content.author;
+    [self loadImageWithURL:[NSURL URLWithString:author.avatarUrlString75]
+         forAttributedCell:cell
+                 contentId:content.idString
+                  cacheKey:author.idString
+               scaleToSize:kCellImageViewSize
+                 loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
+     {
+         [cell.imageView setImage:image];
+     }];
+    
+    LFSOembed *attachment = content.firstPhotoOembed;
+    if (attachment != nil) {
+        [self loadImageWithURL:[NSURL URLWithString:attachment.thumbnailUrlString]
+             forAttributedCell:cell
+                     contentId:content.idString
+                      cacheKey:attachment.thumbnailUrlString
+                   scaleToSize:kAttachmentImageViewSize
+                     loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
+         {
+             [cell setAttachmentImage:image];
+         }];
+    } else {
+        [cell setAttachmentImage:nil];
+    }
 }
 
 #pragma mark - Navigation

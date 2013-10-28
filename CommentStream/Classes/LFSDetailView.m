@@ -72,10 +72,13 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
+@property (assign, nonatomic) CGSize attachmentImageSize;
+
 @end
 
 @implementation LFSDetailView {
     NSURL *_profileRemoteURL;
+    UIViewContentMode _attachmentContentMode;
 }
 
 #pragma mark - Class methods
@@ -96,6 +99,48 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 @synthesize contentBodyHtml = _contentBodyHtml;
 @synthesize contentDate = _contentDate;
+
+#pragma mark - 
+@synthesize attachmentImageSize = _attachmentImageSize;
+-(void)setAttachmentImageSize:(CGSize)attachmentImageSize
+{
+    CGFloat availableWidth =
+    self.bounds.size.width - kDetailPadding.left - kDetailPadding.right;
+    
+    if (attachmentImageSize.width > availableWidth) {
+        // recalculate
+        CGFloat scale = availableWidth / attachmentImageSize.width;
+        CGSize newSize;
+        newSize.height = attachmentImageSize.height * scale;
+        newSize.width = availableWidth;
+        _attachmentImageSize = newSize;
+        _attachmentContentMode = UIViewContentModeScaleAspectFit;
+    } else {
+        // use defaults
+        _attachmentImageSize = attachmentImageSize;
+        _attachmentContentMode = UIViewContentModeTopLeft;
+    }
+}
+
+#pragma mark -
+@synthesize attachmentImageView = _attachmentImageView;
+-(UIImageView*)attachmentImageView
+{
+    if (_attachmentImageView == nil) {
+        // initialize
+        CGRect frame;
+        frame.origin = CGPointZero;
+        frame.size = CGSizeZero;
+        _attachmentImageView = [[UIImageView alloc] initWithFrame:frame];
+        
+        // configure
+        [_attachmentImageView setContentMode:UIViewContentModeTopLeft];
+        
+        // add to superview
+		[self addSubview:_attachmentImageView];
+    }
+    return _attachmentImageView;
+}
 
 #pragma mark -
 @synthesize button1 = _button1;
@@ -493,6 +538,17 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // start with the header
     [self layoutHeader];
     
+    if (self.attachmentImageView.hidden == NO) {
+        CGRect attachmentFrame;
+        attachmentFrame.origin.x = kDetailPadding.left;
+        attachmentFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
+        
+        attachmentFrame.size = self.attachmentImageSize;
+        [self.attachmentImageView setFrame:attachmentFrame];
+        [self.attachmentImageView setContentMode:_attachmentContentMode];
+        bottom += self.attachmentImageSize.height + kDetailMinorVerticalSeparator;
+    }
+
     // layout url link
     LFSResource *contentRemote = self.contentRemote;
     if (contentRemote != nil) {
@@ -501,14 +557,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         CGRect remoteUrlFrame = self.footerRightView.frame;
         remoteUrlFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
         [self.footerRightView setFrame:remoteUrlFrame];
-    }
-    
-    // layout source icon
-    LFSResource *profileRemote = self.profileRemote;
-    if (profileRemote != nil) {
-        [self.headerAccessoryRightView setImage:profileRemote.icon
-                                  forState:UIControlStateNormal];
-        _profileRemoteURL = [NSURL URLWithString:profileRemote.identifier];
     }
 
     // layout date label
@@ -521,7 +569,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // layout toolbar frame
     CGRect toolbarFrame = self.toolbar.frame;
     toolbarFrame.origin = CGPointMake(0.f,
-                                      dateFrame.origin.y +
+                                      bottom + kDetailMinorVerticalSeparator +
                                       dateFrame.size.height +
                                       kDetailMinorVerticalSeparator);
     [self.toolbar setFrame:toolbarFrame];
@@ -529,12 +577,44 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 -(CGSize)sizeThatFits:(CGSize)size
 {
+    /*  __________________________________
+     * |   ___                            |
+     * |  |ava|  header                   |
+     * |  |___|                           |
+     * |                                  |
+     * |  Body text                       |
+     * |  (number of lines can vary)      |
+     * |   __________________             |
+     * |  |                  |            |
+     * |  |                  |            |
+     * |  |                  |            |
+     * |  |                  |            |
+     * |  |                  |            |
+     * |  |__________________|            |
+     * |                                  |
+     * |  Posted 27s ago                  |
+     * |  ______________________________  |
+     * |                                  |
+     * |  toolbar                         |
+     * |  ______________________________  |
+     * |__________________________________|
+     *
+     * |< - - - - size.width  - - - - - ->|
+     */
+    
+    CGFloat extraHeight = 0.f;
+    if (self.attachmentImageView.hidden == NO) {
+        extraHeight = self.attachmentImageSize.height + kDetailMinorVerticalSeparator;
+    }
+    
     CGFloat totalWidthInset = kDetailPadding.left + kDetailContentPaddingRight;
     CGFloat totalHeightInset = (kDetailPadding.bottom
                                 + kDetailBarButtonHeight
                                 + kDetailMinorVerticalSeparator
                                 + kDetailFooterHeight
                                 + kDetailMinorVerticalSeparator
+                                
+                                + extraHeight
                                 
                                 + kDetailMajorVerticalSeparator
                                 + kDetailImageViewSize.height
@@ -545,6 +625,41 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     contentSize.width += totalWidthInset;
     contentSize.height += totalHeightInset;
     return contentSize;
+}
+
+#pragma mark - Public methods
+-(void)setAttachmentImageWithURL:(NSURL*)url size:(CGSize)size placeholderImage:(UIImage*)placeholder
+{
+    if (url != nil) {
+        __weak typeof(self) weakSelf = self;
+        [self.attachmentImageView setImageWithURLRequest:[NSURLRequest requestWithURL:url]
+                                        placeholderImage:placeholder
+                                                 success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
+         {
+             // find out image size here and re-layout view
+             [weakSelf.attachmentImageView setImage:image];
+             if (weakSelf.attachmentImageSize.height != image.size.height || weakSelf.attachmentImageSize.width != image.size.width)
+             {
+                 [weakSelf setAttachmentImageSize:image.size];
+                 [weakSelf.delegate didChangeContentSize];
+                 [weakSelf setNeedsLayout];
+             }
+         }
+                                                 failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
+         {
+             // TODO: image failed to download -- ask JS about desired behavior
+         }];
+        
+        // toggle image view visibility:
+        [self.attachmentImageView setHidden:NO];
+        if (self.attachmentImageView.image != nil) {
+            [self setAttachmentImageSize:self.attachmentImageView.image.size];
+        } else {
+            [self setAttachmentImageSize:size];
+        }
+    } else {
+        [self.attachmentImageView setHidden:YES];
+    }
 }
 
 #pragma mark - Private methods
@@ -561,6 +676,14 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     NSString *headerSubtitle = profileLocal.identifier;
     NSString *headerAccessory = profileLocal.attributeString;
     
+    // layout source icon
+    LFSResource *profileRemote = self.profileRemote;
+    if (profileRemote != nil) {
+        [self.headerAccessoryRightView setImage:profileRemote.icon
+                                       forState:UIControlStateNormal];
+        _profileRemoteURL = [NSURL URLWithString:profileRemote.identifier];
+    }
+
     if (headerTitle && !headerSubtitle && !headerAccessory)
     {
         // display one string
@@ -701,6 +824,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 -(void)resetFields
 {
+    _attachmentImageSize = CGSizeZero;
+    _attachmentContentMode = UIViewContentModeTopLeft;
+    
     _button1 = nil;
     _button2 = nil;
     _bodyView = nil;

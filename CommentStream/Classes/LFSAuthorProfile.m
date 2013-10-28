@@ -181,6 +181,9 @@
     const static NSString* const key = @"avatar";
     if (_avatarUrlString == nil) {
         _avatarUrlString = [_object objectForKey:key];
+        if (_avatarUrlString == (NSString*)[NSNull null]) {
+            _avatarUrlString = nil;
+        }
     }
     return _avatarUrlString;
 }

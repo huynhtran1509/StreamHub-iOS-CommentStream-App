@@ -12,6 +12,7 @@
 
 #import "LFSAuthorCollection.h"
 #import "LFSContentCollection.h"
+#import "LFSOembed.h"
 
 @class LFSContent;
 
@@ -45,7 +46,6 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @property (nonatomic, assign) NSUInteger index;
 
-// convenience properties
 @property (nonatomic, readonly) BOOL authorIsModerator;
 
 @property (nonatomic, readonly) UIImage *contentSourceIconSmall;
@@ -59,11 +59,13 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 - (NSUInteger)nodeCountSumOfChildren;
 
-@property (nonatomic, strong) id childContent;
+@property (nonatomic, strong) NSArray *childContent;
 @property (nonatomic, assign) NSInteger nodeCount;
 -(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block;
 
 @property (nonatomic, copy) NSDictionary *content;
+
+@property (nonatomic, copy) LFSOembed *firstPhotoOembed;
 
 @property (nonatomic, copy) NSString *targetId;
 
