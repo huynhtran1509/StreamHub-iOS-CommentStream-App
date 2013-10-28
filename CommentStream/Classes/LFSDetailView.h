@@ -31,6 +31,10 @@
 
 @property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
+@property (nonatomic, strong) UIImageView *attachmentImageView;
+
+-(void)setAttachmentImageWithURL:(NSURL*)url size:(CGSize)size placeholderImage:(UIImage*)placeholder;
+
 @end
 
 // thanks to this protocol, LFSDetailView does not need

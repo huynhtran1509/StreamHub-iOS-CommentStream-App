@@ -136,6 +136,10 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
         if (_thumbnailUrlString == (NSString*)[NSNull null]) {
             _thumbnailUrlString = nil;
         }
+        // return full-size image URL if thumbnail URL is missing
+        if (_thumbnailUrlString == nil) {
+            _thumbnailUrlString = self.urlSring;
+        }
     }
     return _thumbnailUrlString;
 }
@@ -147,8 +151,8 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     const static NSString* const kWidthKey = @"thumbnail_width";
     const static NSString* const kHeightKey = @"thumbnail_height";
     if (_thumbnailSizeIsSet == NO) {
-        _thumbnailSize = CGSizeMake([[_object objectForKey:kWidthKey] floatValue],
-                                    [[_object objectForKey:kHeightKey] floatValue]);
+        _thumbnailSize = CGSizeMake([[_object objectForKey:kWidthKey] floatValue] / 2.f,
+                                    [[_object objectForKey:kHeightKey] floatValue] / 2.f);
     }
     return _thumbnailSize;
 }
@@ -174,8 +178,8 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     const static NSString* const kWidthKey = @"width";
     const static NSString* const kHeightKey = @"height";
     if (_sizeIsSet == NO) {
-        _size = CGSizeMake([[_object objectForKey:kWidthKey] floatValue],
-                           [[_object objectForKey:kHeightKey] floatValue]);
+        _size = CGSizeMake([[_object objectForKey:kWidthKey] floatValue] / 2.f,
+                           [[_object objectForKey:kHeightKey] floatValue] / 2.f);
     }
     return _size;
 }

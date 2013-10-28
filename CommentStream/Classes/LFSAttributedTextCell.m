@@ -96,17 +96,17 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
                            hasAttachment:(BOOL)hasAttachment
                                    width:(CGFloat)width
 {
-    /*   __________________________________
-     *  |   ___                            |
-     *  |  |ava|  <- avatar image          |
-     *  |  |___|                           |
-     *  |                           _____  |
-     *  |  Body text               | att | | <-- attachment
-     *  |  (number of lines can    | ach | |
-     *  |  vary)                   |_____| |
-     *  |__________________________________|
+    /*  __________________________________
+     * |   ___                            |
+     * |  |ava|  <- avatar image          |
+     * |  |___|                           |
+     * |                           _____  |
+     * |  Body text               | att | | <-- attachment
+     * |  (number of lines can    | ach | |
+     * |  vary)                   |_____| |
+     * |__________________________________|
      *
-     *  |< - - - - - - width - - - - - - ->|
+     * |< - - - - - - width - - - - - - ->|
      */
     CGFloat bodyWidth = width - kCellPadding.left - kCellContentPaddingRight - (hasAttachment ? kAttachmentImageViewSize.width + kCellMinorHorizontalSeparator : 0.f);
     CGSize bodySize = [attributedText sizeConstrainedToSize:CGSizeMake(bodyWidth, CGFLOAT_MAX)];
@@ -393,13 +393,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     return _attachmentImageView;
 }
 
-#pragma mark - 
-@dynamic attachmentImage;
--(UIImage*)attachmentImage
-{
-    return self.attachmentImageView.image;
-}
-
+#pragma mark -
 -(void)setAttachmentImage:(UIImage *)attachmentImage
 {
     [self.attachmentImageView setImage:attachmentImage];
@@ -548,7 +542,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 {
     // layoutSubviews is always called after requiredRowHeightWithFrameWidth:
     // so we take advantage of that by reusing _requiredBodyHeight
-    BOOL hasAttachment = (self.attachmentImage != nil);
+    BOOL hasAttachment = (self.attachmentImageView.hidden == NO);
     
     CGRect textContentFrame;
     CGFloat leftColumn = kCellPadding.left + _leftOffset;

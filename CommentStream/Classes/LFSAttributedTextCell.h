@@ -42,7 +42,8 @@ extern const CGSize kAttachmentImageViewSize;
 @property (nonatomic, assign) CGFloat leftOffset;
 
 @property (nonatomic, strong) UIImageView *headerAccessoryRightImageView;
-@property (nonatomic, strong) UIImage *attachmentImage;
+
+-(void)setAttachmentImage:(UIImage *)attachmentImage;
 
 #pragma mark - Methods
 

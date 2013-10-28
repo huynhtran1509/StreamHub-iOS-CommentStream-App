@@ -16,6 +16,7 @@
 
 #import "LFSAppDelegate.h"
 
+#import "LFSOembed.h"
 #import "LFSAttributedLabelDelegate.h"
 
 typedef NS_ENUM(NSUInteger, LFSActionType) {
@@ -173,6 +174,18 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
     [detailView.bodyView setDelegate:self.attributedLabelDelegate];
+    
+    
+    LFSOembed *oembed = self.contentItem.firstPhotoOembed;
+    if (oembed != nil) {
+        [detailView setAttachmentImageWithURL:[NSURL URLWithString:oembed.urlSring]
+                                         size:oembed.size
+                             placeholderImage:nil];
+    } else {
+        [detailView setAttachmentImageWithURL:nil
+                                         size:CGSizeZero
+                             placeholderImage:nil];
+    }
     
     [self updateLikeButton];
     
