@@ -12,6 +12,7 @@
 #import "LFSResource.h"
 
 extern const CGSize kCellImageViewSize;
+extern const CGSize kAttachmentImageViewSize;
 
 @interface LFSAttributedTextCell : UITableViewCell <UIAppearance>
 
@@ -41,14 +42,15 @@ extern const CGSize kCellImageViewSize;
 @property (nonatomic, assign) CGFloat leftOffset;
 
 @property (nonatomic, strong) UIImageView *headerAccessoryRightImageView;
+@property (nonatomic, strong) UIImage *attachmentImage;
 
 #pragma mark - Methods
 
 + (NSMutableAttributedString*)attributedStringFromHTMLString:(NSString*)html;
 
 + (CGFloat)cellHeightForAttributedString:(NSMutableAttributedString*)attributedText
-                                   width:(CGFloat)width
-                              leftOffset:(CGFloat)leftOffset;
+                           hasAttachment:(BOOL)hasAttachment
+                                   width:(CGFloat)width;
 
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
 

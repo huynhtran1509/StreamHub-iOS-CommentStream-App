@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		938974CA84AA4DFDBBCCCD67 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B24C48529EA4C478A1414B0 /* libPods.a */; };
+		EF05E46A181CD36700153F42 /* LFSOembed.m in Sources */ = {isa = PBXBuildFile; fileRef = EF05E469181CD36700153F42 /* LFSOembed.m */; };
 		EF1179D117B5BE3F00D59E54 /* LFSConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF1179D017B5BE3F00D59E54 /* LFSConfig.plist */; };
 		EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */; };
 		EF2251E417F21295006482BD /* LFSContent.m in Sources */ = {isa = PBXBuildFile; fileRef = EF2251E317F21295006482BD /* LFSContent.m */; };
@@ -46,6 +47,8 @@
 /* Begin PBXFileReference section */
 		0B24C48529EA4C478A1414B0 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA268D01CA8446E4BA6D3FC3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
+		EF05E468181CD36700153F42 /* LFSOembed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSOembed.h; path = Classes/LFSOembed.h; sourceTree = "<group>"; };
+		EF05E469181CD36700153F42 /* LFSOembed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSOembed.m; path = Classes/LFSOembed.m; sourceTree = "<group>"; };
 		EF1179D017B5BE3F00D59E54 /* LFSConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LFSConfig.plist; sourceTree = "<group>"; };
 		EF200BCE17BBB63A007E5295 /* LFSAttributedTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSAttributedTextCell.h; path = Classes/LFSAttributedTextCell.h; sourceTree = "<group>"; };
 		EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSAttributedTextCell.m; path = Classes/LFSAttributedTextCell.m; sourceTree = "<group>"; };
@@ -124,24 +127,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		EF5AFECF17E3BD3700D5A7DF /* LFSToolkit */ = {
-			isa = PBXGroup;
-			children = (
-				EF5AFED017E3BDE300D5A7DF /* Classes */,
-			);
-			name = LFSToolkit;
-			sourceTree = "<group>";
-		};
-		EF5AFED017E3BDE300D5A7DF /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				EFCB940C17F141F100FB9384 /* Model */,
-				EFCB940D17F1421100FB9384 /* View */,
-			);
-			name = Classes;
-			sourceTree = "<group>";
-		};
-		EF6683D817BB9785005F5FC3 /* Classes */ = {
+		EF6683D817BB9785005F5FC3 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				EFAF25FA1815E820005632B2 /* LFSAttributedLabelDelegate.h */,
@@ -159,7 +145,7 @@
 				EF5AFED417E3C2B900D5A7DF /* LFSPostViewController.h */,
 				EF5AFED517E3C2B900D5A7DF /* LFSPostViewController.m */,
 			);
-			name = Classes;
+			name = Controllers;
 			sourceTree = "<group>";
 		};
 		EF7BB6CF17B2B718009E2E70 = {
@@ -195,8 +181,9 @@
 		EF7BB6E117B2B718009E2E70 /* CommentStream */ = {
 			isa = PBXGroup;
 			children = (
-				EF5AFECF17E3BD3700D5A7DF /* LFSToolkit */,
-				EF6683D817BB9785005F5FC3 /* Classes */,
+				EFCB940C17F141F100FB9384 /* Models */,
+				EFCB940D17F1421100FB9384 /* Views */,
+				EF6683D817BB9785005F5FC3 /* Controllers */,
 				EF7BB6ED17B2B718009E2E70 /* Main.storyboard */,
 				EF7BB6F317B2B718009E2E70 /* Images.xcassets */,
 				EF7BB6E217B2B718009E2E70 /* Supporting Files */,
@@ -216,7 +203,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		EFCB940C17F141F100FB9384 /* Model */ = {
+		EFCB940C17F141F100FB9384 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				EFA21EAA17F970ED003589EB /* LFSResource.h */,
@@ -227,15 +214,17 @@
 				EFCB940A17F141E500FB9384 /* LFSAuthorProfile.m */,
 				EF2251E217F21295006482BD /* LFSContent.h */,
 				EF2251E317F21295006482BD /* LFSContent.m */,
+				EF05E468181CD36700153F42 /* LFSOembed.h */,
+				EF05E469181CD36700153F42 /* LFSOembed.m */,
 				EFCB940617F1119600FB9384 /* LFSAuthorCollection.h */,
 				EFCB940717F1119600FB9384 /* LFSAuthorCollection.m */,
 				EFC5CED317FE1FC800936EBD /* LFSContentCollection.h */,
 				EFC5CED417FE1FC800936EBD /* LFSContentCollection.m */,
 			);
-			name = Model;
+			name = Models;
 			sourceTree = "<group>";
 		};
-		EFCB940D17F1421100FB9384 /* View */ = {
+		EFCB940D17F1421100FB9384 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				EFE6FF29180256E6008351DD /* UIImage+LFSColor.h */,
@@ -261,7 +250,7 @@
 				EFACF83517F4EC19003B3FF6 /* LFSDetailView.h */,
 				EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */,
 			);
-			name = View;
+			name = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -381,6 +370,7 @@
 				EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */,
 				EFA21E5F17F65BF7003589EB /* UILabel+Trim.m in Sources */,
 				EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */,
+				EF05E46A181CD36700153F42 /* LFSOembed.m in Sources */,
 				EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */,
 				EFACF83717F4EC19003B3FF6 /* LFSDetailView.m in Sources */,
 				EFE0A2EE180E8B6E006F0AB3 /* LFSWriteCommentView.m in Sources */,

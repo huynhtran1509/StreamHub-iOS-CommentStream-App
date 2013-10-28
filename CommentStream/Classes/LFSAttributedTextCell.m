@@ -17,7 +17,9 @@
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
 
+// external constants
 const CGSize kCellImageViewSize = { .width=25.f, .height=25.f };
+const CGSize kAttachmentImageViewSize = { .width=75.f, .height=75.f }; // 150x150 px thumbnail
 
 static const UIEdgeInsets kCellPadding = {
     .top=10.f, .left=15.f, .bottom=12.f, .right=12.f
@@ -58,6 +60,8 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
+@property (nonatomic, strong) UIImageView *attachmentImageView;
+
 @property (nonatomic, readonly) UILabel *headerAccessoryRightView;
 
 @end
@@ -89,12 +93,28 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 }
 
 + (CGFloat)cellHeightForAttributedString:(NSMutableAttributedString*)attributedText
+                           hasAttachment:(BOOL)hasAttachment
                                    width:(CGFloat)width
-                              leftOffset:(CGFloat)leftOffset
 {
-    CGSize bodySize = [attributedText sizeConstrainedToSize:CGSizeMake(width - kCellPadding.left - leftOffset - kCellContentPaddingRight, CGFLOAT_MAX)];
+    /*   __________________________________
+     *  |   ___                            |
+     *  |  |ava|  <- avatar image          |
+     *  |  |___|                           |
+     *  |                           _____  |
+     *  |  Body text               | att | | <-- attachment
+     *  |  (number of lines can    | ach | |
+     *  |  vary)                   |_____| |
+     *  |__________________________________|
+     *
+     *  |< - - - - - - width - - - - - - ->|
+     */
+    CGFloat bodyWidth = width - kCellPadding.left - kCellContentPaddingRight - (hasAttachment ? kAttachmentImageViewSize.width + kCellMinorHorizontalSeparator : 0.f);
+    CGSize bodySize = [attributedText sizeConstrainedToSize:CGSizeMake(bodyWidth, CGFLOAT_MAX)];
     
-    return kCellPadding.bottom + bodySize.height + kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+    CGFloat deadHeight = kCellPadding.top + kCellPadding.bottom + kCellImageViewSize.height + kCellMinorVerticalSeparator;
+    return (hasAttachment
+            ? MAX(bodySize.height, kAttachmentImageViewSize.height) + deadHeight
+            : bodySize.height + deadHeight);
 }
 
 + (NSDateFormatter*)dateFormatter {
@@ -353,6 +373,40 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 	return _headerAccessoryRightImageView;
 }
 
+#pragma mark - 
+@synthesize attachmentImageView = _attachmentImageView;
+-(UIImageView*)attachmentImageView
+{
+    if (_attachmentImageView == nil) {
+        // initialize
+        CGRect frame;
+        frame.origin = CGPointZero;
+        frame.size = kAttachmentImageViewSize;
+        _attachmentImageView = [[UIImageView alloc] initWithFrame:frame];
+        
+        // configure
+        [_attachmentImageView setContentMode:UIViewContentModeCenter];
+        
+        // add to superview
+		[self.contentView addSubview:_attachmentImageView];
+    }
+    return _attachmentImageView;
+}
+
+#pragma mark - 
+@dynamic attachmentImage;
+-(UIImage*)attachmentImage
+{
+    return self.attachmentImageView.image;
+}
+
+-(void)setAttachmentImage:(UIImage *)attachmentImage
+{
+    [self.attachmentImageView setImage:attachmentImage];
+    // toggle image view visibility:
+    [self.attachmentImageView setHidden:(attachmentImage == nil)];
+}
+
 #pragma mark - Overrides
 
 - (void)layoutSubviews
@@ -494,19 +548,31 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 {
     // layoutSubviews is always called after requiredRowHeightWithFrameWidth:
     // so we take advantage of that by reusing _requiredBodyHeight
+    BOOL hasAttachment = (self.attachmentImage != nil);
+    
     CGRect textContentFrame;
-    textContentFrame.origin = CGPointMake(kCellPadding.left + _leftOffset,
+    CGFloat leftColumn = kCellPadding.left + _leftOffset;
+    CGFloat rightColumn = kCellContentPaddingRight + (hasAttachment ? kAttachmentImageViewSize.width : 0.f);
+    
+    textContentFrame.origin = CGPointMake(leftColumn,
                                           kCellPadding.top + kCellImageViewSize.height + kCellMinorVerticalSeparator);
-    textContentFrame.size = CGSizeMake(rect.size.width - kCellPadding.left - _leftOffset - kCellContentPaddingRight,
+    textContentFrame.size = CGSizeMake(rect.size.width - leftColumn - rightColumn - (hasAttachment ? kCellMinorHorizontalSeparator : 0.f),
                                        self.requiredBodyHeight - textContentFrame.origin.y);
     [self.bodyView setFrame:textContentFrame];
+    
+    if (hasAttachment) {
+        CGRect attachmentFrame;
+        attachmentFrame.origin = CGPointMake(rect.size.width - rightColumn, textContentFrame.origin.y);
+        attachmentFrame.size = kAttachmentImageViewSize;
+        [self.attachmentImageView setFrame:attachmentFrame];
+    }
     
     // fix an annoying bug (in OHAttributedLabel?) where y-value of bounds
     // would go in the negative direction if frame origin y-value exceeded
     // 44 pts (due to 44-pt toolbar being present?)
     CGRect bounds = self.bodyView.bounds;
     bounds.origin = CGPointZero;
-    [_bodyView setBounds:bounds];
+    [self.bodyView setBounds:bounds];
 }
 
 #pragma mark - Public methods
