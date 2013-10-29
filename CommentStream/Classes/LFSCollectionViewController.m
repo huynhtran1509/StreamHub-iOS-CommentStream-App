@@ -621,8 +621,19 @@ const static char kAttributedTextValueKey;
                            parameters:nil
                             onSuccess:^(NSOperation *operation, id responseObject)
          {
+             /*
              NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
                       @"Wrong content Id received");
+              
+              // Note: sometimes we get an object like this:
+              {
+                collections =     (
+                    10726472
+                );
+                messageId = "051d17a631d943f58705e4ad974f4131@livefyre.com";
+              }
+              */
+             
              NSUInteger row = [_content indexOfKey:contentId];
              if (row != NSNotFound) {
                  [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
@@ -655,6 +666,9 @@ const static char kAttributedTextValueKey;
                                          inserts:nil];
              }
          }];
+        
+        // TODO: keep an "undo" stack from where we restore objects if delete operation is
+        // a failure
         
         // the block below will result in the standard content cell being replaced by a
         // "this comment has been removed" cell.
@@ -943,7 +957,7 @@ const static char kAttributedTextValueKey;
 }
 
 #pragma mark - LFSDetailViewControllerDelegate
--(void)deleteContent:(LFSContent*)content;
+-(void)deleteContent:(LFSContent*)content
 {
     if (content != nil) {
         NSUInteger row = [_content indexOfObject:content];

@@ -36,6 +36,8 @@
 
 #pragma mark - Properties
 
+@synthesize writeCommentView;
+
 @synthesize delegate = _delegate;
 
 // render iOS7 status bar methods as writable properties

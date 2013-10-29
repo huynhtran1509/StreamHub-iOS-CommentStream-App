@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, LFSActionType) {
 };
 
 @interface LFSDetailViewController () {
-    LFSActionType actionType;
+    LFSActionType _actionType;
 }
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
@@ -47,6 +47,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 @implementation LFSDetailViewController
 
 #pragma mark - Properties
+
+@synthesize delegate = _delegate;
 
 // render iOS7 status bar methods as writable properties
 @synthesize prefersStatusBarHidden = _prefersStatusBarHidden;
@@ -165,7 +167,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [super viewDidLoad];
     
     _postViewController = nil;
-
     
     LFSDetailView *detailView = self.detailView;
     LFSContent *contentItem = self.contentItem;
@@ -193,11 +194,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView.button2 setImage:[UIImage imageNamed:@"ActionReply"] forState:UIControlStateNormal];
     
     if ([self.user.profile isEqual:self.contentItem.author]) {
-        actionType = kLFSActionTypeDelete;
+        _actionType = kLFSActionTypeDelete;
         [detailView.button3 setTitle:@"Delete" forState:UIControlStateNormal];
         [detailView.button3 setImage:[UIImage imageNamed:@"ActionTrash"] forState:UIControlStateNormal];
     } else {
-        actionType = kLFSActionTypeFlag;
+        _actionType = kLFSActionTypeFlag;
         [detailView.button3 setTitle:@"Flag" forState:UIControlStateNormal];
         [detailView.button3 setImage:[UIImage imageNamed:@"ActionFlag"] forState:UIControlStateNormal];
     }
@@ -361,11 +362,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)didSelectButton3:(id)sender
 {
     // Either "Flag" or "Delete" selected
-    if (actionType == kLFSActionTypeDelete && [self.user.profile isEqual:self.contentItem.author]) {
+    if (_actionType == kLFSActionTypeDelete && [self.user.profile isEqual:self.contentItem.author]) {
         [self.delegate deleteContent:self.contentItem];
         [self.navigationController popViewControllerAnimated:NO];
     }
-    else if (actionType == kLFSActionTypeFlag) {
+    else if (_actionType == kLFSActionTypeFlag) {
         [self showActionSheet:sender];
     }
 }
