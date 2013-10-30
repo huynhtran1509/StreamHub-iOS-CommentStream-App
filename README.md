@@ -12,7 +12,7 @@ https://github.com/Livefyre/StreamHub-iOS-SDK
 
 # Getting Started
 
-You will need to clone StreamHub-iOS-SDK first:
+You will need to clone StreamHub-iOS-SDK first (make sure you have Xcode 5):
 
     git clone https://github.com/Livefyre/StreamHub-iOS-SDK.git
     cd StreamHub-iOS-SDK/examples/
@@ -26,9 +26,9 @@ Use `CommentStream.xcworkspace` to open the project instead of
 
 # Requirements
 
-At present, StreamHub-SDK v0.2.0 requires iOS 6.0 or later (mostly due to
-external dependencies). If you would like to use this SDK with iOS versions
-prior to 6.0, please contact Livefyre and we'll be happy to help.
+StreamHub-SDK v0.2.0 and the Comments app require Xcode 5 and iOS 6.0 or later. 
+If you would like to use this SDK with iOS versions prior to 6.0, please contact 
+Livefyre and we'll be happy to help.
 
 # License
 
