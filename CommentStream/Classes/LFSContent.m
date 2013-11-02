@@ -48,14 +48,26 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
 // For detailed info, see
 // https://github.com/Livefyre/lfdj/blob/production/lfcore/lfcore/v2/publishing/models.proto
 typedef NS_ENUM(NSUInteger, LFSContentSource) {
-    LFSContentSourceDefault = 0u,
-    LFSContentSourceTwitter,
-    LFSContentSourceFacebook,
-    LFSContentSourceGooglePlus,
-    LFSContentSourceFlickr,
-    LFSContentSourceYouTube,
-    LFSContentSourceRSS,
-    LFSContentSourceInstagram
+    LFSContentSourceDefault = 0u,   // 0
+    LFSContentSourceTwitter,        // 1
+    LFSContentSourceFacebook,       // 2
+    LFSContentSourceGooglePlus,     // 3
+    LFSContentSourceFlickr,         // 4
+    LFSContentSourceYouTube,        // 5
+    LFSContentSourceRSS,            // 6
+    LFSContentSourceInstagram       // 7
+};
+
+#define SOURCE_IMAGE_MAP_LENGTH 8u
+static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
+    nil,                        // LFSContentSourceDefault      (0)
+    @"SourceTwitter",           // LFSContentSourceTwitter      (1)
+    @"SourceFacebook",          // LFSContentSourceFacebook     (2)
+    nil,                        // LFSContentSourceGooglePlus   (3)
+    nil,                        // LFSContentSourceFlickr       (4)
+    nil,                        // LFSContentSourceYouTube      (5)
+    @"SourceRSS",               // LFSContentSourceRSS          (6)
+    @"SourceInstagram",         // LFSContentSourceInstagram    (7)
 };
 
 #define CONTENT_SOURCE_DECODE_LENGTH 20u
@@ -81,18 +93,6 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     LFSContentSourceDefault,    // 17
     LFSContentSourceDefault,    // 18
     LFSContentSourceInstagram,  // 19
-};
-
-#define SOURCE_IMAGE_MAP_LENGTH 8u
-static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
-    nil, // LFSContentSourceDefault (0)
-    @"SourceTwitter", //LFSContentSourceTwitter (1)
-    @"SourceFacebook", //LFSContentSourceFacebook (2)
-    nil, //LFSContentSourceGooglePlus (3)
-    nil, //LFSContentSourceFlickr (4)
-    nil, //LFSContentSourceYouTube (5)
-    @"SourceRSS", //LFSContentSourceRSS (6)
-    @"SourceInstagram", //LFSContentSourceInstagram (7)
 };
 
 #pragma mark - LFSContent implementaiton
