@@ -302,13 +302,14 @@ const static char kAttributedTextValueKey;
 #endif
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     [self wheelContainerTeardown];
-    self.navigationController.delegate = nil;
-    self.tableView.delegate = nil;
-    self.tableView.dataSource = nil;
+    [self.navigationController setDelegate:nil];
+    [self.tableView setDelegate:nil];
+    [self.tableView setDataSource:nil];
 
+    [_postViewController setDelegate:nil];
     _postViewController = nil;
 
     _streamClient = nil;
@@ -316,7 +317,7 @@ const static char kAttributedTextValueKey;
     _writeClient = nil;
     _adminClient = nil;
 
-    _postCommentField.delegate = nil;
+    [_postCommentField setDelegate:nil];
     _postCommentField = nil;
     
 #ifdef CACHE_SCALED_IMAGES
@@ -324,6 +325,7 @@ const static char kAttributedTextValueKey;
     _imageCache = nil;
 #endif
 
+    [_content setDelegate:nil];
     _content = nil;
     _container = nil;
     _activityIndicator = nil;

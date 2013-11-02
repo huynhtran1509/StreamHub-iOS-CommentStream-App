@@ -439,6 +439,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 - (void)dealloc
 {
+    [_textView setDelegate:nil];
     [self resetFields];
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIKeyboardWillShowNotification

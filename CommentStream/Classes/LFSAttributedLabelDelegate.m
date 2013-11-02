@@ -36,6 +36,11 @@
     return self;
 }
 
+-(void)dealloc
+{
+    [(UIWebView*)_webViewController.view setDelegate:nil];
+}
+
 #pragma mark - Public methods
 -(void)followURL:(NSURL*)url
 {

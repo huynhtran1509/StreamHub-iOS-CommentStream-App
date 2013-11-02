@@ -182,6 +182,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
 - (void)dealloc
 {
+    [_detailView setDelegate:nil];
+    [_postViewController setDelegate:nil];
     _postViewController = nil;
 }
 

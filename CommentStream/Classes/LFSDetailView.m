@@ -818,9 +818,11 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     {
         UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
         UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
+        // have to check object type because it could be NSNull and then
+        // we would get missing selector exception
         if (newImage != oldImage ||
-            ((newImage != (UIImage*)[NSNull null]) &&
-             (oldImage != (UIImage*)[NSNull null]) &&
+            (([newImage isKindOfClass:[UIImage class]]) &&
+             ([oldImage isKindOfClass:[UIImage class]]) &&
              (newImage.size.width != oldImage.size.width ||
               newImage.size.height != oldImage.size.height)))
         {
