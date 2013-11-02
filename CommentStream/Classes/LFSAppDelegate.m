@@ -25,25 +25,11 @@ typedef NS_ENUM(NSUInteger, kTwitterAppState) {
     kTwitterAppStateBrowser
 };
 
-static kTwitterAppState twitterState = kTwitterAppStateUnknown;
-
 @implementation LFSAppDelegate
 
 #pragma mark - Public properties
 
 @synthesize window = _window;
-
-@dynamic canOpenLinksInTwitterClient;
--(BOOL)canOpenLinksInTwitterClient {
-    static NSString* const twitterSchema = @"twitter://";
-    if (twitterState == kTwitterAppStateUnknown) {
-        NSURL *twitterUrl = [NSURL URLWithString:twitterSchema];
-        twitterState = ([[UIApplication sharedApplication] canOpenURL:twitterUrl]
-                        ? kTwitterAppStateTwitter
-                        : kTwitterAppStateBrowser);
-    }
-    return (twitterState == kTwitterAppStateTwitter);
-}
 
 @synthesize mainStoryboard = _mainStoryboard;
 -(UIStoryboard*)mainStoryboard {
@@ -58,7 +44,7 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
 
 #pragma mark - Public methods
 
--(BOOL)openInTwitterApp:(NSString*)urlString
+-(NSString*)processStreamUrl:(NSString*)urlString
 {
     static NSRegularExpression* regexHashtag = nil;
     static NSRegularExpression* regexHandle = nil;
@@ -81,12 +67,10 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
         // have match, now create Twitter URI, open Twitter app here, and return
         NSString *schemaString = [urlString substringWithRange:[hashtagMatch rangeAtIndex:1u]];
         NSString *contentString = [urlString substringWithRange:[hashtagMatch rangeAtIndex:3u]];
-        NSString *convertedURL = ([self canOpenLinksInTwitterClient]
-                                  ? [NSString stringWithFormat:@"twitter://search?query=%@", contentString]
-                                  : [NSString stringWithFormat:@"%@://twitter.com/search/realtime/%@",
-                                     schemaString, contentString]);
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:convertedURL]];
-        return YES;
+        // [NSString stringWithFormat:@"twitter://search?query=%@", contentString]
+        NSString *convertedURL = [NSString stringWithFormat:@"%@://twitter.com/search/realtime/%@",
+                                     schemaString, contentString];
+        return convertedURL;
     }
     
     // if we are still here, look for possible user handle
@@ -106,12 +90,10 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
         // have match, now create Twitter URI, open Twitter app here, and return
         NSString *schemaString = [urlString substringWithRange:[handleMatch rangeAtIndex:1u]];
         NSString *contentString = [urlString substringWithRange:[handleMatch rangeAtIndex:3u]];
-        NSString *convertedURL = ([self canOpenLinksInTwitterClient]
-                                  ? [NSString stringWithFormat:@"twitter://user?screen_name=%@", contentString]
-                                  : [NSString stringWithFormat:@"%@://twitter.com/%@",
-                                     schemaString, contentString]);
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:convertedURL]];
-        return YES;
+        // [NSString stringWithFormat:@"twitter://user?screen_name=%@", contentString]
+        NSString *convertedURL = [NSString stringWithFormat:@"%@://twitter.com/%@",
+                                     schemaString, contentString];
+        return convertedURL;
     }
     
     // if we are still here, check for status URI
@@ -132,15 +114,13 @@ static kTwitterAppState twitterState = kTwitterAppStateUnknown;
         NSString *schemaString = [urlString substringWithRange:[statusMatch rangeAtIndex:1u]];
         NSString *accountString = [urlString substringWithRange:[statusMatch rangeAtIndex:3u]];
         NSString *statusIdString = [urlString substringWithRange:[statusMatch rangeAtIndex:4u]];
-        NSString *convertedURL = ([self canOpenLinksInTwitterClient]
-                                  ? [NSString stringWithFormat:@"twitter://status?id=%@&account=%@", statusIdString, accountString]
-                                  : [NSString stringWithFormat:@"%@://twitter.com/%@/status/%@",
-                                     schemaString, accountString, statusIdString]);
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:convertedURL]];
-        return YES;
+        // [NSString stringWithFormat:@"twitter://status?id=%@&account=%@", statusIdString, accountString]
+        NSString *convertedURL = [NSString stringWithFormat:@"%@://twitter.com/%@/status/%@",
+                                     schemaString, accountString, statusIdString];
+        return convertedURL;
     }
     
-    return NO;
+    return urlString;
 }
 
 #pragma mark - Lifecycle
