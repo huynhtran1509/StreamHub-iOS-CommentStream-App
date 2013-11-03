@@ -245,10 +245,10 @@
 				EF62178117E8F76900700808 /* LFSTextField.m */,
 				EF529E3917F39ECF00836ACE /* LFSContentToolbar.h */,
 				EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */,
-				EFE0A2EC180E8B6E006F0AB3 /* LFSWriteCommentView.h */,
-				EFE0A2ED180E8B6E006F0AB3 /* LFSWriteCommentView.m */,
 				EFACF83517F4EC19003B3FF6 /* LFSDetailView.h */,
 				EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */,
+				EFE0A2EC180E8B6E006F0AB3 /* LFSWriteCommentView.h */,
+				EFE0A2ED180E8B6E006F0AB3 /* LFSWriteCommentView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";

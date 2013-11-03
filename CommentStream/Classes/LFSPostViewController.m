@@ -65,10 +65,10 @@
 
 #pragma mark - UIViewController
 
-// Hide Status Bar
+// Hide/show status bar
 - (BOOL)prefersStatusBarHidden
 {
-    return YES;
+    return NO;
 }
 
 #pragma mark - Lifecycle
@@ -94,7 +94,7 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    
+
     LFSAuthorProfile *author = self.user.profile;
     NSString *detailString = (author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil);
     LFSResource *headerInfo = [[LFSResource alloc]
@@ -109,10 +109,6 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-    // hide status bar for iOS7 and later
-    [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
-               withAnimation:UIStatusBarAnimationNone];
     
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
     [self.writeCommentView.textView becomeFirstResponder];
@@ -163,17 +159,18 @@
 -(void)setStatusBarHidden:(BOOL)hidden
             withAnimation:(UIStatusBarAnimation)animation
 {
+    const static CGFloat kStatusBarHeight = 20.f;
     _prefersStatusBarHidden = hidden;
     _preferredStatusBarUpdateAnimation = animation;
     
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
     {
-        // iOS 7
+        // iOS7
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     }
     else
     {
-        // iOS 6
+        // iOS6
         [[UIApplication sharedApplication] setStatusBarHidden:hidden
                                                 withAnimation:animation];
         if (self.navigationController) {
@@ -181,13 +178,13 @@
             if (hidden && navigationBar.frame.origin.y > 0.f)
             {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 0;
+                frame.origin.y = 0.f;
                 navigationBar.frame = frame;
             }
-            else if (!hidden && navigationBar.frame.origin.y < 20.f)
+            else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight)
             {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 20.f;
+                frame.origin.y = kStatusBarHeight;
                 navigationBar.frame = frame;
             }
         }

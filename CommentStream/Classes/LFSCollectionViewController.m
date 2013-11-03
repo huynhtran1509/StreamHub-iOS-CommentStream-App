@@ -60,7 +60,6 @@ static NSString* const kCellSelectSegue = @"detailView";
 static NSString* const kFailureDeleteTitle = @"Failed to delete content";
 
 const static CGFloat kGenerationOffset = 20.f;
-const static CGFloat kStatusBarHeight = 20.f;
 
 const static char kAtttributedTextHeightKey;
 const static char kAttributedTextValueKey;
@@ -263,11 +262,7 @@ const static char kAttributedTextValueKey;
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
-    // hide status bar for iOS7 and later
-    [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
-               withAnimation:UIStatusBarAnimationNone];
-
+    
     [self authenticateUser];
     [self startStreamWithBoostrap];
 }
@@ -302,13 +297,14 @@ const static char kAttributedTextValueKey;
 #endif
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     [self wheelContainerTeardown];
-    self.navigationController.delegate = nil;
-    self.tableView.delegate = nil;
-    self.tableView.dataSource = nil;
+    [self.navigationController setDelegate:nil];
+    [self.tableView setDelegate:nil];
+    [self.tableView setDataSource:nil];
 
+    [_postViewController setDelegate:nil];
     _postViewController = nil;
 
     _streamClient = nil;
@@ -316,7 +312,7 @@ const static char kAttributedTextValueKey;
     _writeClient = nil;
     _adminClient = nil;
 
-    _postCommentField.delegate = nil;
+    [_postCommentField setDelegate:nil];
     _postCommentField = nil;
     
 #ifdef CACHE_SCALED_IMAGES
@@ -324,6 +320,7 @@ const static char kAttributedTextValueKey;
     _imageCache = nil;
 #endif
 
+    [_content setDelegate:nil];
     _content = nil;
     _container = nil;
     _activityIndicator = nil;
@@ -384,26 +381,30 @@ const static char kAttributedTextValueKey;
 -(void)setStatusBarHidden:(BOOL)hidden
             withAnimation:(UIStatusBarAnimation)animation
 {
+    const static CGFloat kStatusBarHeight = 20.f;
     _prefersStatusBarHidden = hidden;
     _preferredStatusBarUpdateAnimation = animation;
     
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
     {
-        // iOS 7
+        // iOS7
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     }
     else
     {
-        // iOS 6
+        // iOS6
         [[UIApplication sharedApplication] setStatusBarHidden:hidden
                                                 withAnimation:animation];
         if (self.navigationController) {
             UINavigationBar *navigationBar = self.navigationController.navigationBar;
-            if (hidden && navigationBar.frame.origin.y > 0.f) {
+            if (hidden && navigationBar.frame.origin.y > 0.f)
+            {
                 CGRect frame = navigationBar.frame;
                 frame.origin.y = 0.f;
                 navigationBar.frame = frame;
-            } else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight) {
+            }
+            else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight)
+            {
                 CGRect frame = navigationBar.frame;
                 frame.origin.y = kStatusBarHeight;
                 navigationBar.frame = frame;

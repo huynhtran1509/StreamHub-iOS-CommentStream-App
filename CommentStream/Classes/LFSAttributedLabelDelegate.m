@@ -36,11 +36,18 @@
     return self;
 }
 
+-(void)dealloc
+{
+    [(UIWebView*)_webViewController.view setDelegate:nil];
+}
+
 #pragma mark - Public methods
 -(void)followURL:(NSURL*)url
 {
-    if (![AppDelegate openInTwitterApp:[url absoluteString]]) {
-        [(UIWebView*)self.webViewController.view loadRequest:[NSURLRequest requestWithURL:url]];
+    NSString *processedUrlString = [AppDelegate processStreamUrl:[url absoluteString]];
+    if (processedUrlString != nil) {
+        NSURL *processedUrl = [NSURL URLWithString:processedUrlString];
+        [(UIWebView*)self.webViewController.view loadRequest:[NSURLRequest requestWithURL:processedUrl]];
         [self.navigationController pushViewController:self.webViewController animated:YES];
     }
 }

@@ -78,7 +78,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 @implementation LFSDetailView {
     NSURL *_profileRemoteURL;
-    UIViewContentMode _attachmentContentMode;
 }
 
 #pragma mark - Class methods
@@ -100,27 +99,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @synthesize contentBodyHtml = _contentBodyHtml;
 @synthesize contentDate = _contentDate;
 
-#pragma mark - 
 @synthesize attachmentImageSize = _attachmentImageSize;
--(void)setAttachmentImageSize:(CGSize)attachmentImageSize
-{
-    CGFloat availableWidth =
-    self.bounds.size.width - kDetailPadding.left - kDetailPadding.right;
-    
-    if (attachmentImageSize.width > availableWidth) {
-        // recalculate
-        CGFloat scale = availableWidth / attachmentImageSize.width;
-        CGSize newSize;
-        newSize.height = attachmentImageSize.height * scale;
-        newSize.width = availableWidth;
-        _attachmentImageSize = newSize;
-        _attachmentContentMode = UIViewContentModeScaleAspectFit;
-    } else {
-        // use defaults
-        _attachmentImageSize = attachmentImageSize;
-        _attachmentContentMode = UIViewContentModeTopLeft;
-    }
-}
 
 #pragma mark -
 @synthesize attachmentImageView = _attachmentImageView;
@@ -130,11 +109,13 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         // initialize
         CGRect frame;
         frame.origin = CGPointZero;
-        frame.size = CGSizeZero;
+        frame.size = self.attachmentImageSize;
         _attachmentImageView = [[UIImageView alloc] initWithFrame:frame];
         
         // configure
-        [_attachmentImageView setContentMode:UIViewContentModeTopLeft];
+        [_attachmentImageView setContentMode:UIViewContentModeScaleAspectFit];
+        [_attachmentImageView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin)];
         
         // add to superview
 		[self addSubview:_attachmentImageView];
@@ -524,29 +505,67 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 }
 
 #pragma mark - Private overrides
+-(CGSize)attachmentImageSizeWithMaxWidth:(CGFloat)width
+{
+    // find out new image size based on three things:
+    // (a) attachmentImageSize property
+    // (b) attachmentImageView.image.size value and
+    // (c) view rectangle bounds
+    //
+    // if we have image, use it, otherwise rely on attachmentImageSize
+    CGSize neededSize;
+    CGSize finalSize;
+    UIImage *image = self.attachmentImageView.image;
+    if (image != nil) {
+        neededSize = image.size;
+    } else {
+        neededSize = self.attachmentImageSize;
+    }
+    
+    CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
+    if (neededSize.width > availableWidth) {
+        // recalculate
+        CGFloat scale = availableWidth / neededSize.width;
+        
+        finalSize.height = neededSize.height * scale;
+        finalSize.width = availableWidth;
+    } else {
+        // use defaults
+        finalSize = neededSize;
+    }
+    return finalSize;
+}
+
 -(void)layoutSubviews
 {
     // layout main content label
     CGRect basicHTMLLabelFrame = self.bodyView.frame;
-    CGFloat contentWidth = self.bounds.size.width - kDetailPadding.left - kDetailContentPaddingRight;
+    
+    CGFloat width = self.bounds.size.width;
+    CGFloat contentWidth = width - kDetailPadding.left - kDetailContentPaddingRight;
     basicHTMLLabelFrame.size = [self contentSizeThatFits:
                                 CGSizeMake(contentWidth, CGFLOAT_MAX)];
     [self.bodyView setFrame:basicHTMLLabelFrame];
     
-    CGFloat bottom = basicHTMLLabelFrame.size.height + basicHTMLLabelFrame.origin.y;
+    CGFloat bottom = basicHTMLLabelFrame.origin.y + basicHTMLLabelFrame.size.height;
     
     // start with the header
     [self layoutHeader];
     
+    // do not check for actual image presence here because we want to layout the
+    // frame before even the image is downloaded.
     if (self.attachmentImageView.hidden == NO) {
         CGRect attachmentFrame;
-        attachmentFrame.origin.x = kDetailPadding.left;
+
+        CGSize finalSize = [self attachmentImageSizeWithMaxWidth:width];
+        attachmentFrame.size = finalSize;
+        
+        attachmentFrame.origin.x = (width - finalSize.width) / 2.f;
         attachmentFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
         
-        attachmentFrame.size = self.attachmentImageSize;
         [self.attachmentImageView setFrame:attachmentFrame];
-        [self.attachmentImageView setContentMode:_attachmentContentMode];
-        bottom += self.attachmentImageSize.height + kDetailMinorVerticalSeparator;
+        
+        bottom = attachmentFrame.origin.y + attachmentFrame.size.height;
     }
 
     // layout url link
@@ -603,8 +622,10 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
      */
     
     CGFloat extraHeight = 0.f;
-    if (self.attachmentImageView.hidden == NO) {
-        extraHeight = self.attachmentImageSize.height + kDetailMinorVerticalSeparator;
+    CGSize attachmentSize = [self attachmentImageSizeWithMaxWidth:size.width];
+
+    if (attachmentSize.height > 0.f) {
+        extraHeight = attachmentSize.height + kDetailMinorVerticalSeparator;
     }
     
     CGFloat totalWidthInset = kDetailPadding.left + kDetailContentPaddingRight;
@@ -619,6 +640,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                                 + kDetailMajorVerticalSeparator
                                 + kDetailImageViewSize.height
                                 + kDetailPadding.top);
+    
     CGSize contentSize = [self contentSizeThatFits:
                           CGSizeMake(size.width - totalWidthInset,
                                      CGFLOAT_MAX)];
@@ -632,18 +654,13 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 {
     if (url != nil) {
         __weak typeof(self) weakSelf = self;
+        [self setAttachmentImageSize:size];
         [self.attachmentImageView setImageWithURLRequest:[NSURLRequest requestWithURL:url]
                                         placeholderImage:placeholder
                                                  success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
          {
              // find out image size here and re-layout view
              [weakSelf.attachmentImageView setImage:image];
-             if (weakSelf.attachmentImageSize.height != image.size.height || weakSelf.attachmentImageSize.width != image.size.width)
-             {
-                 [weakSelf setAttachmentImageSize:image.size];
-                 [weakSelf.delegate didChangeContentSize];
-                 [weakSelf setNeedsLayout];
-             }
          }
                                                  failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
          {
@@ -652,11 +669,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         
         // toggle image view visibility:
         [self.attachmentImageView setHidden:NO];
-        if (self.attachmentImageView.image != nil) {
-            [self setAttachmentImageSize:self.attachmentImageView.image.size];
-        } else {
-            [self setAttachmentImageSize:size];
-        }
     } else {
         [self.attachmentImageView setHidden:YES];
     }
@@ -795,6 +807,32 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     return [self.bodyView sizeThatFits:size];
 }
 
+#pragma mark - KVO
+
+-(void)observeValueForKeyPath:(NSString *)keyPath
+                     ofObject:(id)object
+                       change:(NSDictionary *)change
+                      context:(void *)context
+{
+    if (object == self.attachmentImageView && [keyPath isEqualToString:@"image"])
+    {
+        UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
+        UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
+        // have to check object type because it could be NSNull and then
+        // we would get missing selector exception
+        if (newImage != oldImage ||
+            (([newImage isKindOfClass:[UIImage class]]) &&
+             ([oldImage isKindOfClass:[UIImage class]]) &&
+             (newImage.size.width != oldImage.size.width ||
+              newImage.size.height != oldImage.size.height)))
+        {
+            // images differ, update layout
+            [self.delegate didChangeContentSize];
+            [self setNeedsLayout];
+        }
+    }
+}
+
 #pragma mark - Lifecycle
 
 -(id)initWithCoder:(NSCoder *)aDecoder
@@ -802,7 +840,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     self = [super initWithCoder:aDecoder];
     if (self) {
         // Initialization code
-        [self resetFields];
+        [self commonInit];
     }
     return self;
 }
@@ -812,20 +850,30 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
-        [self resetFields];
+        [self commonInit];
     }
     return self;
 }
 
+-(void)commonInit
+{
+    [self.attachmentImageView addObserver:self
+                               forKeyPath:@"image"
+                                  options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+                                  context:NULL];
+    
+    [self resetFields];
+}
+
 - (void)dealloc
 {
+    [self.attachmentImageView removeObserver:self forKeyPath:@"image" context:NULL];
     [self resetFields];
 }
 
 -(void)resetFields
 {
     _attachmentImageSize = CGSizeZero;
-    _attachmentContentMode = UIViewContentModeTopLeft;
     
     _button1 = nil;
     _button2 = nil;

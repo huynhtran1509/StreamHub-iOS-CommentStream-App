@@ -133,6 +133,29 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
 }
 
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+    [self updatScrollViewContentSize];
+}
+
+- (void)updatScrollViewContentSize
+{
+    UIScrollView *scrollView = self.scrollView;
+    UIView *detailView = self.detailView;
+    
+    CGSize scrollViewSize = scrollView.bounds.size;
+    CGSize detailViewSize = [detailView sizeThatFits:CGSizeMake(scrollViewSize.width, CGFLOAT_MAX)];
+    detailViewSize.width = scrollViewSize.width;
+    [scrollView setContentSize:detailViewSize];
+
+    // set height of detailView to calculated height
+    // (otherwise the toolbar stops responding to tap events...)
+    CGRect detailViewFrame = detailView.frame;
+    detailViewFrame.size = detailViewSize;
+    [detailView setFrame:detailViewFrame];
+}
+
 #pragma mark - Lifecycle
 
 -(id)initWithCoder:(NSCoder *)aDecoder
@@ -159,6 +182,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
 - (void)dealloc
 {
+    [_detailView setDelegate:nil];
+    [_postViewController setDelegate:nil];
     _postViewController = nil;
 }
 
@@ -176,17 +201,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView setContentDate:contentItem.contentCreatedAt];
     [detailView.bodyView setDelegate:self.attributedLabelDelegate];
     
-    
     LFSOembed *oembed = self.contentItem.firstPhotoOembed;
-    if (oembed != nil) {
-        [detailView setAttachmentImageWithURL:[NSURL URLWithString:oembed.urlSring]
-                                         size:oembed.size
-                             placeholderImage:nil];
-    } else {
-        [detailView setAttachmentImageWithURL:nil
-                                         size:CGSizeZero
-                             placeholderImage:nil];
-    }
+    [detailView setAttachmentImageWithURL:(oembed ? [NSURL URLWithString:oembed.urlSring] : nil)
+                                     size:(oembed ? oembed.size : CGSizeZero)
+                         placeholderImage:nil];
     
     [self updateLikeButton];
     
@@ -232,31 +250,9 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [super viewWillAppear:animated];
     [self setStatusBarHidden:self.hideStatusBar withAnimation:UIStatusBarAnimationNone];
     //[self.navigationController setToolbarHidden:YES animated:animated];
-    
-    UIScrollView *scrollView = self.scrollView;
-    UIView *detailView = self.detailView;
-    
-    // calculate content size for scrolling
-    CGFloat scrollViewWidth = scrollView.bounds.size.width;
-    CGSize detailViewSize = [detailView sizeThatFits:CGSizeMake(scrollViewWidth, CGFLOAT_MAX)];
-    detailViewSize.width = scrollViewWidth;
-    [scrollView setContentSize:detailViewSize];
-    
-    // set height of detailView to calculated height
-    // (otherwise the toolbar stops responding to tap events...)
-    CGRect detailViewFrame = detailView.frame;
-    detailViewFrame.size.width = scrollViewWidth;
-    detailViewFrame.size.height = detailViewSize.height;
-    [detailView setFrame:detailViewFrame];
-}
 
-- (void)didChangeContentSize
-{
-    UIScrollView *scrollView = self.scrollView;
-    CGFloat scrollViewWidth = scrollView.bounds.size.width;
-    CGSize detailViewSize = [self.detailView sizeThatFits:CGSizeMake(scrollViewWidth, CGFLOAT_MAX)];
-    detailViewSize.width = scrollViewWidth;
-    [scrollView setContentSize:detailViewSize];
+    // calculate content size for scrolling
+    [self updatScrollViewContentSize];
 }
 
 - (void)didReceiveMemoryWarning
@@ -270,28 +266,32 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 -(void)setStatusBarHidden:(BOOL)hidden
             withAnimation:(UIStatusBarAnimation)animation
 {
+    const static CGFloat kStatusBarHeight = 20.f;
     _prefersStatusBarHidden = hidden;
     _preferredStatusBarUpdateAnimation = animation;
     
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
     {
-        // iOS 7
+        // iOS7
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     }
     else
     {
-        // iOS 6
+        // iOS6
         [[UIApplication sharedApplication] setStatusBarHidden:hidden
                                                 withAnimation:animation];
         if (self.navigationController) {
             UINavigationBar *navigationBar = self.navigationController.navigationBar;
-            if (hidden && navigationBar.frame.origin.y > 0.f) {
+            if (hidden && navigationBar.frame.origin.y > 0.f)
+            {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 0;
+                frame.origin.y = 0.f;
                 navigationBar.frame = frame;
-            } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
+            }
+            else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight)
+            {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 20.f;
+                frame.origin.y = kStatusBarHeight;
                 navigationBar.frame = frame;
             }
         }
@@ -299,6 +299,12 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 #pragma mark - LFSDetailViewDelegate
+
+- (void)didChangeContentSize
+{
+    [self updatScrollViewContentSize];
+}
+
 - (void)didSelectButton1:(id)sender
 {
     // Like button selected
