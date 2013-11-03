@@ -119,6 +119,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 @synthesize likes = _likes;
 
+@synthesize authors = _authors;
+
 #pragma mark - some lazy-instantiated properties
 @synthesize deleteStack = _deleteStack;
 -(NSMutableArray*)deleteStack
@@ -177,14 +179,15 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 }
 
 #pragma mark -
-- (id)copyWithZone:(__unused NSZone *)zone
+- (id)copyWithZone:(NSZone *)zone
 {
-    return self;
+    return [[[LFSContentCollection class] allocWithZone:zone]
+            initWithDictionary:self];
 }
 
 - (id)mutableCopyWithZone:(NSZone *)zone
 {
-    return [[[LFSMutableContentCollection class] allocWithZone:zone]
+    return [[[LFSContentCollection class] allocWithZone:zone]
             initWithDictionary:self];
 }
 
@@ -260,7 +263,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (void)removeObjectAtIndex:(NSUInteger)index
 {
-    id object = [self.array objectAtIndex:index];
+    id object = [_array objectAtIndex:index];
     [self removeObject:object];
 }
 
@@ -505,7 +508,19 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
 - (id)objectAtIndex:(NSUInteger)index
 {
-    return [_array objectAtIndex:index];
+    LFSContent *content = [_array objectAtIndex:index];
+    if (content.author == nil && _authors != nil) {
+        // TODO: move setAuthorWithCollection out of LFSContent?
+        [content setAuthorWithCollection:_authors];
+    }
+    NSMutableSet *authors = [_likes objectForKey:content.idString];
+    if (authors == nil) {
+        authors = [[NSMutableSet alloc] init];
+        [_likes setObject:authors forKey:content.idString];
+    }
+    [content setLikes:authors];
+    
+    return content;
 }
 
 - (NSEnumerator *)keyEnumerator
@@ -546,7 +561,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     return self;
 }
 
-#pragma mark - NSMutableArray (private)
+#pragma mark - NSMutableArray
 -(void)addObjectsFromArray:(NSArray*)array
 {
     [array enumerateObjectsWithOptions:NSEnumerationReverse
@@ -556,14 +571,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }];
 }
 
-@end
-
-
-#pragma mark - LFSMutableContentCollection
-
-@implementation LFSMutableContentCollection
-
-@synthesize authors = _authors;
+#pragma mark - Other
 
 -(LFSAuthorCollection*)authors
 {
@@ -616,7 +624,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [self.deleteStack
          enumerateObjectsWithOptions:NSEnumerationReverse
          usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
-            [self.array removeObjectAtIndex:obj.index];
+            [_array removeObjectAtIndex:obj.index];
         }];
     }
     else if (!self.deleteStack.count && self.insertStack.count) {
@@ -629,7 +637,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [self.insertStack
          enumerateObjectsWithOptions:NSEnumerationReverse
          usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
-            [self.array insertObject:obj atIndex:obj.index];
+            [_array insertObject:obj atIndex:obj.index];
             [obj setIndex:NSNotFound];
         }];
     }
@@ -656,7 +664,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [self.deleteStack
          enumerateObjectsWithOptions:NSEnumerationReverse
          usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
-            [self.array removeObjectAtIndex:obj.index];
+            [_array removeObjectAtIndex:obj.index];
         }];
         
         //////////////////////////////////////////////
@@ -670,7 +678,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         [self.insertStack
          enumerateObjectsWithOptions:NSEnumerationReverse
          usingBlock:^(LFSContent *obj, NSUInteger idx, BOOL *stop) {
-            [self.array insertObject:obj atIndex:obj.index];
+            [_array insertObject:obj atIndex:obj.index];
             [obj setIndex:NSNotFound];
         }];
 
@@ -679,18 +687,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [self.delegate didUpdateModelWithDeletes:deletedIndexPaths
                                      updates:updatedIndexPaths
                                      inserts:insertedIndexPaths];
-}
-
-#pragma mark - generic collection methods
-
-- (void)addObject:(id)anObject
-{
-    [super addObject:anObject];
-}
-
--(void)addObjectsFromArray:(NSArray*)array
-{
-    [super addObjectsFromArray:array];
 }
 
 #pragma mark - NSMutableDictionary methods
@@ -709,13 +705,11 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
         // values and keys are private to LFSOrderedDictionary that we
         // inherit from
-        self.mapping = [[NSMutableDictionary alloc] initWithCapacity:capacity];
-        self.array = [[NSMutableArray alloc] initWithCapacity:capacity];
-        self.likes = [[NSMutableDictionary alloc] init];
+        _mapping = [[NSMutableDictionary alloc] initWithCapacity:capacity];
+        _array = [[NSMutableArray alloc] initWithCapacity:capacity];
         
-        // just checking that we didn't mess up attribute naming
-        NSAssert(self.mapping != nil, @"self.mapping failed to initialize");
-        NSAssert(self.array != nil, @"self.array failed to initialize");
+        // TODO: move likes outside of this class?
+        _likes = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -723,12 +717,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 - (id)init
 {
     return [self initWithCapacity:0u];
-}
-
-- (id)copyWithZone:(NSZone *)zone
-{    
-    return [[[LFSContentCollection class] allocWithZone:zone]
-            initWithDictionary:self];
 }
 
 - (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary
@@ -740,22 +728,16 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
      }];
 }
 
--(void)removeObject:(id)object
-{
-    [super removeObject:object];
-}
-
 - (void)removeObjectForKey:(id<NSCopying>)key
 {
-    [self removeObject:[self.mapping objectForKey:key]
-                forKey:key];
+    [self removeObject:[_mapping objectForKey:key] forKey:key];
 }
 
 - (void)removeAllObjects
 {
-    [self.mapping removeAllObjects];
-    [self.array removeAllObjects];
-    [self.likes removeAllObjects];
+    [_mapping removeAllObjects];
+    [_array removeAllObjects];
+    [_likes removeAllObjects];
 }
  
 - (void)removeObjectsForKeys:(NSArray *)keyArray
@@ -772,32 +754,5 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     [self addEntriesFromDictionary:otherDictionary];
 }
 
-- (void)setObject:(id)object forKey:(id<NSCopying>)key
-{
-    [super setObject:object forKey:key];
-}
-
-#pragma mark - NSMutableArray
-
-- (id)objectAtIndex:(NSUInteger)index
-{
-    LFSContent *content = [self.array objectAtIndex:index];
-    if (content.author == nil && _authors != nil) {
-        // TODO: move setAuthorWithCollection out of LFSContent?
-        [content setAuthorWithCollection:_authors];
-    }
-    NSMutableSet *authors = [self.likes objectForKey:content.idString];
-    if (authors == nil) {
-        authors = [[NSMutableSet alloc] init];
-        [self.likes setObject:authors forKey:content.idString];
-    }
-    [content setLikes:authors];
-    return [self.array objectAtIndex:index];
-}
-
-- (void)removeObjectAtIndex:(NSUInteger)index
-{
-    [super removeObjectAtIndex:index];
-}
 
 @end

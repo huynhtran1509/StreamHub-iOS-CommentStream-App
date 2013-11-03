@@ -30,7 +30,7 @@
 #import "LFSAttributedLabelDelegate.h"
 
 @interface LFSCollectionViewController ()
-@property (nonatomic, strong) LFSMutableContentCollection *content;
+@property (nonatomic, strong) LFSContentCollection *content;
 
 @property (nonatomic, readonly) LFSBootstrapClient *bootstrapClient;
 @property (nonatomic, readonly) LFSAdminClient *adminClient;
@@ -176,7 +176,7 @@ const static char kAttributedTextValueKey;
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 
-    _content = [[LFSMutableContentCollection alloc] init];
+    _content = [[LFSContentCollection alloc] init];
     [_content setDelegate:self];
     
     self.title = [_collection objectForKey:@"_name"];
