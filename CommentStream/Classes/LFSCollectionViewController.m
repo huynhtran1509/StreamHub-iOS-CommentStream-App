@@ -263,11 +263,7 @@ const static char kAttributedTextValueKey;
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
-    // hide status bar for iOS7 and later
-    [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
-               withAnimation:UIStatusBarAnimationNone];
-
+    
     [self authenticateUser];
     [self startStreamWithBoostrap];
 }

@@ -65,10 +65,10 @@
 
 #pragma mark - UIViewController
 
-// Hide Status Bar
+// Hide/show status bar
 - (BOOL)prefersStatusBarHidden
 {
-    return YES;
+    return NO;
 }
 
 #pragma mark - Lifecycle
@@ -94,7 +94,7 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    
+
     LFSAuthorProfile *author = self.user.profile;
     NSString *detailString = (author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil);
     LFSResource *headerInfo = [[LFSResource alloc]
@@ -109,10 +109,6 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-    // hide status bar for iOS7 and later
-    [self setStatusBarHidden:LFS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(LFSSystemVersion70)
-               withAnimation:UIStatusBarAnimationNone];
     
     // show keyboard (doing this in viewDidAppear causes unnecessary lag)
     [self.writeCommentView.textView becomeFirstResponder];
