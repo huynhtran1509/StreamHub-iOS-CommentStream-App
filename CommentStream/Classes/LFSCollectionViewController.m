@@ -60,7 +60,6 @@ static NSString* const kCellSelectSegue = @"detailView";
 static NSString* const kFailureDeleteTitle = @"Failed to delete content";
 
 const static CGFloat kGenerationOffset = 20.f;
-const static CGFloat kStatusBarHeight = 20.f;
 
 const static char kAtttributedTextHeightKey;
 const static char kAttributedTextValueKey;
@@ -382,26 +381,30 @@ const static char kAttributedTextValueKey;
 -(void)setStatusBarHidden:(BOOL)hidden
             withAnimation:(UIStatusBarAnimation)animation
 {
+    const static CGFloat kStatusBarHeight = 20.f;
     _prefersStatusBarHidden = hidden;
     _preferredStatusBarUpdateAnimation = animation;
     
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
     {
-        // iOS 7
+        // iOS7
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     }
     else
     {
-        // iOS 6
+        // iOS6
         [[UIApplication sharedApplication] setStatusBarHidden:hidden
                                                 withAnimation:animation];
         if (self.navigationController) {
             UINavigationBar *navigationBar = self.navigationController.navigationBar;
-            if (hidden && navigationBar.frame.origin.y > 0.f) {
+            if (hidden && navigationBar.frame.origin.y > 0.f)
+            {
                 CGRect frame = navigationBar.frame;
                 frame.origin.y = 0.f;
                 navigationBar.frame = frame;
-            } else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight) {
+            }
+            else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight)
+            {
                 CGRect frame = navigationBar.frame;
                 frame.origin.y = kStatusBarHeight;
                 navigationBar.frame = frame;

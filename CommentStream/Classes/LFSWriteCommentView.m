@@ -83,8 +83,14 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
             avatarViewSize = CGSizeMake(37.f, 37.f);
         }
         CGRect frame;
-        frame.origin = CGPointMake(kDetailPadding.left, kDetailPadding.top);
         frame.size = avatarViewSize;
+        frame.origin = CGPointMake(kDetailPadding.left, kDetailPadding.top);
+        
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
         
         // initialize
         _headerImageView = [[UIImageView alloc] initWithFrame:frame];
@@ -114,6 +120,12 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
                                    kDetailPadding.top); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
         // initialize
         _headerAttributeTopView = [[UILabel alloc] initWithFrame:frame];
         
@@ -141,6 +153,12 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
                                    kDetailPadding.top); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
         // initialize
         _headerTitleView = [[UILabel alloc] initWithFrame:frame];
         
@@ -167,6 +185,12 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
                                    kDetailPadding.top); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
         // initialize
         _headerSubtitleView = [[UILabel alloc] initWithFrame:frame];
         
@@ -311,8 +335,10 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
         [_textView setBackgroundColor:[UIColor whiteColor]];
         
         if ([_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS7
             [_textView setTextContainerInset:kPostContentInset];
         } else {
+            // iOS6
             [_textView setContentInset:kPostContentInset];
         }
         [_textView setFont:[UIFont fontWithName:kPostContentFontName size:kPostContentFontSize]];

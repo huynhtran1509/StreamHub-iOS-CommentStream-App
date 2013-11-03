@@ -266,28 +266,32 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 -(void)setStatusBarHidden:(BOOL)hidden
             withAnimation:(UIStatusBarAnimation)animation
 {
+    const static CGFloat kStatusBarHeight = 20.f;
     _prefersStatusBarHidden = hidden;
     _preferredStatusBarUpdateAnimation = animation;
     
     if ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])
     {
-        // iOS 7
+        // iOS7
         [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
     }
     else
     {
-        // iOS 6
+        // iOS6
         [[UIApplication sharedApplication] setStatusBarHidden:hidden
                                                 withAnimation:animation];
         if (self.navigationController) {
             UINavigationBar *navigationBar = self.navigationController.navigationBar;
-            if (hidden && navigationBar.frame.origin.y > 0.f) {
+            if (hidden && navigationBar.frame.origin.y > 0.f)
+            {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 0;
+                frame.origin.y = 0.f;
                 navigationBar.frame = frame;
-            } else if (!hidden && navigationBar.frame.origin.y < 20.f) {
+            }
+            else if (!hidden && navigationBar.frame.origin.y < kStatusBarHeight)
+            {
                 CGRect frame = navigationBar.frame;
-                frame.origin.y = 20.f;
+                frame.origin.y = kStatusBarHeight;
                 navigationBar.frame = frame;
             }
         }
