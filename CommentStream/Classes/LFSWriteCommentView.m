@@ -339,7 +339,7 @@ static const CGFloat kDetailRemoteButtonHeight = 20.0f;
             [_textView setTextContainerInset:kPostContentInset];
         } else {
             // iOS6
-            [_textView setContentInset:kPostContentInset];
+            [_textView setContentInset:UIEdgeInsetsMake(kPostContentInset.top, 0.f, kPostContentInset.bottom, 0.f)];
         }
         [_textView setFont:[UIFont fontWithName:kPostContentFontName size:kPostContentFontSize]];
         [_textView setUserInteractionEnabled:YES];
