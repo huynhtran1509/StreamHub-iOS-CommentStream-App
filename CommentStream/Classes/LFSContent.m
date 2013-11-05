@@ -204,6 +204,10 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 
 #pragma mark - Lazy autho-synthesized properties
 
+@synthLazyWithNull(NSDictionary, content, _object, @"content");
+@synthLazyWithNull(NSDictionary, contentAnnotations, self.content, @"annotations");
+@synthLazyWithNull(NSArray, childContent, _object, @"childContent");
+
 @synthLazyWithNull(NSString, idString, self.content, @"id");
 @synthLazyWithNull(NSString, targetId, self.content, @"targetId");
 @synthLazyWithNull(NSString, contentParentId, self.content, @"parentId");
@@ -293,16 +297,6 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     }
 }
 
-#pragma mark -
-@synthesize content = _content;
--(NSDictionary*)content
-{
-    const static NSString* const key = @"content";
-    if (_content == nil) {
-        _content = [_object objectForKey:key];
-    }
-    return _content;
-}
 
 #pragma mark -
 @synthesize contentTwitterId = _contentTwitterId;
@@ -345,26 +339,15 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
         NSString *twitterHandle = self.author.twitterHandle;
         if (twitterId != nil && twitterHandle != nil)
         {
-            _contentTwitterUrlString = [NSString
-                                        stringWithFormat:@"https://twitter.com/%@/status/%@",
-                                        twitterHandle, twitterId];
+            _contentTwitterUrlString =
+            [NSString stringWithFormat:@"https://twitter.com/%@/status/%@",
+             twitterHandle, twitterId];
         }
     }
     if (_contentTwitterUrlString == (NSString*)[NSNull null]) {
         return nil;
     }
     return _contentTwitterUrlString;
-}
-
-#pragma mark -
-@synthesize contentAnnotations = _contentAnnotations;
--(NSDictionary*)contentAnnotations
-{
-    const static NSString* const key = @"annotations";
-    if (_contentAnnotations == nil) {
-        _contentAnnotations = [self.content objectForKey:key];
-    }
-    return _contentAnnotations;
 }
 
 #pragma mark -
@@ -389,17 +372,6 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
                              [[self.content objectForKey:key] doubleValue]];
     }
     return _contentCreatedAt;
-}
-
-#pragma mark -
-@synthesize childContent = _childContent;
--(id)childContent
-{
-    const static NSString* const key = @"childContent";
-    if (_childContent == nil) {
-        _childContent = [_object objectForKey:key];
-    }
-    return _childContent;
 }
 
 #pragma mark -

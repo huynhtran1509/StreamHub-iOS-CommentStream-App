@@ -99,31 +99,12 @@
 @synthLazyWithNull(NSString, profileUrlString, _object, @"profileUrl");
 @synthLazyWithNull(NSString, settingsUrlString, _object, @"settingsUrl");
 @synthLazyWithNull(NSString, avatarUrlString, _object, @"avatar");
+@synthLazyWithNull(NSString, displayName, _object, @"displayName");
+@synthLazyWithNull(NSString, idString, _object, @"id");
 
 @synthLazyWithNull(NSNumber, userType, _object, @"type");
 
-
-#pragma mark -
-@synthesize displayName = _displayName;
--(NSString*)displayName
-{
-    const static NSString* const key = @"displayName";
-    if (_displayName == nil) {
-        _displayName = [_object objectForKey:key];
-    }
-    return _displayName;
-}
-
-#pragma mark -
-@synthesize idString = _idString;
--(NSString*)idString
-{
-    const static NSString* const key = @"id";
-    if (_idString == nil) {
-        _idString = [_object objectForKey:key];
-    }
-    return _idString;
-}
+@synthLazyWithNull(NSArray, userTags, _object, @"tags");
 
 #pragma mark -
 @synthesize profileUrlStringNoHashBang = _profileUrlStringNoHashBang;
@@ -202,17 +183,6 @@
                                                          withTemplate:regexTemplate2];
     }
     return _avatarUrlString75;
-}
-
-#pragma mark -
-@synthesize userTags = _userTags;
--(NSArray*)userTags
-{
-    const static NSString* const key = @"tags";
-    if (_userTags == nil) {
-        _userTags = [_object objectForKey:key];
-    }
-    return _userTags;
 }
 
 #pragma mark -
