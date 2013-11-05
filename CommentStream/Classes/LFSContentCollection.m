@@ -282,9 +282,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 -(void)updateLastEventWithContent:(LFSContent*)content
 {
     // store last event id
-    if (_lastEventId == nil
-        || (content.eventId != nil && ![content.eventId isEqual:[NSNull null]]
-            && [content.eventId compare:_lastEventId] == NSOrderedDescending))
+    if (_lastEventId == nil ||
+        (content.eventId != nil && [content.eventId compare:_lastEventId] == NSOrderedDescending))
     {
         _lastEventId = content.eventId;
     }

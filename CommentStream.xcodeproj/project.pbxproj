@@ -56,6 +56,7 @@
 		EF2251E317F21295006482BD /* LFSContent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSContent.m; path = Classes/LFSContent.m; sourceTree = "<group>"; };
 		EF4CC0A1180810470042DB40 /* LFSDeletedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDeletedCell.h; path = Classes/LFSDeletedCell.h; sourceTree = "<group>"; };
 		EF4CC0A2180810470042DB40 /* LFSDeletedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSDeletedCell.m; path = Classes/LFSDeletedCell.m; sourceTree = "<group>"; };
+		EF4D0693182880B800DCCEF7 /* LFSModelMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSModelMacros.h; path = Classes/LFSModelMacros.h; sourceTree = "<group>"; };
 		EF529E3917F39ECF00836ACE /* LFSContentToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSContentToolbar.h; path = Classes/LFSContentToolbar.h; sourceTree = "<group>"; };
 		EF529E3A17F39ECF00836ACE /* LFSContentToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSContentToolbar.m; path = Classes/LFSContentToolbar.m; sourceTree = "<group>"; };
 		EF5AFED117E3C13000D5A7DF /* LFSDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDetailViewController.h; path = Classes/LFSDetailViewController.h; sourceTree = "<group>"; };
@@ -206,6 +207,7 @@
 		EFCB940C17F141F100FB9384 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				EF4D0693182880B800DCCEF7 /* LFSModelMacros.h */,
 				EFA21EAA17F970ED003589EB /* LFSResource.h */,
 				EFA21EAB17F970ED003589EB /* LFSResource.m */,
 				EFE0A2E9180E7307006F0AB3 /* LFSUser.h */,

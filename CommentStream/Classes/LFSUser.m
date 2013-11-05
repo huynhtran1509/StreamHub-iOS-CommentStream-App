@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import "LFSModelMacros.h"
 #import "LFSUser.h"
 
 @implementation LFSUser {
@@ -77,11 +78,16 @@
     }
 }
 
+#pragma mark - Lazy autho-synthesized properties
+@synthLazyWithNull(NSString, version, _object, @"version");
+
+
 #pragma mark -
 @synthesize idString = _idString;
 -(NSString*)idString
 {
     if (_idString == nil) {
+        // no need to check for NSNull
         _idString = self.profile.idString;
     }
     return _idString;
@@ -142,16 +148,6 @@
         _token = [_object objectForKey:key];
     }
     return _token;
-}
-
-@synthesize version = _version;
--(NSString*)version
-{
-    const static NSString* const key = @"version";
-    if (_version == nil) {
-        _version = [_object objectForKey:key];
-    }
-    return _version;
 }
 
 #pragma mark - Lifecycle

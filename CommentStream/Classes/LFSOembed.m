@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import "LFSModelMacros.h"
 #import "LFSOembed.h"
 
 const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
@@ -76,55 +77,16 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 
 @synthesize object = _object;
 
-#pragma mark -
-@synthesize providerName = _providerName;
--(NSString*)providerName
-{
-    const static NSString* const key = @"provider_name";
-    if (_providerName == nil) {
-        _providerName = [_object objectForKey:key];
-    }
-    return _providerName;
-}
+#pragma mark - Lazy autho-synthesized properties
+@synthLazyWithNull(NSString, providerName, _object, @"provider_name");
+@synthLazyWithNull(NSString, providerUrlString, _object, @"provider_url");
+@synthLazyWithNull(NSString, title, _object, @"title");
+@synthLazyWithNull(NSString, linkUrlString, _object, @"link");
+@synthLazyWithNull(NSString, authorName, _object, @"author_name");
+@synthLazyWithNull(NSString, authorUrlString, _object, @"author_url");
+@synthLazyWithNull(NSString, urlSring, _object, @"url");
+@synthLazyWithNull(NSString, version, _object, @"version");
 
-#pragma mark -
-@synthesize providerUrlString = _providerUrlString;
--(NSString*)providerUrlString
-{
-    const static NSString* const key = @"provider_url";
-    if (_providerUrlString == nil) {
-        _providerUrlString = [_object objectForKey:key];
-        if (_providerUrlString == (NSString*)[NSNull null]) {
-            _providerUrlString = nil;
-        }
-    }
-    return _providerUrlString;
-}
-
-#pragma mark -
-@synthesize title = _title;
--(NSString*)title
-{
-    const static NSString* const key = @"title";
-    if (_title == nil) {
-        _title = [_object objectForKey:key];
-    }
-    return _title;
-}
-
-#pragma mark -
-@synthesize linkUrlString = _linkUrlString;
--(NSString*)linkUrlString
-{
-    const static NSString* const key = @"link";
-    if (_linkUrlString == nil) {
-        _linkUrlString = [_object objectForKey:key];
-        if (_linkUrlString == (NSString*)[NSNull null]) {
-            _linkUrlString = nil;
-        }
-    }
-    return _linkUrlString;
-}
 
 #pragma mark -
 @synthesize thumbnailUrlString = _thumbnailUrlString;
@@ -133,13 +95,14 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     const static NSString* const key = @"thumbnail_url";
     if (_thumbnailUrlString == nil) {
         _thumbnailUrlString = [_object objectForKey:key];
-        if (_thumbnailUrlString == (NSString*)[NSNull null]) {
-            _thumbnailUrlString = nil;
-        }
         // return full-size image URL if thumbnail URL is missing
         if (_thumbnailUrlString == nil) {
             _thumbnailUrlString = self.urlSring;
         }
+    }
+    if (_thumbnailUrlString == (NSString*)[NSNull null]) {
+        // return full-size image URL if thumbnail URL is missing
+        return self.urlSring;
     }
     return _thumbnailUrlString;
 }
@@ -158,20 +121,6 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 }
 
 #pragma mark -
-@synthesize urlSring = _urlSring;
--(NSString*)urlSring
-{
-    const static NSString* const key = @"url";
-    if (_urlSring == nil) {
-        _urlSring = [_object objectForKey:key];
-        if (_urlSring == (NSString*)[NSNull null]) {
-            _urlSring = nil;
-        }
-    }
-    return _urlSring;
-}
-
-#pragma mark -
 @synthesize size = _size;
 -(CGSize)size
 {
@@ -182,31 +131,6 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
                            [[_object objectForKey:kHeightKey] floatValue] / 2.f);
     }
     return _size;
-}
-
-#pragma mark -
-@synthesize authorName = _authorName;
--(NSString*)authorName
-{
-    const static NSString* const key = @"author_name";
-    if (_authorName == nil) {
-        _authorName = [_object objectForKey:key];
-    }
-    return _authorName;
-}
-
-#pragma mark -
-@synthesize authorUrlString = _authorUrlString;
--(NSString*)authorUrlString
-{
-    const static NSString* const key = @"author_url";
-    if (_authorUrlString == nil) {
-        _authorUrlString = [_object objectForKey:key];
-        if (_authorUrlString == (NSString*)[NSNull null]) {
-            _authorUrlString = nil;
-        }
-    }
-    return _authorUrlString;
 }
 
 #pragma mark -
@@ -231,17 +155,6 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
                            : (LFSOembedType)[tmp unsignedIntegerValue]);
     }
     return _attachmentType;
-}
-
-#pragma mark - 
-@synthesize version = _version;
--(NSString*)version
-{
-    const static NSString* const key = @"version";
-    if (_version == nil) {
-        _version = [_object objectForKey:key];
-    }
-    return _version;
 }
 
 @end
