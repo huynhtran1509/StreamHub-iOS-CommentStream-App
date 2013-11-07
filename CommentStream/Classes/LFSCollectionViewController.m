@@ -606,83 +606,8 @@ const static char kAttributedTextValueKey;
 -(void)deleteContentForIndexPath:(NSIndexPath*)indexPath
 {
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
-    if (userToken != nil) {
-        
-        // cache current visibility state in case we need to revert
-        NSUInteger row = indexPath.row;
-        LFSContent *content = [_content objectAtIndex:row];
-        
-        LFSContentVisibility visibility = content.visibility;
-        NSString *contentId = content.idString;
-        
-        [self.writeClient postMessage:LFSMessageDelete
-                           forContent:content.idString
-                         inCollection:self.collectionId
-                            userToken:userToken
-                           parameters:nil
-                            onSuccess:^(NSOperation *operation, id responseObject)
-         {
-             /*
-             NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
-                      @"Wrong content Id received");
-              
-              // Note: sometimes we get an object like this:
-              {
-                collections =     (
-                    10726472
-                );
-                messageId = "051d17a631d943f58705e4ad974f4131@livefyre.com";
-              }
-              */
-             
-             NSUInteger row = [_content indexOfKey:contentId];
-             if (row != NSNotFound) {
-                 [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
-             }
-             
-         }
-                            onFailure:^(NSOperation *operation, NSError *error)
-         {
-             // show an error message
-             [[[UIAlertView alloc]
-               initWithTitle:kFailureDeleteTitle
-               message:[error localizedDescription]
-               delegate:nil
-               cancelButtonTitle:@"OK"
-               otherButtonTitles:nil] show];
-             
-             // check if an object with the cached id still exists in the model
-             // and if so, revert to its previous visibility state. This check is necessary
-             // because it is conceivable that the streaming client has already deleted
-             // the content object
-             NSUInteger newContentIndex = [_content indexOfKey:contentId];
-             if (newContentIndex != NSNotFound)
-             {
-                 [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
-                 
-                 // obtain new index path since it could have changed during the time
-                 // it toook for the error response to come back
-                 [self didUpdateModelWithDeletes:nil
-                                         updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
-                                         inserts:nil];
-             }
-         }];
-        
-        // TODO: keep an "undo" stack from where we restore objects if delete operation is
-        // a failure
-        
-        // the block below will result in the standard content cell being replaced by a
-        // "this comment has been removed" cell.
-        [content setVisibility:LFSContentVisibilityPendingDelete];
-        
-        UITableView *tableView = self.tableView;
-        [tableView beginUpdates];
-        [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
-                         withRowAnimation:UITableViewRowAnimationFade];
-        [tableView endUpdates];
-    }
-    else {
-        // userToken is nil -- show an error message
+    if (userToken == nil) {
+        // userToken is nil -- show an error message and return
         //
         // Note: Normally we never reach this block because we do not
         // allow editing for cells if our user token is nil
@@ -692,7 +617,84 @@ const static char kAttributedTextValueKey;
           delegate:nil
           cancelButtonTitle:@"OK"
           otherButtonTitles:nil] show];
+        return;
     }
+    
+    ////////////////////////////////////////////////////////////////
+    // cache current visibility state in case we need to revert
+    NSUInteger row = indexPath.row;
+    LFSContent *content = [_content objectAtIndex:row];
+    
+    LFSContentVisibility visibility = content.visibility;
+    NSString *contentId = content.idString;
+    
+    [self.writeClient postMessage:LFSMessageDelete
+                       forContent:content.idString
+                     inCollection:self.collectionId
+                        userToken:userToken
+                       parameters:nil
+                        onSuccess:^(NSOperation *operation, id responseObject)
+     {
+         /*
+          NSAssert([[responseObject objectForKey:@"comment_id"] isEqualToString:contentId],
+          @"Wrong content Id received");
+          
+          // Note: sometimes we get an object like this:
+          {
+          collections =     (
+          10726472
+          );
+          messageId = "051d17a631d943f58705e4ad974f4131@livefyre.com";
+          }
+          */
+         
+         NSUInteger row = [_content indexOfKey:contentId];
+         if (row != NSNotFound) {
+             [_content updateContentForContentId:contentId setVisibility:LFSContentVisibilityNone];
+         }
+         
+     }
+        ////////////////////////////////////////////////////////////////
+                        onFailure:^(NSOperation *operation, NSError *error)
+     {
+         // show an error message
+         [[[UIAlertView alloc]
+           initWithTitle:kFailureDeleteTitle
+           message:[error localizedDescription]
+           delegate:nil
+           cancelButtonTitle:@"OK"
+           otherButtonTitles:nil] show];
+         
+         // check if an object with the cached id still exists in the model
+         // and if so, revert to its previous visibility state. This check is necessary
+         // because it is conceivable that the streaming client has already deleted
+         // the content object
+         NSUInteger newContentIndex = [_content indexOfKey:contentId];
+         if (newContentIndex != NSNotFound)
+         {
+             [[_content objectAtIndex:newContentIndex] setVisibility:visibility];
+             
+             // obtain new index path since it could have changed during the time
+             // it toook for the error response to come back
+             [self didUpdateModelWithDeletes:nil
+                                     updates:@[[NSIndexPath indexPathForRow:newContentIndex inSection:0]]
+                                     inserts:nil];
+         }
+     }];
+    
+    ////////////////////////////////////////////////////////////////
+    // TODO: keep an "undo" stack from where we restore objects if delete operation is
+    // a failure
+    
+    // the block below will result in the standard content cell being replaced by a
+    // "this comment has been removed" cell.
+    [content setVisibility:LFSContentVisibilityPendingDelete];
+    
+    UITableView *tableView = self.tableView;
+    [tableView beginUpdates];
+    [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil]
+                     withRowAnimation:UITableViewRowAnimationFade];
+    [tableView endUpdates];
 }
 
 /*
