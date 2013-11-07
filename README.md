@@ -3,7 +3,8 @@ CommentStream (example)
 
 This is a sample app that demonstrates how to use some of the services
 provided by StreamHub-iOS-SDK, a native client for Livefyre API. It supports
-viewing a collection and streaming comments in real-time. 
+viewing a collection, streaming comments in real-time, nested replies, likes, 
+flagging and deleting of comments, and image attachments.
 
 # Getting Started
 
