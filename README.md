@@ -1,14 +1,9 @@
 CommentStream (example)
 =======================
 
-This is a basic sample app that demonstrates how to use some of the services
+This is a sample app that demonstrates how to use some of the services
 provided by StreamHub-iOS-SDK, a native client for Livefyre API. It supports
-viewing a collection and streaming comments in real-time. The app uses
-OHAttributedLabel to display comments using rich formatting in a way that is
-compatible with iOS 6.x versions.
-
-Also see the official repository for the StreamHub-iOS-SDK:
-https://github.com/Livefyre/StreamHub-iOS-SDK
+viewing a collection and streaming comments in real-time. 
 
 # Getting Started
 

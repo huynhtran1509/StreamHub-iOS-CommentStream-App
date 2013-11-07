@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import "LFSModelMacros.h"
 #import "LFSUser.h"
 
 @implementation LFSUser {
@@ -77,25 +78,23 @@
     }
 }
 
+#pragma mark - Lazy autho-synthesized properties
+@synthLazyWithNull(NSString, version, _object, @"version");
+
+@synthLazyWithNull(NSDictionary, authToken, _object, @"auth_token");
+@synthLazyWithNull(NSDictionary, permissions, _object, @"permissions");
+@synthLazyWithNull(NSDictionary, token, _object, @"token");
+
+
 #pragma mark -
 @synthesize idString = _idString;
 -(NSString*)idString
 {
     if (_idString == nil) {
+        // no need to check for NSNull
         _idString = self.profile.idString;
     }
     return _idString;
-}
-
-#pragma mark -
-@synthesize authToken = _authToken;
--(NSDictionary*)authToken
-{
-    const static NSString* const key = @"auth_token";
-    if (_authToken == nil) {
-        _authToken = [_object objectForKey:key];
-    }
-    return _authToken;
 }
 
 #pragma mark -
@@ -111,17 +110,6 @@
 }
 
 #pragma mark -
-@synthesize permissions = _permissions;
--(NSDictionary*)permissions
-{
-    const static NSString* const key = @"permissions";
-    if (_permissions == nil) {
-        _permissions = [_object objectForKey:key];
-    }
-    return _permissions;
-}
-
-#pragma mark -
 @synthesize profile = _profile;
 -(LFSAuthorProfile*)profile
 {
@@ -131,27 +119,6 @@
         _profile = [[LFSAuthorProfile alloc] initWithObject:object];
     }
     return _profile;
-}
-
-#pragma mark -
-@synthesize token = _token;
--(NSDictionary*)token
-{
-    const static NSString* const key = @"token";
-    if (_token == nil) {
-        _token = [_object objectForKey:key];
-    }
-    return _token;
-}
-
-@synthesize version = _version;
--(NSString*)version
-{
-    const static NSString* const key = @"version";
-    if (_version == nil) {
-        _version = [_object objectForKey:key];
-    }
-    return _version;
 }
 
 #pragma mark - Lifecycle

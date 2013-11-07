@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import "LFSModelMacros.h"
 #import "LFSContent.h"
 
 const static char kVisibleNodeCount;
@@ -200,6 +201,21 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 #pragma mark -
 @synthesize author = _author;
 
+
+#pragma mark - Lazy autho-synthesized properties
+
+@synthLazyWithNull(NSDictionary, content, _object, @"content");
+@synthLazyWithNull(NSDictionary, contentAnnotations, self.content, @"annotations");
+@synthLazyWithNull(NSArray, childContent, _object, @"childContent");
+
+@synthLazyWithNull(NSString, idString, self.content, @"id");
+@synthLazyWithNull(NSString, targetId, self.content, @"targetId");
+@synthLazyWithNull(NSString, contentParentId, self.content, @"parentId");
+@synthLazyWithNull(NSString, contentBodyHtml, self.content, @"bodyHtml");
+@synthLazyWithNull(NSString, contentAuthorId, self.content, @"authorId");
+
+@synthLazyWithNull(NSNumber, eventId, _object, @"event");
+
 #pragma mark -
 @synthesize firstPhotoOembed = _firstPhotoOembed;
 -(LFSOembed*)firstPhotoOembed
@@ -281,38 +297,6 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     }
 }
 
-#pragma mark -
-@synthesize content = _content;
--(NSDictionary*)content
-{
-    const static NSString* const key = @"content";
-    if (_content == nil) {
-        _content = [_object objectForKey:key];
-    }
-    return _content;
-}
-
-#pragma mark -
-@synthesize idString = _idString;
--(NSString*)idString
-{
-    const static NSString* const key = @"id";
-    if (_idString == nil) {
-        _idString = [self.content objectForKey:key];
-    }
-    return _idString;
-}
-
-#pragma mark -
-@synthesize targetId = _targetId;
--(NSString*)targetId
-{
-    const static NSString* const key = @"targetId";
-    if (_targetId == nil) {
-        _targetId = [self.content objectForKey:key];
-    }
-    return _targetId;
-}
 
 #pragma mark -
 @synthesize contentTwitterId = _contentTwitterId;
@@ -322,22 +306,25 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     // if we fail, return nil
     static NSRegularExpression *regex = nil;
     if (_contentTwitterId == nil) {
-        if (regex == nil) {
-            NSError *regexError = nil;
-            regex = [NSRegularExpression
-                     regularExpressionWithPattern:@"^tweet-(\\d+)@twitter.com$"
-                     options:0
-                     error:&regexError];
-            NSAssert(regexError == nil,
-                     @"Error creating regex: %@",
-                     regexError.localizedDescription);
-        }
-        NSTextCheckingResult *match =
-        [regex firstMatchInString:self.idString
-                          options:0
-                            range:NSMakeRange(0, [self.idString length])];
-        if (match != nil) {
-            _contentTwitterId = [self.idString substringWithRange:[match rangeAtIndex:1u]];
+        NSString *idString = self.idString;
+        if (idString != nil) {
+            if (regex == nil) {
+                NSError *regexError = nil;
+                regex = [NSRegularExpression
+                         regularExpressionWithPattern:@"^tweet-(\\d+)@twitter.com$"
+                         options:0
+                         error:&regexError];
+                NSAssert(regexError == nil,
+                         @"Error creating regex: %@",
+                         regexError.localizedDescription);
+            }
+            NSTextCheckingResult *match =
+            [regex firstMatchInString:idString
+                              options:0
+                                range:NSMakeRange(0, [idString length])];
+            if (match != nil) {
+                _contentTwitterId = [idString substringWithRange:[match rangeAtIndex:1u]];
+            }
         }
     }
     return _contentTwitterId;
@@ -352,56 +339,15 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
         NSString *twitterHandle = self.author.twitterHandle;
         if (twitterId != nil && twitterHandle != nil)
         {
-            _contentTwitterUrlString = [NSString
-                                        stringWithFormat:@"https://twitter.com/%@/status/%@",
-                                        twitterHandle, twitterId];
+            _contentTwitterUrlString =
+            [NSString stringWithFormat:@"https://twitter.com/%@/status/%@",
+             twitterHandle, twitterId];
         }
     }
+    if (_contentTwitterUrlString == (NSString*)[NSNull null]) {
+        return nil;
+    }
     return _contentTwitterUrlString;
-}
-
-#pragma mark -
-@synthesize contentParentId = _contentParentId;
--(NSString*)contentParentId
-{
-    const static NSString* const key = @"parentId";
-    if (_contentParentId == nil) {
-        _contentParentId = [self.content objectForKey:key];
-    }
-    return _contentParentId;
-}
-
-#pragma mark -
-@synthesize contentBodyHtml = _contentBodyHtml;
--(NSString*)contentBodyHtml
-{
-    const static NSString* const key = @"bodyHtml";
-    if (_contentBodyHtml == nil) {
-        _contentBodyHtml = [self.content objectForKey:key];
-    }
-    return _contentBodyHtml;
-}
-
-#pragma mark -
-@synthesize contentAnnotations = _contentAnnotations;
--(NSDictionary*)contentAnnotations
-{
-    const static NSString* const key = @"annotations";
-    if (_contentAnnotations == nil) {
-        _contentAnnotations = [self.content objectForKey:key];
-    }
-    return _contentAnnotations;
-}
-
-#pragma mark -
-@synthesize contentAuthorId = _contentAuthorId;
--(NSString*)contentAuthorId
-{
-    const static NSString* const key = @"authorId";
-    if (_contentAuthorId == nil) {
-        _contentAuthorId = [self.content objectForKey:key];
-    }
-    return _contentAuthorId;
 }
 
 #pragma mark -
@@ -426,28 +372,6 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
                              [[self.content objectForKey:key] doubleValue]];
     }
     return _contentCreatedAt;
-}
-
-#pragma mark -
-@synthesize childContent = _childContent;
--(id)childContent
-{
-    const static NSString* const key = @"childContent";
-    if (_childContent == nil) {
-        _childContent = [_object objectForKey:key];
-    }
-    return _childContent;
-}
-
-#pragma mark -
-@synthesize eventId = _eventId;
--(NSNumber*)eventId
-{
-    const static NSString* const key = @"event";
-    if (_eventId == nil) {
-        _eventId = [_object objectForKey:key];
-    }
-    return _eventId;
 }
 
 #pragma mark -

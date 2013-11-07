@@ -12,7 +12,7 @@
 
 @protocol LFSContentCollectionDelegate;
 
-@interface LFSContentCollection : NSDictionary
+@interface LFSContentCollection : NSMutableDictionary
 
 - (id)objectAtIndex:(NSUInteger)index;
 - (NSEnumerator *)reverseObjectEnumerator;
@@ -23,10 +23,7 @@
 
 @property (nonatomic, readonly) NSNumber *lastEventId;
 @property (nonatomic, weak) id<LFSContentCollectionDelegate> delegate;
-@end
 
-// NSMutableDictionary-like methods
-@interface LFSMutableContentCollection : LFSContentCollection
 
 + (id)dictionaryWithCapacity:(NSUInteger)count;
 - (id)initWithCapacity:(NSUInteger)count;

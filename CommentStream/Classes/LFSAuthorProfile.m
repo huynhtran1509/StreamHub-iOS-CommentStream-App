@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import "LFSModelMacros.h"
 #import "LFSAuthorProfile.h"
 
 @implementation LFSAuthorProfile
@@ -94,55 +95,16 @@
     return [_object description];
 }
 
-#pragma mark -
-@synthesize displayName = _displayName;
--(NSString*)displayName
-{
-    const static NSString* const key = @"displayName";
-    if (_displayName == nil) {
-        _displayName = [_object objectForKey:key];
-    }
-    return _displayName;
-}
+#pragma mark - Lazy autho-synthesized properties
+@synthLazyWithNull(NSString, profileUrlString, _object, @"profileUrl");
+@synthLazyWithNull(NSString, settingsUrlString, _object, @"settingsUrl");
+@synthLazyWithNull(NSString, avatarUrlString, _object, @"avatar");
+@synthLazyWithNull(NSString, displayName, _object, @"displayName");
+@synthLazyWithNull(NSString, idString, _object, @"id");
 
-#pragma mark -
-@synthesize idString = _idString;
--(NSString*)idString
-{
-    const static NSString* const key = @"id";
-    if (_idString == nil) {
-        _idString = [_object objectForKey:key];
-    }
-    return _idString;
-}
+@synthLazyWithNull(NSNumber, userType, _object, @"type");
 
-#pragma mark -
-@synthesize profileUrlString = _profileUrlString;
--(NSString*)profileUrlString
-{
-    const static NSString* const key = @"profileUrl";
-    if (_profileUrlString == nil) {
-        _profileUrlString = [_object objectForKey:key];
-        if (_profileUrlString == (NSString*)[NSNull null]) {
-            _profileUrlString = nil;
-        }
-    }
-    return _profileUrlString;
-}
-
-#pragma mark -
-@synthesize settingsUrlString = _settingsUrlString;
--(NSString*)settingsUrlString
-{
-    const static NSString* const key = @"settingsUrl";
-    if (_settingsUrlString == nil) {
-        _settingsUrlString = [_object objectForKey:key];
-        if (_settingsUrlString == (NSString*)[NSNull null]) {
-            _settingsUrlString = nil;
-        }
-    }
-    return _settingsUrlString;
-}
+@synthLazyWithNull(NSArray, userTags, _object, @"tags");
 
 #pragma mark -
 @synthesize profileUrlStringNoHashBang = _profileUrlStringNoHashBang;
@@ -172,20 +134,6 @@
         }
     }
     return _profileUrlStringNoHashBang;
-}
-
-#pragma mark -
-@synthesize avatarUrlString = _avatarUrlString;
--(NSString*)avatarUrlString
-{
-    const static NSString* const key = @"avatar";
-    if (_avatarUrlString == nil) {
-        _avatarUrlString = [_object objectForKey:key];
-        if (_avatarUrlString == (NSString*)[NSNull null]) {
-            _avatarUrlString = nil;
-        }
-    }
-    return _avatarUrlString;
 }
 
 #pragma mark -
@@ -235,28 +183,6 @@
                                                          withTemplate:regexTemplate2];
     }
     return _avatarUrlString75;
-}
-
-#pragma mark -
-@synthesize userType = _userType;
--(NSNumber*)userType
-{
-    const static NSString* const key = @"type";
-    if (_userType == nil) {
-        _userType = [_object objectForKey:key];
-    }
-    return _userType;
-}
-
-#pragma mark -
-@synthesize userTags = _userTags;
--(NSArray*)userTags
-{
-    const static NSString* const key = @"tags";
-    if (_userTags == nil) {
-        _userTags = [_object objectForKey:key];
-    }
-    return _userTags;
 }
 
 #pragma mark -

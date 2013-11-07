@@ -127,13 +127,13 @@ typedef NS_ENUM(NSUInteger, kTwitterAppState) {
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-
-    [[OHAttributedLabel appearance] setLinkColor:[UIColor grayColor]];
-    [[OHAttributedLabel appearance] setLinkUnderlineStyle:kCTUnderlineStyleNone];
+    OHAttributedLabel *labelAppearance = [OHAttributedLabel appearance];
+    [labelAppearance setLinkColor:[UIColor grayColor]];
+    [labelAppearance setLinkUnderlineStyle:kCTUnderlineStyleNone];
     
-    [[LFSAttributedTextCell appearance] setCellContentViewColor:[UIColor whiteColor]];
-
-    //[[LFSAttributedTextCell appearance] setHeaderTitleColor:[UIColor blackColor]];
+    LFSAttributedTextCell *cellAppearance = [LFSAttributedTextCell appearance];
+    [cellAppearance setCellContentViewColor:[UIColor whiteColor]];
+    [cellAppearance setHeaderTitleColor:[UIColor darkGrayColor]];
     return YES;
 }
 
