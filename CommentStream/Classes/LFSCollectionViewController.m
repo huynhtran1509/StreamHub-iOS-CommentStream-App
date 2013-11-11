@@ -342,7 +342,9 @@ const static char kAttributedTextValueKey;
     _activityIndicator.hidesWhenStopped = YES; // we hide it manually anyway
     
     // center activity indicator
-    [_activityIndicator setCenter:_container.center];
+    CGPoint indicatorCenter = _container.center;
+    indicatorCenter.y -= 40.f; // adjust for the presence of status bar etc
+    [_activityIndicator setCenter:indicatorCenter];
     
     // set autoresizing to support landscape mode
     [_activityIndicator setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin |
@@ -792,6 +794,7 @@ const static char kAttributedTextValueKey;
 
 -(void)loadImageWithURL:(NSURL*)url
             scaleToSize:(CGSize)size
+            contentMode:(UIViewContentMode)contentMode
                 success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image))success
                 failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error))failure
 {
@@ -808,10 +811,29 @@ const static char kAttributedTextValueKey;
      imageRequestOperationWithRequest:request
      imageProcessingBlock:^UIImage *(UIImage *image)
      {
-         // scale down image
+         // scale down image with Aspect Fill
          CGRect targetRect;
          targetRect.origin = CGPointZero;
-         targetRect.size = size;
+         if (contentMode == UIViewContentModeScaleAspectFill) {
+             CGSize currentSize = image.size;
+             if (currentSize.height * size.width > size.height * currentSize.width) {
+                 // pick size.width
+                 targetRect.size.width = size.width;
+                 targetRect.size.height = (size.width / currentSize.width) * currentSize.height;
+             } else {
+                 // pick size.height
+                 targetRect.size.height = size.height;
+                 targetRect.size.width = (size.height / currentSize.height) * currentSize.width;
+             }
+         } else if (contentMode == UIViewContentModeScaleToFill) {
+             targetRect.size = size;
+         } else {
+             NSException* invalidContentMode = [NSException
+                                                exceptionWithName:@"LFSInvalidContentMode"
+                                                reason:@"Invalid content mode for image rescaling"
+                                                userInfo:nil];
+             @throw invalidContentMode;
+         }
          
          // don't call UIGraphicsBeginImageContext when supporting Retina,
          // instead call UIGraphicsBeginImageContextWithOptions with zero
@@ -834,6 +856,7 @@ const static char kAttributedTextValueKey;
               contentId:(NSString*)contentId
                cacheKey:(NSString*)key
             scaleToSize:(CGSize)size
+            contentMode:(UIViewContentMode)contentMode
               loadBlock:(void (^)(LFSAttributedTextCell *cell, UIImage *image))loadBlock
 {
 #ifdef CACHE_SCALED_IMAGES
@@ -850,6 +873,7 @@ const static char kAttributedTextValueKey;
         // avatarUrl will be nil if URL string is nil or invalid
         [self loadImageWithURL:url
                    scaleToSize:size
+                     contentMode:contentMode
                        success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
 #ifdef CACHE_SCALED_IMAGES
                            [_imageCache setObject:image forKey:key];
@@ -888,6 +912,7 @@ const static char kAttributedTextValueKey;
                  contentId:content.idString
                   cacheKey:author.idString
                scaleToSize:kCellImageViewSize
+               contentMode:UIViewContentModeScaleToFill
                  loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
      {
          [cell.imageView setImage:image];
@@ -900,6 +925,7 @@ const static char kAttributedTextValueKey;
                      contentId:content.idString
                       cacheKey:attachment.thumbnailUrlString
                    scaleToSize:kAttachmentImageViewSize
+                   contentMode:UIViewContentModeScaleAspectFill
                      loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
          {
              [cell setAttachmentImage:image];

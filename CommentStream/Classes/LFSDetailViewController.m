@@ -136,24 +136,34 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-    [self updatScrollViewContentSize];
+    [self updateScrollViewContentSize];
 }
 
-- (void)updatScrollViewContentSize
+- (void)updateScrollViewContentSize
 {
     UIScrollView *scrollView = self.scrollView;
-    UIView *detailView = self.detailView;
+    LFSDetailView *detailView = self.detailView;
+    LFSOembed* oembed = self.contentItem.firstPhotoOembed;
+    
+    if (oembed != nil) {
+        [UIView animateWithDuration:0.5f animations:^{
+            CGRect attachmentFrame = detailView.attachmentView.frame;
+            attachmentFrame.size = oembed.size;
+            [detailView.attachmentView setFrame:attachmentFrame];
+        }];
+    }
     
     CGSize scrollViewSize = scrollView.bounds.size;
     CGSize detailViewSize = [detailView sizeThatFits:CGSizeMake(scrollViewSize.width, CGFLOAT_MAX)];
     detailViewSize.width = scrollViewSize.width;
     [scrollView setContentSize:detailViewSize];
-
+    
     // set height of detailView to calculated height
     // (otherwise the toolbar stops responding to tap events...)
     CGRect detailViewFrame = detailView.frame;
     detailViewFrame.size = detailViewSize;
     [detailView setFrame:detailViewFrame];
+    
 }
 
 #pragma mark - Lifecycle
@@ -187,6 +197,71 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     _postViewController = nil;
 }
 
+#pragma mark - Public methods
+
+- (void)detailView:(LFSDetailView*)detailView setOembed:(LFSOembed*)oembed
+{
+    // currently supporting image and video oembeds
+    if (oembed != nil && oembed.urlSring != nil) {
+        if (oembed.oembedType == LFSOembedTypePhoto) {
+            // set attachment view frame size
+            UIView *attachmentView = [[UIImageView alloc] init];
+            [self.detailView setAttachmentView:attachmentView];
+            CGRect attachmentFrame = attachmentView.frame;
+            attachmentFrame.size = oembed.size;
+            [attachmentView setFrame:attachmentFrame];
+            
+            __weak UIImageView* weakAttachmentView = (UIImageView*)attachmentView;
+            [(UIImageView*)attachmentView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlSring]]
+                                                placeholderImage:nil
+                                                         success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
+             {
+                 // find out image size here and re-layout view
+                 [weakAttachmentView setImage:image];
+             }
+                                                         failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
+             {
+                 // TODO: image failed to download -- ask JS about desired behavior
+             }];
+            // toggle attachment view visibility
+            [attachmentView setHidden:NO];
+        }
+        else if (oembed.oembedType == LFSOembedTypeVideo) {
+            // set attachment view frame size
+            UIWebView *attachmentView = [[UIWebView alloc] init];
+            [attachmentView setBackgroundColor:[UIColor clearColor]];
+            [attachmentView setScalesPageToFit:YES];
+            [attachmentView.scrollView setScrollEnabled:NO];
+            [attachmentView.scrollView setBounces:NO];
+            
+            [self.detailView setAttachmentView:attachmentView];
+            if (oembed.embedYouTubeId == nil) {
+                [attachmentView loadHTMLString:oembed.html baseURL:nil];
+            }
+            else {
+                NSString *urlString = [@"http://www.youtube.com/embed/"
+                                       stringByAppendingString:oembed.embedYouTubeId];
+                NSURL *url = [NSURL URLWithString:urlString];
+                [attachmentView loadRequest:[NSURLRequest requestWithURL:url]];
+            }
+            
+            CGRect attachmentFrame = attachmentView.frame;
+            attachmentFrame.size = oembed.size;
+            [attachmentView setFrame:attachmentFrame];
+
+            
+            // toggle attachment view visibility
+            [attachmentView setHidden:NO];
+        }
+        else {
+            [detailView.attachmentView setHidden:YES];
+        }
+    }
+    else {
+        [detailView.attachmentView setHidden:YES];
+    }
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -200,12 +275,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
     [detailView.bodyView setDelegate:self.attributedLabelDelegate];
-    
-    LFSOembed *oembed = self.contentItem.firstPhotoOembed;
-    [detailView setAttachmentImageWithURL:(oembed ? [NSURL URLWithString:oembed.urlSring] : nil)
-                                     size:(oembed ? oembed.size : CGSizeZero)
-                         placeholderImage:nil];
-    
+    [self detailView:detailView setOembed:self.contentItem.firstPhotoOembed];
+
     [self updateLikeButton];
     
     [detailView.button2 setTitle:@"Reply" forState:UIControlStateNormal];
@@ -250,15 +321,61 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [super viewWillAppear:animated];
     [self setStatusBarHidden:self.hideStatusBar withAnimation:UIStatusBarAnimationNone];
     //[self.navigationController setToolbarHidden:YES animated:animated];
-
+    
     // calculate content size for scrolling
-    [self updatScrollViewContentSize];
+    [self updateScrollViewContentSize];
+    
+    // KVO attach observer
+    if ([self.detailView.attachmentView isKindOfClass:[UIImageView class]]) {
+        [self.detailView.attachmentView addObserver:self
+                                              forKeyPath:@"image"
+                                                 options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+                                                 context:NULL];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    // KVO detach observer
+    if ([self.detailView.attachmentView isKindOfClass:[UIImageView class]]) {
+        [self.detailView.attachmentView removeObserver:self
+                                                 forKeyPath:@"image"
+                                                    context:NULL];
+    }
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - KVO
+
+-(void)observeValueForKeyPath:(NSString *)keyPath
+                     ofObject:(id)object
+                       change:(NSDictionary *)change
+                      context:(void *)context
+{
+    if (object == self.detailView.attachmentView && [keyPath isEqualToString:@"image"])
+    {
+        UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
+        UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
+        // have to check object type because it could be NSNull and then
+        // we would get missing selector exception
+        if (newImage != oldImage ||
+            (([newImage isKindOfClass:[UIImage class]]) &&
+             ([oldImage isKindOfClass:[UIImage class]]) &&
+             (newImage.size.width != oldImage.size.width ||
+              newImage.size.height != oldImage.size.height)))
+        {
+            // images differ, update layout
+            [self updateScrollViewContentSize];
+            [self.detailView setNeedsLayout];
+        }
+    }
 }
 
 #pragma mark - Status bar
@@ -299,11 +416,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 #pragma mark - LFSDetailViewDelegate
-
-- (void)didChangeContentSize
-{
-    [self updatScrollViewContentSize];
-}
 
 - (void)didSelectButton1:(id)sender
 {

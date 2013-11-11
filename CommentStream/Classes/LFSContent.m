@@ -229,7 +229,8 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
                     id oembedObject = [content objectForKey:@"oembed"];
                     if (oembedObject != nil) {
                         LFSOembed *oembed = [[LFSOembed alloc] initWithObject:oembedObject];
-                        if (oembed.oembedType == LFSOembedTypePhoto) {
+                        LFSOembedType oembedType = oembed.oembedType;
+                        if (oembedType == LFSOembedTypePhoto || oembedType == LFSOembedTypeVideo) {
                             _firstPhotoOembed = oembed;
                             break;
                         }

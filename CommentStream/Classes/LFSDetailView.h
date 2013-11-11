@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <AFNetworking/UIImageView+AFNetworking.h>
+
 #import "LFSResource.h"
 #import "LFSBasicHTMLLabel.h"
 
@@ -31,9 +33,7 @@
 
 @property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
-@property (nonatomic, strong) UIImageView *attachmentImageView;
-
--(void)setAttachmentImageWithURL:(NSURL*)url size:(CGSize)size placeholderImage:(UIImage*)placeholder;
+@property (nonatomic, strong) UIView *attachmentView;
 
 @end
 
@@ -45,8 +45,6 @@
 - (void)didSelectButton1:(id)sender;
 - (void)didSelectButton2:(id)sender;
 - (void)didSelectButton3:(id)sender;
-
-- (void)didChangeContentSize;
 
 @optional
 - (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url;

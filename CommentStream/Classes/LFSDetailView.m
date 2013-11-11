@@ -8,7 +8,6 @@
 
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
-#import <AFNetworking/UIImageView+AFNetworking.h>
 
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
@@ -72,8 +71,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
-@property (assign, nonatomic) CGSize attachmentImageSize;
-
 @end
 
 @implementation LFSDetailView {
@@ -99,28 +96,27 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @synthesize contentBodyHtml = _contentBodyHtml;
 @synthesize contentDate = _contentDate;
 
-@synthesize attachmentImageSize = _attachmentImageSize;
-
 #pragma mark -
-@synthesize attachmentImageView = _attachmentImageView;
--(UIImageView*)attachmentImageView
+@synthesize attachmentView = _attachmentView;
+-(UIView*)attachmentView
 {
-    if (_attachmentImageView == nil) {
+    if (_attachmentView == nil) {
+        
         // initialize
-        CGRect frame;
-        frame.origin = CGPointZero;
-        frame.size = self.attachmentImageSize;
-        _attachmentImageView = [[UIImageView alloc] initWithFrame:frame];
-        
-        // configure
-        [_attachmentImageView setContentMode:UIViewContentModeScaleAspectFit];
-        [_attachmentImageView
-         setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin)];
-        
-        // add to superview
-		[self addSubview:_attachmentImageView];
+        [self setAttachmentView:[[UIView alloc] init]];
     }
-    return _attachmentImageView;
+    return _attachmentView;
+}
+
+-(void)setAttachmentView:(UIView *)attachmentView
+{
+    if (_attachmentView != nil) {
+        [_attachmentView removeFromSuperview];
+    }
+    [attachmentView setContentMode:UIViewContentModeScaleAspectFit];
+    [attachmentView setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin)];
+    [self addSubview:attachmentView];
+    _attachmentView = attachmentView;
 }
 
 #pragma mark -
@@ -505,7 +501,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 }
 
 #pragma mark - Private overrides
--(CGSize)attachmentImageSizeWithMaxWidth:(CGFloat)width
+-(CGSize)attachmentSizeWithMaxWidth:(CGFloat)width
 {
     // find out new image size based on three things:
     // (a) attachmentImageSize property
@@ -513,15 +509,14 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // (c) view rectangle bounds
     //
     // if we have image, use it, otherwise rely on attachmentImageSize
-    CGSize neededSize;
-    CGSize finalSize;
-    UIImage *image = self.attachmentImageView.image;
-    if (image != nil) {
-        neededSize = image.size;
-    } else {
-        neededSize = self.attachmentImageSize;
-    }
     
+    UIView *view = self.attachmentView;
+    CGSize neededSize = (( [view isKindOfClass:[UIImageView class]]
+                          && [(UIImageView*)view image] != nil)
+                         ? [(UIImageView*)view image].size
+                         : view.frame.size);
+    
+    CGSize finalSize;
     CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
     if (neededSize.width > availableWidth) {
         // recalculate
@@ -554,16 +549,16 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     
     // do not check for actual image presence here because we want to layout the
     // frame before even the image is downloaded.
-    if (self.attachmentImageView.hidden == NO) {
+    if (self.attachmentView.hidden == NO) {
         CGRect attachmentFrame;
 
-        CGSize finalSize = [self attachmentImageSizeWithMaxWidth:width];
+        CGSize finalSize = [self attachmentSizeWithMaxWidth:width];
         attachmentFrame.size = finalSize;
         
         attachmentFrame.origin.x = (width - finalSize.width) / 2.f;
         attachmentFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
         
-        [self.attachmentImageView setFrame:attachmentFrame];
+        [self.attachmentView setFrame:attachmentFrame];
         
         bottom = attachmentFrame.origin.y + attachmentFrame.size.height;
     }
@@ -622,7 +617,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
      */
     
     CGFloat extraHeight = 0.f;
-    CGSize attachmentSize = [self attachmentImageSizeWithMaxWidth:size.width];
+    CGSize attachmentSize = [self attachmentSizeWithMaxWidth:size.width];
 
     if (attachmentSize.height > 0.f) {
         extraHeight = attachmentSize.height + kDetailMinorVerticalSeparator;
@@ -647,31 +642,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     contentSize.width += totalWidthInset;
     contentSize.height += totalHeightInset;
     return contentSize;
-}
-
-#pragma mark - Public methods
--(void)setAttachmentImageWithURL:(NSURL*)url size:(CGSize)size placeholderImage:(UIImage*)placeholder
-{
-    if (url != nil) {
-        __weak typeof(self) weakSelf = self;
-        [self setAttachmentImageSize:size];
-        [self.attachmentImageView setImageWithURLRequest:[NSURLRequest requestWithURL:url]
-                                        placeholderImage:placeholder
-                                                 success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
-         {
-             // find out image size here and re-layout view
-             [weakSelf.attachmentImageView setImage:image];
-         }
-                                                 failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
-         {
-             // TODO: image failed to download -- ask JS about desired behavior
-         }];
-        
-        // toggle image view visibility:
-        [self.attachmentImageView setHidden:NO];
-    } else {
-        [self.attachmentImageView setHidden:YES];
-    }
 }
 
 #pragma mark - Private methods
@@ -807,32 +777,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     return [self.bodyView sizeThatFits:size];
 }
 
-#pragma mark - KVO
-
--(void)observeValueForKeyPath:(NSString *)keyPath
-                     ofObject:(id)object
-                       change:(NSDictionary *)change
-                      context:(void *)context
-{
-    if (object == self.attachmentImageView && [keyPath isEqualToString:@"image"])
-    {
-        UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
-        UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
-        // have to check object type because it could be NSNull and then
-        // we would get missing selector exception
-        if (newImage != oldImage ||
-            (([newImage isKindOfClass:[UIImage class]]) &&
-             ([oldImage isKindOfClass:[UIImage class]]) &&
-             (newImage.size.width != oldImage.size.width ||
-              newImage.size.height != oldImage.size.height)))
-        {
-            // images differ, update layout
-            [self.delegate didChangeContentSize];
-            [self setNeedsLayout];
-        }
-    }
-}
-
 #pragma mark - Lifecycle
 
 -(id)initWithCoder:(NSCoder *)aDecoder
@@ -857,24 +801,16 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 -(void)commonInit
 {
-    [self.attachmentImageView addObserver:self
-                               forKeyPath:@"image"
-                                  options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
-                                  context:NULL];
-    
     [self resetFields];
 }
 
 - (void)dealloc
 {
-    [self.attachmentImageView removeObserver:self forKeyPath:@"image" context:NULL];
     [self resetFields];
 }
 
 -(void)resetFields
 {
-    _attachmentImageSize = CGSizeZero;
-    
     _button1 = nil;
     _button2 = nil;
     _bodyView = nil;
