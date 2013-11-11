@@ -45,6 +45,7 @@ typedef NS_ENUM(NSUInteger, LFSOembedType) {
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *html;
 @property (nonatomic, copy) NSString *linkUrlString;
+@property (nonatomic, readonly) NSString *embedYouTubeId;
 
 // image stuff
 @property (nonatomic, copy) NSString *thumbnailUrlString;

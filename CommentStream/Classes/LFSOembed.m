@@ -61,6 +61,7 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     // reset all cached properties except _object
     _providerName = nil;
     _providerUrlString = nil;
+    _embedYouTubeId = nil;
     
     _title = nil;
     _linkUrlString = nil;
@@ -87,6 +88,37 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 @synthLazyWithNull(NSString, authorUrlString, _object, @"author_url");
 @synthLazyWithNull(NSString, urlSring, _object, @"url");
 @synthLazyWithNull(NSString, version, _object, @"version");
+
+#pragma mark -
+@synthesize embedYouTubeId = _embedYouTubeId;
+-(NSString*)embedYouTubeId
+{
+    // try to extract twitter id from contentId --
+    // if we fail, return nil
+    static NSRegularExpression *regex = nil;
+    if (_embedYouTubeId == nil) {
+        NSString *urlString = self.urlSring;
+        if (urlString != nil) {
+            if (regex == nil) {
+                NSError *regexError = nil;
+                regex = [NSRegularExpression
+                         regularExpressionWithPattern:@"^(http|https)://www.youtube.com/watch\\?v=([a-zA-Z0-9]+)$"
+                         options:0 error:&regexError];
+                NSAssert(regexError == nil,
+                         @"Error creating regex: %@",
+                         regexError.localizedDescription);
+            }
+            NSTextCheckingResult *match =
+            [regex firstMatchInString:urlString
+                              options:0
+                                range:NSMakeRange(0, [urlString length])];
+            if (match != nil) {
+                _embedYouTubeId = [urlString substringWithRange:[match rangeAtIndex:2u]];
+            }
+        }
+    }
+    return _embedYouTubeId;
+}
 
 
 #pragma mark -

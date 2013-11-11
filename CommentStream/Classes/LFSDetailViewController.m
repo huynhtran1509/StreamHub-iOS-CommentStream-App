@@ -235,8 +235,16 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             [attachmentView.scrollView setBounces:NO];
             
             [self.detailView setAttachmentView:attachmentView];
-            [attachmentView loadHTMLString:oembed.html baseURL:nil];
-        
+            if (oembed.embedYouTubeId == nil) {
+                [attachmentView loadHTMLString:oembed.html baseURL:nil];
+            }
+            else {
+                NSString *urlString = [@"http://www.youtube.com/embed/"
+                                       stringByAppendingString:oembed.embedYouTubeId];
+                NSURL *url = [NSURL URLWithString:urlString];
+                [attachmentView loadRequest:[NSURLRequest requestWithURL:url]];
+            }
+            
             CGRect attachmentFrame = attachmentView.frame;
             attachmentFrame.size = oembed.size;
             [attachmentView setFrame:attachmentFrame];
