@@ -35,8 +35,6 @@
 
 @property (nonatomic, strong) UIImageView *attachmentImageView;
 
-@property (assign, nonatomic) CGSize attachmentImageSize;
-
 @end
 
 // thanks to this protocol, LFSDetailView does not need
@@ -47,8 +45,6 @@
 - (void)didSelectButton1:(id)sender;
 - (void)didSelectButton2:(id)sender;
 - (void)didSelectButton3:(id)sender;
-
-- (void)didChangeContentSize;
 
 @optional
 - (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url;

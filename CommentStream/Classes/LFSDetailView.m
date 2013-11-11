@@ -96,18 +96,13 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @synthesize contentBodyHtml = _contentBodyHtml;
 @synthesize contentDate = _contentDate;
 
-@synthesize attachmentImageSize = _attachmentImageSize;
-
 #pragma mark -
 @synthesize attachmentImageView = _attachmentImageView;
 -(UIImageView*)attachmentImageView
 {
     if (_attachmentImageView == nil) {
         // initialize
-        CGRect frame;
-        frame.origin = CGPointZero;
-        frame.size = self.attachmentImageSize;
-        _attachmentImageView = [[UIImageView alloc] initWithFrame:frame];
+        _attachmentImageView = [[UIImageView alloc] init];
         
         // configure
         [_attachmentImageView setContentMode:UIViewContentModeScaleAspectFit];
@@ -516,7 +511,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     if (image != nil) {
         neededSize = image.size;
     } else {
-        neededSize = self.attachmentImageSize;
+        neededSize = self.attachmentImageView.frame.size;
     }
     
     CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
@@ -779,32 +774,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     return [self.bodyView sizeThatFits:size];
 }
 
-#pragma mark - KVO
-
--(void)observeValueForKeyPath:(NSString *)keyPath
-                     ofObject:(id)object
-                       change:(NSDictionary *)change
-                      context:(void *)context
-{
-    if (object == self.attachmentImageView && [keyPath isEqualToString:@"image"])
-    {
-        UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
-        UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
-        // have to check object type because it could be NSNull and then
-        // we would get missing selector exception
-        if (newImage != oldImage ||
-            (([newImage isKindOfClass:[UIImage class]]) &&
-             ([oldImage isKindOfClass:[UIImage class]]) &&
-             (newImage.size.width != oldImage.size.width ||
-              newImage.size.height != oldImage.size.height)))
-        {
-            // images differ, update layout
-            [self.delegate didChangeContentSize];
-            [self setNeedsLayout];
-        }
-    }
-}
-
 #pragma mark - Lifecycle
 
 -(id)initWithCoder:(NSCoder *)aDecoder
@@ -829,24 +798,16 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 -(void)commonInit
 {
-    [self.attachmentImageView addObserver:self
-                               forKeyPath:@"image"
-                                  options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
-                                  context:NULL];
-    
     [self resetFields];
 }
 
 - (void)dealloc
 {
-    [self.attachmentImageView removeObserver:self forKeyPath:@"image" context:NULL];
     [self resetFields];
 }
 
 -(void)resetFields
 {
-    _attachmentImageSize = CGSizeZero;
-    
     _button1 = nil;
     _button2 = nil;
     _bodyView = nil;

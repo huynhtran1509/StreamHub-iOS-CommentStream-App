@@ -195,15 +195,17 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     
     if (oembed != nil && oembed.urlSring != nil) {
         __weak LFSDetailView* weakDetailView = detailView;
-        [detailView setAttachmentImageSize:oembed.size];
+        CGRect attachmentFrame = detailView.attachmentImageView.frame;
+        attachmentFrame.size = oembed.size;
+        [detailView.attachmentImageView setFrame:attachmentFrame];
         [detailView.attachmentImageView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlSring]]
-                                        placeholderImage:nil
-                                                 success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
+                                              placeholderImage:nil
+                                                       success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
          {
              // find out image size here and re-layout view
              [weakDetailView.attachmentImageView setImage:image];
          }
-                                                 failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
+                                                       failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
          {
              // TODO: image failed to download -- ask JS about desired behavior
          }];
@@ -274,15 +276,61 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [super viewWillAppear:animated];
     [self setStatusBarHidden:self.hideStatusBar withAnimation:UIStatusBarAnimationNone];
     //[self.navigationController setToolbarHidden:YES animated:animated];
-
+    
     // calculate content size for scrolling
     [self updatScrollViewContentSize];
+    
+    // KVO attach observer
+    if ([self.detailView.attachmentImageView isKindOfClass:[UIImageView class]]) {
+        [self.detailView.attachmentImageView addObserver:self
+                                              forKeyPath:@"image"
+                                                 options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+                                                 context:NULL];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    // KVO detach observer
+    if ([self.detailView.attachmentImageView isKindOfClass:[UIImageView class]]) {
+        [self.detailView.attachmentImageView removeObserver:self
+                                                 forKeyPath:@"image"
+                                                    context:NULL];
+    }
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - KVO
+
+-(void)observeValueForKeyPath:(NSString *)keyPath
+                     ofObject:(id)object
+                       change:(NSDictionary *)change
+                      context:(void *)context
+{
+    if (object == self.detailView.attachmentImageView && [keyPath isEqualToString:@"image"])
+    {
+        UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
+        UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
+        // have to check object type because it could be NSNull and then
+        // we would get missing selector exception
+        if (newImage != oldImage ||
+            (([newImage isKindOfClass:[UIImage class]]) &&
+             ([oldImage isKindOfClass:[UIImage class]]) &&
+             (newImage.size.width != oldImage.size.width ||
+              newImage.size.height != oldImage.size.height)))
+        {
+            // images differ, update layout
+            [self updatScrollViewContentSize];
+            [self.detailView setNeedsLayout];
+        }
+    }
 }
 
 #pragma mark - Status bar
@@ -323,11 +371,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 #pragma mark - LFSDetailViewDelegate
-
-- (void)didChangeContentSize
-{
-    [self updatScrollViewContentSize];
-}
 
 - (void)didSelectButton1:(id)sender
 {
