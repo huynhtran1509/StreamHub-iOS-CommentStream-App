@@ -75,6 +75,10 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     _version = nil;
 }
 
+-(NSString*)description
+{
+    return [_object description];
+}
 
 @synthesize object = _object;
 
