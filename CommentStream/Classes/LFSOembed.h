@@ -43,6 +43,7 @@ typedef NS_ENUM(NSUInteger, LFSOembedType) {
 
 // general content stuff
 @property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *html;
 @property (nonatomic, copy) NSString *linkUrlString;
 
 // image stuff

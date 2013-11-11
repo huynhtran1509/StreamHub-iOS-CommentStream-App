@@ -192,28 +192,49 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)detailView:(LFSDetailView*)detailView setOembed:(LFSOembed*)oembed
 {
     // currently supporting image and video oembeds
-    
     if (oembed != nil && oembed.urlSring != nil) {
-        __weak LFSDetailView* weakDetailView = detailView;
-        CGRect attachmentFrame = detailView.attachmentImageView.frame;
-        attachmentFrame.size = oembed.size;
-        [detailView.attachmentImageView setFrame:attachmentFrame];
-        [detailView.attachmentImageView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlSring]]
-                                              placeholderImage:nil
-                                                       success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
-         {
-             // find out image size here and re-layout view
-             [weakDetailView.attachmentImageView setImage:image];
-         }
-                                                       failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
-         {
-             // TODO: image failed to download -- ask JS about desired behavior
-         }];
-        
-        // toggle image view visibility:
-        [detailView.attachmentImageView setHidden:NO];
-    } else {
-        [detailView.attachmentImageView setHidden:YES];
+        if (oembed.oembedType == LFSOembedTypePhoto) {
+            // set attachment view frame size
+            UIView *attachmentView = [[UIImageView alloc] init];
+            [self.detailView setAttachmentView:attachmentView];
+            CGRect attachmentFrame = attachmentView.frame;
+            attachmentFrame.size = oembed.size;
+            [attachmentView setFrame:attachmentFrame];
+            
+            __weak UIImageView* weakAttachmentView = (UIImageView*)attachmentView;
+            [(UIImageView*)attachmentView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlSring]]
+                                                placeholderImage:nil
+                                                         success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
+             {
+                 // find out image size here and re-layout view
+                 [weakAttachmentView setImage:image];
+             }
+                                                         failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
+             {
+                 // TODO: image failed to download -- ask JS about desired behavior
+             }];
+            // toggle attachment view visibility
+            [attachmentView setHidden:NO];
+        }
+        else if (oembed.oembedType == LFSOembedTypeVideo) {
+            // set attachment view frame size
+            UIWebView *attachmentView = [[UIWebView alloc] init];
+            [attachmentView setScalesPageToFit:YES];
+            [attachmentView loadHTMLString:oembed.html baseURL:nil];
+            [self.detailView setAttachmentView:attachmentView];
+            CGRect attachmentFrame = attachmentView.frame;
+            attachmentFrame.size = oembed.size;
+            [attachmentView setFrame:attachmentFrame];
+            
+            // toggle attachment view visibility
+            [attachmentView setHidden:NO];
+        }
+        else {
+            [detailView.attachmentView setHidden:YES];
+        }
+    }
+    else {
+        [detailView.attachmentView setHidden:YES];
     }
 }
 
@@ -281,8 +302,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [self updatScrollViewContentSize];
     
     // KVO attach observer
-    if ([self.detailView.attachmentImageView isKindOfClass:[UIImageView class]]) {
-        [self.detailView.attachmentImageView addObserver:self
+    if ([self.detailView.attachmentView isKindOfClass:[UIImageView class]]) {
+        [self.detailView.attachmentView addObserver:self
                                               forKeyPath:@"image"
                                                  options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
                                                  context:NULL];
@@ -294,8 +315,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [super viewWillDisappear:animated];
     
     // KVO detach observer
-    if ([self.detailView.attachmentImageView isKindOfClass:[UIImageView class]]) {
-        [self.detailView.attachmentImageView removeObserver:self
+    if ([self.detailView.attachmentView isKindOfClass:[UIImageView class]]) {
+        [self.detailView.attachmentView removeObserver:self
                                                  forKeyPath:@"image"
                                                     context:NULL];
     }
@@ -314,7 +335,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                        change:(NSDictionary *)change
                       context:(void *)context
 {
-    if (object == self.detailView.attachmentImageView && [keyPath isEqualToString:@"image"])
+    if (object == self.detailView.attachmentView && [keyPath isEqualToString:@"image"])
     {
         UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
         UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];

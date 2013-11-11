@@ -81,6 +81,7 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 @synthLazyWithNull(NSString, providerName, _object, @"provider_name");
 @synthLazyWithNull(NSString, providerUrlString, _object, @"provider_url");
 @synthLazyWithNull(NSString, title, _object, @"title");
+@synthLazyWithNull(NSString, html, _object, @"html");
 @synthLazyWithNull(NSString, linkUrlString, _object, @"link");
 @synthLazyWithNull(NSString, authorName, _object, @"author_name");
 @synthLazyWithNull(NSString, authorUrlString, _object, @"author_url");

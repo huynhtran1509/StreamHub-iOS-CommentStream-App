@@ -33,7 +33,7 @@
 
 @property (readonly, nonatomic) LFSBasicHTMLLabel *bodyView;
 
-@property (nonatomic, strong) UIImageView *attachmentImageView;
+@property (nonatomic, strong) UIView *attachmentView;
 
 @end
 

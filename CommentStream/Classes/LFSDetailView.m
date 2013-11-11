@@ -97,22 +97,26 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @synthesize contentDate = _contentDate;
 
 #pragma mark -
-@synthesize attachmentImageView = _attachmentImageView;
--(UIImageView*)attachmentImageView
+@synthesize attachmentView = _attachmentView;
+-(UIView*)attachmentView
 {
-    if (_attachmentImageView == nil) {
+    if (_attachmentView == nil) {
+        
         // initialize
-        _attachmentImageView = [[UIImageView alloc] init];
-        
-        // configure
-        [_attachmentImageView setContentMode:UIViewContentModeScaleAspectFit];
-        [_attachmentImageView
-         setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin)];
-        
-        // add to superview
-		[self addSubview:_attachmentImageView];
+        [self setAttachmentView:[[UIView alloc] init]];
     }
-    return _attachmentImageView;
+    return _attachmentView;
+}
+
+-(void)setAttachmentView:(UIView *)attachmentView
+{
+    if (_attachmentView != nil) {
+        [_attachmentView removeFromSuperview];
+    }
+    [attachmentView setContentMode:UIViewContentModeScaleAspectFit];
+    [attachmentView setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin)];
+    [self addSubview:attachmentView];
+    _attachmentView = attachmentView;
 }
 
 #pragma mark -
@@ -497,7 +501,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 }
 
 #pragma mark - Private overrides
--(CGSize)attachmentImageSizeWithMaxWidth:(CGFloat)width
+-(CGSize)attachmentSizeWithMaxWidth:(CGFloat)width
 {
     // find out new image size based on three things:
     // (a) attachmentImageSize property
@@ -505,15 +509,14 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     // (c) view rectangle bounds
     //
     // if we have image, use it, otherwise rely on attachmentImageSize
-    CGSize neededSize;
-    CGSize finalSize;
-    UIImage *image = self.attachmentImageView.image;
-    if (image != nil) {
-        neededSize = image.size;
-    } else {
-        neededSize = self.attachmentImageView.frame.size;
-    }
     
+    UIView *view = self.attachmentView;
+    CGSize neededSize = (( [view isKindOfClass:[UIImageView class]]
+                          && [(UIImageView*)view image] != nil)
+                         ? [(UIImageView*)view image].size
+                         : view.frame.size);
+    
+    CGSize finalSize;
     CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
     if (neededSize.width > availableWidth) {
         // recalculate
@@ -546,16 +549,16 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     
     // do not check for actual image presence here because we want to layout the
     // frame before even the image is downloaded.
-    if (self.attachmentImageView.hidden == NO) {
+    if (self.attachmentView.hidden == NO) {
         CGRect attachmentFrame;
 
-        CGSize finalSize = [self attachmentImageSizeWithMaxWidth:width];
+        CGSize finalSize = [self attachmentSizeWithMaxWidth:width];
         attachmentFrame.size = finalSize;
         
         attachmentFrame.origin.x = (width - finalSize.width) / 2.f;
         attachmentFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
         
-        [self.attachmentImageView setFrame:attachmentFrame];
+        [self.attachmentView setFrame:attachmentFrame];
         
         bottom = attachmentFrame.origin.y + attachmentFrame.size.height;
     }
@@ -614,7 +617,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
      */
     
     CGFloat extraHeight = 0.f;
-    CGSize attachmentSize = [self attachmentImageSizeWithMaxWidth:size.width];
+    CGSize attachmentSize = [self attachmentSizeWithMaxWidth:size.width];
 
     if (attachmentSize.height > 0.f) {
         extraHeight = attachmentSize.height + kDetailMinorVerticalSeparator;
