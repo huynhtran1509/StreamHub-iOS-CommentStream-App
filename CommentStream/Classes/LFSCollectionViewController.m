@@ -342,7 +342,9 @@ const static char kAttributedTextValueKey;
     _activityIndicator.hidesWhenStopped = YES; // we hide it manually anyway
     
     // center activity indicator
-    [_activityIndicator setCenter:_container.center];
+    CGPoint indicatorCenter = _container.center;
+    indicatorCenter.y -= 40.f; // adjust for the presence of status bar etc
+    [_activityIndicator setCenter:indicatorCenter];
     
     // set autoresizing to support landscape mode
     [_activityIndicator setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin |

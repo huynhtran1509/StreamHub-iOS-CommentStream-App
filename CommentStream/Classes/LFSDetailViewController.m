@@ -136,24 +136,34 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-    [self updatScrollViewContentSize];
+    [self updateScrollViewContentSize];
 }
 
-- (void)updatScrollViewContentSize
+- (void)updateScrollViewContentSize
 {
     UIScrollView *scrollView = self.scrollView;
-    UIView *detailView = self.detailView;
+    LFSDetailView *detailView = self.detailView;
+    LFSOembed* oembed = self.contentItem.firstPhotoOembed;
+    
+    if (oembed != nil) {
+        [UIView animateWithDuration:0.5f animations:^{
+            CGRect attachmentFrame = detailView.attachmentView.frame;
+            attachmentFrame.size = oembed.size;
+            [detailView.attachmentView setFrame:attachmentFrame];
+        }];
+    }
     
     CGSize scrollViewSize = scrollView.bounds.size;
     CGSize detailViewSize = [detailView sizeThatFits:CGSizeMake(scrollViewSize.width, CGFLOAT_MAX)];
     detailViewSize.width = scrollViewSize.width;
     [scrollView setContentSize:detailViewSize];
-
+    
     // set height of detailView to calculated height
     // (otherwise the toolbar stops responding to tap events...)
     CGRect detailViewFrame = detailView.frame;
     detailViewFrame.size = detailViewSize;
     [detailView setFrame:detailViewFrame];
+    
 }
 
 #pragma mark - Lifecycle
@@ -219,12 +229,18 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         else if (oembed.oembedType == LFSOembedTypeVideo) {
             // set attachment view frame size
             UIWebView *attachmentView = [[UIWebView alloc] init];
+            [attachmentView setBackgroundColor:[UIColor clearColor]];
             [attachmentView setScalesPageToFit:YES];
-            [attachmentView loadHTMLString:oembed.html baseURL:nil];
+            [attachmentView.scrollView setScrollEnabled:NO];
+            [attachmentView.scrollView setBounces:NO];
+            
             [self.detailView setAttachmentView:attachmentView];
+            [attachmentView loadHTMLString:oembed.html baseURL:nil];
+        
             CGRect attachmentFrame = attachmentView.frame;
             attachmentFrame.size = oembed.size;
             [attachmentView setFrame:attachmentFrame];
+
             
             // toggle attachment view visibility
             [attachmentView setHidden:NO];
@@ -299,7 +315,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     //[self.navigationController setToolbarHidden:YES animated:animated];
     
     // calculate content size for scrolling
-    [self updatScrollViewContentSize];
+    [self updateScrollViewContentSize];
     
     // KVO attach observer
     if ([self.detailView.attachmentView isKindOfClass:[UIImageView class]]) {
@@ -348,7 +364,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
               newImage.size.height != oldImage.size.height)))
         {
             // images differ, update layout
-            [self updatScrollViewContentSize];
+            [self updateScrollViewContentSize];
             [self.detailView setNeedsLayout];
         }
     }
