@@ -187,6 +187,34 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     _postViewController = nil;
 }
 
+#pragma mark - Public methods
+
+- (void)detailView:(LFSDetailView*)detailView setOembed:(LFSOembed*)oembed
+{
+    // currently supporting image and video oembeds
+    
+    if (oembed != nil && oembed.urlSring != nil) {
+        __weak LFSDetailView* weakDetailView = detailView;
+        [detailView setAttachmentImageSize:oembed.size];
+        [detailView.attachmentImageView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlSring]]
+                                        placeholderImage:nil
+                                                 success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
+         {
+             // find out image size here and re-layout view
+             [weakDetailView.attachmentImageView setImage:image];
+         }
+                                                 failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
+         {
+             // TODO: image failed to download -- ask JS about desired behavior
+         }];
+        
+        // toggle image view visibility:
+        [detailView.attachmentImageView setHidden:NO];
+    } else {
+        [detailView.attachmentImageView setHidden:YES];
+    }
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -200,12 +228,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
     [detailView.bodyView setDelegate:self.attributedLabelDelegate];
-    
-    LFSOembed *oembed = self.contentItem.firstPhotoOembed;
-    [detailView setAttachmentImageWithURL:(oembed ? [NSURL URLWithString:oembed.urlSring] : nil)
-                                     size:(oembed ? oembed.size : CGSizeZero)
-                         placeholderImage:nil];
-    
+    [self detailView:detailView setOembed:self.contentItem.firstPhotoOembed];
+
     [self updateLikeButton];
     
     [detailView.button2 setTitle:@"Reply" forState:UIControlStateNormal];

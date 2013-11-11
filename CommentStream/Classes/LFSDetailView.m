@@ -8,7 +8,6 @@
 
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
-#import <AFNetworking/UIImageView+AFNetworking.h>
 
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
@@ -71,8 +70,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
-
-@property (assign, nonatomic) CGSize attachmentImageSize;
 
 @end
 
@@ -647,31 +644,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     contentSize.width += totalWidthInset;
     contentSize.height += totalHeightInset;
     return contentSize;
-}
-
-#pragma mark - Public methods
--(void)setAttachmentImageWithURL:(NSURL*)url size:(CGSize)size placeholderImage:(UIImage*)placeholder
-{
-    if (url != nil) {
-        __weak typeof(self) weakSelf = self;
-        [self setAttachmentImageSize:size];
-        [self.attachmentImageView setImageWithURLRequest:[NSURLRequest requestWithURL:url]
-                                        placeholderImage:placeholder
-                                                 success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
-         {
-             // find out image size here and re-layout view
-             [weakSelf.attachmentImageView setImage:image];
-         }
-                                                 failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
-         {
-             // TODO: image failed to download -- ask JS about desired behavior
-         }];
-        
-        // toggle image view visibility:
-        [self.attachmentImageView setHidden:NO];
-    } else {
-        [self.attachmentImageView setHidden:YES];
-    }
 }
 
 #pragma mark - Private methods

@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <AFNetworking/UIImageView+AFNetworking.h>
+
 #import "LFSResource.h"
 #import "LFSBasicHTMLLabel.h"
 
@@ -33,7 +35,7 @@
 
 @property (nonatomic, strong) UIImageView *attachmentImageView;
 
--(void)setAttachmentImageWithURL:(NSURL*)url size:(CGSize)size placeholderImage:(UIImage*)placeholder;
+@property (assign, nonatomic) CGSize attachmentImageSize;
 
 @end
 
