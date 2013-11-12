@@ -101,6 +101,18 @@
 			<key>articleId</key>
 			<string>113</string>
 		</dict>
+		<dict>
+			<key>_name</key>
+			<string>demon in the box</string>
+			<key>environment</key>
+			<string>t402.livefyre.com</string>
+			<key>network</key>
+			<string>livefyre.com</string>
+			<key>siteId</key>
+			<string>303613</string>
+			<key>articleId</key>
+			<string>228</string>
+		</dict>
 	</array>
 </dict>
 </plist>

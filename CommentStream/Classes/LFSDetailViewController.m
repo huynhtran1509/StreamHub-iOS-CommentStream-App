@@ -143,7 +143,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 {
     UIScrollView *scrollView = self.scrollView;
     LFSDetailView *detailView = self.detailView;
-    LFSOembed* oembed = self.contentItem.firstPhotoOembed;
+    LFSOembed* oembed = self.contentItem.firstOembed;
     
     if (oembed != nil) {
         [UIView animateWithDuration:0.5f animations:^{
@@ -202,7 +202,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)detailView:(LFSDetailView*)detailView setOembed:(LFSOembed*)oembed
 {
     // currently supporting image and video oembeds
-    if (oembed != nil && oembed.urlSring != nil) {
+    if (oembed != nil) {
         if (oembed.oembedType == LFSOembedTypePhoto) {
             // set attachment view frame size
             UIView *attachmentView = [[UIImageView alloc] init];
@@ -226,7 +226,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             // toggle attachment view visibility
             [attachmentView setHidden:NO];
         }
-        else if (oembed.oembedType == LFSOembedTypeVideo) {
+        else if (oembed.oembedType == LFSOembedTypeVideo || oembed.oembedType == LFSOembedTypeRich) {
             // set attachment view frame size
             UIWebView *attachmentView = [[UIWebView alloc] init];
             [attachmentView setBackgroundColor:[UIColor clearColor]];
@@ -235,20 +235,18 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             [attachmentView.scrollView setBounces:NO];
             
             [self.detailView setAttachmentView:attachmentView];
-            if (oembed.embedYouTubeId == nil) {
-                [attachmentView loadHTMLString:oembed.html baseURL:nil];
-            }
-            else {
+            if (oembed.oembedType == LFSOembedTypeVideo && oembed.embedYouTubeId != nil) {
                 NSString *urlString = [@"http://www.youtube.com/embed/"
                                        stringByAppendingString:oembed.embedYouTubeId];
                 NSURL *url = [NSURL URLWithString:urlString];
                 [attachmentView loadRequest:[NSURLRequest requestWithURL:url]];
+            } else {
+                [attachmentView loadHTMLString:oembed.html baseURL:nil];
             }
             
             CGRect attachmentFrame = attachmentView.frame;
             attachmentFrame.size = oembed.size;
             [attachmentView setFrame:attachmentFrame];
-
             
             // toggle attachment view visibility
             [attachmentView setHidden:NO];
@@ -275,7 +273,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
     [detailView.bodyView setDelegate:self.attributedLabelDelegate];
-    [self detailView:detailView setOembed:self.contentItem.firstPhotoOembed];
+    [self detailView:detailView setOembed:self.contentItem.firstOembed];
 
     [self updateLikeButton];
     

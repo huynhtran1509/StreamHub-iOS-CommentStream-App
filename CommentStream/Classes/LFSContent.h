@@ -65,7 +65,7 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @property (nonatomic, copy) NSDictionary *content;
 
-@property (nonatomic, copy) LFSOembed *firstPhotoOembed;
+@property (nonatomic, copy) LFSOembed *firstOembed;
 
 @property (nonatomic, copy) NSString *targetId;
 

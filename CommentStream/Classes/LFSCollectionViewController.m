@@ -560,7 +560,7 @@ const static char kAttributedTextValueKey;
             
             cellHeightValue = [LFSAttributedTextCell
                                cellHeightForAttributedString:attributedString
-                               hasAttachment:(content.firstPhotoOembed != nil)
+                               hasAttachment:(content.firstOembed != nil)
                                width:(tableView.bounds.size.width - leftOffset)];
 
             objc_setAssociatedObject(content, &kAtttributedTextHeightKey,
@@ -918,8 +918,8 @@ const static char kAttributedTextValueKey;
          [cell.imageView setImage:image];
      }];
     
-    LFSOembed *attachment = content.firstPhotoOembed;
-    if (attachment != nil) {
+    LFSOembed *attachment = content.firstOembed;
+    if (attachment != nil && attachment.thumbnailUrlString != nil) {
         [self loadImageWithURL:[NSURL URLWithString:attachment.thumbnailUrlString]
              forAttributedCell:cell
                      contentId:content.idString
