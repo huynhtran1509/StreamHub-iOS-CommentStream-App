@@ -147,8 +147,8 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     const static NSString* const kWidthKey = @"width";
     const static NSString* const kHeightKey = @"height";
     if (_sizeIsSet == NO) {
-        NSNumber *width = [_object objectForKey:kWidthKey] ?: @320;
-        NSNumber *height = [_object objectForKey:kHeightKey] ?: @200;
+        NSNumber *width = [_object objectForKey:kWidthKey] ?: @0;
+        NSNumber *height = [_object objectForKey:kHeightKey] ?: @0;
         _size = CGSizeMake([width floatValue] / 2.f,
                            [height floatValue] / 2.f);
     }

@@ -136,21 +136,44 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-    [self updateScrollViewContentSize];
+    UIView *attachmentView = self.detailView.attachmentView;
+    
+    CGSize attachmentSize;
+    if ([attachmentView isKindOfClass:[UIImageView class]]) {
+        attachmentSize = [(UIImageView*)attachmentView image].size;
+    }
+    else if ([attachmentView isKindOfClass:[UIWebView class]]) {
+        CGRect frame = attachmentView.frame;
+        CGRect oldFrame = frame;
+        frame.size.height = 1;
+        attachmentView.frame = frame;
+        attachmentSize = [attachmentView sizeThatFits:CGSizeZero];
+        attachmentView.frame = oldFrame;
+    }
+    else {
+        [NSException raise:@"Invalid attachment view type"
+                    format:@"Do not know how to calculate content size of a view of type %@",
+         [attachmentView class]];
+    }
+    [self updateScrollViewWithBlock:^{
+        CGRect attachmentFrame = attachmentView.frame;
+        attachmentFrame.size = attachmentSize;
+        [attachmentView setFrame:attachmentFrame];
+    } animated:YES];
 }
 
-- (void)updateScrollViewContentSize
+- (void)updateScrollViewWithBlock:(void (^)(void))block animated:(BOOL)animated
 {
     UIScrollView *scrollView = self.scrollView;
     LFSDetailView *detailView = self.detailView;
     LFSOembed* oembed = self.contentItem.firstOembed;
     
     if (oembed != nil) {
-        [UIView animateWithDuration:0.5f animations:^{
-            CGRect attachmentFrame = detailView.attachmentView.frame;
-            attachmentFrame.size = oembed.size;
-            [detailView.attachmentView setFrame:attachmentFrame];
-        }];
+        if (animated) {
+            [UIView animateWithDuration:0.5f animations:block];
+        } else {
+            block();
+        }
     }
     
     CGSize scrollViewSize = scrollView.bounds.size;
@@ -322,14 +345,24 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     //[self.navigationController setToolbarHidden:YES animated:animated];
     
     // calculate content size for scrolling
-    [self updateScrollViewContentSize];
+    UIView *attachmentView = self.detailView.attachmentView;
+    CGSize attachmentSize = self.contentItem.firstOembed.size;
+    [self updateScrollViewWithBlock:^{
+        CGRect attachmentFrame = attachmentView.frame;
+        attachmentFrame.size = attachmentSize;
+        [attachmentView setFrame:attachmentFrame];
+    } animated:animated];
     
     // KVO attach observer
-    if ([self.detailView.attachmentView isKindOfClass:[UIImageView class]]) {
-        [self.detailView.attachmentView addObserver:self
-                                              forKeyPath:@"image"
-                                                 options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
-                                                 context:NULL];
+    if (attachmentView != nil) {
+        if ([attachmentView isKindOfClass:[UIImageView class]]) {
+            [attachmentView addObserver:self
+                             forKeyPath:@"image"
+                                options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+                                context:NULL];
+        } else if ([attachmentView isKindOfClass:[UIWebView class]]) {
+            [(UIWebView*)attachmentView setDelegate:self];
+        }
     }
 }
 
@@ -338,10 +371,15 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [super viewWillDisappear:animated];
     
     // KVO detach observer
-    if ([self.detailView.attachmentView isKindOfClass:[UIImageView class]]) {
-        [self.detailView.attachmentView removeObserver:self
-                                                 forKeyPath:@"image"
-                                                    context:NULL];
+    UIView *attachmentView = self.detailView.attachmentView;
+    if (attachmentView) {
+        if ([attachmentView isKindOfClass:[UIImageView class]]) {
+            [attachmentView removeObserver:self
+                                forKeyPath:@"image"
+                                   context:NULL];
+        } else if ([attachmentView isKindOfClass:[UIWebView class]]) {
+            [(UIWebView*)attachmentView setDelegate:nil];
+        }
     }
 }
 
@@ -351,6 +389,27 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - UIWebViewDelegate
+-(void)webViewDidFinishLoad:(UIWebView *)aWebView
+{
+    UIView *attachmentView = self.detailView.attachmentView;
+    if (aWebView == attachmentView) {
+        CGRect frame = aWebView.frame;
+        CGRect oldFrame = frame;
+        frame.size.height = 1;
+        aWebView.frame = frame;
+        CGSize fittingSize = [aWebView sizeThatFits:CGSizeZero];
+        aWebView.frame = oldFrame;
+        
+        [self updateScrollViewWithBlock:^{
+            CGRect attachmentFrame = aWebView.frame;
+            attachmentFrame.size = fittingSize;
+            [aWebView setFrame:attachmentFrame];
+            [self.detailView setNeedsLayout];
+        } animated:NO];
+    }
+}
+
 #pragma mark - KVO
 
 -(void)observeValueForKeyPath:(NSString *)keyPath
@@ -358,7 +417,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                        change:(NSDictionary *)change
                       context:(void *)context
 {
-    if (object == self.detailView.attachmentView && [keyPath isEqualToString:@"image"])
+    UIView *attachmentView = self.detailView.attachmentView;
+    if (object == attachmentView && [keyPath isEqualToString:@"image"])
     {
         UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
         UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
@@ -371,8 +431,12 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
               newImage.size.height != oldImage.size.height)))
         {
             // images differ, update layout
-            [self updateScrollViewContentSize];
-            [self.detailView setNeedsLayout];
+            [self updateScrollViewWithBlock:^{
+                CGRect attachmentFrame = attachmentView.frame;
+                attachmentFrame.size = newImage.size;
+                [attachmentView setFrame:attachmentFrame];
+                [self.detailView setNeedsLayout];
+            } animated:NO];
         }
     }
 }

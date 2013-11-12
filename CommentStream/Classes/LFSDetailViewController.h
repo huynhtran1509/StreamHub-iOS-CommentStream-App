@@ -22,7 +22,7 @@
 @protocol LFSDetailViewDelegate;
 @protocol LFSDetailViewControllerDelegate;
 
-@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFSPostViewControllerDelegate, UIActionSheetDelegate>
+@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFSPostViewControllerDelegate, UIActionSheetDelegate, UIWebViewDelegate>
 
 @property (nonatomic, assign) BOOL hideStatusBar;
 
