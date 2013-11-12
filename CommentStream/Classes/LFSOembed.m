@@ -92,6 +92,7 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 @synthLazyWithNull(NSString, authorUrlString, _object, @"author_url");
 @synthLazyWithNull(NSString, urlString, _object, @"url");
 @synthLazyWithNull(NSString, version, _object, @"version");
+@synthLazyWithNull(NSString, thumbnailUrlString, _object, @"thumbnail_url");
 
 #pragma mark -
 @synthesize embedYouTubeId = _embedYouTubeId;
@@ -122,25 +123,6 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
         }
     }
     return _embedYouTubeId;
-}
-
-#pragma mark -
-@synthesize thumbnailUrlString = _thumbnailUrlString;
--(NSString*)thumbnailUrlString
-{
-    const static NSString* const key = @"thumbnail_url";
-    if (_thumbnailUrlString == nil) {
-        _thumbnailUrlString = [_object objectForKey:key];
-        // return full-size image URL if thumbnail URL is missing
-        if (_thumbnailUrlString == nil) {
-            _thumbnailUrlString = self.urlString;
-        }
-    }
-    if (_thumbnailUrlString == (NSString*)[NSNull null]) {
-        // return full-size image URL if thumbnail URL is missing
-        return self.urlString;
-    }
-    return _thumbnailUrlString;
 }
 
 #pragma mark -
