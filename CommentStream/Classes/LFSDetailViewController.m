@@ -212,7 +212,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             [attachmentView setFrame:attachmentFrame];
             
             __weak UIImageView* weakAttachmentView = (UIImageView*)attachmentView;
-            [(UIImageView*)attachmentView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlSring]]
+            [(UIImageView*)attachmentView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlString]]
                                                 placeholderImage:nil
                                                          success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
              {
@@ -241,7 +241,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                 NSURL *url = [NSURL URLWithString:urlString];
                 [attachmentView loadRequest:[NSURLRequest requestWithURL:url]];
             } else {
-                [attachmentView loadHTMLString:oembed.html baseURL:nil];
+                NSString *urlString = oembed.urlString ?: oembed.linkUrlString ?: oembed.providerUrlString;
+                [attachmentView loadHTMLString:oembed.html baseURL:[NSURL URLWithString:urlString]];
             }
             
             CGRect attachmentFrame = attachmentView.frame;
