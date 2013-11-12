@@ -151,8 +151,10 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     const static NSString* const kWidthKey = @"thumbnail_width";
     const static NSString* const kHeightKey = @"thumbnail_height";
     if (_thumbnailSizeIsSet == NO) {
-        _thumbnailSize = CGSizeMake([[_object objectForKey:kWidthKey] floatValue] / 2.f,
-                                    [[_object objectForKey:kHeightKey] floatValue] / 2.f);
+        NSNumber *width = [_object objectForKey:kWidthKey] ?: @0;
+        NSNumber *height = [_object objectForKey:kHeightKey] ?: @0;
+        _thumbnailSize = CGSizeMake([width floatValue] / 2.f,
+                                    [height floatValue] / 2.f);
     }
     return _thumbnailSize;
 }
@@ -164,8 +166,10 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     const static NSString* const kWidthKey = @"width";
     const static NSString* const kHeightKey = @"height";
     if (_sizeIsSet == NO) {
-        _size = CGSizeMake([[_object objectForKey:kWidthKey] floatValue] / 2.f,
-                           [[_object objectForKey:kHeightKey] floatValue] / 2.f);
+        NSNumber *width = [_object objectForKey:kWidthKey] ?: @200;
+        NSNumber *height = [_object objectForKey:kHeightKey] ?: @200;
+        _size = CGSizeMake([width floatValue] / 2.f,
+                           [height floatValue] / 2.f);
     }
     return _size;
 }

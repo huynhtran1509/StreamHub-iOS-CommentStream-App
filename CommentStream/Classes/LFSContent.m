@@ -217,11 +217,11 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 @synthLazyWithNull(NSNumber, eventId, _object, @"event");
 
 #pragma mark -
-@synthesize firstPhotoOembed = _firstPhotoOembed;
--(LFSOembed*)firstPhotoOembed
+@synthesize firstOembed = _firstOembed;
+-(LFSOembed*)firstOembed
 {
     // return first attachment of type "photo" if it exists
-    if (_firstPhotoOembed == nil) {
+    if (_firstOembed == nil) {
         if (self.childContent != nil) {
             for (NSDictionary *obj in self.childContent) {
                 NSDictionary *content = [obj objectForKey:@"content"];
@@ -230,8 +230,10 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
                     if (oembedObject != nil) {
                         LFSOembed *oembed = [[LFSOembed alloc] initWithObject:oembedObject];
                         LFSOembedType oembedType = oembed.oembedType;
-                        if (oembedType == LFSOembedTypePhoto || oembedType == LFSOembedTypeVideo) {
-                            _firstPhotoOembed = oembed;
+                        if (oembedType == LFSOembedTypePhoto ||
+                            oembedType == LFSOembedTypeVideo ||
+                            oembedType == LFSOembedTypeRich) {
+                            _firstOembed = oembed;
                             break;
                         }
                     }
@@ -239,7 +241,7 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
             }
         }
     }
-    return _firstPhotoOembed;
+    return _firstOembed;
 }
 
 #pragma mark -
@@ -593,7 +595,7 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     _author = nil;
     
     _content = nil;
-    _firstPhotoOembed = nil;
+    _firstOembed = nil;
     
     _contentTwitterId = nil;
     _contentTwitterUrlString = nil;
