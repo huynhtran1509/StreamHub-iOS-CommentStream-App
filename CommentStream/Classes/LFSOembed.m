@@ -95,6 +95,18 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 @synthLazyWithNull(NSString, thumbnailUrlString, _object, @"thumbnail_url");
 
 #pragma mark -
+-(NSString*)contentAttachmentThumbnailUrlString
+{
+    if (self.oembedType == LFSOembedTypePhoto) {
+        // when dealing with a photo attachment, a URL will point
+        // to an image that we can use when lacking a thumbnail.
+        return self.thumbnailUrlString ?: self.urlString;
+    } else {
+        return self.thumbnailUrlString;
+    }
+}
+
+#pragma mark -
 @synthesize embedYouTubeId = _embedYouTubeId;
 -(NSString*)embedYouTubeId
 {

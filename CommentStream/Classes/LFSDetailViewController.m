@@ -133,9 +133,11 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
 }
 
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+-(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+                                        duration:(NSTimeInterval)duration
 {
-    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+    
     UIView *attachmentView = self.detailView.attachmentView;
     
     CGSize attachmentSize;
@@ -143,12 +145,15 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         attachmentSize = [(UIImageView*)attachmentView image].size;
     }
     else if ([attachmentView isKindOfClass:[UIWebView class]]) {
-        CGRect frame = attachmentView.frame;
-        CGRect oldFrame = frame;
-        frame.size.height = 1;
-        attachmentView.frame = frame;
-        attachmentSize = [attachmentView sizeThatFits:CGSizeZero];
-        attachmentView.frame = oldFrame;
+        attachmentSize = self.contentItem.firstOembed.size;
+        if (attachmentSize.width == 0.f || attachmentSize.height == 0.f) {
+            CGRect frame = attachmentView.frame;
+            CGRect oldFrame = frame;
+            frame.size.height = 1;
+            attachmentView.frame = frame;
+            attachmentSize = [attachmentView sizeThatFits:CGSizeZero];
+            attachmentView.frame = oldFrame;
+        }
     }
     else {
         [NSException raise:@"Invalid attachment view type"
@@ -159,19 +164,22 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         CGRect attachmentFrame = attachmentView.frame;
         attachmentFrame.size = attachmentSize;
         [attachmentView setFrame:attachmentFrame];
-    } animated:YES];
+    } duration:duration];
 }
 
-- (void)updateScrollViewWithBlock:(void (^)(void))block animated:(BOOL)animated
+- (void)updateScrollViewWithBlock:(void (^)(void))block duration:(NSTimeInterval)duration
 {
     UIScrollView *scrollView = self.scrollView;
     LFSDetailView *detailView = self.detailView;
     LFSOembed* oembed = self.contentItem.firstOembed;
     
     if (oembed != nil) {
-        if (animated) {
-            [UIView animateWithDuration:0.5f animations:block];
-        } else {
+        if (duration > 0.f) {
+            // animated
+            [UIView animateWithDuration:duration animations:block];
+        }
+        else {
+            // not animated
             block();
         }
     }
@@ -253,7 +261,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             // set attachment view frame size
             UIWebView *attachmentView = [[UIWebView alloc] init];
             [attachmentView setBackgroundColor:[UIColor clearColor]];
+            [attachmentView setOpaque:NO];
             [attachmentView setScalesPageToFit:YES];
+            [attachmentView setSuppressesIncrementalRendering:YES];
+            [attachmentView setAllowsInlineMediaPlayback:YES];
             [attachmentView.scrollView setScrollEnabled:NO];
             [attachmentView.scrollView setBounces:NO];
             
@@ -351,7 +362,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         CGRect attachmentFrame = attachmentView.frame;
         attachmentFrame.size = attachmentSize;
         [attachmentView setFrame:attachmentFrame];
-    } animated:animated];
+    } duration:0.f];
     
     // KVO attach observer
     if (attachmentView != nil) {
@@ -394,19 +405,22 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 {
     UIView *attachmentView = self.detailView.attachmentView;
     if (aWebView == attachmentView) {
-        CGRect frame = aWebView.frame;
-        CGRect oldFrame = frame;
-        frame.size.height = 1;
-        aWebView.frame = frame;
-        CGSize fittingSize = [aWebView sizeThatFits:CGSizeZero];
-        aWebView.frame = oldFrame;
+        CGSize attachmentSize = self.contentItem.firstOembed.size;
+        if (attachmentSize.width == 0.f || attachmentSize.height == 0.f) {
+            CGRect frame = aWebView.frame;
+            CGRect oldFrame = frame;
+            frame.size.height = 1;
+            aWebView.frame = frame;
+            attachmentSize = [aWebView sizeThatFits:CGSizeZero];
+            aWebView.frame = oldFrame;
+        }
         
         [self updateScrollViewWithBlock:^{
             CGRect attachmentFrame = aWebView.frame;
-            attachmentFrame.size = fittingSize;
+            attachmentFrame.size = attachmentSize;
             [aWebView setFrame:attachmentFrame];
             [self.detailView setNeedsLayout];
-        } animated:NO];
+        } duration:0.f];
     }
 }
 
@@ -436,7 +450,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                 attachmentFrame.size = newImage.size;
                 [attachmentView setFrame:attachmentFrame];
                 [self.detailView setNeedsLayout];
-            } animated:NO];
+            } duration:0.f];
         }
     }
 }

@@ -61,4 +61,6 @@ typedef NS_ENUM(NSUInteger, LFSOembedType) {
 @property (nonatomic, assign) LFSOembedType oembedType;
 @property (nonatomic, copy) NSString *version;
 
+-(NSString*)contentAttachmentThumbnailUrlString;
+
 @end
