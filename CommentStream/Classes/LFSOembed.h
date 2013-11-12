@@ -50,7 +50,7 @@ typedef NS_ENUM(NSUInteger, LFSOembedType) {
 // image stuff
 @property (nonatomic, copy) NSString *thumbnailUrlString;
 @property (nonatomic, assign) CGSize thumbnailSize; // in points (1/2 pixel)
-@property (nonatomic, copy) NSString *urlSring;
+@property (nonatomic, copy) NSString *urlString;
 @property (nonatomic, assign) CGSize size; // in points (1/2 pixel)
 
 // author stuff
@@ -60,5 +60,7 @@ typedef NS_ENUM(NSUInteger, LFSOembedType) {
 // meta
 @property (nonatomic, assign) LFSOembedType oembedType;
 @property (nonatomic, copy) NSString *version;
+
+-(NSString*)contentAttachmentThumbnailUrlString;
 
 @end

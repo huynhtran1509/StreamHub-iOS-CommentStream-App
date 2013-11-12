@@ -67,7 +67,7 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     _linkUrlString = nil;
     
     _thumbnailUrlString = nil;
-    _urlSring = nil;
+    _urlString = nil;
     
     _authorName = nil;
     _authorUrlString = nil;
@@ -90,8 +90,21 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
 @synthLazyWithNull(NSString, linkUrlString, _object, @"link");
 @synthLazyWithNull(NSString, authorName, _object, @"author_name");
 @synthLazyWithNull(NSString, authorUrlString, _object, @"author_url");
-@synthLazyWithNull(NSString, urlSring, _object, @"url");
+@synthLazyWithNull(NSString, urlString, _object, @"url");
 @synthLazyWithNull(NSString, version, _object, @"version");
+@synthLazyWithNull(NSString, thumbnailUrlString, _object, @"thumbnail_url");
+
+#pragma mark -
+-(NSString*)contentAttachmentThumbnailUrlString
+{
+    if (self.oembedType == LFSOembedTypePhoto) {
+        // when dealing with a photo attachment, a URL will point
+        // to an image that we can use when lacking a thumbnail.
+        return self.thumbnailUrlString ?: self.urlString;
+    } else {
+        return self.thumbnailUrlString;
+    }
+}
 
 #pragma mark -
 @synthesize embedYouTubeId = _embedYouTubeId;
@@ -101,7 +114,7 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     // if we fail, return nil
     static NSRegularExpression *regex = nil;
     if (_embedYouTubeId == nil) {
-        NSString *urlString = self.urlSring;
+        NSString *urlString = self.urlString;
         if (urlString != nil) {
             if (regex == nil) {
                 NSError *regexError = nil;
@@ -122,26 +135,6 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
         }
     }
     return _embedYouTubeId;
-}
-
-
-#pragma mark -
-@synthesize thumbnailUrlString = _thumbnailUrlString;
--(NSString*)thumbnailUrlString
-{
-    const static NSString* const key = @"thumbnail_url";
-    if (_thumbnailUrlString == nil) {
-        _thumbnailUrlString = [_object objectForKey:key];
-        // return full-size image URL if thumbnail URL is missing
-        if (_thumbnailUrlString == nil) {
-            _thumbnailUrlString = self.urlSring;
-        }
-    }
-    if (_thumbnailUrlString == (NSString*)[NSNull null]) {
-        // return full-size image URL if thumbnail URL is missing
-        return self.urlSring;
-    }
-    return _thumbnailUrlString;
 }
 
 #pragma mark -
@@ -166,8 +159,8 @@ const NSString *const LFSOembedTypes[LFS_OEMBED_TYPES_LENGTH] =
     const static NSString* const kWidthKey = @"width";
     const static NSString* const kHeightKey = @"height";
     if (_sizeIsSet == NO) {
-        NSNumber *width = [_object objectForKey:kWidthKey] ?: @200;
-        NSNumber *height = [_object objectForKey:kHeightKey] ?: @200;
+        NSNumber *width = [_object objectForKey:kWidthKey] ?: @0;
+        NSNumber *height = [_object objectForKey:kHeightKey] ?: @0;
         _size = CGSizeMake([width floatValue] / 2.f,
                            [height floatValue] / 2.f);
     }
