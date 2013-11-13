@@ -133,56 +133,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
 }
 
--(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
-                                        duration:(NSTimeInterval)duration
-{
-    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
-    
-    UIView *attachmentView = self.detailView.attachmentView;
-    
-    CGSize attachmentSize;
-    if ([attachmentView isKindOfClass:[UIImageView class]]) {
-        attachmentSize = [(UIImageView*)attachmentView image].size;
-    }
-    else if ([attachmentView isKindOfClass:[UIWebView class]]) {
-        attachmentSize = self.contentItem.firstOembed.size;
-        if (attachmentSize.width == 0.f || attachmentSize.height == 0.f) {
-            CGRect frame = attachmentView.frame;
-            CGRect oldFrame = frame;
-            frame.size.height = 1;
-            attachmentView.frame = frame;
-            attachmentSize = [attachmentView sizeThatFits:CGSizeZero];
-            attachmentView.frame = oldFrame;
-        }
-    }
-    else {
-        [NSException raise:@"Invalid attachment view type"
-                    format:@"Do not know how to calculate content size of a view of type %@",
-         [attachmentView class]];
-    }
-    [self updateScrollViewWithBlock:^{
-        CGRect attachmentFrame = attachmentView.frame;
-        attachmentFrame.size = attachmentSize;
-        [attachmentView setFrame:attachmentFrame];
-    } duration:duration];
-}
-
-- (void)updateScrollViewWithBlock:(void (^)(void))block duration:(NSTimeInterval)duration
+- (void)updateScrollViewContentSize
 {
     UIScrollView *scrollView = self.scrollView;
     LFSDetailView *detailView = self.detailView;
-    LFSOembed* oembed = self.contentItem.firstOembed;
-    
-    if (oembed != nil) {
-        if (duration > 0.f) {
-            // animated
-            [UIView animateWithDuration:duration animations:block];
-        }
-        else {
-            // not animated
-            block();
-        }
-    }
     
     CGSize scrollViewSize = scrollView.bounds.size;
     CGSize detailViewSize = [detailView sizeThatFits:CGSizeMake(scrollViewSize.width, CGFLOAT_MAX)];
@@ -194,7 +148,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     CGRect detailViewFrame = detailView.frame;
     detailViewFrame.size = detailViewSize;
     [detailView setFrame:detailViewFrame];
-    
 }
 
 #pragma mark - Lifecycle
@@ -236,14 +189,14 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     if (oembed != nil) {
         if (oembed.oembedType == LFSOembedTypePhoto) {
             // set attachment view frame size
-            UIView *attachmentView = [[UIImageView alloc] init];
+            UIImageView *attachmentView = [[UIImageView alloc] init];
             [self.detailView setAttachmentView:attachmentView];
             CGRect attachmentFrame = attachmentView.frame;
             attachmentFrame.size = oembed.size;
             [attachmentView setFrame:attachmentFrame];
             
-            __weak UIImageView* weakAttachmentView = (UIImageView*)attachmentView;
-            [(UIImageView*)attachmentView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlString]]
+            __weak UIImageView* weakAttachmentView = attachmentView;
+            [attachmentView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlString]]
                                                 placeholderImage:nil
                                                          success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
              {
@@ -356,103 +309,19 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     //[self.navigationController setToolbarHidden:YES animated:animated];
     
     // calculate content size for scrolling
-    UIView *attachmentView = self.detailView.attachmentView;
-    CGSize attachmentSize = self.contentItem.firstOembed.size;
-    [self updateScrollViewWithBlock:^{
-        CGRect attachmentFrame = attachmentView.frame;
-        attachmentFrame.size = attachmentSize;
-        [attachmentView setFrame:attachmentFrame];
-    } duration:0.f];
-    
-    // KVO attach observer
-    if (attachmentView != nil) {
-        if ([attachmentView isKindOfClass:[UIImageView class]]) {
-            [attachmentView addObserver:self
-                             forKeyPath:@"image"
-                                options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
-                                context:NULL];
-        } else if ([attachmentView isKindOfClass:[UIWebView class]]) {
-            [(UIWebView*)attachmentView setDelegate:self];
-        }
-    }
+    [self updateScrollViewContentSize];
 }
 
-- (void)viewWillDisappear:(BOOL)animated
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-    [super viewWillDisappear:animated];
-    
-    // KVO detach observer
-    UIView *attachmentView = self.detailView.attachmentView;
-    if (attachmentView) {
-        if ([attachmentView isKindOfClass:[UIImageView class]]) {
-            [attachmentView removeObserver:self
-                                forKeyPath:@"image"
-                                   context:NULL];
-        } else if ([attachmentView isKindOfClass:[UIWebView class]]) {
-            [(UIWebView*)attachmentView setDelegate:nil];
-        }
-    }
+    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+    [self updateScrollViewContentSize];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - UIWebViewDelegate
--(void)webViewDidFinishLoad:(UIWebView *)aWebView
-{
-    UIView *attachmentView = self.detailView.attachmentView;
-    if (aWebView == attachmentView) {
-        CGSize attachmentSize = self.contentItem.firstOembed.size;
-        if (attachmentSize.width == 0.f || attachmentSize.height == 0.f) {
-            CGRect frame = aWebView.frame;
-            CGRect oldFrame = frame;
-            frame.size.height = 1;
-            aWebView.frame = frame;
-            attachmentSize = [aWebView sizeThatFits:CGSizeZero];
-            aWebView.frame = oldFrame;
-        }
-        
-        [self updateScrollViewWithBlock:^{
-            CGRect attachmentFrame = aWebView.frame;
-            attachmentFrame.size = attachmentSize;
-            [aWebView setFrame:attachmentFrame];
-            [self.detailView setNeedsLayout];
-        } duration:0.f];
-    }
-}
-
-#pragma mark - KVO
-
--(void)observeValueForKeyPath:(NSString *)keyPath
-                     ofObject:(id)object
-                       change:(NSDictionary *)change
-                      context:(void *)context
-{
-    UIView *attachmentView = self.detailView.attachmentView;
-    if (object == attachmentView && [keyPath isEqualToString:@"image"])
-    {
-        UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
-        UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
-        // have to check object type because it could be NSNull and then
-        // we would get missing selector exception
-        if (newImage != oldImage ||
-            (([newImage isKindOfClass:[UIImage class]]) &&
-             ([oldImage isKindOfClass:[UIImage class]]) &&
-             (newImage.size.width != oldImage.size.width ||
-              newImage.size.height != oldImage.size.height)))
-        {
-            // images differ, update layout
-            [self updateScrollViewWithBlock:^{
-                CGRect attachmentFrame = attachmentView.frame;
-                attachmentFrame.size = newImage.size;
-                [attachmentView setFrame:attachmentFrame];
-                [self.detailView setNeedsLayout];
-            } duration:0.f];
-        }
-    }
 }
 
 #pragma mark - Status bar
@@ -493,6 +362,17 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 }
 
 #pragma mark - LFSDetailViewDelegate
+
+- (void)didChangeContentSize
+{
+    [self updateScrollViewContentSize];
+}
+
+- (CGSize)requestedContentSize
+{
+    CGSize requestedSize = self.contentItem.firstOembed.size;
+    return requestedSize;
+}
 
 - (void)didSelectButton1:(id)sender
 {

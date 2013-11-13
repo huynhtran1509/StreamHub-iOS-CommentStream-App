@@ -15,7 +15,7 @@
 
 @protocol LFSDetailViewDelegate;
 
-@interface LFSDetailView : UIView
+@interface LFSDetailView : UIView <UIWebViewDelegate>
 
 @property (nonatomic, weak) id<LFSDetailViewDelegate>delegate;
 
@@ -45,6 +45,9 @@
 - (void)didSelectButton1:(id)sender;
 - (void)didSelectButton2:(id)sender;
 - (void)didSelectButton3:(id)sender;
+
+- (void)didChangeContentSize;
+- (CGSize)requestedContentSize;
 
 @optional
 - (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url;
