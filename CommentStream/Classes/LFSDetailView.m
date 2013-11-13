@@ -22,6 +22,8 @@ static const UIEdgeInsets kDetailPadding = {
 
 static const CGFloat kDetailContentPaddingRight = 12.0f;
 
+static NSString* const kImageViewObservedPath = @"image";
+
 // content font settings
 static NSString* const kDetailContentFontName = @"Georgia";
 static const CGFloat kDetailContentFontSize = 16.0f;
@@ -110,13 +112,38 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 -(void)setAttachmentView:(UIView *)attachmentView
 {
-    if (_attachmentView != nil) {
-        [_attachmentView removeFromSuperview];
-    }
+    [self removeAttachmentView];
     [attachmentView setContentMode:UIViewContentModeScaleAspectFit];
     [attachmentView setAutoresizingMask:(UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin)];
-    [self addSubview:attachmentView];
+    if (attachmentView != nil) {
+        [self addSubview:attachmentView];
+        if ([attachmentView isKindOfClass:[UIImageView class]]) {
+            [attachmentView addObserver:self
+                             forKeyPath:kImageViewObservedPath
+                                options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld)
+                                context:NULL];
+        }
+        else if ([attachmentView isKindOfClass:[UIWebView class]]) {
+            [(UIWebView*)attachmentView setDelegate:self];
+        }
+    }
     _attachmentView = attachmentView;
+}
+
+// helper method
+-(void)removeAttachmentView
+{
+    if (_attachmentView != nil) {
+        [_attachmentView removeFromSuperview];
+        if ([_attachmentView isKindOfClass:[UIImageView class]]) {
+            [_attachmentView removeObserver:self
+                                 forKeyPath:kImageViewObservedPath
+                                    context:NULL];
+        }
+        else if ([_attachmentView isKindOfClass:[UIWebView class]]) {
+            [(UIWebView*)_attachmentView setDelegate:nil];
+        }
+    }
 }
 
 #pragma mark -
@@ -500,29 +527,92 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     return _toolbar;
 }
 
-#pragma mark - Private overrides
+#pragma mark - KVO
+
+-(void)observeValueForKeyPath:(NSString *)keyPath
+                     ofObject:(id)object
+                       change:(NSDictionary *)change
+                      context:(void *)context
+{
+    UIView *attachmentView = self.attachmentView;
+    if (object == attachmentView && [keyPath isEqualToString:kImageViewObservedPath])
+    {
+        UIImage *newImage = [change objectForKey:NSKeyValueChangeNewKey];
+        UIImage *oldImage = [change objectForKey:NSKeyValueChangeOldKey];
+        // have to check object type because it could be NSNull and then
+        // we would get missing selector exception
+        if (newImage != oldImage ||
+            (([newImage isKindOfClass:[UIImage class]]) &&
+             ([oldImage isKindOfClass:[UIImage class]]) &&
+             (newImage.size.width != oldImage.size.width ||
+              newImage.size.height != oldImage.size.height)))
+        {
+            // images differ in size, update layout
+            CGRect attachmentFrame = attachmentView.frame;
+            attachmentFrame.size = newImage.size;
+            [attachmentView setFrame:attachmentFrame];
+            
+            [self.delegate didChangeContentSize];
+            [self setNeedsLayout];
+        }
+    }
+}
+
+#pragma mark - UIWebViewDelegate
+-(void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    if (webView == self.attachmentView) {
+        [self.delegate didChangeContentSize];
+        [self setNeedsLayout];
+    }
+}
+
+#pragma mark - Private methods
 -(CGSize)attachmentSizeWithMaxWidth:(CGFloat)width
 {
-    // find out new image size based on three things:
-    // (a) attachmentImageSize property
-    // (b) attachmentImageView.image.size value and
-    // (c) view rectangle bounds
-    //
-    // if we have image, use it, otherwise rely on attachmentImageSize
-    
     UIView *view = self.attachmentView;
-    CGSize neededSize = (( [view isKindOfClass:[UIImageView class]]
-                          && [(UIImageView*)view image] != nil)
-                         ? [(UIImageView*)view image].size
-                         : view.frame.size);
+    CGSize neededSize;
+    
+    CGSize requestedContentSize = [self.delegate requestedContentSize];
+    if ([view isKindOfClass:[UIImageView class]]) {
+        UIImage *image = [(UIImageView*)view image];
+        neededSize = (image != nil
+                      ? image.size
+                      : requestedContentSize);
+    }
+    else if ([view isKindOfClass:[UIWebView class]]) {
+        // choose the widest possible size
+        neededSize = [(UIWebView*)view scrollView].contentSize;
+        if (neededSize.width < width) {
+            CGSize requestedSize = requestedContentSize;
+            if (requestedSize.width > neededSize.width) {
+                neededSize = requestedSize;
+            }
+        }
+        if ([(UIWebView*)view isLoading])
+        {
+            CGRect frame = view.frame;
+            CGRect oldFrame = frame;
+            frame.size.height = 1;
+            frame.size.width = width; // setting this to "width" gives 100% frame width
+            view.frame = frame;
+            neededSize = [view sizeThatFits:CGSizeZero];
+            view.frame = oldFrame; // restore old frame
+        }
+    }
     
     CGSize finalSize;
     CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
     if (neededSize.width > availableWidth) {
         // recalculate
         CGFloat scale = availableWidth / neededSize.width;
-        
-        finalSize.height = neededSize.height * scale;
+        if (requestedContentSize.height > 0.f) {
+            // Images and YouTube videos (oembed height is zero)
+            finalSize.height = neededSize.height * scale;
+        } else {
+            // web content with undefined height
+            finalSize.height = neededSize.height;
+        }
         finalSize.width = availableWidth;
     } else {
         // use defaults
@@ -531,120 +621,11 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     return finalSize;
 }
 
--(void)layoutSubviews
+-(CGSize)contentSizeThatFits:(CGSize)size
 {
-    // layout main content label
-    CGRect basicHTMLLabelFrame = self.bodyView.frame;
-    
-    CGFloat width = self.bounds.size.width;
-    CGFloat contentWidth = width - kDetailPadding.left - kDetailContentPaddingRight;
-    basicHTMLLabelFrame.size = [self contentSizeThatFits:
-                                CGSizeMake(contentWidth, CGFLOAT_MAX)];
-    [self.bodyView setFrame:basicHTMLLabelFrame];
-    
-    CGFloat bottom = basicHTMLLabelFrame.origin.y + basicHTMLLabelFrame.size.height;
-    
-    // start with the header
-    [self layoutHeader];
-    
-    // do not check for actual image presence here because we want to layout the
-    // frame before even the image is downloaded.
-    if (self.attachmentView.hidden == NO) {
-        CGRect attachmentFrame;
-
-        CGSize finalSize = [self attachmentSizeWithMaxWidth:width];
-        attachmentFrame.size = finalSize;
-        
-        attachmentFrame.origin.x = (width - finalSize.width) / 2.f;
-        attachmentFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
-        
-        [self.attachmentView setFrame:attachmentFrame];
-        
-        bottom = attachmentFrame.origin.y + attachmentFrame.size.height;
-    }
-
-    // layout url link
-    LFSResource *contentRemote = self.contentRemote;
-    if (contentRemote != nil) {
-        [self.footerRightView setTitle:contentRemote.displayString
-                              forState:UIControlStateNormal];
-        CGRect remoteUrlFrame = self.footerRightView.frame;
-        remoteUrlFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
-        [self.footerRightView setFrame:remoteUrlFrame];
-    }
-
-    // layout date label
-    CGRect dateFrame = self.footerLeftView.frame;
-    dateFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
-    [self.footerLeftView setFrame:dateFrame];
-    [self.footerLeftView setText:[[[self class] dateFormatter]
-                                  extendedRelativeStringFromDate:self.contentDate]];
-    
-    // layout toolbar frame
-    CGRect toolbarFrame = self.toolbar.frame;
-    toolbarFrame.origin = CGPointMake(0.f,
-                                      bottom + kDetailMinorVerticalSeparator +
-                                      dateFrame.size.height +
-                                      kDetailMinorVerticalSeparator);
-    [self.toolbar setFrame:toolbarFrame];
+    [self.bodyView setHTMLString:self.contentBodyHtml];
+    return [self.bodyView sizeThatFits:size];
 }
-
--(CGSize)sizeThatFits:(CGSize)size
-{
-    /*  __________________________________
-     * |   ___                            |
-     * |  |ava|  header                   |
-     * |  |___|                           |
-     * |                                  |
-     * |  Body text                       |
-     * |  (number of lines can vary)      |
-     * |   __________________             |
-     * |  |                  |            |
-     * |  |                  |            |
-     * |  |                  |            |
-     * |  |                  |            |
-     * |  |                  |            |
-     * |  |__________________|            |
-     * |                                  |
-     * |  Posted 27s ago                  |
-     * |  ______________________________  |
-     * |                                  |
-     * |  toolbar                         |
-     * |  ______________________________  |
-     * |__________________________________|
-     *
-     * |< - - - - size.width  - - - - - ->|
-     */
-    
-    CGFloat extraHeight = 0.f;
-    CGSize attachmentSize = [self attachmentSizeWithMaxWidth:size.width];
-
-    if (attachmentSize.height > 0.f) {
-        extraHeight = attachmentSize.height + kDetailMinorVerticalSeparator;
-    }
-    
-    CGFloat totalWidthInset = kDetailPadding.left + kDetailContentPaddingRight;
-    CGFloat totalHeightInset = (kDetailPadding.bottom
-                                + kDetailBarButtonHeight
-                                + kDetailMinorVerticalSeparator
-                                + kDetailFooterHeight
-                                + kDetailMinorVerticalSeparator
-                                
-                                + extraHeight
-                                
-                                + kDetailMajorVerticalSeparator
-                                + kDetailImageViewSize.height
-                                + kDetailPadding.top);
-    
-    CGSize contentSize = [self contentSizeThatFits:
-                          CGSizeMake(size.width - totalWidthInset,
-                                     CGFLOAT_MAX)];
-    contentSize.width += totalWidthInset;
-    contentSize.height += totalHeightInset;
-    return contentSize;
-}
-
-#pragma mark - Private methods
 
 -(void)layoutHeader
 {
@@ -771,10 +752,119 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                          placeholderImage:profileLocal.icon];
 }
 
--(CGSize)contentSizeThatFits:(CGSize)size
+
+#pragma mark - Private overrides
+-(void)layoutSubviews
 {
-    [self.bodyView setHTMLString:self.contentBodyHtml];
-    return [self.bodyView sizeThatFits:size];
+    // layout main content label
+    CGRect basicHTMLLabelFrame = self.bodyView.frame;
+    
+    CGFloat width = self.bounds.size.width;
+    CGFloat contentWidth = width - kDetailPadding.left - kDetailContentPaddingRight;
+    basicHTMLLabelFrame.size = [self contentSizeThatFits:
+                                CGSizeMake(contentWidth, CGFLOAT_MAX)];
+    [self.bodyView setFrame:basicHTMLLabelFrame];
+    
+    CGFloat bottom = basicHTMLLabelFrame.origin.y + basicHTMLLabelFrame.size.height;
+    
+    // start with the header
+    [self layoutHeader];
+    
+    // do not check for actual image presence here because we want to layout the
+    // frame before even the image is downloaded.
+    if (self.attachmentView.hidden == NO) {
+        CGRect attachmentFrame;
+        
+        CGSize finalSize = [self attachmentSizeWithMaxWidth:width];
+        attachmentFrame.size = finalSize;
+        
+        attachmentFrame.origin.x = (width - finalSize.width) / 2.f;
+        attachmentFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
+        
+        [self.attachmentView setFrame:attachmentFrame];
+        
+        bottom = attachmentFrame.origin.y + attachmentFrame.size.height;
+    }
+    
+    // layout url link
+    LFSResource *contentRemote = self.contentRemote;
+    if (contentRemote != nil) {
+        [self.footerRightView setTitle:contentRemote.displayString
+                              forState:UIControlStateNormal];
+        CGRect remoteUrlFrame = self.footerRightView.frame;
+        remoteUrlFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
+        [self.footerRightView setFrame:remoteUrlFrame];
+    }
+    
+    // layout date label
+    CGRect dateFrame = self.footerLeftView.frame;
+    dateFrame.origin.y = bottom + kDetailMinorVerticalSeparator;
+    [self.footerLeftView setFrame:dateFrame];
+    [self.footerLeftView setText:[[[self class] dateFormatter]
+                                  extendedRelativeStringFromDate:self.contentDate]];
+    
+    // layout toolbar frame
+    CGRect toolbarFrame = self.toolbar.frame;
+    toolbarFrame.origin = CGPointMake(0.f,
+                                      bottom + kDetailMinorVerticalSeparator +
+                                      dateFrame.size.height +
+                                      kDetailMinorVerticalSeparator);
+    [self.toolbar setFrame:toolbarFrame];
+}
+
+-(CGSize)sizeThatFits:(CGSize)size
+{
+    /*  __________________________________
+     * |   ___                            |
+     * |  |ava|  header                   |
+     * |  |___|                           |
+     * |                                  |
+     * |  Body text                       |
+     * |  (number of lines can vary)      |
+     * |   __________________             |
+     * |  |                  |            |
+     * |  |                  |            |
+     * |  |                  |            |
+     * |  |                  |            |
+     * |  |                  |            |
+     * |  |__________________|            |
+     * |                                  |
+     * |  Posted 27s ago                  |
+     * |  ______________________________  |
+     * |                                  |
+     * |  toolbar                         |
+     * |  ______________________________  |
+     * |__________________________________|
+     *
+     * |< - - - - size.width  - - - - - ->|
+     */
+    
+    CGFloat extraHeight = 0.f;
+    CGSize attachmentSize = [self attachmentSizeWithMaxWidth:size.width];
+    
+    if (attachmentSize.height > 0.f) {
+        extraHeight = attachmentSize.height + kDetailMinorVerticalSeparator;
+    }
+    
+    CGFloat totalWidthInset = kDetailPadding.left + kDetailContentPaddingRight;
+    CGFloat totalHeightInset = (kDetailPadding.bottom
+                                + kDetailBarButtonHeight
+                                + kDetailMinorVerticalSeparator
+                                + kDetailFooterHeight
+                                + kDetailMinorVerticalSeparator
+                                
+                                + extraHeight
+                                
+                                + kDetailMajorVerticalSeparator
+                                + kDetailImageViewSize.height
+                                + kDetailPadding.top);
+    
+    CGSize contentSize = [self contentSizeThatFits:
+                          CGSizeMake(size.width - totalWidthInset,
+                                     CGFLOAT_MAX)];
+    contentSize.width += totalWidthInset;
+    contentSize.height += totalHeightInset;
+    return contentSize;
 }
 
 #pragma mark - Lifecycle
@@ -806,6 +896,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 
 - (void)dealloc
 {
+    [self removeAttachmentView]; // unregister observers, etc
     [self resetFields];
 }
 
