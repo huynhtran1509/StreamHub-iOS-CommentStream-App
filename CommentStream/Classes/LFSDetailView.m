@@ -559,9 +559,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 }
 
 #pragma mark - UIWebViewDelegate
--(void)webViewDidFinishLoad:(UIWebView *)aWebView
+-(void)webViewDidFinishLoad:(UIWebView *)webView
 {
-    if (aWebView == self.attachmentView) {
+    if (webView == self.attachmentView) {
         [self.delegate didChangeContentSize];
         [self setNeedsLayout];
     }
@@ -573,24 +573,28 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     UIView *view = self.attachmentView;
     CGSize neededSize;
     
+    CGSize requestedContentSize = [self.delegate requestedContentSize];
     if ([view isKindOfClass:[UIImageView class]]) {
         UIImage *image = [(UIImageView*)view image];
         neededSize = (image != nil
                       ? image.size
-                      : [self.delegate requestedContentSize]);
+                      : requestedContentSize);
     }
     else if ([view isKindOfClass:[UIWebView class]]) {
-        if ([(UIWebView*)view isLoading]) {
-            neededSize = [self.delegate requestedContentSize];
-        } else {
-            neededSize = [(UIWebView*)view scrollView].contentSize;
+        // choose the widest possible size
+        neededSize = [(UIWebView*)view scrollView].contentSize;
+        if (neededSize.width < width) {
+            CGSize requestedSize = requestedContentSize;
+            if (requestedSize.width > neededSize.width) {
+                neededSize = requestedSize;
+            }
         }
-        if (neededSize.height == 0.f || neededSize.width == 0.f)
+        if ([(UIWebView*)view isLoading])
         {
             CGRect frame = view.frame;
             CGRect oldFrame = frame;
             frame.size.height = 1;
-            frame.size.width = neededSize.width;
+            frame.size.width = width; // setting this to "width" gives 100% frame width
             view.frame = frame;
             neededSize = [view sizeThatFits:CGSizeZero];
             view.frame = oldFrame; // restore old frame
@@ -602,8 +606,13 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     if (neededSize.width > availableWidth) {
         // recalculate
         CGFloat scale = availableWidth / neededSize.width;
-        
-        finalSize.height = neededSize.height * scale;
+        if (requestedContentSize.height > 0.f) {
+            // Images and YouTube videos (oembed height is zero)
+            finalSize.height = neededSize.height * scale;
+        } else {
+            // web content with undefined height
+            finalSize.height = neededSize.height;
+        }
         finalSize.width = availableWidth;
     } else {
         // use defaults
