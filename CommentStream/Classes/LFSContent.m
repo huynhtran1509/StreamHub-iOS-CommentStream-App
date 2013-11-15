@@ -522,7 +522,7 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     
     NSMutableArray *stack = [[NSMutableArray alloc] init];
     __block NSUInteger visibleNodeCount = self.visibility == LFSContentVisibilityEveryone ? 1u : 0u;
-    [self.childContent enumerateObjectsWithOptions:NSEnumerationConcurrent
+    [self.childContent enumerateObjectsWithOptions:NSEnumerationReverse
                                    usingBlock:^(id obj, NSUInteger idx, BOOL *stop)
      {
          // order does not matter here as all immediate children are on the

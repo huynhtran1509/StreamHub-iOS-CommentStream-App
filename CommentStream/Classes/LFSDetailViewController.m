@@ -257,6 +257,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     LFSDetailView *detailView = self.detailView;
     LFSContent *contentItem = self.contentItem;
     
+    [self.scrollView setAlwaysBounceVertical:YES];
+    
     [detailView setDelegate:self];
     [detailView setContentBodyHtml:contentItem.contentBodyHtml];
     [detailView setContentDate:contentItem.contentCreatedAt];
