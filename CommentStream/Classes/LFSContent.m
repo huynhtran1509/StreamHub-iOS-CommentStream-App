@@ -205,14 +205,14 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 #pragma mark - Lazy autho-synthesized properties
 
 @synthLazyWithNull(NSDictionary, content, _object, @"content");
-@synthLazyWithNull(NSDictionary, contentAnnotations, self.content, @"annotations");
+@synthLazyWithNull(NSDictionary, annotations, self.content, @"annotations");
 @synthLazyWithNull(NSArray, childContent, _object, @"childContent");
 
 @synthLazyWithNull(NSString, idString, self.content, @"id");
 @synthLazyWithNull(NSString, targetId, self.content, @"targetId");
-@synthLazyWithNull(NSString, contentParentId, self.content, @"parentId");
-@synthLazyWithNull(NSString, contentBodyHtml, self.content, @"bodyHtml");
-@synthLazyWithNull(NSString, contentAuthorId, self.content, @"authorId");
+@synthLazyWithNull(NSString, parentId, self.content, @"parentId");
+@synthLazyWithNull(NSString, bodyHtml, self.content, @"bodyHtml");
+@synthLazyWithNull(NSString, authorId, self.content, @"authorId");
 
 @synthLazyWithNull(NSNumber, eventId, _object, @"event");
 
@@ -270,14 +270,14 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 {
     const static NSString* const key = @"moderator";
     if (!_authorIsModeratorIsSet) {
-        NSNumber *moderator = [self.contentAnnotations objectForKey:key];
+        NSNumber *moderator = [self.annotations objectForKey:key];
         _authorIsModerator = (moderator != nil && [moderator boolValue]);
     }
     return _authorIsModerator;
 }
 
 #pragma mark -
--(UIImage*)contentSourceIcon
+-(UIImage*)sourceIcon
 {
     NSUInteger rawContentSource = self.contentSource;
     if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
@@ -289,7 +289,7 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 }
 
 #pragma mark -
--(UIImage*)contentSourceIconSmall
+-(UIImage*)sourceIconSmall
 {
     NSUInteger rawContentSource = self.contentSource;
     if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
@@ -302,13 +302,15 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 
 
 #pragma mark -
-@synthesize contentTwitterId = _contentTwitterId;
--(NSString*)contentTwitterId
+
+// TODO: use a factory or a category pattern to specialize content objects
+// by their souce?
+@synthesize twitterId = _twitterId;
+-(NSString*)twitterId
 {
-    // try to extract twitter id from contentId --
-    // if we fail, return nil
+    // extract twitter id from contentId, return nil on failure
     static NSRegularExpression *regex = nil;
-    if (_contentTwitterId == nil) {
+    if (_twitterId == nil) {
         NSString *idString = self.idString;
         if (idString != nil) {
             if (regex == nil) {
@@ -326,55 +328,55 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
                               options:0
                                 range:NSMakeRange(0, [idString length])];
             if (match != nil) {
-                _contentTwitterId = [idString substringWithRange:[match rangeAtIndex:1u]];
+                _twitterId = [idString substringWithRange:[match rangeAtIndex:1u]];
             }
         }
     }
-    return _contentTwitterId;
+    return _twitterId;
 }
 
 #pragma mark -
-@synthesize contentTwitterUrlString = _contentTwitterUrlString;
--(NSString*)contentTwitterUrlString
+@synthesize twitterUrlString = _twitterUrlString;
+-(NSString*)twitterUrlString
 {
-    if (_contentTwitterUrlString == nil) {
-        NSString *twitterId = self.contentTwitterId;
+    if (_twitterUrlString == nil) {
+        NSString *contentTwitterId = self.twitterId;
         NSString *twitterHandle = self.author.twitterHandle;
-        if (twitterId != nil && twitterHandle != nil)
+        if (contentTwitterId != nil && twitterHandle != nil)
         {
-            _contentTwitterUrlString =
+            _twitterUrlString =
             [NSString stringWithFormat:@"https://twitter.com/%@/status/%@",
-             twitterHandle, twitterId];
+             twitterHandle, contentTwitterId];
         }
     }
-    if (_contentTwitterUrlString == (NSString*)[NSNull null]) {
+    if (_twitterUrlString == (NSString*)[NSNull null]) {
         return nil;
     }
-    return _contentTwitterUrlString;
+    return _twitterUrlString;
 }
 
 #pragma mark -
-@synthesize contentUpdatedAt = _contentUpdatedAt;
--(NSDate*)contentUpdatedAt
+@synthesize updatedAt = _updatedAt;
+-(NSDate*)updatedAt
 {
     const static NSString* const key = @"updatedAt";
-    if (_contentUpdatedAt == nil) {
-        _contentUpdatedAt = [NSDate dateWithTimeIntervalSince1970:
+    if (_updatedAt == nil) {
+        _updatedAt = [NSDate dateWithTimeIntervalSince1970:
                              [[self.content objectForKey:key] doubleValue]];
     }
-    return _contentUpdatedAt;
+    return _updatedAt;
 }
 
 #pragma mark -
-@synthesize contentCreatedAt = _contentCreatedAt;
--(NSDate*)contentCreatedAt
+@synthesize createdAt = _createdAt;
+-(NSDate*)createdAt
 {
     const static NSString* const key = @"createdAt";
-    if (_contentCreatedAt == nil) {
-        _contentCreatedAt = [NSDate dateWithTimeIntervalSince1970:
+    if (_createdAt == nil) {
+        _createdAt = [NSDate dateWithTimeIntervalSince1970:
                              [[self.content objectForKey:key] doubleValue]];
     }
-    return _contentCreatedAt;
+    return _createdAt;
 }
 
 #pragma mark -
@@ -487,7 +489,7 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 
 -(void)setAuthorWithCollection:(LFSAuthorCollection *)authorCollection
 {
-    self.author = [authorCollection objectForKey:self.contentAuthorId];
+    self.author = [authorCollection objectForKey:self.authorId];
 }
 
 -(NSComparisonResult)compare:(LFSContent*)otherObject
@@ -595,14 +597,14 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     _content = nil;
     _firstOembed = nil;
     
-    _contentTwitterId = nil;
-    _contentTwitterUrlString = nil;
-    _contentParentId = nil;
-    _contentBodyHtml = nil;
-    _contentAnnotations = nil;
-    _contentAuthorId = nil;
-    _contentUpdatedAt = nil;
-    _contentCreatedAt = nil;
+    _twitterId = nil;
+    _twitterUrlString = nil;
+    _parentId = nil;
+    _bodyHtml = nil;
+    _annotations = nil;
+    _authorId = nil;
+    _updatedAt = nil;
+    _createdAt = nil;
     _childContent = nil;
     _eventId = nil;
     

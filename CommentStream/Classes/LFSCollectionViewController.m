@@ -552,7 +552,7 @@ const static char kAttributedTextValueKey;
         if (cellHeight == nil)
         {
             NSMutableAttributedString *attributedString =
-            [LFSAttributedTextCell attributedStringFromHTMLString:(content.contentBodyHtml ?: @"")];
+            [LFSAttributedTextCell attributedStringFromHTMLString:(content.bodyHtml ?: @"")];
             
             objc_setAssociatedObject(content, &kAttributedTextValueKey,
                                      attributedString,
@@ -769,8 +769,8 @@ const static char kAttributedTextValueKey;
     [self loadImagesForAttributedCell:cell withContent:content];
     
     // configure the rest of the cell
-    [cell setContentDate:content.contentCreatedAt];
-    [cell.headerAccessoryRightImageView setImage:content.contentSourceIconSmall];
+    [cell setContentDate:content.createdAt];
+    [cell.headerAccessoryRightImageView setImage:content.sourceIconSmall];
     
     [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
     

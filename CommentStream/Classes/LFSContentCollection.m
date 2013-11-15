@@ -232,13 +232,13 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     
     // prepare our nested enumeration data
     LFSContent *parent;
-    if (object.contentParentId != nil
-        && (parent = [self objectForKey:object.contentParentId]) != nil)
+    if (object.parentId != nil
+        && (parent = [self objectForKey:object.parentId]) != nil)
     {
         // found parent
         NSAssert(parent.datePath != nil, @"evenPath cannot be nil");
         NSMutableArray *array = [parent.datePath mutableCopy];
-        [array addObject:object.contentCreatedAt];
+        [array addObject:object.createdAt];
         [object setDatePath:array];
         [object setParent:parent];
         [parent.children addObject:object];
@@ -246,7 +246,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     else
     {
         // either no nesting or parent does not exist in memory
-        object.datePath = [[NSMutableArray alloc] initWithObjects:object.contentCreatedAt, nil];
+        object.datePath = [[NSMutableArray alloc] initWithObjects:object.createdAt, nil];
     }
     
     // at this point, we actually want to know the insertion index
@@ -299,11 +299,11 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
     if (content.visibility == LFSContentVisibilityNone) {
         // unlike -- remove author id
-        [authors removeObject:content.contentAuthorId];
+        [authors removeObject:content.authorId];
     }
     else if (content.visibility == LFSContentVisibilityEveryone) {
         // like -- add author id
-        [authors addObject:content.contentAuthorId];
+        [authors addObject:content.authorId];
     }
 }
 
@@ -358,8 +358,8 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             [self insertObject:obj];
         }];
         
-        if (content.nodeCount > 0 && content.contentParentId != nil) {
-            LFSContent *parent = [self objectForKey:content.contentParentId];
+        if (content.nodeCount > 0 && content.parentId != nil) {
+            LFSContent *parent = [self objectForKey:content.parentId];
             
             // update parents
             if (parent != nil) {

@@ -48,34 +48,25 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @property (nonatomic, readonly) BOOL authorIsModerator;
 
-@property (nonatomic, readonly) UIImage *contentSourceIconSmall;
-@property (nonatomic, readonly) UIImage *contentSourceIcon;
-@property (nonatomic, readonly) NSString *contentTwitterId;
-@property (nonatomic, readonly) NSString *contentTwitterUrlString;
+@property (nonatomic, readonly) UIImage *sourceIconSmall;
+@property (nonatomic, readonly) UIImage *sourceIcon;
+@property (nonatomic, readonly) NSString *twitterId;
+@property (nonatomic, readonly) NSString *twitterUrlString;
 
 @property (nonatomic, strong) LFSAuthorProfile *author;
 @property (nonatomic, strong) LFSContent *parent;
 @property (nonatomic, strong) NSHashTable *children;
 
-- (NSUInteger)nodeCountSumOfChildren;
-
-@property (nonatomic, strong) NSArray *childContent;
-@property (nonatomic, assign) NSInteger nodeCount;
--(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block;
-
 @property (nonatomic, copy) NSDictionary *content;
 
-@property (nonatomic, copy) LFSOembed *firstOembed;
-
 @property (nonatomic, copy) NSString *targetId;
+@property (nonatomic, copy) NSString *authorId;
+@property (nonatomic, copy) NSString *parentId;
+@property (nonatomic, copy) NSString *bodyHtml;
+@property (nonatomic, copy) NSDictionary *annotations;
 
-@property (nonatomic, copy) NSString *contentParentId;
-@property (nonatomic, copy) NSString *contentBodyHtml;
-@property (nonatomic, copy) NSDictionary *contentAnnotations;
-@property (nonatomic, copy) NSString *contentAuthorId;
-
-@property (nonatomic, strong) NSDate *contentUpdatedAt;
-@property (nonatomic, strong) NSDate *contentCreatedAt;
+@property (nonatomic, strong) NSDate *updatedAt;
+@property (nonatomic, strong) NSDate *createdAt;
 @property (nonatomic, strong) NSNumber *eventId;
 
 @property (nonatomic, assign) LFSContentVisibility lastVis;
@@ -85,6 +76,14 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @property (nonatomic, strong) NSMutableSet *likes;
 @property (nonatomic, copy) NSMutableArray *datePath;
+
+@property (nonatomic, strong) NSArray *childContent;
+@property (nonatomic, assign) NSInteger nodeCount;
+
+@property (nonatomic, copy) LFSOembed *firstOembed;
+
+-(NSUInteger)nodeCountSumOfChildren;
+-(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block;
 
 -(void)setAuthorWithCollection:(LFSAuthorCollection*)authorCollection;
 -(NSComparisonResult)compare:(LFSContent*)content;

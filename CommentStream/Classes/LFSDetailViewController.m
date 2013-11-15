@@ -260,8 +260,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [self.scrollView setAlwaysBounceVertical:YES];
     
     [detailView setDelegate:self];
-    [detailView setContentBodyHtml:contentItem.contentBodyHtml];
-    [detailView setContentDate:contentItem.contentCreatedAt];
+    [detailView setContentBodyHtml:contentItem.bodyHtml];
+    [detailView setContentDate:contentItem.createdAt];
     [detailView.bodyView setDelegate:self.attributedLabelDelegate];
     [self detailView:detailView setOembed:self.contentItem.firstOembed];
 
@@ -281,7 +281,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
     
     // only set an object if we have a remote (Twitter) url
-    NSString *twitterUrlString = contentItem.contentTwitterUrlString;
+    NSString *twitterUrlString = contentItem.twitterUrlString;
     if (twitterUrlString != nil) {
         [detailView setContentRemote:[[LFSResource alloc]
                                       initWithIdentifier:twitterUrlString
@@ -293,7 +293,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView setProfileRemote:[[LFSResource alloc]
                                   initWithIdentifier:author.profileUrlStringNoHashBang
                                   displayString:nil
-                                  icon:contentItem.contentSourceIcon]];
+                                  icon:contentItem.sourceIcon]];
     
     LFSResource *headerInfo = [[LFSResource alloc]
                                initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
