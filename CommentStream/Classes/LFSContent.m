@@ -33,7 +33,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
         }
     }
     
-    // only visit a child if it or *any* of its children are visible
+    // only visit a child if that child or *any* of its children are visible
     // (this creates a problem where we visit a child only after all of its own
     // children have been visited. To remedy this, we build up a LIFO stack)
     if (visibleNodeCount > 0u)
@@ -515,8 +515,6 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 
 -(void)enumerateVisiblePathsUsingBlock:(LFSContentChildVisitor)block
 {
-    // returns number of visible children
-    
     // one visible child to the stack
     if (self.contentType != LFSContentTypeMessage) {
         return;

@@ -18,6 +18,8 @@
 -(UIViewController*)webViewController
 {
     if (_webViewController == nil) {
+        // TODO: add back and forward buttons to a UIToolbar in this
+        // view controller
         _webViewController = [[UIViewController alloc] init];
         UIWebView *webView = [[UIWebView alloc] init];
         [webView setDelegate:self];

@@ -12,7 +12,7 @@ You will need to clone StreamHub-iOS-SDK first (make sure you have Xcode 5):
 
     git clone https://github.com/Livefyre/StreamHub-iOS-SDK.git
     cd StreamHub-iOS-SDK/examples/
-    git  clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git CommentStream
+    git clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git CommentStream
     cd CommentStream
     pod install
     open CommentStream.xcworkspace
