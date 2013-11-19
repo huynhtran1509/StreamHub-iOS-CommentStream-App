@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <StreamHub-iOS-SDK/LFSConstants.h>
 #import "LFSAuthorCollection.h"
 
 @protocol LFSContentCollectionDelegate;
