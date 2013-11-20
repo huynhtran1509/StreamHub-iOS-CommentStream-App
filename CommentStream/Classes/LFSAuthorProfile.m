@@ -96,15 +96,15 @@
 }
 
 #pragma mark - Lazy autho-synthesized properties
-@synthLazyWithNull(NSString, profileUrlString, _object, @"profileUrl");
-@synthLazyWithNull(NSString, settingsUrlString, _object, @"settingsUrl");
-@synthLazyWithNull(NSString, avatarUrlString, _object, @"avatar");
-@synthLazyWithNull(NSString, displayName, _object, @"displayName");
-@synthLazyWithNull(NSString, idString, _object, @"id");
+@synthLazyWithNull(NSString, profileUrlString, _object, @"profileUrl")
+@synthLazyWithNull(NSString, settingsUrlString, _object, @"settingsUrl")
+@synthLazyWithNull(NSString, avatarUrlString, _object, @"avatar")
+@synthLazyWithNull(NSString, displayName, _object, @"displayName")
+@synthLazyWithNull(NSString, idString, _object, @"id")
 
-@synthLazyWithNull(NSNumber, userType, _object, @"type");
+@synthLazyWithNull(NSNumber, userType, _object, @"type")
 
-@synthLazyWithNull(NSArray, userTags, _object, @"tags");
+@synthLazyWithNull(NSArray, userTags, _object, @"tags")
 
 #pragma mark -
 @synthesize profileUrlStringNoHashBang = _profileUrlStringNoHashBang;

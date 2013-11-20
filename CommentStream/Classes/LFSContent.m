@@ -204,17 +204,17 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
 
 #pragma mark - Lazy autho-synthesized properties
 
-@synthLazyWithNull(NSDictionary, content, _object, @"content");
-@synthLazyWithNull(NSDictionary, annotations, self.content, @"annotations");
-@synthLazyWithNull(NSArray, childContent, _object, @"childContent");
+@synthLazyWithNull(NSDictionary, content, _object, @"content")
+@synthLazyWithNull(NSDictionary, annotations, self.content, @"annotations")
+@synthLazyWithNull(NSArray, childContent, _object, @"childContent")
 
-@synthLazyWithNull(NSString, idString, self.content, @"id");
-@synthLazyWithNull(NSString, targetId, self.content, @"targetId");
-@synthLazyWithNull(NSString, parentId, self.content, @"parentId");
-@synthLazyWithNull(NSString, bodyHtml, self.content, @"bodyHtml");
-@synthLazyWithNull(NSString, authorId, self.content, @"authorId");
+@synthLazyWithNull(NSString, idString, self.content, @"id")
+@synthLazyWithNull(NSString, targetId, self.content, @"targetId")
+@synthLazyWithNull(NSString, parentId, self.content, @"parentId")
+@synthLazyWithNull(NSString, bodyHtml, self.content, @"bodyHtml")
+@synthLazyWithNull(NSString, authorId, self.content, @"authorId")
 
-@synthLazyWithNull(NSNumber, eventId, _object, @"event");
+@synthLazyWithNull(NSNumber, eventId, _object, @"event")
 
 #pragma mark -
 @synthesize firstOembed = _firstOembed;

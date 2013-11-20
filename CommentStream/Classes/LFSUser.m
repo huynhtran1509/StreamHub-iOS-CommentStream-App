@@ -79,11 +79,11 @@
 }
 
 #pragma mark - Lazy autho-synthesized properties
-@synthLazyWithNull(NSString, version, _object, @"version");
+@synthLazyWithNull(NSString, version, _object, @"version")
 
-@synthLazyWithNull(NSDictionary, authToken, _object, @"auth_token");
-@synthLazyWithNull(NSDictionary, permissions, _object, @"permissions");
-@synthLazyWithNull(NSDictionary, token, _object, @"token");
+@synthLazyWithNull(NSDictionary, authToken, _object, @"auth_token")
+@synthLazyWithNull(NSDictionary, permissions, _object, @"permissions")
+@synthLazyWithNull(NSDictionary, token, _object, @"token")
 
 
 #pragma mark -
