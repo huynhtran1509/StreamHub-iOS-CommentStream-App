@@ -6,7 +6,7 @@ provided by StreamHub-iOS-SDK, a native client for Livefyre API. It supports
 viewing a collection, streaming comments in real-time, nested replies, likes, 
 flagging and deleting of comments, and image attachments.
 
-# Getting Started
+## Getting Started
 
 You will need to clone StreamHub-iOS-SDK first (make sure you have Xcode 5):
 
@@ -20,13 +20,11 @@ You will need to clone StreamHub-iOS-SDK first (make sure you have Xcode 5):
 Use `CommentStream.xcworkspace` to open the project instead of
 `CommentStream.xcproject`
 
-# Requirements
+## Requirements
 
 StreamHub-SDK v0.2.0 and the Comments app require Xcode 5 and iOS 6.0 or later. 
-If you would like to use this SDK with iOS versions prior to 6.0, please contact 
-Livefyre and we'll be happy to help.
 
-# License
+## License
 
 This software is licensed under the MIT License.
 
