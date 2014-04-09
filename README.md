@@ -10,10 +10,12 @@ flagging and deleting of comments, and image attachments.
 
 You will need to clone StreamHub-iOS-SDK first (make sure you have Xcode 5):
 
+    cd ~/dev
     git clone https://github.com/Livefyre/StreamHub-iOS-SDK.git
     cd StreamHub-iOS-SDK/examples/
     git clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git CommentStream
     cd CommentStream
+    pod repo add escherba git@github.com:escherba/Specs.git
     pod install
     open CommentStream.xcworkspace
 
