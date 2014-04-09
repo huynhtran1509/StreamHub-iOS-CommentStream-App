@@ -10,7 +10,7 @@
 #define CACHE_SCALED_IMAGES
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
-#import <AFNetworking/AFImageRequestOperation.h>
+#import <AFNetworking/AFURLResponseSerialization.h>
 
 #import <objc/runtime.h>
 
@@ -792,62 +792,61 @@ const static char kAttributedTextValueKey;
                            icon:nil]];
 }
 
+
+UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
+{
+    // scale down image with Aspect Fill
+    CGRect targetRect;
+    targetRect.origin = CGPointZero;
+    if (contentMode == UIViewContentModeScaleAspectFill) {
+        CGSize currentSize = image.size;
+        if (currentSize.height * size.width > size.height * currentSize.width) {
+            // pick size.width
+            targetRect.size.width = size.width;
+            targetRect.size.height = (size.width / currentSize.width) * currentSize.height;
+        } else {
+            // pick size.height
+            targetRect.size.height = size.height;
+            targetRect.size.width = (size.height / currentSize.height) * currentSize.width;
+        }
+    }
+    else if (contentMode == UIViewContentModeScaleToFill) {
+        targetRect.size = size;
+    }
+    else {
+        NSException* invalidContentMode =
+        [NSException exceptionWithName:@"LFSInvalidContentMode"
+                                reason:@"Invalid content mode for image rescaling"
+                              userInfo:nil];
+        @throw invalidContentMode;
+    }
+    
+    // don't call UIGraphicsBeginImageContext when supporting Retina,
+    // instead call UIGraphicsBeginImageContextWithOptions with zero
+    // for scale
+    UIGraphicsBeginImageContextWithOptions(size, YES, 0.f);
+    [image drawInRect:targetRect];
+    UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return processedImage;
+}
+
 -(void)loadImageWithURL:(NSURL*)url
             scaleToSize:(CGSize)size
             contentMode:(UIViewContentMode)contentMode
-                success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image))success
-                failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error))failure
+                success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    // handle actual downloading and scaling of the image
-    if (url == nil) {
-        return;
-    }
-    
+    if (url == nil) { return; }
+
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    
-    // set up the NSOperation here
-    AFImageRequestOperation* operation =
-    [AFImageRequestOperation
-     imageRequestOperationWithRequest:request
-     imageProcessingBlock:^UIImage *(UIImage *image)
-     {
-         // scale down image with Aspect Fill
-         CGRect targetRect;
-         targetRect.origin = CGPointZero;
-         if (contentMode == UIViewContentModeScaleAspectFill) {
-             CGSize currentSize = image.size;
-             if (currentSize.height * size.width > size.height * currentSize.width) {
-                 // pick size.width
-                 targetRect.size.width = size.width;
-                 targetRect.size.height = (size.width / currentSize.width) * currentSize.height;
-             } else {
-                 // pick size.height
-                 targetRect.size.height = size.height;
-                 targetRect.size.width = (size.height / currentSize.height) * currentSize.width;
-             }
-         } else if (contentMode == UIViewContentModeScaleToFill) {
-             targetRect.size = size;
-         } else {
-             NSException* invalidContentMode = [NSException
-                                                exceptionWithName:@"LFSInvalidContentMode"
-                                                reason:@"Invalid content mode for image rescaling"
-                                                userInfo:nil];
-             @throw invalidContentMode;
-         }
-         
-         // don't call UIGraphicsBeginImageContext when supporting Retina,
-         // instead call UIGraphicsBeginImageContextWithOptions with zero
-         // for scale
-         UIGraphicsBeginImageContextWithOptions(size, YES, 0.f);
-         [image drawInRect:targetRect];
-         UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
-         UIGraphicsEndImageContext();
-         return processedImage;
-     }
-     success:success
-     failure:failure];
-    
-    // add operation to queue
+    AFHTTPRequestOperation* operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    [operation setResponseSerializer:[AFImageResponseSerializer serializer]];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        UIImage *image = scaleImage(responseObject, size, contentMode);
+        success(operation, image);
+    } failure:failure];
+
     [self.operationQueue addOperation:operation];
 }
 
@@ -874,7 +873,7 @@ const static char kAttributedTextValueKey;
         [self loadImageWithURL:url
                    scaleToSize:size
                      contentMode:contentMode
-                       success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
+                       success:^(AFHTTPRequestOperation *operation, UIImage* image) {
 #ifdef CACHE_SCALED_IMAGES
                            [_imageCache setObject:image forKey:key];
 #endif
@@ -890,7 +889,7 @@ const static char kAttributedTextValueKey;
                                [cell setNeedsLayout];
                            }
                        }
-                       failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
+                       failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 #ifdef CACHE_SCALED_IMAGES
                            // cache placeholder image instead so we don't repeatedly
                            // hit the server looking for stuff that doesn't exist
