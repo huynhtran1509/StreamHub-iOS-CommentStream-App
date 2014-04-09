@@ -43,7 +43,7 @@ static const CGFloat kDetailImageCornerRadius = 4.f;
 static const CGFloat kDetailImageMarginRight = 8.0f;
 
 static const CGFloat kDetailRemoteButtonWidth = 20.0f;
-static const CGFloat kDetailRemoteButtonHeight = 20.0f;
+//static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 
 @interface LFSWriteCommentView ()

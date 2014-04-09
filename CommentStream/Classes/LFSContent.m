@@ -9,7 +9,7 @@
 #import "LFSModelMacros.h"
 #import "LFSContent.h"
 
-const static char kVisibleNodeCount;
+//const static char kVisibleNodeCount;
 
 // TODO: return latest eventId, event for nodes that are not shown (hidden)
 NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)

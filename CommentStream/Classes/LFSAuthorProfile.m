@@ -147,6 +147,10 @@
     static NSString* const regexTemplate2 = @"/75.$1";
     if (_avatarUrlString75 == nil)
     {
+        NSString *avatarUrlString = self.avatarUrlString;
+        if (avatarUrlString == nil) {
+            return nil;
+        }
         // We will handle two types of avatar URLs:
         // http://gravatar.com/avatar/c228ecbc43be06cc999c08cf020f9fde/?s=50&d=http://avatars-staging.fyre.co/a/anon/50.jpg
         // http://avatars.fyre.co/a/26/6dbce19ef7452f69164e857d55d173ae/50.jpg?v=1375324889"
@@ -173,9 +177,9 @@
                      regexError2.localizedDescription);
         }
         
-        NSString *avatarUrlString1 = [regex1 stringByReplacingMatchesInString:self.avatarUrlString
+        NSString *avatarUrlString1 = [regex1 stringByReplacingMatchesInString:avatarUrlString
                                                                       options:0
-                                                                        range:NSMakeRange(0, [self.avatarUrlString length])
+                                                                        range:NSMakeRange(0, [avatarUrlString length])
                                                                  withTemplate:regexTemplate1];
         _avatarUrlString75 = [regex2 stringByReplacingMatchesInString:avatarUrlString1
                                                               options:0
