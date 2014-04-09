@@ -13,16 +13,16 @@ static const CGFloat kDeletedCellImageCornerRadius = 4.f;
 
 static const CGSize kDeletedCellImageViewSize = { .width=25.f, .height=25.f };
 
-static const CGFloat kDeletedCellHeaderAdjust = 2.f;
+//static const CGFloat kDeletedCellHeaderAdjust = 2.f;
 
 static const UIEdgeInsets kDeletedCellPadding = {
     .top=10.f, .left=15.f, .bottom=12.f, .right=12.f
 };
 
 static const CGFloat kDeletedCellMinorHorizontalSeparator = 8.0f;
-static const CGFloat kDeletedCellMinorVerticalSeparator = 12.0f;
+//static const CGFloat kDeletedCellMinorVerticalSeparator = 12.0f;
 
-static const CGFloat kDeletedCellHeaderTitleFontSize = 12.f;
+//static const CGFloat kDeletedCellHeaderTitleFontSize = 12.f;
 
 @interface LFSDeletedCell ()
 
