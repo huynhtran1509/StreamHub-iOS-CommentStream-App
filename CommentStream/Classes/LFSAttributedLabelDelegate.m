@@ -46,11 +46,13 @@
 #pragma mark - Public methods
 -(void)followURL:(NSURL*)url
 {
-    NSString *processedUrlString = [AppDelegate processStreamUrl:[url absoluteString]];
-    if (processedUrlString != nil) {
-        NSURL *processedUrl = [NSURL URLWithString:processedUrlString];
-        [(UIWebView*)self.webViewController.view loadRequest:[NSURLRequest requestWithURL:processedUrl]];
-        [self.navigationController pushViewController:self.webViewController animated:YES];
+    if (url != nil) {
+        NSString *processedUrlString = [AppDelegate processStreamUrl:[url absoluteString]];
+        if (processedUrlString != nil) {
+            NSURL *processedUrl = [NSURL URLWithString:processedUrlString];
+            [(UIWebView*)self.webViewController.view loadRequest:[NSURLRequest requestWithURL:processedUrl]];
+            [self.navigationController pushViewController:self.webViewController animated:YES];
+        }
     }
 }
 

@@ -16,6 +16,7 @@
 @interface LFSAttributedLabelDelegate : NSObject <OHAttributedLabelDelegate, UIWebViewDelegate>
 
 -(void)followURL:(NSURL*)url;
+
 @property (nonatomic, strong) UIViewController *webViewController;
 @property (nonatomic, strong) UINavigationController *navigationController;
 
