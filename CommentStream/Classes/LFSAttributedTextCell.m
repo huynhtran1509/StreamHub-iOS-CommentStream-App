@@ -237,7 +237,11 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         // initialize
         _bodyView = [[LFSBasicHTMLLabel alloc] initWithFrame:frame];
         
-        // configure
+        // configure OHAttributedLabel
+        
+        // do not display phonen number-looking data as links
+        // (we wouldn't source personal information in the first place)
+        [_bodyView setAutomaticallyAddLinksForType:NSTextCheckingTypeLink];
         [_bodyView setFont:[UIFont fontWithName:kCellBodyFontName
                                            size:kCellBodyFontSize]];
         [_bodyView setTextColor:[UIColor blackColor]];
