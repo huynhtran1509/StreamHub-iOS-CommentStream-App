@@ -450,16 +450,12 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
 - (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url
 {
-    if (url != nil) {
-        [self.attributedLabelDelegate followURL:url];
-    }
+    [self.attributedLabelDelegate followURL:url];
 }
 
 - (void)didSelectContentRemote:(id)sender wihtURL:(NSURL*)url
 {
-    if (url != nil) {
-        [self.attributedLabelDelegate followURL:url];
-    }
+    [self.attributedLabelDelegate followURL:url];
 }
 
 #pragma mark - Private methods
