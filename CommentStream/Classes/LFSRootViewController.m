@@ -20,7 +20,7 @@
 @end
 
 // some module-level constants
-static NSString* const kAttributedCellReuseIdentifier = @"Cell";
+static NSString* const kAttributedCellReuseIdentifier = @"CollectionCell";
 static NSString* const kCellSelectSegue = @"collectionView";
 
 @implementation LFSRootViewController
