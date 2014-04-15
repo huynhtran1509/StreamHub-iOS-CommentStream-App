@@ -8,7 +8,7 @@ flagging and deleting of comments, and image attachments.
 
 ## Getting Started
 
-If you haven't already, please install CocoaPods first.
+If you haven't already, please install CocoaPods [[1]] first.
 
     cd ~/dev
     git clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git
@@ -51,3 +51,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+[1]: http://guides.cocoapods.org/using/getting-started.html
