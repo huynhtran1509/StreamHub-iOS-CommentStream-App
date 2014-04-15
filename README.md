@@ -3,28 +3,27 @@ CommentStream
 
 This is a sample app that demonstrates how to use some of the services
 provided by StreamHub-iOS-SDK, a native client for Livefyre HTTP API. It supports
-viewing a collection, streaming comments in real-time, nested replies, likes, 
+viewing a collection, streaming comments in real-time, nested replies, likes,
 flagging and deleting of comments, and image attachments.
 
 ## Getting Started
 
-You will need to clone StreamHub-iOS-SDK first (make sure you have Xcode 5):
+If you haven't already, please install CocoaPods first.
 
     cd ~/dev
-    git clone https://github.com/Livefyre/StreamHub-iOS-SDK.git
-    cd StreamHub-iOS-SDK/examples/
-    git clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git CommentStream
-    cd CommentStream
+    git clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git
+    cd StreamHub-iOS-Example-App
     pod repo add escherba git@github.com:escherba/Specs.git
     pod install
     open CommentStream.xcworkspace
 
-Use `CommentStream.xcworkspace` to open the project instead of
-`CommentStream.xcproject`
+Note that the `pod install` step above can take a minute or two. When done
+installing, use `CommentStream.xcworkspace` to open the project instead of the
+`CommentStream.xcproject` file.
 
 ## Requirements
 
-StreamHub-SDK v0.2.0 and the Comments app require Xcode 5 and iOS 6.0 or later. 
+StreamHub-SDK v0.2.0 and the Comments app require Xcode 5 and iOS 6.0 or later.
 
 ## License
 
