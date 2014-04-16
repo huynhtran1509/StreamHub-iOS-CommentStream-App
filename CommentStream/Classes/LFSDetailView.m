@@ -596,13 +596,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         }
         if ([(UIWebView*)view isLoading])
         {
-            CGRect frame = view.frame;
-            CGRect oldFrame = frame;
-            frame.size.height = 1;
-            frame.size.width = width; // setting this to "width" gives 100% frame width
-            view.frame = frame;
-            neededSize = [view sizeThatFits:CGSizeZero];
-            view.frame = oldFrame; // restore old frame
+            neededSize = ((UIWebView*)view).scrollView.contentSize;
         }
     }
     
