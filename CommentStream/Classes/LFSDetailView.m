@@ -603,7 +603,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     if (neededSize.width > availableWidth) {
         // recalculate
         CGFloat scale = availableWidth / neededSize.width;
-        if (requestedContentSize.height > 0.f) {
+        if ([view isKindOfClass:[UIImageView class]] ||
+            requestedContentSize.height > 0.f)
+        {
             // Images and YouTube videos (oembed height is zero)
             finalSize.height = neededSize.height * scale;
         } else {
