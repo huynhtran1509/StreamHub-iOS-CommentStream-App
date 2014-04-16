@@ -594,10 +594,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                 neededSize = requestedSize;
             }
         }
-        if ([(UIWebView*)view isLoading])
-        {
-            neededSize = ((UIWebView*)view).scrollView.contentSize;
-        }
+        // TODO: make sure nothing else is necessary to do when
+        // the web view is loading (isLoading)
     }
     
     CGSize finalSize;
