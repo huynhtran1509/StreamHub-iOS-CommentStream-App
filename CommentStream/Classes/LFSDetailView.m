@@ -594,16 +594,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                 neededSize = requestedSize;
             }
         }
-        if ([(UIWebView*)view isLoading])
-        {
-            CGRect frame = view.frame;
-            CGRect oldFrame = frame;
-            frame.size.height = 1;
-            frame.size.width = width; // setting this to "width" gives 100% frame width
-            view.frame = frame;
-            neededSize = [view sizeThatFits:CGSizeZero];
-            view.frame = oldFrame; // restore old frame
-        }
+        // TODO: make sure nothing else is necessary to do when
+        // the web view is loading (isLoading)
     }
     
     CGSize finalSize;
@@ -611,7 +603,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     if (neededSize.width > availableWidth) {
         // recalculate
         CGFloat scale = availableWidth / neededSize.width;
-        if (requestedContentSize.height > 0.f) {
+        if ([view isKindOfClass:[UIImageView class]] ||
+            requestedContentSize.height > 0.f)
+        {
             // Images and YouTube videos (oembed height is zero)
             finalSize.height = neededSize.height * scale;
         } else {
