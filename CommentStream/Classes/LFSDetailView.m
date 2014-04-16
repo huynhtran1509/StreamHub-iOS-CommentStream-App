@@ -15,6 +15,7 @@
 #import "LFSContentToolbar.h"
 #import "UILabel+Trim.h"
 #import "LFSRightAlignedButton.h"
+#import "UIWebView+ScrollViewContentSize.h"
 
 static const UIEdgeInsets kDetailPadding = {
     .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
@@ -587,15 +588,17 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     }
     else if ([view isKindOfClass:[UIWebView class]]) {
         // choose the widest possible size
-        neededSize = [(UIWebView*)view scrollView].contentSize;
-        if (neededSize.width < width) {
-            CGSize requestedSize = requestedContentSize;
-            if (requestedSize.width > neededSize.width) {
-                neededSize = requestedSize;
+        if ([(UIWebView*)view isLoading]) {
+            neededSize = [(UIWebView*)view scrollView].contentSize;
+            if (neededSize.width < width) {
+                CGSize requestedSize = requestedContentSize;
+                if (requestedSize.width > neededSize.width) {
+                    neededSize = requestedSize;
+                }
             }
+        } else {
+            neededSize = [(UIWebView*)view scrollViewContentSizeWithWidth:width];
         }
-        // TODO: make sure nothing else is necessary to do when
-        // the web view is loading (isLoading)
     }
     
     CGSize finalSize;
