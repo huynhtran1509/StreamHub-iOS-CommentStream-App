@@ -244,6 +244,17 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     return _firstOembed;
 }
 
+-(void)addOembed:(id)oembed
+{
+    NSMutableArray *childContent = [NSMutableArray arrayWithArray:self.childContent];
+    if ([oembed isKindOfClass:[LFSContent class]]) {
+        [childContent addObject:((LFSContent*)oembed).object];
+    } else {
+        [childContent addObject:oembed];
+    }
+    _childContent = childContent;
+}
+
 #pragma mark -
 -(NSUInteger)nodeCountSumOfChildren
 {

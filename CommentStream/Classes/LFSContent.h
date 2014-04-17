@@ -91,4 +91,6 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 -(NSMutableDictionary*)authorHandles;
 -(NSOrderedSet*)conversationParticipants;
 
+-(void)addOembed:(id)oembed;
+
 @end

@@ -289,6 +289,13 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
+- (void)registerOembedWithContent:(LFSContent*)content
+{
+    NSString *targetId = content.targetId;
+    id obj = [_mapping objectForKey:targetId];
+    [obj addOembed:content];
+}
+
 - (void)registerOpineWithContent:(LFSContent*)content
 {
     NSString *targetId = content.targetId;
@@ -368,10 +375,12 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         }
     }
     
-    if (content.contentType == LFSContentTypeOpine)
-    {
+    if (content.contentType == LFSContentTypeOpine) {
         // dealing with an opine
         [self registerOpineWithContent:content];
+    }
+    else if (content.contentType == LFSContentTypeOEmbed) {
+        [self registerOembedWithContent:content];
     }
 }
 
@@ -683,6 +692,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
     }
 
+    // TODO: switch from delegate to observer pattern here
     [self.delegate didUpdateModelWithDeletes:deletedIndexPaths
                                      updates:updatedIndexPaths
                                      inserts:insertedIndexPaths];
