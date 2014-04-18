@@ -593,11 +593,10 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
             //neededSize = [(UIWebView*)view scrollViewContentSizeWithWidth:width];
             neededSize = [(UIWebView*)view documentSizeByEvaluatingJavaScript];
         }
-        else if (neededSize.width < width) {
+        else {
             neededSize = [(UIWebView*)view scrollView].contentSize;
-            CGSize requestedSize = requestedContentSize;
-            if (requestedSize.width > neededSize.width) {
-                neededSize = requestedSize;
+            if (requestedContentSize.width > neededSize.width) {
+                neededSize = requestedContentSize;
             }
         }
     }
