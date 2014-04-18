@@ -588,14 +588,14 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                       : requestedContentSize);
     }
     else if ([view isKindOfClass:[UIWebView class]]) {
-        // choose the widest possible size
         if ([(UIWebView*)view isLoading]) {
             //neededSize = [(UIWebView*)view scrollViewContentSizeWithWidth:width];
             neededSize = [(UIWebView*)view documentSizeByEvaluatingJavaScript];
         }
         else {
             neededSize = [(UIWebView*)view scrollView].contentSize;
-            if (requestedContentSize.width > neededSize.width) {
+            // choose the widest possible size
+            if (neededSize.width < requestedContentSize.width) {
                 neededSize = requestedContentSize;
             }
         }
@@ -608,18 +608,20 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         if ([view isKindOfClass:[UIImageView class]] ||
             requestedContentSize.height > 0.f)
         {
-            // Images and YouTube videos (oembed height is zero)
+            // images and YouTube videos (oembed height is zero)
             finalSize.height = neededSize.height * scale;
-        } else {
+        }
+        else {
             // web content with undefined height
             finalSize.height = neededSize.height;
         }
         finalSize.width = availableWidth;
-    } else {
-        // use defaults
-        finalSize = neededSize;
+        return finalSize;
     }
-    return finalSize;
+    else {
+        // use defaults
+        return neededSize;
+    }
 }
 
 -(CGSize)contentSizeThatFits:(CGSize)size
