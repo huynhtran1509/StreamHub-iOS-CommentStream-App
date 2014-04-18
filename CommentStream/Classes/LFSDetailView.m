@@ -577,7 +577,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 -(CGSize)attachmentSizeWithMaxWidth:(CGFloat)width
 {
     UIView *view = self.attachmentView;
-    CGSize neededSize;
+    CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
+    CGSize neededSize = CGSizeMake(availableWidth, 100.f);
     
     CGSize requestedContentSize = [self.delegate requestedContentSize];
     if ([view isKindOfClass:[UIImageView class]]) {
@@ -602,7 +603,6 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     }
     
     CGSize finalSize;
-    CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
     if (neededSize.width > availableWidth) {
         // recalculate
         CGFloat scale = availableWidth / neededSize.width;
