@@ -361,7 +361,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // (this means that the insert/update/delete stacks also do not contain
         // said object)
         if (content.contentType == LFSContentTypeMessage) {
-            NSLog(@"xxx Inserting message with id %@", content.idString);
             [content enumerateVisiblePathsUsingBlock:^(LFSContent *obj) {
                 // insert all objects listed here in that order
                 [self insertObject:obj];
@@ -381,7 +380,6 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
             [self registerOpineWithContent:content];
         }
         else if (content.contentType == LFSContentTypeOEmbed) {
-            NSLog(@"xxx Inserting oembed with id %@", content.idString);
             [self registerOembedWithContent:content];
         }
     }
