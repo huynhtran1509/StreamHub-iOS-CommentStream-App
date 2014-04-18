@@ -616,10 +616,11 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
             finalSize.height = neededSize.height;
         }
         finalSize.width = availableWidth;
-        if ([view isKindOfClass:[UIWebView class]])
-        {
+        /*
+        if ([view isKindOfClass:[UIWebView class]]) {
             [[(UIWebView*)view scrollView] setZoomScale:scale animated:NO];
         }
+        */
         return finalSize;
     }
     else {
