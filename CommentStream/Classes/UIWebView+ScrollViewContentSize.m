@@ -24,6 +24,8 @@
 
 -(CGSize)documentSizeByEvaluatingJavaScript
 {
+    //NSString *height = [self stringByEvaluatingJavaScriptFromString:@"document.documentElement.scrollHeight"];
+    //NSString *width = [self stringByEvaluatingJavaScriptFromString:@"document.documentElement.scrollWidth"];
     NSString *height = [self stringByEvaluatingJavaScriptFromString:@"document.height"];
     NSString *width = [self stringByEvaluatingJavaScriptFromString:@"document.width"];
     return CGSizeMake([width floatValue], [height floatValue]);
