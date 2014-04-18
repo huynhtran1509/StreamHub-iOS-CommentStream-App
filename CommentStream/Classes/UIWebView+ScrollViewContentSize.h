@@ -11,5 +11,6 @@
 @interface UIWebView (ScrollViewContentSize)
 
 -(CGSize)scrollViewContentSizeWithWidth:(CGFloat)width;
+-(CGSize)documentSizeByEvaluatingJavaScript;
 
 @end
