@@ -80,16 +80,12 @@
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		EFA106AD18FF120C002E8411 /* UIWebView+ScrollViewContentSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIWebView+ScrollViewContentSize.h"; path = "Classes/UIWebView+ScrollViewContentSize.h"; sourceTree = "<group>"; };
-		EFA106AE18FF120C002E8411 /* UIWebView+ScrollViewContentSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIWebView+ScrollViewContentSize.m"; path = "Classes/UIWebView+ScrollViewContentSize.m"; sourceTree = "<group>"; };
 		EFA106B219031C2C002E8411 /* UIImage+LFSColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+LFSColor.h"; sourceTree = "<group>"; };
 		EFA106B419031C2C002E8411 /* UILabel+Trim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+Trim.h"; sourceTree = "<group>"; };
 		EFA106B619031C2C002E8411 /* UIWebView+ScrollViewContentSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWebView+ScrollViewContentSize.h"; sourceTree = "<group>"; };
 		EFA106BE19031CAB002E8411 /* UIImage+LFSColor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+LFSColor.m"; sourceTree = "<group>"; };
 		EFA106BF19031CAB002E8411 /* UILabel+Trim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UILabel+Trim.m"; sourceTree = "<group>"; };
 		EFA106C019031CAB002E8411 /* UIWebView+ScrollViewContentSize.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+ScrollViewContentSize.m"; sourceTree = "<group>"; };
-		EFA21E5D17F65BF7003589EB /* UILabel+Trim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UILabel+Trim.h"; path = "Classes/UILabel+Trim.h"; sourceTree = "<group>"; };
-		EFA21E5E17F65BF7003589EB /* UILabel+Trim.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UILabel+Trim.m"; path = "Classes/UILabel+Trim.m"; sourceTree = "<group>"; };
 		EFA21EAA17F970ED003589EB /* LFSResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSResource.h; path = Classes/LFSResource.h; sourceTree = "<group>"; };
 		EFA21EAB17F970ED003589EB /* LFSResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSResource.m; path = Classes/LFSResource.m; sourceTree = "<group>"; };
 		EFACF83517F4EC19003B3FF6 /* LFSDetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDetailView.h; path = Classes/LFSDetailView.h; sourceTree = "<group>"; };
@@ -117,8 +113,6 @@
 		EFE0A2EA180E7307006F0AB3 /* LFSUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSUser.m; path = Classes/LFSUser.m; sourceTree = "<group>"; };
 		EFE0A2EC180E8B6E006F0AB3 /* LFSWriteCommentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSWriteCommentView.h; path = Classes/LFSWriteCommentView.h; sourceTree = "<group>"; };
 		EFE0A2ED180E8B6E006F0AB3 /* LFSWriteCommentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSWriteCommentView.m; path = Classes/LFSWriteCommentView.m; sourceTree = "<group>"; };
-		EFE6FF29180256E6008351DD /* UIImage+LFSColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+LFSColor.h"; path = "Classes/UIImage+LFSColor.h"; sourceTree = "<group>"; };
-		EFE6FF2A180256E6008351DD /* UIImage+LFSColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+LFSColor.m"; path = "Classes/UIImage+LFSColor.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -252,12 +246,6 @@
 		EFCB940D17F1421100FB9384 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				EFE6FF29180256E6008351DD /* UIImage+LFSColor.h */,
-				EFE6FF2A180256E6008351DD /* UIImage+LFSColor.m */,
-				EFA21E5D17F65BF7003589EB /* UILabel+Trim.h */,
-				EFA21E5E17F65BF7003589EB /* UILabel+Trim.m */,
-				EFA106AD18FF120C002E8411 /* UIWebView+ScrollViewContentSize.h */,
-				EFA106AE18FF120C002E8411 /* UIWebView+ScrollViewContentSize.m */,
 				EFAF25FD18162935005632B2 /* LFSRightAlignedButton.h */,
 				EFAF25FE18162935005632B2 /* LFSRightAlignedButton.m */,
 				EFCB9F8A17EBED3B00797BCE /* LFSBasicHTMLParser.h */,
