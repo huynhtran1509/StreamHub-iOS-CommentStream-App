@@ -489,7 +489,7 @@ const static char kAttributedTextValueKey;
          }
                                    onFailure:^(NSOperation *operation, NSError *error)
          {
-             NSLog(@"Error code %d, with description %@", error.code, [error localizedDescription]);
+             NSLog(@"Error code %ld, with description %@", (long)error.code, [error localizedDescription]);
              [self stopSpinning];
          }];
     }

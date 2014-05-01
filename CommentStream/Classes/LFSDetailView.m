@@ -579,8 +579,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     UIView *view = self.attachmentView;
     CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
     CGSize neededSize = CGSizeMake(availableWidth, 100.f);
-    
     CGSize requestedContentSize = [self.delegate requestedContentSize];
+
     if ([view isKindOfClass:[UIImageView class]]) {
         UIImage *image = [(UIImageView*)view image];
         neededSize = (image != nil
@@ -601,9 +601,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         }
     }
     
-    CGSize finalSize;
     if (neededSize.width > availableWidth) {
         // recalculate
+        CGSize finalSize;
         CGFloat scale = availableWidth / neededSize.width;
         if ([view isKindOfClass:[UIImageView class]] ||
             requestedContentSize.height > 0.f)
@@ -616,6 +616,11 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
             finalSize.height = neededSize.height;
         }
         finalSize.width = availableWidth;
+        /*
+        if ([view isKindOfClass:[UIWebView class]]) {
+            [[(UIWebView*)view scrollView] setZoomScale:scale animated:NO];
+        }
+        */
         return finalSize;
     }
     else {
