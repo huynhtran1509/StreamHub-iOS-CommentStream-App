@@ -8,7 +8,8 @@ flagging and deleting of comments, and image attachments.
 
 ## Getting Started
 
-If you haven't already, please install CocoaPods first. [[1]] Then,
+If you haven't already, please install CocoaPods first. [[1]], You can do this
+simply by running `gem install cocoapods` and `pod setup`. Once installed,
 do the following (assuming you keep your projects in `~/dev` directory):
 
     cd ~/dev
