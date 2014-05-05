@@ -50,7 +50,7 @@
 - (CGSize)requestedContentSize;
 
 @optional
-- (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url;
-- (void)didSelectContentRemote:(id)sender wihtURL:(NSURL*)url;
+- (void)didSelectProfile:(id)sender withURL:(NSURL*)url;
+- (void)didSelectContentRemote:(id)sender withURL:(NSURL*)url;
 
 @end

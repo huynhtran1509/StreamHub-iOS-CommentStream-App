@@ -448,12 +448,12 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     }
 }
 
-- (void)didSelectProfile:(id)sender wihtURL:(NSURL*)url
+- (void)didSelectProfile:(id)sender withURL:(NSURL*)url
 {
     [self.attributedLabelDelegate followURL:url];
 }
 
-- (void)didSelectContentRemote:(id)sender wihtURL:(NSURL*)url
+- (void)didSelectContentRemote:(id)sender withURL:(NSURL*)url
 {
     [self.attributedLabelDelegate followURL:url];
 }

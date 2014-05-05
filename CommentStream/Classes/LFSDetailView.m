@@ -948,18 +948,18 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 - (IBAction)didSelectProfile:(id)sender
 {
     // call optional selector
-    if ([self.delegate respondsToSelector:@selector(didSelectProfile:wihtURL:)]) {
+    if ([self.delegate respondsToSelector:@selector(didSelectProfile:withURL:)]) {
         [self.delegate didSelectProfile:sender
-                                wihtURL:_profileRemoteURL];
+                                withURL:_profileRemoteURL];
     }
 }
 
 - (IBAction)didSelectContentRemote:(id)sender
 {
     // call optional selector
-    if ([self.delegate respondsToSelector:@selector(didSelectContentRemote:wihtURL:)]) {
+    if ([self.delegate respondsToSelector:@selector(didSelectContentRemote:withURL:)]) {
         [self.delegate didSelectContentRemote:sender
-                                      wihtURL:[NSURL URLWithString:self.contentRemote.identifier]];
+                                      withURL:[NSURL URLWithString:self.contentRemote.identifier]];
     }
 }
 
