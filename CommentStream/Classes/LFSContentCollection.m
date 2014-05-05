@@ -289,6 +289,13 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
     }
 }
 
+- (void)registerOembedWithContent:(LFSContent*)content
+{
+    NSString *targetId = content.targetId;
+    id obj = [_mapping objectForKey:targetId];
+    [obj addOembed:content];
+}
+
 - (void)registerOpineWithContent:(LFSContent*)content
 {
     NSString *targetId = content.targetId;
@@ -353,25 +360,28 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
         // no pre-existing object found
         // (this means that the insert/update/delete stacks also do not contain
         // said object)
-        [content enumerateVisiblePathsUsingBlock:^(LFSContent *obj) {
-            // insert all objects listed here in that order
-            [self insertObject:obj];
-        }];
-        
-        if (content.nodeCount > 0 && content.parentId != nil) {
-            LFSContent *parent = [self objectForKey:content.parentId];
+        if (content.contentType == LFSContentTypeMessage) {
+            [content enumerateVisiblePathsUsingBlock:^(LFSContent *obj) {
+                // insert all objects listed here in that order
+                [self insertObject:obj];
+            }];
             
-            // update parents
-            if (parent != nil) {
-                [self changeNodeCountOf:parent withDelta:content.nodeCount];
+            if (content.nodeCount > 0 && content.parentId != nil) {
+                LFSContent *parent = [self objectForKey:content.parentId];
+                
+                // update parents
+                if (parent != nil) {
+                    [self changeNodeCountOf:parent withDelta:content.nodeCount];
+                }
             }
         }
-    }
-    
-    if (content.contentType == LFSContentTypeOpine)
-    {
-        // dealing with an opine
-        [self registerOpineWithContent:content];
+        else if (content.contentType == LFSContentTypeOpine) {
+            // dealing with an opine
+            [self registerOpineWithContent:content];
+        }
+        else if (content.contentType == LFSContentTypeOEmbed) {
+            [self registerOembedWithContent:content];
+        }
     }
 }
 
@@ -683,6 +693,7 @@ NSString *descriptionForObject(id object, id locale, NSUInteger indent)
 
     }
 
+    // TODO: switch from delegate to observer pattern here
     [self.delegate didUpdateModelWithDeletes:deletedIndexPaths
                                      updates:updatedIndexPaths
                                      inserts:insertedIndexPaths];

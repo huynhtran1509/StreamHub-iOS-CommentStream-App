@@ -24,9 +24,11 @@
 		EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7BB6DF17B2B718009E2E70 /* UIKit.framework */; };
 		EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */; };
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
-		EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
-		EFA21E5F17F65BF7003589EB /* UILabel+Trim.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA21E5E17F65BF7003589EB /* UILabel+Trim.m */; };
+		EFA106C119031D2E002E8411 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
+		EFA106C2190563A9002E8411 /* UIImage+LFSColor.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA106BE19031CAB002E8411 /* UIImage+LFSColor.m */; };
+		EFA106C3190563A9002E8411 /* UILabel+Trim.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA106BF19031CAB002E8411 /* UILabel+Trim.m */; };
+		EFA106C4190563A9002E8411 /* UIWebView+ScrollViewContentSize.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA106C019031CAB002E8411 /* UIWebView+ScrollViewContentSize.m */; };
 		EFA21EAC17F970ED003589EB /* LFSResource.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA21EAB17F970ED003589EB /* LFSResource.m */; };
 		EFACF83717F4EC19003B3FF6 /* LFSDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFACF83617F4EC19003B3FF6 /* LFSDetailView.m */; };
 		EFAF25FC1815E820005632B2 /* LFSAttributedLabelDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EFAF25FB1815E820005632B2 /* LFSAttributedLabelDelegate.m */; };
@@ -41,7 +43,6 @@
 		EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = EFD5BFD517EC604500C28880 /* LFSBasicHTMLLabel.m */; };
 		EFE0A2EB180E7307006F0AB3 /* LFSUser.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE0A2EA180E7307006F0AB3 /* LFSUser.m */; };
 		EFE0A2EE180E8B6E006F0AB3 /* LFSWriteCommentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE0A2ED180E8B6E006F0AB3 /* LFSWriteCommentView.m */; };
-		EFE6FF2B180256E6008351DD /* UIImage+LFSColor.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE6FF2A180256E6008351DD /* UIImage+LFSColor.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -79,8 +80,12 @@
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		EFA21E5D17F65BF7003589EB /* UILabel+Trim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UILabel+Trim.h"; path = "Classes/UILabel+Trim.h"; sourceTree = "<group>"; };
-		EFA21E5E17F65BF7003589EB /* UILabel+Trim.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UILabel+Trim.m"; path = "Classes/UILabel+Trim.m"; sourceTree = "<group>"; };
+		EFA106B219031C2C002E8411 /* UIImage+LFSColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+LFSColor.h"; sourceTree = "<group>"; };
+		EFA106B419031C2C002E8411 /* UILabel+Trim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+Trim.h"; sourceTree = "<group>"; };
+		EFA106B619031C2C002E8411 /* UIWebView+ScrollViewContentSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWebView+ScrollViewContentSize.h"; sourceTree = "<group>"; };
+		EFA106BE19031CAB002E8411 /* UIImage+LFSColor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+LFSColor.m"; sourceTree = "<group>"; };
+		EFA106BF19031CAB002E8411 /* UILabel+Trim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UILabel+Trim.m"; sourceTree = "<group>"; };
+		EFA106C019031CAB002E8411 /* UIWebView+ScrollViewContentSize.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+ScrollViewContentSize.m"; sourceTree = "<group>"; };
 		EFA21EAA17F970ED003589EB /* LFSResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSResource.h; path = Classes/LFSResource.h; sourceTree = "<group>"; };
 		EFA21EAB17F970ED003589EB /* LFSResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSResource.m; path = Classes/LFSResource.m; sourceTree = "<group>"; };
 		EFACF83517F4EC19003B3FF6 /* LFSDetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSDetailView.h; path = Classes/LFSDetailView.h; sourceTree = "<group>"; };
@@ -108,8 +113,6 @@
 		EFE0A2EA180E7307006F0AB3 /* LFSUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSUser.m; path = Classes/LFSUser.m; sourceTree = "<group>"; };
 		EFE0A2EC180E8B6E006F0AB3 /* LFSWriteCommentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSWriteCommentView.h; path = Classes/LFSWriteCommentView.h; sourceTree = "<group>"; };
 		EFE0A2ED180E8B6E006F0AB3 /* LFSWriteCommentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSWriteCommentView.m; path = Classes/LFSWriteCommentView.m; sourceTree = "<group>"; };
-		EFE6FF29180256E6008351DD /* UIImage+LFSColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+LFSColor.h"; path = "Classes/UIImage+LFSColor.h"; sourceTree = "<group>"; };
-		EFE6FF2A180256E6008351DD /* UIImage+LFSColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+LFSColor.m"; path = "Classes/UIImage+LFSColor.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +185,7 @@
 		EF7BB6E117B2B718009E2E70 /* CommentStream */ = {
 			isa = PBXGroup;
 			children = (
+				EFA106B119031C2C002E8411 /* Categories */,
 				EFCB940C17F141F100FB9384 /* Models */,
 				EFCB940D17F1421100FB9384 /* Views */,
 				EF6683D817BB9785005F5FC3 /* Controllers */,
@@ -202,6 +206,19 @@
 				EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		EFA106B119031C2C002E8411 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				EFA106B219031C2C002E8411 /* UIImage+LFSColor.h */,
+				EFA106BE19031CAB002E8411 /* UIImage+LFSColor.m */,
+				EFA106B419031C2C002E8411 /* UILabel+Trim.h */,
+				EFA106BF19031CAB002E8411 /* UILabel+Trim.m */,
+				EFA106B619031C2C002E8411 /* UIWebView+ScrollViewContentSize.h */,
+				EFA106C019031CAB002E8411 /* UIWebView+ScrollViewContentSize.m */,
+			);
+			path = Categories;
 			sourceTree = "<group>";
 		};
 		EFCB940C17F141F100FB9384 /* Models */ = {
@@ -229,10 +246,6 @@
 		EFCB940D17F1421100FB9384 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				EFE6FF29180256E6008351DD /* UIImage+LFSColor.h */,
-				EFE6FF2A180256E6008351DD /* UIImage+LFSColor.m */,
-				EFA21E5D17F65BF7003589EB /* UILabel+Trim.h */,
-				EFA21E5E17F65BF7003589EB /* UILabel+Trim.m */,
 				EFAF25FD18162935005632B2 /* LFSRightAlignedButton.h */,
 				EFAF25FE18162935005632B2 /* LFSRightAlignedButton.m */,
 				EFCB9F8A17EBED3B00797BCE /* LFSBasicHTMLParser.h */,
@@ -318,7 +331,7 @@
 				EF1179D117B5BE3F00D59E54 /* LFSConfig.plist in Resources */,
 				EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */,
 				EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */,
-				EF7BB6EF17B2B718009E2E70 /* Main.storyboard in Resources */,
+				EFA106C119031D2E002E8411 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +375,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EFA106C2190563A9002E8411 /* UIImage+LFSColor.m in Sources */,
+				EFA106C3190563A9002E8411 /* UILabel+Trim.m in Sources */,
+				EFA106C4190563A9002E8411 /* UIWebView+ScrollViewContentSize.m in Sources */,
 				EFA21EAC17F970ED003589EB /* LFSResource.m in Sources */,
 				EF5AFED617E3C2B900D5A7DF /* LFSPostViewController.m in Sources */,
 				EF529E3B17F39ECF00836ACE /* LFSContentToolbar.m in Sources */,
@@ -370,7 +386,6 @@
 				EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */,
 				EFCB9F8C17EBED3B00797BCE /* LFSBasicHTMLParser.m in Sources */,
 				EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */,
-				EFA21E5F17F65BF7003589EB /* UILabel+Trim.m in Sources */,
 				EF6683E117BB97E2005F5FC3 /* LFSCollectionViewController.m in Sources */,
 				EF05E46A181CD36700153F42 /* LFSOembed.m in Sources */,
 				EF5AFED317E3C13000D5A7DF /* LFSDetailViewController.m in Sources */,
@@ -379,7 +394,6 @@
 				EFCB940817F1119600FB9384 /* LFSAuthorCollection.m in Sources */,
 				EFC5CED617FE1FC800936EBD /* LFSContentCollection.m in Sources */,
 				EFCB940B17F141E500FB9384 /* LFSAuthorProfile.m in Sources */,
-				EFE6FF2B180256E6008351DD /* UIImage+LFSColor.m in Sources */,
 				EFC4F61317DFC35C00E60F6F /* LFSRootViewController.m in Sources */,
 				EF4CC0A3180810470042DB40 /* LFSDeletedCell.m in Sources */,
 				EF7BB6E817B2B718009E2E70 /* main.m in Sources */,

@@ -15,6 +15,7 @@
 #import "LFSContentToolbar.h"
 #import "UILabel+Trim.h"
 #import "LFSRightAlignedButton.h"
+#import "UIWebView+ScrollViewContentSize.h"
 
 static const UIEdgeInsets kDetailPadding = {
     .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
@@ -576,9 +577,10 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 -(CGSize)attachmentSizeWithMaxWidth:(CGFloat)width
 {
     UIView *view = self.attachmentView;
-    CGSize neededSize;
-    
+    CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
+    CGSize neededSize = CGSizeMake(availableWidth, 100.f);
     CGSize requestedContentSize = [self.delegate requestedContentSize];
+
     if ([view isKindOfClass:[UIImageView class]]) {
         UIImage *image = [(UIImageView*)view image];
         neededSize = (image != nil
@@ -586,44 +588,45 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                       : requestedContentSize);
     }
     else if ([view isKindOfClass:[UIWebView class]]) {
-        // choose the widest possible size
-        neededSize = [(UIWebView*)view scrollView].contentSize;
-        if (neededSize.width < width) {
-            CGSize requestedSize = requestedContentSize;
-            if (requestedSize.width > neededSize.width) {
-                neededSize = requestedSize;
-            }
+        if ([(UIWebView*)view isLoading]) {
+            //neededSize = [(UIWebView*)view scrollViewContentSizeWithWidth:width];
+            neededSize = [(UIWebView*)view documentSizeByEvaluatingJavaScript];
         }
-        if ([(UIWebView*)view isLoading])
-        {
-            CGRect frame = view.frame;
-            CGRect oldFrame = frame;
-            frame.size.height = 1;
-            frame.size.width = width; // setting this to "width" gives 100% frame width
-            view.frame = frame;
-            neededSize = [view sizeThatFits:CGSizeZero];
-            view.frame = oldFrame; // restore old frame
+        else {
+            neededSize = [(UIWebView*)view scrollView].contentSize;
+            // choose the widest possible size
+            if (neededSize.width < requestedContentSize.width) {
+                neededSize = requestedContentSize;
+            }
         }
     }
     
-    CGSize finalSize;
-    CGFloat availableWidth = width - kDetailPadding.left - kDetailPadding.right;
     if (neededSize.width > availableWidth) {
         // recalculate
+        CGSize finalSize;
         CGFloat scale = availableWidth / neededSize.width;
-        if (requestedContentSize.height > 0.f) {
-            // Images and YouTube videos (oembed height is zero)
+        if ([view isKindOfClass:[UIImageView class]] ||
+            requestedContentSize.height > 0.f)
+        {
+            // images and YouTube videos (oembed height is zero)
             finalSize.height = neededSize.height * scale;
-        } else {
+        }
+        else {
             // web content with undefined height
             finalSize.height = neededSize.height;
         }
         finalSize.width = availableWidth;
-    } else {
-        // use defaults
-        finalSize = neededSize;
+        /*
+        if ([view isKindOfClass:[UIWebView class]]) {
+            [[(UIWebView*)view scrollView] setZoomScale:scale animated:NO];
+        }
+        */
+        return finalSize;
     }
-    return finalSize;
+    else {
+        // use defaults
+        return neededSize;
+    }
 }
 
 -(CGSize)contentSizeThatFits:(CGSize)size
@@ -945,18 +948,18 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 - (IBAction)didSelectProfile:(id)sender
 {
     // call optional selector
-    if ([self.delegate respondsToSelector:@selector(didSelectProfile:wihtURL:)]) {
+    if ([self.delegate respondsToSelector:@selector(didSelectProfile:withURL:)]) {
         [self.delegate didSelectProfile:sender
-                                wihtURL:_profileRemoteURL];
+                                withURL:_profileRemoteURL];
     }
 }
 
 - (IBAction)didSelectContentRemote:(id)sender
 {
     // call optional selector
-    if ([self.delegate respondsToSelector:@selector(didSelectContentRemote:wihtURL:)]) {
+    if ([self.delegate respondsToSelector:@selector(didSelectContentRemote:withURL:)]) {
         [self.delegate didSelectContentRemote:sender
-                                      wihtURL:[NSURL URLWithString:self.contentRemote.identifier]];
+                                      withURL:[NSURL URLWithString:self.contentRemote.identifier]];
     }
 }
 
