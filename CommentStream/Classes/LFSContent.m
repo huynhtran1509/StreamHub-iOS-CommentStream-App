@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Livefyre. All rights reserved.
 //
 
+#import <StreamHub-iOS-SDK/LFSConstants.h>
 #import "LFSModelMacros.h"
 #import "LFSContent.h"
 
@@ -45,22 +46,9 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
     return visibleNodeCount;
 }
 
-
-// For detailed info, see
-// https://github.com/Livefyre/lfdj/blob/production/lfcore/lfcore/v2/publishing/models.proto
-typedef NS_ENUM(NSUInteger, LFSContentSource) {
-    LFSContentSourceDefault = 0u,   // 0
-    LFSContentSourceTwitter,        // 1
-    LFSContentSourceFacebook,       // 2
-    LFSContentSourceGooglePlus,     // 3
-    LFSContentSourceFlickr,         // 4
-    LFSContentSourceYouTube,        // 5
-    LFSContentSourceRSS,            // 6
-    LFSContentSourceInstagram       // 7
-};
-
 #define SOURCE_IMAGE_MAP_LENGTH 8u
-static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
+const NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] =
+{
     nil,                        // LFSContentSourceDefault      (0)
     @"SourceTwitter",           // LFSContentSourceTwitter      (1)
     @"SourceFacebook",          // LFSContentSourceFacebook     (2)
@@ -71,30 +59,6 @@ static NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] = {
     @"SourceInstagram",         // LFSContentSourceInstagram    (7)
 };
 
-#define CONTENT_SOURCE_DECODE_LENGTH 20u
-static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
-{
-    LFSContentSourceDefault,    //  0
-    LFSContentSourceTwitter,    //  1
-    LFSContentSourceTwitter,    //  2
-    LFSContentSourceFacebook,   //  3
-    LFSContentSourceDefault,    //  4
-    LFSContentSourceDefault,    //  5
-    LFSContentSourceFacebook,   //  6
-    LFSContentSourceTwitter,    //  7
-    LFSContentSourceDefault,    //  8
-    LFSContentSourceDefault,    //  9
-    LFSContentSourceGooglePlus, // 10
-    LFSContentSourceFlickr,     // 11
-    LFSContentSourceYouTube,    // 12
-    LFSContentSourceRSS,        // 13
-    LFSContentSourceFacebook,   // 14
-    LFSContentSourceTwitter,    // 15
-    LFSContentSourceYouTube,    // 16
-    LFSContentSourceDefault,    // 17
-    LFSContentSourceDefault,    // 18
-    LFSContentSourceInstagram,  // 19
-};
 
 #pragma mark - LFSContent implementaiton
 @implementation LFSContent {
@@ -433,8 +397,8 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     NSParameterAssert((NSUInteger)contentSource < SOURCE_IMAGE_MAP_LENGTH);
     // do a simple range check for memory safety
     if (contentSource <= LFSContentSourceInstagram) {
-        NSString* const imageName = kLFSSourceImageMap[contentSource];
-        return [UIImage imageNamed:imageName];
+        const NSString* const imageName = kLFSSourceImageMap[contentSource];
+        return [UIImage imageNamed:(NSString*)imageName];
     } else {
         return nil;
     }
@@ -445,7 +409,7 @@ static const NSUInteger kLFSContentSourceDecode[CONTENT_SOURCE_DECODE_LENGTH] =
     NSParameterAssert((NSUInteger)contentSource < SOURCE_IMAGE_MAP_LENGTH);
     // do a simple range check for memory safety
     if (contentSource <= LFSContentSourceInstagram) {
-        NSString* const imageName = kLFSSourceImageMap[contentSource];
+        const NSString* const imageName = kLFSSourceImageMap[contentSource];
         NSString *smallImageName = [imageName stringByAppendingString:@"Small"];
         return [UIImage imageNamed:smallImageName];
     } else {
