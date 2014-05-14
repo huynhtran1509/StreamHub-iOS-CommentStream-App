@@ -28,7 +28,7 @@ id AttributeObjectFromContent(LFSContent* content)
         return [UIImage imageNamed:@"Featured"];
     }
     else {
-        return nil;
+        return @"";
     }
 }
 
