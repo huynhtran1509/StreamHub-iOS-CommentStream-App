@@ -149,7 +149,12 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     if (_headerAttributeTopImageView == nil) {
         CGFloat leftColumnWidth = kDetailPadding.left + kDetailImageViewSize.width + kDetailImageMarginRight;
         CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
-        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderAttributeTopHeight);
+
+        id fillImage = self.profileLocal.attributeObject;
+        CGSize labelSize = ([fillImage isKindOfClass:[UIImage class]]
+                            ? [(UIImage*)fillImage size]
+                            : CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth,
+                                         kDetailHeaderAttributeTopHeight));
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
