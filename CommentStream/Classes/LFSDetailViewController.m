@@ -10,6 +10,7 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
+#import "LFSViewResources.h"
 #import "UIImage+LFSColor.h"
 #import "LFSDetailViewController.h"
 #import "LFSContentToolbar.h"
@@ -289,15 +290,16 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
                                       icon:nil]];
     }
     
+    UIImage *iconLarge = ImageForContentSource(contentItem.contentSource);
     LFSAuthorProfile *author = contentItem.author;
     [detailView setProfileRemote:[[LFSResource alloc]
                                   initWithIdentifier:author.profileUrlStringNoHashBang
                                   displayString:nil
-                                  icon:contentItem.sourceIcon]];
+                                  icon:iconLarge]];
     
     LFSResource *headerInfo = [[LFSResource alloc]
                                initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil)
-                               attributeString:(contentItem.authorIsModerator ? @"Moderator" : nil)
+                               attribute:AttributeObjectFromContent(contentItem)
                                displayString:author.displayName
                                icon:self.avatarImage];
     [headerInfo setIconURLString:author.avatarUrlString75];

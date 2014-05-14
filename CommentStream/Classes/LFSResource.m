@@ -10,7 +10,7 @@
 
 @implementation LFSResource
 
-@synthesize attributeString = _attributeString;
+@synthesize attributeObject = _attributeObject;
 @synthesize identifier = _identifier;
 @synthesize icon = _icon;
 @synthesize displayString = _displayString;
@@ -18,14 +18,14 @@
 
 // designated initializer
 -(id)initWithIdentifier:(NSString*)identifierString
-        attributeString:(NSString*)attributeString
+              attribute:(NSString*)attributeString
           displayString:(NSString*)displayString
                    icon:(UIImage*)iconImage
 {
     self = [super init];
     if (self) {
         _identifier = identifierString;
-        _attributeString = attributeString;
+        _attributeObject = attributeString;
         _icon = iconImage;
         _displayString = displayString;
     }
@@ -37,7 +37,7 @@
                    icon:(UIImage*)iconImage
 {
     self = [self initWithIdentifier:identifierString
-                    attributeString:nil
+                          attribute:nil
                       displayString:displayString
                                icon:iconImage];
     return self;
@@ -46,7 +46,7 @@
 -(id)init
 {
     self = [self initWithIdentifier:nil
-                    attributeString:nil
+                          attribute:nil
                       displayString:nil
                                icon:nil];
     return self;

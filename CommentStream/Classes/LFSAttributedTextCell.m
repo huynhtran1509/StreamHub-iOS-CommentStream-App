@@ -57,6 +57,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 @property (nonatomic, assign) NSUInteger contentHash;
 
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
+@property (readonly, nonatomic) UIImageView *headerAttributeTopImageView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
@@ -282,6 +283,31 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 }
 
 #pragma mark -
+@synthesize headerAttributeTopImageView = _headerAttributeTopImageView;
+- (UIImageView*)headerAttributeTopImageView
+{
+    if (_headerAttributeTopImageView == nil) {
+        CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - kCellPadding.right,
+                                      kCellHeaderAttributeTopHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kCellPadding.top); // size.y will be changed in layoutSubviews
+        // initialize
+        _headerAttributeTopImageView = [[UIImageView alloc] initWithFrame:frame];
+        
+        // configure
+        [_headerAttributeTopImageView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        
+        // add to superview
+        [self.contentView addSubview:_headerAttributeTopImageView];
+    }
+    return _headerAttributeTopImageView;
+}
+
+#pragma mark -
 @synthesize headerTitleView = _headerTitleView;
 - (UILabel *)headerTitleView
 {
@@ -438,7 +464,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
     LFSResource *profileLocal = self.profileLocal;
     NSString *headerTitle = profileLocal.displayString;
     NSString *headerSubtitle = profileLocal.identifier;
-    NSString *headerAccessory = profileLocal.attributeString;
+    id headerAccessory = profileLocal.attributeObject;
     
     CGFloat leftColumnWidth = kCellPadding.left + _leftOffset + kCellImageViewSize.width + kCellMinorHorizontalSeparator;
     
@@ -485,11 +511,16 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
                                                   - headerTitleFrame.origin.x
                                                   - headerTitleFrame.size.width,
                                                   headerTitleFrame.size.height);
-        
-        [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
-        [self.headerAttributeTopView setText:headerAccessory];
-        [self.headerAttributeTopView resizeVerticalCenterRightTrim];
-        
+
+        if ([headerAccessory isKindOfClass:[UIImage class]]) {
+            [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopImageView setImage:headerAccessory];
+        }
+        else {
+            [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopView setText:headerAccessory];
+            [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        }
     }
     else if (headerTitle && headerSubtitle && headerAccessory)
     {
@@ -511,9 +542,15 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
                                                   - headerTitleFrame.size.width,
                                                   headerTitleFrame.size.height);
         
-        [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
-        [self.headerAttributeTopView setText:headerAccessory];
-        [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        if ([headerAccessory isKindOfClass:[UIImage class]]) {
+            [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopImageView setImage:headerAccessory];
+        }
+        else {
+            [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopView setText:headerAccessory];
+            [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        }
     }
     else {
         // no header

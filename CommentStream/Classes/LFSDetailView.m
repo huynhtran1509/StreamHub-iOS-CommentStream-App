@@ -71,6 +71,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 @property (readonly, nonatomic) LFSRightAlignedButton *footerRightView;
 
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
+@property (readonly, nonatomic) UIImageView *headerAttributeTopImageView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
@@ -432,6 +433,31 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 }
 
 #pragma mark -
+@synthesize headerAttributeTopImageView = _headerAttributeTopImageView;
+- (UIImageView*)headerAttributeTopImageView
+{
+    if (_headerAttributeTopImageView == nil) {
+        CGFloat leftColumnWidth = kDetailPadding.left + kDetailImageViewSize.width + kDetailImageMarginRight;
+        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderAttributeTopHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
+        // initialize
+        _headerAttributeTopImageView = [[UIImageView alloc] initWithFrame:frame];
+        
+        // configure
+        [_headerAttributeTopImageView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        
+        // add to superview
+        [self addSubview:_headerAttributeTopImageView];
+    }
+    return _headerAttributeTopImageView;
+}
+
+#pragma mark -
 @synthesize headerTitleView = _headerTitleView;
 - (UILabel*)headerTitleView
 {
@@ -645,7 +671,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     LFSResource *profileLocal = self.profileLocal;
     NSString *headerTitle = profileLocal.displayString;
     NSString *headerSubtitle = profileLocal.identifier;
-    NSString *headerAccessory = profileLocal.attributeString;
+    id headerAccessory = profileLocal.attributeObject;
     
     // layout source icon
     LFSResource *profileRemote = self.profileRemote;
@@ -689,8 +715,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     else if (headerTitle && !headerSubtitle && headerAccessory)
     {
         // attribute + full name
-        
-        CGRect headerAttributeTopFrame = self.headerAttributeTopView.frame;
+        CGRect headerAttributeTopFrame = ([headerAccessory isKindOfClass:[UIImage class]]
+                                          ? self.headerAttributeTopImageView.frame
+                                          : self.headerAttributeTopView.frame);
         CGRect headerTitleFrame = self.headerTitleView.frame;
         
         CGFloat separator = floorf((kDetailImageViewSize.height
@@ -704,9 +731,15 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                                      + headerAttributeTopFrame.size.height
                                      + separator);
         
-        [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
-        [self.headerAttributeTopView setText:headerAccessory];
-        [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        if ([headerAccessory isKindOfClass:[UIImage class]]) {
+            [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopImageView setImage:headerAccessory];
+        }
+        else {
+            [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopView setText:headerAccessory];
+            [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        }
         
         [self.headerTitleView setFrame:headerTitleFrame];
         [self.headerTitleView setText:headerTitle];
@@ -715,8 +748,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     else if (headerTitle && headerSubtitle && headerAccessory)
     {
         // attribute + full name + twitter handle
-        
-        CGRect headerAttributeTopFrame = self.headerAttributeTopView.frame;
+        CGRect headerAttributeTopFrame = ([headerAccessory isKindOfClass:[UIImage class]]
+                                          ? self.headerAttributeTopImageView.frame
+                                          : self.headerAttributeTopView.frame);
         CGRect headerTitleFrame = self.headerTitleView.frame;
         CGRect headerSubtitleFrame = self.headerSubtitleView.frame;
         
@@ -739,9 +773,15 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
                                         + headerTitleFrame.size.height
                                         + separator);
         
-        [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
-        [self.headerAttributeTopView setText:headerAccessory];
-        [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        if ([headerAccessory isKindOfClass:[UIImage class]]) {
+            [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopImageView setImage:headerAccessory];
+        }
+        else {
+            [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopView setText:headerAccessory];
+            [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        }
         
         [self.headerTitleView setFrame:headerTitleFrame];
         [self.headerTitleView setText:headerTitle];

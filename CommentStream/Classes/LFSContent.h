@@ -20,25 +20,6 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 
 @interface LFSContent : NSObject
 
-/* Sample content:
- {
- childContent: [ ],
- vis: 1,
- content: {
- parentId: "",
- bodyHtml: "Can anyone tell me what Vila Velha in Brazil is like? <a href="https://twitter.com/#!/search/realtime/%23WorldCup" class="fyre-hashtag" hashtag="WorldCup" rel="tag" target="_blank">#WorldCup</a> <a href="https://twitter.com/#!/search/realtime/%23carnival" class="fyre-hashtag" hashtag="carnival" rel="tag" target="_blank">#carnival</a>",
- annotations: { },
- authorId: "391303630@twitter.com",
- updatedAt: 1374902038,
- id: "tweet-360991428312186880@twitter.com",
- createdAt: 1374902038
- },
- source: 1,
- type: 0,
- event: 1374902038279948
- }
- */
-
 -(id)initWithObject:(id)object;
 
 @property (nonatomic, strong) id object;
@@ -47,9 +28,8 @@ typedef void (^LFSContentChildVisitor) (LFSContent *obj);
 @property (nonatomic, assign) NSUInteger index;
 
 @property (nonatomic, readonly) BOOL authorIsModerator;
+@property (nonatomic, readonly) BOOL isFeatured;
 
-@property (nonatomic, readonly) UIImage *sourceIconSmall;
-@property (nonatomic, readonly) UIImage *sourceIcon;
 @property (nonatomic, readonly) NSString *twitterId;
 @property (nonatomic, readonly) NSString *twitterUrlString;
 

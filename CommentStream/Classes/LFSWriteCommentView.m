@@ -51,6 +51,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 // UIView-specific
 @property (readonly, nonatomic) UIImageView *headerImageView;
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
+@property (readonly, nonatomic) UIImageView *headerAttributeTopImageView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
@@ -142,6 +143,37 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 }
 
 #pragma mark -
+@synthesize headerAttributeTopImageView = _headerAttributeTopImageView;
+- (UIImageView*)headerAttributeTopImageView
+{
+    if (_headerAttributeTopImageView == nil) {
+        CGFloat leftColumnWidth = kDetailPadding.left + kDetailImageViewSize.width + kDetailImageMarginRight;
+        CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderAttributeTopHeight);
+        CGRect frame;
+        frame.size = labelSize;
+        frame.origin = CGPointMake(leftColumnWidth,
+                                   kDetailPadding.top); // size.y will be changed in layoutSubviews
+        if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+            // iOS6
+            frame.origin.y -= kPostContentInset.top;
+            frame.origin.x -= kPostContentInset.left;
+        }
+        
+        // initialize
+        _headerAttributeTopImageView = [[UIImageView alloc] initWithFrame:frame];
+        
+        // configure
+        [_headerAttributeTopImageView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        
+        // add to superview
+        [self.textView addSubview:_headerAttributeTopImageView];
+    }
+    return _headerAttributeTopImageView;
+}
+
+#pragma mark -
 @synthesize headerTitleView = _headerTitleView;
 - (UILabel*)headerTitleView
 {
@@ -217,7 +249,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     LFSResource *profileLocal = self.profileLocal;
     NSString *headerTitle = profileLocal.displayString;
     NSString *headerSubtitle = profileLocal.identifier;
-    NSString *headerAccessory = profileLocal.attributeString;
+    id headerAccessory = profileLocal.attributeObject;
     
     if (headerTitle && !headerSubtitle && !headerAccessory)
     {
@@ -253,9 +285,10 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     else if (headerTitle && !headerSubtitle && headerAccessory)
     {
         // attribute + full name
-        
-        CGRect headerAttributeTopFrame = self.headerAttributeTopView.frame;
         CGRect headerTitleFrame = self.headerTitleView.frame;
+        CGRect headerAttributeTopFrame = ([headerAccessory isKindOfClass:[UIImage class]]
+                                          ? self.headerAttributeTopImageView.frame
+                                          : self.headerAttributeTopView.frame);
         
         CGFloat separator = floorf((kDetailImageViewSize.height
                                     - headerTitleFrame.size.height
@@ -268,9 +301,15 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
                                      + headerAttributeTopFrame.size.height
                                      + separator);
         
-        [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
-        [self.headerAttributeTopView setText:headerAccessory];
-        [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        if ([headerAccessory isKindOfClass:[UIImage class]]) {
+            [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopImageView setImage:headerAccessory];
+        }
+        else {
+            [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopView setText:headerAccessory];
+            [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        }
         
         [self.headerTitleView setFrame:headerTitleFrame];
         [self.headerTitleView setText:headerTitle];
@@ -279,9 +318,11 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     else if (headerTitle && headerSubtitle && headerAccessory)
     {
         // attribute + full name + twitter handle
-        
-        CGRect headerAttributeTopFrame = self.headerAttributeTopView.frame;
         CGRect headerTitleFrame = self.headerTitleView.frame;
+        CGRect headerAttributeTopFrame = ([headerAccessory isKindOfClass:[UIImage class]]
+                                          ? self.headerAttributeTopImageView.frame
+                                          : self.headerAttributeTopView.frame);
+
         CGRect headerSubtitleFrame = self.headerSubtitleView.frame;
         
         CGFloat separator = floorf((kDetailImageViewSize.height
@@ -303,9 +344,15 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
                                         + headerTitleFrame.size.height
                                         + separator);
         
-        [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
-        [self.headerAttributeTopView setText:headerAccessory];
-        [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        if ([headerAccessory isKindOfClass:[UIImage class]]) {
+            [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopImageView setImage:headerAccessory];
+        }
+        else {
+            [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
+            [self.headerAttributeTopView setText:headerAccessory];
+            [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+        }
         
         [self.headerTitleView setFrame:headerTitleFrame];
         [self.headerTitleView setText:headerTitle];
