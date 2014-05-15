@@ -57,7 +57,6 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
 @property (nonatomic, assign) NSUInteger contentHash;
 
 @property (readonly, nonatomic) UILabel *headerAttributeTopView;
-@property (readonly, nonatomic) UIImageView *headerAttributeTopImageView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
 
@@ -516,11 +515,13 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         if ([headerAccessory isKindOfClass:[UIImage class]]) {
             [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
             [self.headerAttributeTopImageView setImage:headerAccessory];
+            [self.headerAttributeTopView setText:nil];
         }
         else {
             [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
             [self.headerAttributeTopView setText:headerAccessory];
             [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+            [self.headerAttributeTopImageView setImage:nil];
         }
     }
     else if (headerTitle && headerSubtitle && headerAccessory)
@@ -546,11 +547,13 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         if ([headerAccessory isKindOfClass:[UIImage class]]) {
             [self.headerAttributeTopImageView setFrame:headerAttributeTopFrame];
             [self.headerAttributeTopImageView setImage:headerAccessory];
+            [self.headerAttributeTopView setText:nil];
         }
         else {
             [self.headerAttributeTopView setFrame:headerAttributeTopFrame];
             [self.headerAttributeTopView setText:headerAccessory];
             [self.headerAttributeTopView resizeVerticalCenterRightTrim];
+            [self.headerAttributeTopImageView setImage:nil];
         }
     }
     else {
