@@ -13,7 +13,7 @@
 
 #import "LFSContent.h"
 
-UIImage* ImageForContentSource(LFSContentSource contentSource);
-UIImage* SmallImageForContentSource(LFSContentSource contentSource);
+UIImage* ImageForContentSource(NSUInteger contentSource);
+UIImage* SmallImageForContentSource(NSUInteger contentSource);
 
 id AttributeObjectFromContent(LFSContent* content);

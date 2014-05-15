@@ -18,7 +18,6 @@ static const NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] =
     [LFSContentSourceInstagram] = @"SourceInstagram"
 };
 
-
 id AttributeObjectFromContent(LFSContent* content)
 {
     if (content.authorIsModerator) {
@@ -32,18 +31,20 @@ id AttributeObjectFromContent(LFSContent* content)
     }
 }
 
-
-UIImage* ImageForContentSource(LFSContentSource contentSource)
+UIImage* ImageForContentSource(NSUInteger contentSource)
 {
-    assert((NSUInteger)contentSource < SOURCE_IMAGE_MAP_LENGTH);
-    const NSString* const imageName = kLFSSourceImageMap[contentSource];
+    assert(contentSource < CONTENT_SOURCE_DECODE_LENGTH);
+    LFSContentSourceClass contentSourceClass = LFSContentSourceClasses[contentSource];
+    assert((NSUInteger)contentSourceClass < SOURCE_IMAGE_MAP_LENGTH);
+    const NSString* const imageName = kLFSSourceImageMap[contentSourceClass];
     return [UIImage imageNamed:(NSString*)imageName];
 }
 
-UIImage* SmallImageForContentSource(LFSContentSource contentSource)
+UIImage* SmallImageForContentSource(NSUInteger contentSource)
 {
-    assert((NSUInteger)contentSource < SOURCE_IMAGE_MAP_LENGTH);
-    const NSString* const imageName = kLFSSourceImageMap[contentSource];
-    NSString *smallImageName = [imageName stringByAppendingString:@"Small"];
-    return [UIImage imageNamed:smallImageName];
+    assert(contentSource < CONTENT_SOURCE_DECODE_LENGTH);
+    LFSContentSourceClass contentSourceClass = LFSContentSourceClasses[contentSource];
+    assert((NSUInteger)contentSourceClass < SOURCE_IMAGE_MAP_LENGTH);
+    const NSString* const imageName = kLFSSourceImageMap[contentSourceClass];
+    return [UIImage imageNamed:[imageName stringByAppendingString:@"Small"]];
 }
