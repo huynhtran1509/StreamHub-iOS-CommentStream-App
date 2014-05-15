@@ -16,12 +16,12 @@
 
 @property (strong, nonatomic) UIImage *icon;
 @property (copy, nonatomic) NSString *iconURLString;
-@property (copy, nonatomic) NSString *attributeString;
+@property (copy, nonatomic) NSString *attributeObject;
 @property (copy, nonatomic) NSString *displayString;
 @property (copy, nonatomic) NSString *identifier;
 
 -(id)initWithIdentifier:(NSString*)identifierString
-        attributeString:(NSString*)attributeString
+              attribute:(NSString*)attributeString
           displayString:(NSString*)displayString
                    icon:(UIImage*)iconImage;
 

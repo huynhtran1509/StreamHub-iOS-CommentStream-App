@@ -46,16 +46,6 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
     return visibleNodeCount;
 }
 
-#define SOURCE_IMAGE_MAP_LENGTH 8u
-static const NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] =
-{
-    /* C99 designated initializer, with other fields set to nil */
-    [LFSContentSourceTwitter]   = @"SourceTwitter",
-    [LFSContentSourceFacebook]  = @"SourceFacebook",
-    [LFSContentSourceRSS]       = @"SourceRSS",
-    [LFSContentSourceInstagram] = @"SourceInstagram"
-};
-
 
 #pragma mark - LFSContent implementaiton
 @implementation LFSContent {
@@ -112,6 +102,31 @@ static const NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] =
     };
     event = 1382723577264480;
     source = 1;
+    type = 0;
+    vis = 1;
+}
+ 
+
+{
+    childContent =     (
+    );
+    collectionId = 10726472;
+    content =     {
+        annotations =         {
+            featuredmessage =             {
+                collectionId = 10726472;
+                value = 1399412736;
+            };
+        };
+        authorId = "_up29893478@livefyre.com";
+        bodyHtml = "<p>DiScoUNT c1alis <a href=\"http://www.zopepope54.com/c90984jk\" target=\"_blank\" rel=\"nofollow\">http://www.zopepope54.com/c90984jk</a></p>";
+        createdAt = 1389928943;
+        id = 26500467;
+        parentId = "";
+        updatedAt = 1389928943;
+    };
+    event = 1399412736432199;
+    source = 0;
     type = 0;
     vis = 1;
 }
@@ -248,30 +263,12 @@ static const NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] =
     return _authorIsModerator;
 }
 
-#pragma mark -
--(UIImage*)sourceIcon
-{
-    NSUInteger rawContentSource = self.contentSource;
-    if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
-        LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
-        return [self imageForContentSource:contentSource];
-    } else {
-        return nil;
-    }
-}
 
 #pragma mark -
--(UIImage*)sourceIconSmall
+-(BOOL)isFeatured
 {
-    NSUInteger rawContentSource = self.contentSource;
-    if (rawContentSource < CONTENT_SOURCE_DECODE_LENGTH) {
-        LFSContentSource contentSource = kLFSContentSourceDecode[rawContentSource];
-        return [self smallImageForContentSource:contentSource];
-    } else {
-        return nil;
-    }
+    return ([self.annotations objectForKey:@"featuredmessage"] != nil);
 }
-
 
 #pragma mark -
 
@@ -397,34 +394,6 @@ static const NSString* const kLFSSourceImageMap[SOURCE_IMAGE_MAP_LENGTH] =
     }
     return _contentSource;
 }
-
-#pragma mark - Private methods
-
--(UIImage*)imageForContentSource:(LFSContentSource)contentSource
-{
-    NSParameterAssert((NSUInteger)contentSource < SOURCE_IMAGE_MAP_LENGTH);
-    // do a simple range check for memory safety
-    if (contentSource <= LFSContentSourceInstagram) {
-        const NSString* const imageName = kLFSSourceImageMap[contentSource];
-        return [UIImage imageNamed:(NSString*)imageName];
-    } else {
-        return nil;
-    }
-}
-
--(UIImage*)smallImageForContentSource:(LFSContentSource)contentSource
-{
-    NSParameterAssert((NSUInteger)contentSource < SOURCE_IMAGE_MAP_LENGTH);
-    // do a simple range check for memory safety
-    if (contentSource <= LFSContentSourceInstagram) {
-        const NSString* const imageName = kLFSSourceImageMap[contentSource];
-        NSString *smallImageName = [imageName stringByAppendingString:@"Small"];
-        return [UIImage imageNamed:smallImageName];
-    } else {
-        return nil;
-    }
-}
-
 
 #pragma mark - Public methods
 

@@ -14,6 +14,7 @@
 
 #import <objc/runtime.h>
 
+#import "LFSViewResources.h"
 #import "UIImage+LFSColor.h"
 
 #import "LFSConfig.h"
@@ -762,6 +763,7 @@ const static char kAttributedTextValueKey;
     [cell.textLabel setText:bodyText];
 }
 
+
 // called every time a cell is configured
 - (void)configureAttributedCell:(LFSAttributedTextCell*)cell forContent:(LFSContent*)content
 {
@@ -770,7 +772,8 @@ const static char kAttributedTextValueKey;
     
     // configure the rest of the cell
     [cell setContentDate:content.createdAt];
-    [cell.headerAccessoryRightImageView setImage:content.sourceIconSmall];
+    UIImage *iconSmall = SmallImageForContentSource(content.contentSource);
+    [cell.headerAccessoryRightImageView setImage:iconSmall];
     
     [cell setLeftOffset:((CGFloat)([content.datePath count] - 1) * kGenerationOffset)];
     
@@ -787,7 +790,7 @@ const static char kAttributedTextValueKey;
     
     [cell setProfileLocal:[[LFSResource alloc]
                            initWithIdentifier:(author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : @"")
-                           attributeString:(content.authorIsModerator ? @"Moderator" : @"")
+                           attribute:AttributeObjectFromContent(content)
                            displayString:title
                            icon:nil]];
 }

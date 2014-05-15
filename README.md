@@ -8,7 +8,7 @@ flagging and deleting of comments, and image attachments.
 
 ## Getting Started
 
-If you haven't already, please install CocoaPods first. [[1]], You can do this
+If you haven't already, please install CocoaPods first [[1]]. You can do this
 simply by running `gem install cocoapods` and `pod setup`. Once installed,
 do the following (assuming you keep your projects in `~/dev` directory):
 
@@ -25,7 +25,7 @@ installing, use `CommentStream.xcworkspace` to open the project instead of the
 
 ## Requirements
 
-StreamHub-SDK v0.2.0 and the Comments app require Xcode 5 and iOS 6.0 or later.
+StreamHub-SDK starting from v0.2 requires Xcode 5 and iOS 6.0 or later.
 
 ## License
 

@@ -99,7 +99,7 @@
     NSString *detailString = (author.twitterHandle ? [@"@" stringByAppendingString:author.twitterHandle] : nil);
     LFSResource *headerInfo = [[LFSResource alloc]
                                initWithIdentifier:detailString
-                               attributeString:nil
+                               attribute:nil
                                displayString:author.displayName
                                icon:self.avatarImage];
     [headerInfo setIconURLString:author.avatarUrlString75];

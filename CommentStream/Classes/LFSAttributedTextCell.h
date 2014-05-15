@@ -43,6 +43,8 @@ extern const CGSize kAttachmentImageViewSize;
 
 @property (nonatomic, strong) UIImageView *headerAccessoryRightImageView;
 
+@property (readonly, nonatomic) UIImageView *headerAttributeTopImageView;
+
 -(void)setAttachmentImage:(UIImage *)attachmentImage;
 
 #pragma mark - Methods
