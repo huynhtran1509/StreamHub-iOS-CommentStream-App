@@ -37,6 +37,7 @@ static const CGFloat kDetailHeaderSubtitleFontSize = 12.f;
 
 // header label heights
 static const CGFloat kDetailHeaderAttributeTopHeight = 10.0f;
+static const CGFloat kDetailHeaderAttributeTopImageHeight = 18.0f;
 static const CGFloat kDetailHeaderTitleHeight = 18.0f;
 static const CGFloat kHeaderSubtitleHeight = 10.0f;
 
@@ -412,7 +413,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     if (_headerAttributeTopView == nil) {
         CGFloat leftColumnWidth = kDetailPadding.left + kDetailImageViewSize.width + kDetailImageMarginRight;
         CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
-        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth, kDetailHeaderAttributeTopHeight);
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth,
+                                      kDetailHeaderAttributeTopHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
@@ -439,12 +441,8 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     if (_headerAttributeTopImageView == nil) {
         CGFloat leftColumnWidth = kDetailPadding.left + kDetailImageViewSize.width + kDetailImageMarginRight;
         CGFloat rightColumnWidth = kDetailRemoteButtonWidth + kDetailPadding.right;
-        
-        id fillImage = self.profileLocal.attributeObject;
-        CGSize labelSize = ([fillImage isKindOfClass:[UIImage class]]
-                            ? [(UIImage*)fillImage size]
-                            : CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth,
-                                         kDetailHeaderAttributeTopHeight));
+        CGSize labelSize = CGSizeMake(self.bounds.size.width - leftColumnWidth - rightColumnWidth,
+                                      kDetailHeaderAttributeTopImageHeight);
         CGRect frame;
         frame.size = labelSize;
         frame.origin = CGPointMake(leftColumnWidth,
@@ -455,6 +453,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         // configure
         [_headerAttributeTopImageView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_headerAttributeTopImageView setContentMode:UIViewContentModeTopLeft];
         
         // add to superview
         [self addSubview:_headerAttributeTopImageView];

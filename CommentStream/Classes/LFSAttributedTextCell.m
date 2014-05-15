@@ -300,6 +300,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
         // configure
         [_headerAttributeTopImageView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_headerAttributeTopImageView setContentMode:UIViewContentModeTopLeft];
         
         // add to superview
         [self.contentView addSubview:_headerAttributeTopImageView];
