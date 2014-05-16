@@ -9,14 +9,15 @@
 #import <Foundation/Foundation.h>
 #import "LFSContent.h"
 
+
 typedef NS_ENUM(NSUInteger, LFSContentAction) {
     /*! Unsolicited advertising (flagging will delete content when performed by moderator) */
-    LFSContentActionBanUser = 0u,            // 0
-    LFSContentActionBozo,            // 1
-    LFSContentActionFeature,           // 2
-    LFSContentActionFlag,           // 3
-    LFSContentActionEdit,           // 4
-    LFSContentActionDelete           // 5
+    LFSContentActionDelete = 0u,    // 0
+    LFSContentActionBanUser,        // 1
+    LFSContentActionBozo,           // 2
+    LFSContentActionEdit,           // 3
+    LFSContentActionFeature,        // 4
+    LFSContentActionFlag            // 5
 };
 // }}}
 

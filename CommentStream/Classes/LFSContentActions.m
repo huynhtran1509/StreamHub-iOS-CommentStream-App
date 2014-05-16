@@ -13,12 +13,12 @@
 #define LFS_CONTENT_ACTIONS_LENGTH 6u
 const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
 {
-    @"ban user",    // 0
-    @"bozo",        // 1
-    @"feature",     // 2
-    @"flag",        // 3
-    @"edit",        // 4
-    @"delete",      // 5
+    @"delete",      // 0
+    @"ban user",    // 1
+    @"bozo",        // 2
+    @"edit",        // 3
+    @"feature",     // 4
+    @"flag"         // 5
 };
 
 #pragma mark -
@@ -40,13 +40,13 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
                         initWithTitle:nil
                         delegate:self
                         cancelButtonTitle:@"Cancel"
-                        destructiveButtonTitle:[LFSContentActionStrings[LFSContentActionBanUser] capitalizedString]
+                        destructiveButtonTitle:[LFSContentActionStrings[LFSContentActionDelete] capitalizedString]
                         otherButtonTitles:
+                        [LFSContentActionStrings[LFSContentActionBanUser] capitalizedString],
                         [LFSContentActionStrings[LFSContentActionBozo] capitalizedString],
+                        [LFSContentActionStrings[LFSContentActionEdit] capitalizedString],
                         [LFSContentActionStrings[LFSContentActionFeature] capitalizedString],
                         [LFSContentActionStrings[LFSContentActionFlag] capitalizedString],
-                        [LFSContentActionStrings[LFSContentActionEdit] capitalizedString],
-                        [LFSContentActionStrings[LFSContentActionDelete] capitalizedString],
                         nil];
     }
     return _actionSheet;
@@ -58,7 +58,7 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
 {
     if (_actionSheet2 == nil) {
         _actionSheet2 = [[UIActionSheet alloc]
-                         initWithTitle:@"Flag Comment"
+                         initWithTitle:nil
                          delegate:self
                          cancelButtonTitle:@"Cancel"
                          destructiveButtonTitle:[LFSContentFlags[LFSFlagSpam] capitalizedString]
@@ -79,13 +79,21 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
     
     if (actionSheet == self.actionSheet) {
         
-        if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionBanUser] capitalizedString]])
+        if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionDelete] capitalizedString]])
+        {
+            [self.delegate performAction:LFSContentActionDelete];
+        }
+        else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionBanUser] capitalizedString]])
         {
             [self.delegate performAction:LFSContentActionBanUser];
         }
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionBozo] capitalizedString]])
         {
             [self.delegate performAction:LFSContentActionBozo];
+        }
+        else if  ([action isEqualToString:[LFSContentActionStrings[LFSContentActionEdit] capitalizedString]])
+        {
+            [self.delegate performAction:LFSContentActionEdit];
         }
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionFeature] capitalizedString]])
         {
@@ -94,14 +102,6 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionFlag] capitalizedString]])
         {
             [self.actionSheet2 showInView:self.actionSheet.viewForBaselineLayout];
-        }
-        else if  ([action isEqualToString:[LFSContentActionStrings[LFSContentActionEdit] capitalizedString]])
-        {
-            [self.delegate performAction:LFSContentActionEdit];
-        }
-        else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionDelete] capitalizedString]])
-        {
-            [self.delegate performAction:LFSContentActionDelete];
         }
         else if ([action isEqualToString:@"Cancel"])
         {
