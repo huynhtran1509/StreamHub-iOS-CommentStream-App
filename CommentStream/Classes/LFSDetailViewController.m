@@ -40,6 +40,8 @@ typedef NS_ENUM(NSUInteger, LFSActionType) {
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet LFSDetailView *detailView;
 
+@property (nonatomic, strong) LFSContentActions *contentActions;
+
 @end
 
 // hardcode author id for now
@@ -160,6 +162,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         _hideStatusBar = NO;
         _writeClient = nil;
         _postViewController = nil;
+        _contentActions = [[LFSContentActions alloc] init];
+        [_contentActions setDelegate:self];
     }
     return self;
 }
@@ -171,6 +175,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         _hideStatusBar = NO;
         _writeClient = nil;
         _postViewController = nil;
+        _contentActions = [[LFSContentActions alloc] init];
+        [_contentActions setDelegate:self];
     }
     return self;
 }
@@ -463,50 +469,19 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 #pragma mark - Private methods
 -(void)showActionSheet:(id)sender
 {
-    UIActionSheet *actionSheet = [[UIActionSheet alloc]
-                                  initWithTitle:@"Flag Comment"
-                                  delegate:self
-                                  cancelButtonTitle:@"Cancel"
-                                  destructiveButtonTitle:[LFSContentFlags[LFSFlagSpam] capitalizedString]
-                                  otherButtonTitles:
-                                  [LFSContentFlags[LFSFlagOffensive] capitalizedString],
-                                  [LFSContentFlags[LFSFlagOfftopic] capitalizedString],
-                                  [LFSContentFlags[LFSFlagDisagree] capitalizedString],
-                                  nil];
-    
-    [actionSheet showInView:self.view];
+    [self.contentActions.actionSheet showInView:self.view];
 }
 
-#pragma mark - UIActionSheetDelegate
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+#pragma mark - LFSContentActionsDelegate
+-(void)flagContentWithFlag:(LFSContentFlag)flag
 {
-    //Get the name of the current pressed button
-    BOOL animatedPop = NO;
-    NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
-    if  ([action isEqualToString:[LFSContentFlags[LFSFlagSpam] capitalizedString]])
-    {
-        [self.delegate flagContent:self.contentItem withFlag:LFSFlagSpam];
-        [self.navigationController popViewControllerAnimated:animatedPop];
-    }
-    else if ([action isEqualToString:[LFSContentFlags[LFSFlagOffensive] capitalizedString]])
-    {
-        [self.delegate flagContent:self.contentItem withFlag:LFSFlagOffensive];
-        [self.navigationController popViewControllerAnimated:animatedPop];
-    }
-    else if ([action isEqualToString:[LFSContentFlags[LFSFlagOfftopic] capitalizedString]])
-    {
-        [self.delegate flagContent:self.contentItem withFlag:LFSFlagOfftopic];
-        [self.navigationController popViewControllerAnimated:animatedPop];
-    }
-    else if ([action isEqualToString:[LFSContentFlags[LFSFlagDisagree] capitalizedString]])
-    {
-        [self.delegate flagContent:self.contentItem withFlag:LFSFlagDisagree];
-        [self.navigationController popViewControllerAnimated:animatedPop];
-    }
-    else if ([action isEqualToString:@"Cancel"])
-    {
-        // do nothing
-    }
+    [self.delegate flagContent:self.contentItem withFlag:flag];
+    [self.navigationController popViewControllerAnimated:NO];
+}
+
+-(void)performAction:(LFSContentAction)action
+{
+    // TODO: fill this
 }
 
 #pragma mark - LFSPostViewControllerDelegate
