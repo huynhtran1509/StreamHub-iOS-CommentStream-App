@@ -11,10 +11,12 @@
 
 typedef NS_ENUM(NSUInteger, LFSContentAction) {
     /*! Unsolicited advertising (flagging will delete content when performed by moderator) */
-    LFSContentAction1 = 0u,      // 0
-    LFSContentAction2,           // 1
-    LFSContentAction3,           // 2
-    LFSContentAction4            // 3
+    LFSContentActionBanUser = 0u,            // 0
+    LFSContentActionBozo,            // 1
+    LFSContentActionFeature,           // 2
+    LFSContentActionFlag,           // 3
+    LFSContentActionEdit,           // 4
+    LFSContentActionDelete           // 5
 };
 // }}}
 
@@ -28,9 +30,11 @@ typedef NS_ENUM(NSUInteger, LFSContentAction) {
 
 @end
 
+
 @protocol LFSContentActionsDelegate <NSObject>
 
 -(void)flagContentWithFlag:(LFSContentFlag)flag;
 -(void)performAction:(LFSContentAction)action;
+-(UINavigationController*)navigationController;
 
 @end
