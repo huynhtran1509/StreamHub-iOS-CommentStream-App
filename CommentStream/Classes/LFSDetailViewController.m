@@ -460,6 +460,10 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 -(void)performAction:(LFSContentAction)action
 {
     // TODO: fill this
+    if (action == LFSContentActionDelete) {
+        [self.delegate deleteContent:self.contentItem];
+        [self.navigationController popViewControllerAnimated:NO];
+    }
 }
 
 #pragma mark - LFSPostViewControllerDelegate

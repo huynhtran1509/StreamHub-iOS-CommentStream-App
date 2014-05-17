@@ -663,7 +663,7 @@ const static char kAttributedTextValueKey;
          // show an error message
          [[[UIAlertView alloc]
            initWithTitle:kFailureDeleteTitle
-           message:[error localizedDescription]
+           message:[error localizedRecoverySuggestion]
            delegate:nil
            cancelButtonTitle:@"OK"
            otherButtonTitles:nil] show];

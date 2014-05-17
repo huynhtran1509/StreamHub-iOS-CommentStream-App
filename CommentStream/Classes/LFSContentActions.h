@@ -19,7 +19,6 @@ typedef NS_ENUM(NSUInteger, LFSContentAction) {
     LFSContentActionFeature,        // 4
     LFSContentActionFlag            // 5
 };
-// }}}
 
 
 @protocol LFSContentActionsDelegate;
