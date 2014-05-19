@@ -42,8 +42,10 @@
 
 @protocol LFSDetailViewControllerDelegate <NSObject>
 
+@optional
+
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
--(void)deleteContent:(LFSContent*)content;
+-(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content;
 -(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag;
 
 @end

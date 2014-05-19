@@ -33,8 +33,9 @@ typedef NS_ENUM(NSUInteger, LFSContentAction) {
 
 @protocol LFSContentActionsDelegate <NSObject>
 
+-(UINavigationController*)navigationController;
+
 -(void)flagContentWithFlag:(LFSContentFlag)flag;
 -(void)performAction:(LFSContentAction)action;
--(UINavigationController*)navigationController;
 
 @end

@@ -58,7 +58,7 @@ static NSString* const kAttributedCellReuseIdentifier = @"LFSAttributedCell";
 static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 static NSString* const kCellSelectSegue = @"detailView";
 
-static NSString* const kFailureDeleteTitle = @"Failed to delete content";
+static NSString* const kFailureModifyTitle = @"Failed to modify content";
 
 const static CGFloat kGenerationOffset = 20.f;
 
@@ -602,11 +602,11 @@ const static char kAttributedTextValueKey;
 {
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        [self deleteContentForIndexPath:indexPath];
+        [self postDestructiveMessage:LFSMessageDelete forIndexPath:indexPath];
     }
 }
 
--(void)deleteContentForIndexPath:(NSIndexPath*)indexPath
+-(void)postDestructiveMessage:(LFSMessageAction)message forIndexPath:(NSIndexPath*)indexPath
 {
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken == nil) {
@@ -615,8 +615,8 @@ const static char kAttributedTextValueKey;
         // Note: Normally we never reach this block because we do not
         // allow editing for cells if our user token is nil
         [[[UIAlertView alloc]
-          initWithTitle:kFailureDeleteTitle
-          message:@"You do not have permission to delete comments in this collection"
+          initWithTitle:kFailureModifyTitle
+          message:@"You do not have permission to modify comments in this collection"
           delegate:nil
           cancelButtonTitle:@"OK"
           otherButtonTitles:nil] show];
@@ -631,7 +631,7 @@ const static char kAttributedTextValueKey;
     LFSContentVisibility visibility = content.visibility;
     NSString *contentId = content.idString;
     
-    [self.writeClient postMessage:LFSMessageDelete
+    [self.writeClient postMessage:message
                        forContent:content.idString
                      inCollection:self.collectionId
                         userToken:userToken
@@ -662,7 +662,7 @@ const static char kAttributedTextValueKey;
      {
          // show an error message
          [[[UIAlertView alloc]
-           initWithTitle:kFailureDeleteTitle
+           initWithTitle:kFailureModifyTitle
            message:[error localizedRecoverySuggestion]
            delegate:nil
            cancelButtonTitle:@"OK"
@@ -988,11 +988,12 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 }
 
 #pragma mark - LFSDetailViewControllerDelegate
--(void)deleteContent:(LFSContent*)content
+-(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content
 {
     if (content != nil) {
         NSUInteger row = [_content indexOfObject:content];
-        [self deleteContentForIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+        [self postDestructiveMessage:message
+                        forIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
     }
 }
 

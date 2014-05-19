@@ -453,16 +453,31 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 #pragma mark - LFSContentActionsDelegate
 -(void)flagContentWithFlag:(LFSContentFlag)flag
 {
-    [self.delegate flagContent:self.contentItem withFlag:flag];
+    id<LFSDetailViewControllerDelegate> delegate = self.delegate;
+    if ([delegate respondsToSelector:@selector(flagContent:withFlag:)]) {
+        [delegate flagContent:self.contentItem withFlag:flag];
+    }
     [self.navigationController popViewControllerAnimated:NO];
 }
 
 -(void)performAction:(LFSContentAction)action
 {
-    // TODO: fill this
-    if (action == LFSContentActionDelete) {
-        [self.delegate deleteContent:self.contentItem];
-        [self.navigationController popViewControllerAnimated:NO];
+    id<LFSDetailViewControllerDelegate> delegate = self.delegate;
+    switch (action) {
+        case LFSContentActionDelete:
+            if ([delegate respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
+                [delegate postDestructiveMessage:LFSMessageDelete forContent:self.contentItem];
+            }
+            [self.navigationController popViewControllerAnimated:NO];
+            break;
+        case LFSContentActionBozo:
+            if ([delegate respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
+                [delegate postDestructiveMessage:LFSMessageBozo forContent:self.contentItem];
+            }
+            [self.navigationController popViewControllerAnimated:NO];
+            break;
+        default:
+            break;
     }
 }
 
