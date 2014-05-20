@@ -69,7 +69,7 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
 {
     if (_actionSheet2 == nil) {
         _actionSheet2 = [[UIActionSheet alloc]
-                         initWithTitle:nil
+                         initWithTitle:@"Flag Comment"
                          delegate:self
                          cancelButtonTitle:@"Cancel"
                          destructiveButtonTitle:[LFSContentFlags[LFSFlagSpam] capitalizedString]
