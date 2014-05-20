@@ -31,7 +31,6 @@
 @protocol LFSPostViewControllerDelegate <NSObject>
 
 @optional
-
 -(id<LFSPostViewControllerDelegate>)collectionViewController;
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
 -(void)didSendPostRequestWithReplyTo:(NSString*)replyTo;

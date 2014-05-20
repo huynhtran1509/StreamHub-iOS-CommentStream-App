@@ -1011,9 +1011,6 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 
 -(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag
 {
-    
-    // TODO: write a wrapper that triggers a dialog box on failure
-    
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (content != nil && userToken != nil && self.collectionId != nil) {
         [self.writeClient postFlag:flag
@@ -1079,7 +1076,6 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
          }];
     }
 }
-
 
 #pragma mark - LFSPostViewControllerDelegate
 -(id<LFSPostViewControllerDelegate>)collectionViewController
