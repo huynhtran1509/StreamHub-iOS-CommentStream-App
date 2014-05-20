@@ -21,9 +21,8 @@
 #import "LFSContentActions.h"
 
 @protocol LFSDetailViewDelegate;
-@protocol LFSDetailViewControllerDelegate;
 
-@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFSPostViewControllerDelegate, LFSContentActionsDelegate>
+@interface LFSDetailViewController : UIViewController <LFSDetailViewDelegate, LFSPostViewControllerDelegate>
 
 @property (nonatomic, assign) BOOL hideStatusBar;
 
@@ -36,18 +35,8 @@
 
 @property (nonatomic, strong) LFSAttributedLabelDelegate *attributedLabelDelegate;
 
-@property (nonatomic, weak) id<LFSDetailViewControllerDelegate> delegate;
+@property (nonatomic, weak) id<LFSContentActionsDelegate> delegate;
 
-@end
-
-@protocol LFSDetailViewControllerDelegate <NSObject>
-
-@optional
-
--(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
--(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content;
--(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag;
--(void)featureContent:(LFSContent*)content;
--(void)banAuthorOfContent:(LFSContent*)content;
+@property (nonatomic, strong) LFSContentActions *contentActions;
 
 @end

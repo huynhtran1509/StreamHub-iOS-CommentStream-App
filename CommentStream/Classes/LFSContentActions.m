@@ -30,6 +30,17 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
 @implementation LFSContentActions
 
 @synthesize delegate = _delegate;
+@synthesize contentItem = _contentItem;
+
+-(id)initWithContent:(LFSContent*)content delegate:(id<LFSContentActionsDelegate>)delegate
+{
+    self = [super init];
+    if (self) {
+        [self setDelegate:delegate];
+        [self setContentItem:content];
+    }
+    return self;
+}
 
 #pragma mark -
 @synthesize actionSheet = _actionSheet;
@@ -76,28 +87,37 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
 {
     // Get the name of the button pressed
     NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
+    id<LFSContentActionsDelegate> delegate = self.delegate;
     
     if (actionSheet == self.actionSheet) {
         
         if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionDelete] capitalizedString]])
         {
-            [self.delegate performAction:LFSContentActionDelete];
+            if ([delegate respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
+                [delegate postDestructiveMessage:LFSMessageDelete forContent:self.contentItem];
+            }
         }
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionBanUser] capitalizedString]])
         {
-            [self.delegate performAction:LFSContentActionBanUser];
+            if ([delegate respondsToSelector:@selector(banAuthorOfContent:)]) {
+                [delegate banAuthorOfContent:self.contentItem];
+            }
         }
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionBozo] capitalizedString]])
         {
-            [self.delegate performAction:LFSContentActionBozo];
+            if ([delegate respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
+                [delegate postDestructiveMessage:LFSMessageBozo forContent:self.contentItem];
+            }
         }
         else if  ([action isEqualToString:[LFSContentActionStrings[LFSContentActionEdit] capitalizedString]])
         {
-            [self.delegate performAction:LFSContentActionEdit];
+            // TODO: add edit widget
         }
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionFeature] capitalizedString]])
         {
-            [self.delegate performAction:LFSContentActionFeature];
+            if ([delegate respondsToSelector:@selector(featureContent:)]) {
+                [delegate featureContent:self.contentItem];
+            }
         }
         else if ([action isEqualToString:[LFSContentActionStrings[LFSContentActionFlag] capitalizedString]])
         {
@@ -109,25 +129,27 @@ const NSString* const LFSContentActionStrings[LFS_CONTENT_ACTIONS_LENGTH] =
         }
     }
     else if (actionSheet == self.actionSheet2) {
-        if  ([action isEqualToString:[LFSContentFlags[LFSFlagSpam] capitalizedString]])
-        {
-            [self.delegate flagContentWithFlag:LFSFlagSpam];
-        }
-        else if ([action isEqualToString:[LFSContentFlags[LFSFlagOffensive] capitalizedString]])
-        {
-            [self.delegate flagContentWithFlag:LFSFlagOffensive];
-        }
-        else if ([action isEqualToString:[LFSContentFlags[LFSFlagOfftopic] capitalizedString]])
-        {
-            [self.delegate flagContentWithFlag:LFSFlagOfftopic];
-        }
-        else if ([action isEqualToString:[LFSContentFlags[LFSFlagDisagree] capitalizedString]])
-        {
-            [self.delegate flagContentWithFlag:LFSFlagDisagree];
-        }
-        else if ([action isEqualToString:@"Cancel"])
-        {
-            // do nothing
+        if ([delegate respondsToSelector:@selector(flagContent:withFlag:)]) {
+            if  ([action isEqualToString:[LFSContentFlags[LFSFlagSpam] capitalizedString]])
+            {
+                [delegate flagContent:self.contentItem withFlag:LFSFlagSpam];
+            }
+            else if ([action isEqualToString:[LFSContentFlags[LFSFlagOffensive] capitalizedString]])
+            {
+                [delegate flagContent:self.contentItem withFlag:LFSFlagOffensive];
+            }
+            else if ([action isEqualToString:[LFSContentFlags[LFSFlagOfftopic] capitalizedString]])
+            {
+                [delegate flagContent:self.contentItem withFlag:LFSFlagOfftopic];
+            }
+            else if ([action isEqualToString:[LFSContentFlags[LFSFlagDisagree] capitalizedString]])
+            {
+                [delegate flagContent:self.contentItem withFlag:LFSFlagDisagree];
+            }
+            else if ([action isEqualToString:@"Cancel"])
+            {
+                // do nothing
+            }
         }
     }
 }

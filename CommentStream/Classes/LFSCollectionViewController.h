@@ -16,7 +16,7 @@
 @interface LFSCollectionViewController : UITableViewController
 <UITextFieldDelegate,
 LFSPostViewControllerDelegate,
-LFSDetailViewControllerDelegate,
+LFSContentActionsDelegate,
 LFSContentCollectionDelegate>
 
 @property (nonatomic, copy) NSDictionary *collection;

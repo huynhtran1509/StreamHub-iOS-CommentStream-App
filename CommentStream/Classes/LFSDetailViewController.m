@@ -38,8 +38,6 @@ typedef NS_ENUM(NSUInteger, LFSActionType) {
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet LFSDetailView *detailView;
 
-@property (nonatomic, strong) LFSContentActions *contentActions;
-
 @end
 
 // hardcode author id for now
@@ -160,8 +158,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         _hideStatusBar = NO;
         _writeClient = nil;
         _postViewController = nil;
-        _contentActions = [[LFSContentActions alloc] init];
-        [_contentActions setDelegate:self];
     }
     return self;
 }
@@ -173,8 +169,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
         _hideStatusBar = NO;
         _writeClient = nil;
         _postViewController = nil;
-        _contentActions = [[LFSContentActions alloc] init];
-        [_contentActions setDelegate:self];
     }
     return self;
 }
@@ -448,49 +442,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)didSelectContentRemote:(id)sender withURL:(NSURL*)url
 {
     [self.attributedLabelDelegate followURL:url];
-}
-
-#pragma mark - LFSContentActionsDelegate
--(void)flagContentWithFlag:(LFSContentFlag)flag
-{
-    id<LFSDetailViewControllerDelegate> delegate = self.delegate;
-    if ([delegate respondsToSelector:@selector(flagContent:withFlag:)]) {
-        [delegate flagContent:self.contentItem withFlag:flag];
-    }
-    [self.navigationController popViewControllerAnimated:NO];
-}
-
--(void)performAction:(LFSContentAction)action
-{
-    id<LFSDetailViewControllerDelegate> delegate = self.delegate;
-    switch (action) {
-        case LFSContentActionDelete:
-            if ([delegate respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
-                [delegate postDestructiveMessage:LFSMessageDelete forContent:self.contentItem];
-            }
-            [self.navigationController popViewControllerAnimated:NO];
-            break;
-        case LFSContentActionBozo:
-            if ([delegate respondsToSelector:@selector(postDestructiveMessage:forContent:)]) {
-                [delegate postDestructiveMessage:LFSMessageBozo forContent:self.contentItem];
-            }
-            [self.navigationController popViewControllerAnimated:NO];
-            break;
-        case LFSContentActionBanUser:
-            if ([delegate respondsToSelector:@selector(banAuthorOfContent:)]) {
-                [delegate banAuthorOfContent:self.contentItem];
-            }
-            [self.navigationController popViewControllerAnimated:NO];
-            break;
-        case LFSContentActionFeature:
-            if ([delegate respondsToSelector:@selector(featureContent:)]) {
-                [delegate featureContent:self.contentItem];
-            }
-            [self.navigationController popViewControllerAnimated:NO];
-            break;
-        default:
-            break;
-    }
 }
 
 #pragma mark - LFSPostViewControllerDelegate

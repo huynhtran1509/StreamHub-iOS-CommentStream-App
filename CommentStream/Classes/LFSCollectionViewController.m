@@ -441,6 +441,15 @@ const static char kAttributedTextValueKey;
 
 #pragma mark - Private methods
 
+- (void)popDetailControllerForContent:(LFSContent*)content
+{
+    UIViewController *vc = self.navigationController.topViewController;
+    if ([vc isKindOfClass:[LFSDetailViewController class]] &&
+        [(LFSDetailViewController*)vc contentItem] == content) {
+        [self.navigationController popViewControllerAnimated:NO];
+    }
+}
+
 - (void)authenticateUser
 {
     if ([self.collection objectForKey:@"lftoken"] == nil) {
@@ -967,6 +976,8 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                 [vc setUser:self.user];
                 [vc setDelegate:self];
                 [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
+                [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
+                                                                        delegate:self]];
             }
         }
     }
@@ -987,13 +998,14 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                                           completion:nil];
 }
 
-#pragma mark - LFSDetailViewControllerDelegate
+#pragma mark - LFSContentActionsDelegate
 -(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content
 {
     if (content != nil) {
         NSUInteger row = [_content indexOfObject:content];
         [self postDestructiveMessage:message
                         forIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+        [self popDetailControllerForContent:content];
     }
 }
 

@@ -25,7 +25,10 @@ typedef NS_ENUM(NSUInteger, LFSContentAction) {
 
 @interface LFSContentActions : NSObject <UIActionSheetDelegate>
 
+-(id)initWithContent:(LFSContent*)content delegate:(id<LFSContentActionsDelegate>)delegate;
+
 @property (nonatomic, assign) id<LFSContentActionsDelegate> delegate;
+@property (nonatomic, strong) LFSContent *contentItem;
 @property (nonatomic, strong) UIActionSheet *actionSheet;
 
 @end
@@ -33,9 +36,12 @@ typedef NS_ENUM(NSUInteger, LFSContentAction) {
 
 @protocol LFSContentActionsDelegate <NSObject>
 
--(UINavigationController*)navigationController;
+@optional
 
--(void)flagContentWithFlag:(LFSContentFlag)flag;
--(void)performAction:(LFSContentAction)action;
+-(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
+-(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content;
+-(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag;
+-(void)featureContent:(LFSContent*)content;
+-(void)banAuthorOfContent:(LFSContent*)content;
 
 @end
