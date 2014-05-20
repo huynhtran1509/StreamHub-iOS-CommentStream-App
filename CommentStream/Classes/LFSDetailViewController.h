@@ -47,5 +47,7 @@
 -(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
 -(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content;
 -(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag;
+-(void)featureContent:(LFSContent*)content;
+-(void)banAuthorOfContent:(LFSContent*)content;
 
 @end

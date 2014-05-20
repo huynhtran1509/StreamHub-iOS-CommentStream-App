@@ -999,15 +999,75 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
 
 -(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag
 {
+    
+    // TODO: write a wrapper that triggers a dialog box on failure
+    
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (content != nil && userToken != nil && self.collectionId != nil) {
         [self.writeClient postFlag:flag
                         forContent:content.idString
                       inCollection:self.collectionId
                          userToken:userToken
-                        parameters:nil onSuccess:nil onFailure:nil];
+                        parameters:nil
+                         onSuccess:nil
+                         onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
     }
 }
+
+-(void)featureContent:(LFSContent*)content
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (content != nil && userToken != nil && self.collectionId != nil) {
+        [self.writeClient feature:YES
+                          comment:content.idString
+                     inCollection:self.collectionId
+                        userToken:userToken
+                        onSuccess:nil
+                        onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
+    }
+}
+
+-(void)banAuthorOfContent:(LFSContent*)content
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (content != nil && userToken != nil && self.collectionId != nil) {
+        [self.writeClient flagAuthor:content.author.idString
+                              action:LFSAuthorActionBan
+                            forSites:[self.collection objectForKey:@"siteId"]
+                         retroactive:NO
+                           userToken:userToken
+                           onSuccess:nil
+                           onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
+    }
+}
+
 
 #pragma mark - LFSPostViewControllerDelegate
 -(id<LFSPostViewControllerDelegate>)collectionViewController

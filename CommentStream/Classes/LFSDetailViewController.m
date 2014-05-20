@@ -476,6 +476,18 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             }
             [self.navigationController popViewControllerAnimated:NO];
             break;
+        case LFSContentActionBanUser:
+            if ([delegate respondsToSelector:@selector(banAuthorOfContent:)]) {
+                [delegate banAuthorOfContent:self.contentItem];
+            }
+            [self.navigationController popViewControllerAnimated:NO];
+            break;
+        case LFSContentActionFeature:
+            if ([delegate respondsToSelector:@selector(featureContent:)]) {
+                [delegate featureContent:self.contentItem];
+            }
+            [self.navigationController popViewControllerAnimated:NO];
+            break;
         default:
             break;
     }
