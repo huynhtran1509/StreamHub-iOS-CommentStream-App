@@ -25,9 +25,7 @@ typedef NS_ENUM(NSUInteger, LFSActionType) {
     kLFSActionTypeDelete
 };
 
-@interface LFSDetailViewController () {
-    LFSActionType _actionType;
-}
+@interface LFSDetailViewController ()
 
 @property (nonatomic, readonly) LFSWriteClient *writeClient;
 
@@ -271,15 +269,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
     [detailView.button2 setTitle:@"Reply" forState:UIControlStateNormal];
     [detailView.button2 setImage:[UIImage imageNamed:@"ActionReply"] forState:UIControlStateNormal];
     
-    if ([self.user.profile isEqual:self.contentItem.author]) {
-        _actionType = kLFSActionTypeDelete;
-        [detailView.button3 setTitle:@"Delete" forState:UIControlStateNormal];
-        [detailView.button3 setImage:[UIImage imageNamed:@"ActionTrash"] forState:UIControlStateNormal];
-    } else {
-        _actionType = kLFSActionTypeFlag;
-        [detailView.button3 setTitle:@"Flag" forState:UIControlStateNormal];
-        [detailView.button3 setImage:[UIImage imageNamed:@"ActionFlag"] forState:UIControlStateNormal];
-    }
+    [detailView.button3 setTitle:@"More" forState:UIControlStateNormal];
+    [detailView.button3 setImage:[UIImage imageNamed:@"More"] forState:UIControlStateNormal];
     
     // only set an object if we have a remote (Twitter) url
     NSString *twitterUrlString = contentItem.twitterUrlString;
@@ -440,14 +431,7 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 
 - (void)didSelectButton3:(id)sender
 {
-    // Either "Flag" or "Delete" selected
-    if (_actionType == kLFSActionTypeDelete && [self.user.profile isEqual:self.contentItem.author]) {
-        [self.delegate deleteContent:self.contentItem];
-        [self.navigationController popViewControllerAnimated:NO];
-    }
-    else if (_actionType == kLFSActionTypeFlag) {
-        [self showActionSheet:sender];
-    }
+    [self.contentActions.actionSheet showInView:self.view];
 }
 
 - (void)didSelectProfile:(id)sender withURL:(NSURL*)url
@@ -458,55 +442,6 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
 - (void)didSelectContentRemote:(id)sender withURL:(NSURL*)url
 {
     [self.attributedLabelDelegate followURL:url];
-}
-
-#pragma mark - Private methods
--(void)showActionSheet:(id)sender
-{
-    UIActionSheet *actionSheet = [[UIActionSheet alloc]
-                                  initWithTitle:@"Flag Comment"
-                                  delegate:self
-                                  cancelButtonTitle:@"Cancel"
-                                  destructiveButtonTitle:[LFSContentFlags[LFSFlagSpam] capitalizedString]
-                                  otherButtonTitles:
-                                  [LFSContentFlags[LFSFlagOffensive] capitalizedString],
-                                  [LFSContentFlags[LFSFlagOfftopic] capitalizedString],
-                                  [LFSContentFlags[LFSFlagDisagree] capitalizedString],
-                                  nil];
-    
-    [actionSheet showInView:self.view];
-}
-
-#pragma mark - UIActionSheetDelegate
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    //Get the name of the current pressed button
-    BOOL animatedPop = NO;
-    NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
-    if  ([action isEqualToString:[LFSContentFlags[LFSFlagSpam] capitalizedString]])
-    {
-        [self.delegate flagContent:self.contentItem withFlag:LFSFlagSpam];
-        [self.navigationController popViewControllerAnimated:animatedPop];
-    }
-    else if ([action isEqualToString:[LFSContentFlags[LFSFlagOffensive] capitalizedString]])
-    {
-        [self.delegate flagContent:self.contentItem withFlag:LFSFlagOffensive];
-        [self.navigationController popViewControllerAnimated:animatedPop];
-    }
-    else if ([action isEqualToString:[LFSContentFlags[LFSFlagOfftopic] capitalizedString]])
-    {
-        [self.delegate flagContent:self.contentItem withFlag:LFSFlagOfftopic];
-        [self.navigationController popViewControllerAnimated:animatedPop];
-    }
-    else if ([action isEqualToString:[LFSContentFlags[LFSFlagDisagree] capitalizedString]])
-    {
-        [self.delegate flagContent:self.contentItem withFlag:LFSFlagDisagree];
-        [self.navigationController popViewControllerAnimated:animatedPop];
-    }
-    else if ([action isEqualToString:@"Cancel"])
-    {
-        // do nothing
-    }
 }
 
 #pragma mark - LFSPostViewControllerDelegate

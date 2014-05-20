@@ -58,7 +58,7 @@ static NSString* const kAttributedCellReuseIdentifier = @"LFSAttributedCell";
 static NSString* const kDeletedCellReuseIdentifier = @"LFSDeletedCell";
 static NSString* const kCellSelectSegue = @"detailView";
 
-static NSString* const kFailureDeleteTitle = @"Failed to delete content";
+static NSString* const kFailureModifyTitle = @"Failed to modify content";
 
 const static CGFloat kGenerationOffset = 20.f;
 
@@ -441,6 +441,15 @@ const static char kAttributedTextValueKey;
 
 #pragma mark - Private methods
 
+- (void)popDetailControllerForContent:(LFSContent*)content
+{
+    UIViewController *vc = self.navigationController.topViewController;
+    if ([vc isKindOfClass:[LFSDetailViewController class]] &&
+        [(LFSDetailViewController*)vc contentItem] == content) {
+        [self.navigationController popViewControllerAnimated:NO];
+    }
+}
+
 - (void)authenticateUser
 {
     if ([self.collection objectForKey:@"lftoken"] == nil) {
@@ -602,11 +611,11 @@ const static char kAttributedTextValueKey;
 {
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        [self deleteContentForIndexPath:indexPath];
+        [self postDestructiveMessage:LFSMessageDelete forIndexPath:indexPath];
     }
 }
 
--(void)deleteContentForIndexPath:(NSIndexPath*)indexPath
+-(void)postDestructiveMessage:(LFSMessageAction)message forIndexPath:(NSIndexPath*)indexPath
 {
     NSString *userToken = [self.collection objectForKey:@"lftoken"];
     if (userToken == nil) {
@@ -615,8 +624,8 @@ const static char kAttributedTextValueKey;
         // Note: Normally we never reach this block because we do not
         // allow editing for cells if our user token is nil
         [[[UIAlertView alloc]
-          initWithTitle:kFailureDeleteTitle
-          message:@"You do not have permission to delete comments in this collection"
+          initWithTitle:kFailureModifyTitle
+          message:@"You do not have permission to modify comments in this collection"
           delegate:nil
           cancelButtonTitle:@"OK"
           otherButtonTitles:nil] show];
@@ -631,7 +640,7 @@ const static char kAttributedTextValueKey;
     LFSContentVisibility visibility = content.visibility;
     NSString *contentId = content.idString;
     
-    [self.writeClient postMessage:LFSMessageDelete
+    [self.writeClient postMessage:message
                        forContent:content.idString
                      inCollection:self.collectionId
                         userToken:userToken
@@ -662,8 +671,8 @@ const static char kAttributedTextValueKey;
      {
          // show an error message
          [[[UIAlertView alloc]
-           initWithTitle:kFailureDeleteTitle
-           message:[error localizedDescription]
+           initWithTitle:kFailureModifyTitle
+           message:[error localizedRecoverySuggestion]
            delegate:nil
            cancelButtonTitle:@"OK"
            otherButtonTitles:nil] show];
@@ -967,6 +976,8 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                 [vc setUser:self.user];
                 [vc setDelegate:self];
                 [vc setAttributedLabelDelegate:self.attributedLabelDelegate];
+                [vc setContentActions:[[LFSContentActions alloc] initWithContent:contentItem
+                                                                        delegate:self]];
             }
         }
     }
@@ -987,12 +998,14 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                                           completion:nil];
 }
 
-#pragma mark - LFSDetailViewControllerDelegate
--(void)deleteContent:(LFSContent*)content
+#pragma mark - LFSContentActionsDelegate
+-(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content
 {
     if (content != nil) {
         NSUInteger row = [_content indexOfObject:content];
-        [self deleteContentForIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+        [self postDestructiveMessage:message
+                        forIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+        [self popDetailControllerForContent:content];
     }
 }
 
@@ -1004,7 +1017,63 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                         forContent:content.idString
                       inCollection:self.collectionId
                          userToken:userToken
-                        parameters:nil onSuccess:nil onFailure:nil];
+                        parameters:nil
+                         onSuccess:nil
+                         onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
+    }
+}
+
+-(void)featureContent:(LFSContent*)content
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (content != nil && userToken != nil && self.collectionId != nil) {
+        [self.writeClient feature:YES
+                          comment:content.idString
+                     inCollection:self.collectionId
+                        userToken:userToken
+                        onSuccess:nil
+                        onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
+    }
+}
+
+-(void)banAuthorOfContent:(LFSContent*)content
+{
+    NSString *userToken = [self.collection objectForKey:@"lftoken"];
+    if (content != nil && userToken != nil && self.collectionId != nil) {
+        [self.writeClient flagAuthor:content.author.idString
+                              action:LFSAuthorActionBan
+                            forSites:[self.collection objectForKey:@"siteId"]
+                         retroactive:NO
+                           userToken:userToken
+                           onSuccess:nil
+                           onFailure:^(NSOperation *operation, NSError *error)
+         {
+             // show an error message
+             [[[UIAlertView alloc]
+               initWithTitle:kFailureModifyTitle
+               message:[error localizedRecoverySuggestion]
+               delegate:nil
+               cancelButtonTitle:@"OK"
+               otherButtonTitles:nil] show];
+         }];
     }
 }
 

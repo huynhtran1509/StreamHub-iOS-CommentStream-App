@@ -271,7 +271,7 @@
              // show an error message
              [[[UIAlertView alloc]
                initWithTitle:kFailurePostTitle
-               message:[error localizedDescription]
+               message:[error localizedRecoverySuggestion]
                delegate:nil
                cancelButtonTitle:@"OK"
                otherButtonTitles:nil] show];

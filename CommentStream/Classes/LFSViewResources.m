@@ -33,18 +33,30 @@ id AttributeObjectFromContent(LFSContent* content)
 
 UIImage* ImageForContentSource(NSUInteger contentSource)
 {
-    assert(contentSource < CONTENT_SOURCE_DECODE_LENGTH);
-    LFSContentSourceClass contentSourceClass = LFSContentSourceClasses[contentSource];
-    assert((NSUInteger)contentSourceClass < SOURCE_IMAGE_MAP_LENGTH);
-    const NSString* const imageName = kLFSSourceImageMap[contentSourceClass];
-    return [UIImage imageNamed:(NSString*)imageName];
+    if (contentSource < CONTENT_SOURCE_DECODE_LENGTH) {
+        LFSContentSourceClass contentSourceClass = LFSContentSourceClasses[contentSource];
+        if ((NSUInteger)contentSourceClass < SOURCE_IMAGE_MAP_LENGTH) {
+            const NSString* const imageName = kLFSSourceImageMap[contentSourceClass];
+            return [UIImage imageNamed:(NSString*)imageName];
+        } else {
+            return nil;
+        }
+    } else {
+        return nil;
+    }
 }
 
 UIImage* SmallImageForContentSource(NSUInteger contentSource)
 {
-    assert(contentSource < CONTENT_SOURCE_DECODE_LENGTH);
-    LFSContentSourceClass contentSourceClass = LFSContentSourceClasses[contentSource];
-    assert((NSUInteger)contentSourceClass < SOURCE_IMAGE_MAP_LENGTH);
-    const NSString* const imageName = kLFSSourceImageMap[contentSourceClass];
-    return [UIImage imageNamed:[imageName stringByAppendingString:@"Small"]];
+    if(contentSource < CONTENT_SOURCE_DECODE_LENGTH) {
+        LFSContentSourceClass contentSourceClass = LFSContentSourceClasses[contentSource];
+        if((NSUInteger)contentSourceClass < SOURCE_IMAGE_MAP_LENGTH) {
+            const NSString* const imageName = kLFSSourceImageMap[contentSourceClass];
+            return [UIImage imageNamed:[imageName stringByAppendingString:@"Small"]];
+        } else {
+            return nil;
+        }
+    } else {
+        return nil;
+    }
 }
