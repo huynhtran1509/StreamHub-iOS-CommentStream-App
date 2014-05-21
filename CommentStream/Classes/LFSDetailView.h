@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <AFNetworking/UIImageView+AFNetworking.h>
+#import <SDWebImage/UIImageView+WebCache.h>
 
 #import "LFSResource.h"
 #import "LFSBasicHTMLLabel.h"

@@ -195,17 +195,15 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             [attachmentView setFrame:attachmentFrame];
             
             __weak UIImageView* weakAttachmentView = attachmentView;
-            [attachmentView setImageWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:oembed.urlString]]
-                                                placeholderImage:nil
-                                                         success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image)
-             {
-                 // find out image size here and re-layout view
-                 [weakAttachmentView setImage:image];
-             }
-                                                         failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error)
-             {
-                 // TODO: image failed to download -- ask JS about desired behavior
-             }];
+            
+            // TODO: ask JS about desired behavior on image download failure
+            [attachmentView setImageWithURL:[NSURL URLWithString:oembed.urlString]
+                                  completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType)
+            {
+                // find out image size here and re-layout view
+                [weakAttachmentView setImage:image];
+            }];
+            
             // toggle attachment view visibility
             [attachmentView setHidden:NO];
         }
