@@ -38,7 +38,6 @@ typedef NS_ENUM(NSUInteger, LFSContentAction) {
 
 @optional
 
--(void)didPostContentWithOperation:(NSOperation*)operation response:(id)responseObject;
 -(void)postDestructiveMessage:(LFSMessageAction)message forContent:(LFSContent*)content;
 -(void)flagContent:(LFSContent*)content withFlag:(LFSContentFlag)flag;
 -(void)featureContent:(LFSContent*)content;

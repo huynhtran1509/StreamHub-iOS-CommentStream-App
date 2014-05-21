@@ -8,7 +8,7 @@
 
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
-#import <AFNetworking/UIImageView+AFNetworking.h>
+#import <SDWebImage/UIImageView+WebCache.h>
 
 #import "LFSWriteCommentView.h"
 #import "UILabel+Trim.h"
