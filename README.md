@@ -2,13 +2,13 @@ CommentStream
 =============
 
 This is a sample app that demonstrates how to use some of the services
-provided by StreamHub-iOS-SDK, a native client for Livefyre HTTP API. It supports
+provided by StreamHub-iOS-SDK [[1]], a native client for Livefyre HTTP API. It supports
 viewing a collection, streaming comments in real-time, nested replies, likes,
 flagging and deleting of comments, and image attachments.
 
 ## Getting Started
 
-If you haven't already, please install CocoaPods first [[1]]. You can do this
+If you haven't already, please install CocoaPods first [[2]]. You can do this
 simply by running `gem install cocoapods` and `pod setup`. Once installed,
 do the following (assuming you keep your projects in `~/dev` directory):
 
@@ -53,4 +53,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-[1]: http://guides.cocoapods.org/using/getting-started.html
+[1]: https://github.com/Livefyre/StreamHub-iOS-SDK
+[2]: http://guides.cocoapods.org/using/getting-started.html
