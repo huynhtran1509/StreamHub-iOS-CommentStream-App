@@ -11,11 +11,12 @@
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
 #import <AFNetworking/AFURLResponseSerialization.h>
+#import <UIImage+Resize/UIImage+Resize.h>
 
 #import <objc/runtime.h>
 
 #import "LFSViewResources.h"
-#import "UIImage+LFSColor.h"
+#import "UIImage+LFSUtils.h"
 
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
@@ -804,45 +805,6 @@ const static char kAttributedTextValueKey;
                            icon:nil]];
 }
 
-
-UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
-{
-    // scale down image with Aspect Fill
-    CGRect targetRect;
-    targetRect.origin = CGPointZero;
-    if (contentMode == UIViewContentModeScaleAspectFill) {
-        CGSize currentSize = image.size;
-        if (currentSize.height * size.width > size.height * currentSize.width) {
-            // pick size.width
-            targetRect.size.width = size.width;
-            targetRect.size.height = (size.width / currentSize.width) * currentSize.height;
-        } else {
-            // pick size.height
-            targetRect.size.height = size.height;
-            targetRect.size.width = (size.height / currentSize.height) * currentSize.width;
-        }
-    }
-    else if (contentMode == UIViewContentModeScaleToFill) {
-        targetRect.size = size;
-    }
-    else {
-        NSException* invalidContentMode =
-        [NSException exceptionWithName:@"LFSInvalidContentMode"
-                                reason:@"Invalid content mode for image rescaling"
-                              userInfo:nil];
-        @throw invalidContentMode;
-    }
-    
-    // don't call UIGraphicsBeginImageContext when supporting Retina,
-    // instead call UIGraphicsBeginImageContextWithOptions with zero
-    // for scale
-    UIGraphicsBeginImageContextWithOptions(size, YES, 0.f);
-    [image drawInRect:targetRect];
-    UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return processedImage;
-}
-
 -(void)loadImageWithURL:(NSURL*)url
             scaleToSize:(CGSize)size
             contentMode:(UIViewContentMode)contentMode
@@ -854,10 +816,12 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     AFHTTPRequestOperation* operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
     [operation setResponseSerializer:[AFImageResponseSerializer serializer]];
-    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        UIImage *image = scaleImage(responseObject, size, contentMode);
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject)
+    {
+        UIImage *image = [(UIImage*)responseObject resizedImageWithContentMode:contentMode bounds:size interpolationQuality:kCGInterpolationDefault];
         success(operation, image);
-    } failure:failure];
+    }
+                                     failure:failure];
 
     [self.operationQueue addOperation:operation];
 }
@@ -923,7 +887,7 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                  contentId:content.idString
                   cacheKey:author.idString
                scaleToSize:kCellImageViewSize
-               contentMode:UIViewContentModeScaleToFill
+               contentMode:UIViewContentModeScaleAspectFit
                  loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
      {
          [cell.imageView setImage:image];
@@ -936,7 +900,7 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                      contentId:content.idString
                       cacheKey:attachment.thumbnailUrlString
                    scaleToSize:kAttachmentImageViewSize
-                   contentMode:UIViewContentModeScaleAspectFill
+                   contentMode:UIViewContentModeScaleAspectFit
                      loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
          {
              [cell setAttachmentImage:image];

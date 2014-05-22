@@ -11,7 +11,7 @@
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
 #import "LFSViewResources.h"
-#import "UIImage+LFSColor.h"
+#import "UIImage+LFSUtils.h"
 #import "LFSDetailViewController.h"
 #import "LFSContentToolbar.h"
 
