@@ -12,6 +12,6 @@
 @interface UIImage (LFSUtils)
 
 + (UIImage *)imageWithColor:(UIColor *)color;
-- (UIImage*)simpleResizedImageWithContentMode:(UIViewContentMode)contentMode bounds:(CGSize) bounds interpolationQuality:(CGInterpolationQuality)quality;
+- (UIImage*)croppedResizedImageWithContentMode:(UIViewContentMode)contentMode bounds:(CGSize) bounds interpolationQuality:(CGInterpolationQuality)quality;
 
 @end

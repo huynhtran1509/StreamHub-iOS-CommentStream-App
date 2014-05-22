@@ -26,7 +26,7 @@
     return image;
 }
 
-- (UIImage*)simpleResizedImageWithContentMode:(UIViewContentMode)contentMode bounds:(CGSize) bounds interpolationQuality:(CGInterpolationQuality)quality
+- (UIImage*)croppedResizedImageWithContentMode:(UIViewContentMode)contentMode bounds:(CGSize) bounds interpolationQuality:(CGInterpolationQuality)quality
 {
     CGSize size = self.size;
     CGSize targetSize;
