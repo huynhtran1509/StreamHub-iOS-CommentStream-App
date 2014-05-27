@@ -11,10 +11,11 @@
 
 #import "LFSUser.h"
 #import "LFSContent.h"
+#import "LFSWriteCommentView.h"
 
 @protocol LFSPostViewControllerDelegate;
 
-@interface LFSPostViewController : UIViewController
+@interface LFSPostViewController : UIViewController <LFSWriteCommentViewDelegate>
 
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;

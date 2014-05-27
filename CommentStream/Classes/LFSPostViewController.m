@@ -9,9 +9,9 @@
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
 #import "LFSPostViewController.h"
 
-#import "LFSWriteCommentView.h"
 #import "LFSAuthorProfile.h"
 #import "LFSResource.h"
+#import "UIColor+CommentStream.h"
 
 @interface LFSPostViewController ()
 
@@ -23,7 +23,6 @@
 @property (weak, nonatomic) IBOutlet LFSWriteCommentView *writeCommentView;
 
 @property (weak, nonatomic) IBOutlet UINavigationBar *postNavbar;
-
 
 - (IBAction)cancelClicked:(UIBarButtonItem *)sender;
 - (IBAction)postClicked:(UIBarButtonItem *)sender;
@@ -62,6 +61,11 @@
     return _writeClient;
 }
 
+#pragma mark - LFSWritecommentViewDelegate
+-(void)didClickAddPhotoButton
+{
+    NSLog(@"did click add photo button");
+}
 
 #pragma mark - UIViewController
 
@@ -103,6 +107,8 @@
                                displayString:author.displayName
                                icon:self.avatarImage];
     [headerInfo setIconURLString:author.avatarUrlString75];
+    
+    [self.writeCommentView setDelegate:self];
     [self.writeCommentView setProfileLocal:headerInfo];
 }
 

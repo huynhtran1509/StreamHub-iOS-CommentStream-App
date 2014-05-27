@@ -16,6 +16,7 @@
 #import "LFSBasicHTMLParser.h"
 #import "LFSAttributedTextCell.h"
 #import "UILabel+Trim.h"
+#import "UIColor+CommentStream.h"
 
 // external constants
 const CGSize kCellImageViewSize = { .width=25.f, .height=25.f };
@@ -655,10 +656,7 @@ static const CGFloat kCellMinorVerticalSeparator = 12.0f;
             // iOS7-like selected background color
             [self setSelectionStyle:UITableViewCellSelectionStyleGray];
             UIView *selectionColor = [[UIView alloc] init];
-            [selectionColor setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
-                                                               green:(217.f/255.f)
-                                                                blue:(217.f/255.f)
-                                                               alpha:1.f]];
+            [selectionColor setBackgroundColor:[UIColor colorForCellSelectionBackground]];
             [self setSelectedBackgroundView:selectionColor];
         }
         

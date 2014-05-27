@@ -30,6 +30,7 @@
 #import "LFSAppDelegate.h"
 
 #import "LFSAttributedLabelDelegate.h"
+#import "UIColor+CommentStream.h"
 
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSContentCollection *content;
@@ -250,11 +251,7 @@ const static char kAttributedTextValueKey;
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
     
-    _placeholderImage = [UIImage imageWithColor:
-                         [UIColor colorWithRed:232.f / 255.f
-                                         green:236.f / 255.f
-                                          blue:239.f / 255.f
-                                         alpha:1.f]];
+    _placeholderImage = [UIImage imageWithColor:[UIColor colorForImagePlaceholder]];
     
     _operationQueue = [[NSOperationQueue alloc] init];
     [_operationQueue setMaxConcurrentOperationCount:8];
@@ -742,10 +739,7 @@ const static char kAttributedTextValueKey;
         if (!cell) {
             cell = [[LFSDeletedCell alloc]
                     initWithReuseIdentifier:kDeletedCellReuseIdentifier];
-            [cell.imageView setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
-                                                               green:(217.f/255.f)
-                                                                blue:(217.f/255.f)
-                                                               alpha:1.f]];
+            [cell.imageView setBackgroundColor:[UIColor colorForCellSelectionBackground]];
             [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
             [cell.imageView setContentMode:UIViewContentModeCenter];
             [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];

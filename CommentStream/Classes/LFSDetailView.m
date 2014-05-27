@@ -11,6 +11,8 @@
 
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
+#import "UIColor+CommentStream.h"
+
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
 #import "UILabel+Trim.h"
@@ -163,9 +165,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         
         // configure
         [_button1.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
-        [_button1 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+        [_button1 setTitleColor:[UIColor colorForToolbarButtonNormal]
                        forState:UIControlStateNormal];
-        [_button1 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+        [_button1 setTitleColor:[UIColor colorForToolbarButtonHighlighted]
                        forState:UIControlStateHighlighted];
         
         // Set the amount of space to appear between image and title
@@ -195,9 +197,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         
         // configure
         [_button2.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
-        [_button2 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+        [_button2 setTitleColor:[UIColor colorForToolbarButtonNormal]
                        forState:UIControlStateNormal];
-        [_button2 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+        [_button2 setTitleColor:[UIColor colorForToolbarButtonHighlighted]
                        forState:UIControlStateHighlighted];
         
         // Set the amount of space to appear between image and title
@@ -227,9 +229,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         
         // configure
         [_button3.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
-        [_button3 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+        [_button3 setTitleColor:[UIColor colorForToolbarButtonNormal]
                        forState:UIControlStateNormal];
-        [_button3 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+        [_button3 setTitleColor:[UIColor colorForToolbarButtonHighlighted]
                        forState:UIControlStateHighlighted];
         
         // Set the amount of space to appear between image and title
@@ -387,9 +389,9 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         [_footerRightView.titleLabel setFont:[UIFont boldSystemFontOfSize:13.f]];
         [_footerRightView.titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
         [_footerRightView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin)];
-        [_footerRightView setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+        [_footerRightView setTitleColor:[UIColor colorForToolbarButtonNormal]
                                forState:UIControlStateNormal];
-        [_footerRightView setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+        [_footerRightView setTitleColor:[UIColor colorForToolbarButtonHighlighted]
                                forState:UIControlStateHighlighted];
         [_footerRightView setContentHorizontalAlignment:UIControlContentHorizontalAlignmentRight];
         

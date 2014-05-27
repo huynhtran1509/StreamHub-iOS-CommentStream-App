@@ -7,14 +7,13 @@
 //
 
 #import "LFSContentToolbar.h"
+#import "UIColor+CommentStream.h"
 
 @implementation LFSContentToolbar
 
 - (void)drawRect:(CGRect)rect
 {
-    [[UIColor colorWithRed:(200.f/255.f)
-                     green:(199.f/255.f)
-                      blue:(204.f/255.f) alpha:1.f] setStroke];
+    [[UIColor colorForToolbarEdge] setStroke];
     
     CGPoint origin = rect.origin;
     CGSize size = rect.size;
