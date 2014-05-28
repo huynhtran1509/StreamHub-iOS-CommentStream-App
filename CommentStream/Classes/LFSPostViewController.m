@@ -130,7 +130,16 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 {
     UIImagePickerController * picker = [[UIImagePickerController alloc] init];
     [picker setDelegate:self];
-    [picker setSourceType:sourceType];
+    @try {
+        [picker setSourceType:sourceType];
+    }
+    @catch (NSException *e) {
+        if ([e name] == NSInvalidArgumentException) {
+            return; // source type not available (on iOS simulator)
+        } else {
+            @throw e;
+        }
+    }
     [self presentViewController:picker animated:YES completion:nil];
 }
 
