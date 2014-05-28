@@ -65,7 +65,7 @@
             
         default:
             [NSException raise:NSInvalidArgumentException
-                        format:@"Unsupported content mode: %d", contentMode];
+                        format:@"Unsupported content mode: %ld", (long)contentMode];
     }
     
     CGRect targetRect;

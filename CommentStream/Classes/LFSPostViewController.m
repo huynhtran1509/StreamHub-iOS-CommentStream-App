@@ -13,6 +13,25 @@
 #import "LFSResource.h"
 #import "UIColor+CommentStream.h"
 
+
+#define LFS_PHOTO_ACTIONS_LENGTH 3u
+
+typedef NS_ENUM(NSUInteger, kAddPhotoAction) {
+    kAddPhotoTakePhoto = 0u,
+    kAddPhotoChooseExisting,
+    kAddPhotoSocialSource
+};
+
+// (for internal use):
+// https://github.com/Livefyre/lfdj/blob/production/lfwrite/lfwrite/api/v3_0/urls.py#L75
+static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
+{
+    @"Take Photo",            // 0
+    @"Choose Existing Photo", // 1
+    @"Use Social Sources",    // 2
+};
+
+
 @interface LFSPostViewController ()
 
 // render iOS7 status bar methods as writable properties
@@ -72,9 +91,9 @@
                         cancelButtonTitle:@"Cancel"
                         destructiveButtonTitle:nil
                         otherButtonTitles:
-                        @"Take Photo",
-                        @"Choose Existing Photo",
-                        @"Use Social Sources",
+                        kPhotoActionsArray[kAddPhotoTakePhoto],
+                        kPhotoActionsArray[kAddPhotoChooseExisting],
+                        kPhotoActionsArray[kAddPhotoSocialSource],
                         nil];
     }
     return _actionSheet;
@@ -89,23 +108,30 @@
     NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
     
     if (actionSheet == self.actionSheet) {
-        NSLog(@"test test test");
-        if ([action isEqualToString:@"Take Photo"])
+        if ([action isEqualToString:kPhotoActionsArray[kAddPhotoTakePhoto]])
         {
-            NSLog(@"Take Photo");
+            [self presentImagePickerWithSourceType:UIImagePickerControllerSourceTypeCamera];
         }
-        else if ([action isEqualToString:@"Choose Existing Photo"])
+        else if ([action isEqualToString:kPhotoActionsArray[kAddPhotoChooseExisting]])
         {
-            NSLog(@"Choose Existing Photo pressed");
+            [self presentImagePickerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
         }
-        else if ([action isEqualToString:@"Use Social Sources"])
+        else if ([action isEqualToString:kPhotoActionsArray[kAddPhotoSocialSource]])
         {
-            NSLog(@"Use Social Sources pressed");
+            // use FilePicker control
         }
         else {
-            NSLog(@"Cancel pressed");
+            // do nothing
         }
     }
+}
+
+- (void)presentImagePickerWithSourceType:(UIImagePickerControllerSourceType)sourceType
+{
+    UIImagePickerController * picker = [[UIImagePickerController alloc] init];
+    [picker setDelegate:self];
+    [picker setSourceType:sourceType];
+    [self presentViewController:picker animated:YES completion:nil];
 }
 
 #pragma mark - LFSWritecommentViewDelegate
