@@ -198,9 +198,6 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 {
     [super viewWillAppear:animated];
     
-    // show keyboard (doing this in viewDidAppear causes unnecessary lag)
-    [self.writeCommentView.textView becomeFirstResponder];
-    
     if (self.replyToContent != nil) {
         [self.postNavbar.topItem setTitle:@"Reply"];
         
@@ -210,6 +207,15 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
             [self.writeCommentView.textView setText:replyPrefix];
         }
     }
+    
+    // show keyboard (doing this in viewDidAppear causes unnecessary lag)
+    [self.writeCommentView.textView becomeFirstResponder];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [self.writeCommentView.textView resignFirstResponder];
 }
 
 - (NSString*)replyPrefixFromContent:(LFSContent*)content
@@ -224,7 +230,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     _authorHandles = dictionary;
     NSArray *handles = [_authorHandles allKeys];
     NSString *prefix = nil;
-    if (handles.count  > 0) {
+    if (handles.count > 0) {
         NSString *joinedParticipants = [handles componentsJoinedByString:@" @"];
         prefix = [NSString stringWithFormat:@"@%@ ", joinedParticipants];
     }
