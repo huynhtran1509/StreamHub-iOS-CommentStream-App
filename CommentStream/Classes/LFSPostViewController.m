@@ -61,10 +61,57 @@
     return _writeClient;
 }
 
+#pragma mark -
+@synthesize actionSheet = _actionSheet;
+-(UIActionSheet*)actionSheet
+{
+    if (_actionSheet == nil) {
+        _actionSheet = [[UIActionSheet alloc]
+                        initWithTitle:nil
+                        delegate:self
+                        cancelButtonTitle:@"Cancel"
+                        destructiveButtonTitle:nil
+                        otherButtonTitles:
+                        @"Take Photo",
+                        @"Choose Existing Photo",
+                        @"Use Social Sources",
+                        nil];
+    }
+    return _actionSheet;
+}
+
+#pragma mark - UIActionSheetDelegate
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    // TODO: this method is incomplete
+    
+    // Get the name of the button pressed
+    NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
+    
+    if (actionSheet == self.actionSheet) {
+        NSLog(@"test test test");
+        if ([action isEqualToString:@"Take Photo"])
+        {
+            NSLog(@"Take Photo");
+        }
+        else if ([action isEqualToString:@"Choose Existing Photo"])
+        {
+            NSLog(@"Choose Existing Photo pressed");
+        }
+        else if ([action isEqualToString:@"Use Social Sources"])
+        {
+            NSLog(@"Use Social Sources pressed");
+        }
+        else {
+            NSLog(@"Cancel pressed");
+        }
+    }
+}
+
 #pragma mark - LFSWritecommentViewDelegate
 -(void)didClickAddPhotoButton
 {
-    NSLog(@"did click add photo button");
+    [self.actionSheet showInView:self.view];
 }
 
 #pragma mark - UIViewController

@@ -15,7 +15,7 @@
 
 @protocol LFSPostViewControllerDelegate;
 
-@interface LFSPostViewController : UIViewController <LFSWriteCommentViewDelegate>
+@interface LFSPostViewController : UIViewController <LFSWriteCommentViewDelegate, UIActionSheetDelegate>
 
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;
@@ -25,6 +25,8 @@
 @property (nonatomic, strong) UIImage *avatarImage;
 
 @property (nonatomic, weak) id<LFSPostViewControllerDelegate> delegate;
+
+@property (nonatomic, strong) UIActionSheet *actionSheet;
 
 @end
 
