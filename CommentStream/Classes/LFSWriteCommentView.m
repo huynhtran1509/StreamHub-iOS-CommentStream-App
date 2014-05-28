@@ -14,9 +14,10 @@
 #import "LFSWriteCommentView.h"
 #import "UILabel+Trim.h"
 
-static const CGFloat kDetailContentLineSpacing = 8.0f;
-static const CGFloat kDetailBarButtonHeight = 44.0f;
-static const CGFloat kDetailBarButtonWidth = 120.0f;
+static const CGFloat kToolbarIconLabelSpacing = 8.0f;
+static const CGFloat kToolbarButtonHeight = 44.0f;
+
+static const CGFloat kToolbarButtonWidth = 120.0f;
 
 static const UIEdgeInsets kDetailPadding = {
     .top=15.0f, .left=15.0f, .bottom=15.0f, .right=15.0f
@@ -101,8 +102,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     if (_button1 == nil) {
         
         CGRect frame = CGRectMake(0.f, 0.f,
-                                  kDetailBarButtonWidth,
-                                  kDetailBarButtonHeight);
+                                  kToolbarButtonWidth,
+                                  kToolbarButtonHeight);
         // initialize
         _button1 = [[UIButton alloc] initWithFrame:frame];
         
@@ -114,8 +115,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
                        forState:UIControlStateHighlighted];
         
         // Set the amount of space to appear between image and title
-        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
-        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kDetailContentLineSpacing, 0, 0);
+        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, kToolbarIconLabelSpacing, 0, 0);
+        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kToolbarIconLabelSpacing, 0, 0);
         
         [_button1 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
         
