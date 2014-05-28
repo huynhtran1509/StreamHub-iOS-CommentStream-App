@@ -143,6 +143,13 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     [self presentViewController:picker animated:YES completion:nil];
 }
 
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+    [self dismissViewControllerAnimated:NO completion:^{
+        [self.writeCommentView.textView becomeFirstResponder];
+    }];
+}
+
 #pragma mark - LFSWritecommentViewDelegate
 -(void)didClickAddPhotoButton
 {
