@@ -169,7 +169,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 -(void)FPPickerController:(FPPickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     // TODO: finish this method
-    NSLog(@"Finished picking media");
+    NSLog(@"Finished picking media: %@", info);
 }
 
 -(void)FPPickerControllerDidCancel:(FPPickerController *)picker
