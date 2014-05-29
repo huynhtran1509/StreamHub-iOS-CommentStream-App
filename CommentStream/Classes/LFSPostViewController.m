@@ -7,8 +7,9 @@
 //
 
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
-#import "LFSPostViewController.h"
 
+#import "UIImagePickerController+StatusBarHidden.h"
+#import "LFSPostViewController.h"
 #import "LFSAuthorProfile.h"
 #import "LFSResource.h"
 #import "UIColor+CommentStream.h"
@@ -119,6 +120,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
         else if ([action isEqualToString:kPhotoActionsArray[kAddPhotoSocialSource]])
         {
             // use FilePicker control
+            [self presentSocialPicker];
         }
         else {
             // do nothing
@@ -128,7 +130,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 - (void)presentImagePickerWithSourceType:(UIImagePickerControllerSourceType)sourceType
 {
-    UIImagePickerController * picker = [[UIImagePickerController alloc] init];
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     [picker setDelegate:self];
     @try {
         [picker setSourceType:sourceType];
@@ -143,7 +145,34 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     [self presentViewController:picker animated:YES completion:nil];
 }
 
+- (void)presentSocialPicker
+{
+    FPPickerController *picker = [[FPPickerController alloc] init];
+    [picker setFpdelegate:self];
+    [picker setDataTypes:[NSArray arrayWithObjects:@"image/*", nil]];
+    [picker setSourceNames:[[NSArray alloc]
+                            initWithObjects: FPSourceImagesearch, FPSourceDropbox, FPSourceFacebook, FPSourceFlickr, FPSourceInstagram, FPSourceGoogleDrive, nil]];
+
+    [picker setSelectMultiple:NO];
+    [self presentViewController:picker animated:YES completion:nil];
+}
+
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+    [self dismissViewControllerAnimated:NO completion:^{
+        [self.writeCommentView.textView becomeFirstResponder];
+    }];
+}
+
+#pragma mark - FPPickerDelegate
+
+-(void)FPPickerController:(FPPickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+    // TODO: finish this method
+    NSLog(@"Finished picking media");
+}
+
+-(void)FPPickerControllerDidCancel:(FPPickerController *)picker
 {
     [self dismissViewControllerAnimated:NO completion:^{
         [self.writeCommentView.textView becomeFirstResponder];

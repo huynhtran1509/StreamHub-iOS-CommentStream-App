@@ -27,6 +27,7 @@
 		EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */; };
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
+		EF85A19C1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m in Sources */ = {isa = PBXBuildFile; fileRef = EF85A19B1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m */; };
 		EF9EB0EE19350DE90063AFA3 /* UIColor+CommentStream.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9EB0ED19350DE90063AFA3 /* UIColor+CommentStream.m */; };
 		EFA106C119031D2E002E8411 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
 		EFA106C2190563A9002E8411 /* UIImage+LFSUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA106BE19031CAB002E8411 /* UIImage+LFSUtils.m */; };
@@ -87,6 +88,8 @@
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		EF85A19A1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImagePickerController+StatusBarHidden.h"; sourceTree = "<group>"; };
+		EF85A19B1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImagePickerController+StatusBarHidden.m"; sourceTree = "<group>"; };
 		EF9EB0EC19350DE90063AFA3 /* UIColor+CommentStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CommentStream.h"; sourceTree = "<group>"; };
 		EF9EB0ED19350DE90063AFA3 /* UIColor+CommentStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CommentStream.m"; sourceTree = "<group>"; };
 		EFA106B219031C2C002E8411 /* UIImage+LFSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+LFSUtils.h"; sourceTree = "<group>"; };
@@ -220,6 +223,8 @@
 		EFA106B119031C2C002E8411 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				EF85A19A1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.h */,
+				EF85A19B1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m */,
 				EFA106B219031C2C002E8411 /* UIImage+LFSUtils.h */,
 				EFA106BE19031CAB002E8411 /* UIImage+LFSUtils.m */,
 				EFA106B419031C2C002E8411 /* UILabel+Trim.h */,
@@ -400,6 +405,7 @@
 				EF529E3B17F39ECF00836ACE /* LFSContentToolbar.m in Sources */,
 				EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */,
 				EFE0A2EB180E7307006F0AB3 /* LFSUser.m in Sources */,
+				EF85A19C1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m in Sources */,
 				EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */,
 				EFCB9F8C17EBED3B00797BCE /* LFSBasicHTMLParser.m in Sources */,
 				EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */,
