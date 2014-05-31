@@ -24,7 +24,7 @@ static const UIEdgeInsets kDetailPadding = {
 };
 
 static const UIEdgeInsets kPostContentInset = {
-    .top=75.f, .left=7.f, .bottom=20.f, .right=5.f
+    .top=75.f, .left=7.f, .bottom=200.f, .right=5.f
 };
 
 // header font settings
@@ -52,6 +52,8 @@ static const CGFloat kDetailImageMarginRight = 8.0f;
 static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 //static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
+
+static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f };
 
 @interface LFSWriteCommentView ()
 
@@ -206,6 +208,46 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     }
     return _headerAttributeTopView;
 }
+
+#pragma mark -
+
+-(void)fixAttachmentImageViewFrame
+{
+    CGFloat x = (self.textView.frame.size.width - kAttachmentImageViewSize.width) / 2.f;
+    CGFloat y = self.textView.contentSize.height - kPostContentInset.bottom + (kPostContentInset.bottom - kAttachmentImageViewSize.height) / 2.f;
+    CGRect frame;
+    frame.size = kAttachmentImageViewSize;
+    frame.origin = CGPointMake(x, y);
+    if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+        // TODO: verify that this is needed
+        // iOS6
+        frame.origin.y -= kPostContentInset.top;
+        frame.origin.x -= kPostContentInset.left;
+    }
+    // initialize
+    [self.attachmentImageView setFrame:frame];
+}
+
+@synthesize attachmentImageView = _attachmentImageView;
+- (UIImageView*)attachmentImageView
+{
+    if (_attachmentImageView == nil) {
+        // initialize
+        _attachmentImageView = [[UIImageView alloc] init];
+        
+        [self fixAttachmentImageViewFrame];
+        
+        // configure
+        [_attachmentImageView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_attachmentImageView setContentMode:UIViewContentModeScaleToFill];
+        
+        // add to superview
+        [self.textView addSubview:_attachmentImageView];
+    }
+    return _attachmentImageView;
+}
+
 
 #pragma mark -
 @synthesize headerAttributeTopImageView = _headerAttributeTopImageView;
@@ -482,6 +524,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGFloat new_offset = MAX((caret_rect.origin.y + caret_rect.size.height) - visible_rect.size.height - textView.contentInset.top,  -textView.contentInset.top);
         [textView setContentOffset:CGPointMake(0, new_offset) animated:NO];
     }
+    
+    [self fixAttachmentImageViewFrame];
 }
 
 #pragma mark - Lifecycle

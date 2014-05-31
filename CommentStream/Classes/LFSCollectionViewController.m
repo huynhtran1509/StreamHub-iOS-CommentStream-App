@@ -844,19 +844,21 @@ const static char kAttributedTextValueKey;
                    scaleToSize:size
                      contentMode:contentMode
                        success:^(AFHTTPRequestOperation *operation, UIImage* image) {
+                           if (image != nil) {
 #ifdef CACHE_SCALED_IMAGES
-                           [_imageCache setObject:image forKey:key];
+                               [_imageCache setObject:image forKey:key];
 #endif
-                           // we are on the main thead here -- display the image
-                           NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
-                                                                       inSection:0];
-                           UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
-                           if (cell != nil && [cell isKindOfClass:[LFSAttributedTextCell class]])
-                           {
-                               // check for cell class (as it could have been deleted)
-                               // `cell' is true here only when cell is visible
-                               loadBlock((LFSAttributedTextCell*)cell, image);
-                               [cell setNeedsLayout];
+                               // we are on the main thead here -- display the image
+                               NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
+                                                                           inSection:0];
+                               UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
+                               if (cell != nil && [cell isKindOfClass:[LFSAttributedTextCell class]])
+                               {
+                                   // check for cell class (as it could have been deleted)
+                                   // `cell' is true here only when cell is visible
+                                   loadBlock((LFSAttributedTextCell*)cell, image);
+                                   [cell setNeedsLayout];
+                               }
                            }
                        }
                        failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -887,12 +889,12 @@ const static char kAttributedTextValueKey;
          [cell.imageView setImage:image];
      }];
     
-    LFSOembed *attachment = content.firstOembed;
-    if (content.firstOembed.contentAttachmentThumbnailUrlString != nil) {
-        [self loadImageWithURL:[NSURL URLWithString:content.firstOembed.contentAttachmentThumbnailUrlString]
+    NSString *imageURLString = content.firstOembed.contentAttachmentThumbnailUrlString;
+    if (imageURLString != nil) {
+        [self loadImageWithURL:[NSURL URLWithString:imageURLString]
              forAttributedCell:cell
                      contentId:content.idString
-                      cacheKey:attachment.thumbnailUrlString
+                      cacheKey:imageURLString
                    scaleToSize:kAttachmentImageViewSize
                    contentMode:UIViewContentModeScaleAspectFit
                      loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
