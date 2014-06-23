@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		938974CA84AA4DFDBBCCCD67 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B24C48529EA4C478A1414B0 /* libPods.a */; };
 		EF05E46A181CD36700153F42 /* LFSOembed.m in Sources */ = {isa = PBXBuildFile; fileRef = EF05E469181CD36700153F42 /* LFSOembed.m */; };
+		EF0CEBB91950570E0003BF4B /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF0CEBB81950570E0003BF4B /* AssetsLibrary.framework */; };
 		EF1179D117B5BE3F00D59E54 /* LFSConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF1179D017B5BE3F00D59E54 /* LFSConfig.plist */; };
 		EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */; };
 		EF2251E417F21295006482BD /* LFSContent.m in Sources */ = {isa = PBXBuildFile; fileRef = EF2251E317F21295006482BD /* LFSContent.m */; };
@@ -27,8 +28,10 @@
 		EF7BB6E617B2B718009E2E70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6E417B2B718009E2E70 /* InfoPlist.strings */; };
 		EF7BB6E817B2B718009E2E70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7BB6E717B2B718009E2E70 /* main.m */; };
 		EF7BB6F417B2B718009E2E70 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6F317B2B718009E2E70 /* Images.xcassets */; };
+		EF85A19C1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m in Sources */ = {isa = PBXBuildFile; fileRef = EF85A19B1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m */; };
+		EF9EB0EE19350DE90063AFA3 /* UIColor+CommentStream.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9EB0ED19350DE90063AFA3 /* UIColor+CommentStream.m */; };
 		EFA106C119031D2E002E8411 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF7BB6ED17B2B718009E2E70 /* Main.storyboard */; };
-		EFA106C2190563A9002E8411 /* UIImage+LFSColor.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA106BE19031CAB002E8411 /* UIImage+LFSColor.m */; };
+		EFA106C2190563A9002E8411 /* UIImage+LFSUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA106BE19031CAB002E8411 /* UIImage+LFSUtils.m */; };
 		EFA106C3190563A9002E8411 /* UILabel+Trim.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA106BF19031CAB002E8411 /* UILabel+Trim.m */; };
 		EFA106C4190563A9002E8411 /* UIWebView+ScrollViewContentSize.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA106C019031CAB002E8411 /* UIWebView+ScrollViewContentSize.m */; };
 		EFA21EAC17F970ED003589EB /* LFSResource.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA21EAB17F970ED003589EB /* LFSResource.m */; };
@@ -52,6 +55,7 @@
 		BA268D01CA8446E4BA6D3FC3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		EF05E468181CD36700153F42 /* LFSOembed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSOembed.h; path = Classes/LFSOembed.h; sourceTree = "<group>"; };
 		EF05E469181CD36700153F42 /* LFSOembed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSOembed.m; path = Classes/LFSOembed.m; sourceTree = "<group>"; };
+		EF0CEBB81950570E0003BF4B /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		EF1179D017B5BE3F00D59E54 /* LFSConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LFSConfig.plist; sourceTree = "<group>"; };
 		EF200BCE17BBB63A007E5295 /* LFSAttributedTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSAttributedTextCell.h; path = Classes/LFSAttributedTextCell.h; sourceTree = "<group>"; };
 		EF200BCF17BBB63A007E5295 /* LFSAttributedTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LFSAttributedTextCell.m; path = Classes/LFSAttributedTextCell.m; sourceTree = "<group>"; };
@@ -86,10 +90,14 @@
 		EF7BB6E917B2B718009E2E70 /* CommentStream-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CommentStream-Prefix.pch"; sourceTree = "<group>"; };
 		EF7BB6EE17B2B718009E2E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EF7BB6F317B2B718009E2E70 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		EFA106B219031C2C002E8411 /* UIImage+LFSColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+LFSColor.h"; sourceTree = "<group>"; };
+		EF85A19A1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImagePickerController+StatusBarHidden.h"; sourceTree = "<group>"; };
+		EF85A19B1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImagePickerController+StatusBarHidden.m"; sourceTree = "<group>"; };
+		EF9EB0EC19350DE90063AFA3 /* UIColor+CommentStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CommentStream.h"; sourceTree = "<group>"; };
+		EF9EB0ED19350DE90063AFA3 /* UIColor+CommentStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CommentStream.m"; sourceTree = "<group>"; };
+		EFA106B219031C2C002E8411 /* UIImage+LFSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+LFSUtils.h"; sourceTree = "<group>"; };
 		EFA106B419031C2C002E8411 /* UILabel+Trim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+Trim.h"; sourceTree = "<group>"; };
 		EFA106B619031C2C002E8411 /* UIWebView+ScrollViewContentSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWebView+ScrollViewContentSize.h"; sourceTree = "<group>"; };
-		EFA106BE19031CAB002E8411 /* UIImage+LFSColor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+LFSColor.m"; sourceTree = "<group>"; };
+		EFA106BE19031CAB002E8411 /* UIImage+LFSUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+LFSUtils.m"; sourceTree = "<group>"; };
 		EFA106BF19031CAB002E8411 /* UILabel+Trim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UILabel+Trim.m"; sourceTree = "<group>"; };
 		EFA106C019031CAB002E8411 /* UIWebView+ScrollViewContentSize.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+ScrollViewContentSize.m"; sourceTree = "<group>"; };
 		EFA21EAA17F970ED003589EB /* LFSResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LFSResource.h; path = Classes/LFSResource.h; sourceTree = "<group>"; };
@@ -127,6 +135,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				938974CA84AA4DFDBBCCCD67 /* libPods.a in Frameworks */,
+				EF0CEBB91950570E0003BF4B /* AssetsLibrary.framework in Frameworks */,
 				EFB27A9C17EE3FFA008AD723 /* QuartzCore.framework in Frameworks */,
 				EF7BB6DE17B2B718009E2E70 /* CoreGraphics.framework in Frameworks */,
 				EF7BB6E017B2B718009E2E70 /* UIKit.framework in Frameworks */,
@@ -179,6 +188,7 @@
 		EF7BB6DA17B2B718009E2E70 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EF0CEBB81950570E0003BF4B /* AssetsLibrary.framework */,
 				EFB27A9B17EE3FFA008AD723 /* QuartzCore.framework */,
 				EF7BB6DB17B2B718009E2E70 /* Foundation.framework */,
 				EF7BB6DD17B2B718009E2E70 /* CoreGraphics.framework */,
@@ -217,12 +227,16 @@
 		EFA106B119031C2C002E8411 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				EFA106B219031C2C002E8411 /* UIImage+LFSColor.h */,
-				EFA106BE19031CAB002E8411 /* UIImage+LFSColor.m */,
+				EF85A19A1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.h */,
+				EF85A19B1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m */,
+				EFA106B219031C2C002E8411 /* UIImage+LFSUtils.h */,
+				EFA106BE19031CAB002E8411 /* UIImage+LFSUtils.m */,
 				EFA106B419031C2C002E8411 /* UILabel+Trim.h */,
 				EFA106BF19031CAB002E8411 /* UILabel+Trim.m */,
 				EFA106B619031C2C002E8411 /* UIWebView+ScrollViewContentSize.h */,
 				EFA106C019031CAB002E8411 /* UIWebView+ScrollViewContentSize.m */,
+				EF9EB0EC19350DE90063AFA3 /* UIColor+CommentStream.h */,
+				EF9EB0ED19350DE90063AFA3 /* UIColor+CommentStream.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -385,15 +399,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFA106C2190563A9002E8411 /* UIImage+LFSColor.m in Sources */,
+				EFA106C2190563A9002E8411 /* UIImage+LFSUtils.m in Sources */,
 				EFA106C3190563A9002E8411 /* UILabel+Trim.m in Sources */,
 				EFA106C4190563A9002E8411 /* UIWebView+ScrollViewContentSize.m in Sources */,
+				EF9EB0EE19350DE90063AFA3 /* UIColor+CommentStream.m in Sources */,
 				EFA21EAC17F970ED003589EB /* LFSResource.m in Sources */,
 				EF5AFED617E3C2B900D5A7DF /* LFSPostViewController.m in Sources */,
 				EF59CFEB1922BDF0007EACD7 /* LFSViewResources.m in Sources */,
 				EF529E3B17F39ECF00836ACE /* LFSContentToolbar.m in Sources */,
 				EF6683E017BB97E2005F5FC3 /* LFSAppDelegate.m in Sources */,
 				EFE0A2EB180E7307006F0AB3 /* LFSUser.m in Sources */,
+				EF85A19C1936A8BD00EA42EB /* UIImagePickerController+StatusBarHidden.m in Sources */,
 				EFD5BFD617EC604500C28880 /* LFSBasicHTMLLabel.m in Sources */,
 				EFCB9F8C17EBED3B00797BCE /* LFSBasicHTMLParser.m in Sources */,
 				EF200BD017BBB63A007E5295 /* LFSAttributedTextCell.m in Sources */,

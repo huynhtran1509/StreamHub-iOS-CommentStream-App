@@ -11,6 +11,8 @@
 
 #import <StreamHub-iOS-SDK/NSDateFormatter+RelativeTo.h>
 
+#import "UIColor+CommentStream.h"
+
 #import "LFSDetailView.h"
 #import "LFSContentToolbar.h"
 #import "UILabel+Trim.h"
@@ -28,7 +30,7 @@ static NSString* const kImageViewObservedPath = @"image";
 // content font settings
 static NSString* const kDetailContentFontName = @"Georgia";
 static const CGFloat kDetailContentFontSize = 16.0f;
-static const CGFloat kDetailContentLineSpacing = 8.0f;
+static const CGFloat kToolbarIconLabelSpacing = 8.0f;
 
 // header font settings
 static const CGFloat kDetailHeaderAttributeTopFontSize = 11.f;
@@ -51,8 +53,8 @@ static const CGFloat kDetailFooterHeight = 21.0f;
 static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
-static const CGFloat kDetailBarButtonHeight = 44.0f;
-static const CGFloat kDetailBarButtonWidth = 80.0f;
+static const CGFloat kToolbarButtonHeight = 44.0f;
+static const CGFloat kToolbarButtonWidth = 80.0f;
 
 static const CGFloat kDetailMinorVerticalSeparator = 12.0f;
 static const CGFloat kDetailMajorVerticalSeparator = 20.0f;
@@ -156,21 +158,21 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     if (_button1 == nil) {
 
         CGRect frame = CGRectMake(0.f, 0.f,
-                                  kDetailBarButtonWidth,
-                                  kDetailBarButtonHeight);
+                                  kToolbarButtonWidth,
+                                  kToolbarButtonHeight);
         // initialize
         _button1 = [[UIButton alloc] initWithFrame:frame];
         
         // configure
         [_button1.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
-        [_button1 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+        [_button1 setTitleColor:[UIColor colorForToolbarButtonNormal]
                        forState:UIControlStateNormal];
-        [_button1 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+        [_button1 setTitleColor:[UIColor colorForToolbarButtonHighlighted]
                        forState:UIControlStateHighlighted];
         
         // Set the amount of space to appear between image and title
-        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
-        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kDetailContentLineSpacing, 0, 0);
+        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, kToolbarIconLabelSpacing, 0, 0);
+        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kToolbarIconLabelSpacing, 0, 0);
         
         [_button1 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
         
@@ -188,21 +190,21 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 {
     if (_button2 == nil) {
         CGRect frame = CGRectMake(0.f, 0.f,
-                                  kDetailBarButtonWidth,
-                                  kDetailBarButtonHeight);
+                                  kToolbarButtonWidth,
+                                  kToolbarButtonHeight);
         // initialize
         _button2 = [[UIButton alloc] initWithFrame:frame];
         
         // configure
         [_button2.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
-        [_button2 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+        [_button2 setTitleColor:[UIColor colorForToolbarButtonNormal]
                        forState:UIControlStateNormal];
-        [_button2 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+        [_button2 setTitleColor:[UIColor colorForToolbarButtonHighlighted]
                        forState:UIControlStateHighlighted];
         
         // Set the amount of space to appear between image and title
-        _button2.imageEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
-        _button2.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kDetailContentLineSpacing, 0, 0);
+        _button2.imageEdgeInsets = UIEdgeInsetsMake(0, kToolbarIconLabelSpacing, 0, 0);
+        _button2.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kToolbarIconLabelSpacing, 0, 0);
         
         [_button2 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
         
@@ -220,21 +222,21 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
 {
     if (_button3 == nil) {
         CGRect frame = CGRectMake(0.f, 0.f,
-                                  kDetailBarButtonWidth,
-                                  kDetailBarButtonHeight);
+                                  kToolbarButtonWidth,
+                                  kToolbarButtonHeight);
         // initialize
         _button3 = [[UIButton alloc] initWithFrame:frame];
         
         // configure
         [_button3.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
-        [_button3 setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+        [_button3 setTitleColor:[UIColor colorForToolbarButtonNormal]
                        forState:UIControlStateNormal];
-        [_button3 setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+        [_button3 setTitleColor:[UIColor colorForToolbarButtonHighlighted]
                        forState:UIControlStateHighlighted];
         
         // Set the amount of space to appear between image and title
-        _button3.imageEdgeInsets = UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0);
-        _button3.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kDetailContentLineSpacing, 0, 0);
+        _button3.imageEdgeInsets = UIEdgeInsetsMake(0, kToolbarIconLabelSpacing, 0, 0);
+        _button3.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kToolbarIconLabelSpacing, 0, 0);
         
         [_button3 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
         
@@ -267,7 +269,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         
         [_bodyView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [_bodyView setFont:[UIFont fontWithName:kDetailContentFontName size:kDetailContentFontSize]];
-        [_bodyView setLineSpacing:kDetailContentLineSpacing];
+        [_bodyView setLineSpacing:kToolbarIconLabelSpacing];
         [_bodyView setLineBreakMode:NSLineBreakByWordWrapping];
         // Note: do not force text alignment here as that will break
         // right-alignment for Arabic text
@@ -387,14 +389,14 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
         [_footerRightView.titleLabel setFont:[UIFont boldSystemFontOfSize:13.f]];
         [_footerRightView.titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
         [_footerRightView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin)];
-        [_footerRightView setTitleColor:[UIColor colorWithRed:162.f/255.f green:165.f/255.f blue:170.f/255.f alpha:1.f]
+        [_footerRightView setTitleColor:[UIColor colorForToolbarButtonNormal]
                                forState:UIControlStateNormal];
-        [_footerRightView setTitleColor:[UIColor colorWithRed:86.f/255.f green:88.f/255.f blue:90.f/255.f alpha:1.f]
+        [_footerRightView setTitleColor:[UIColor colorForToolbarButtonHighlighted]
                                forState:UIControlStateHighlighted];
         [_footerRightView setContentHorizontalAlignment:UIControlContentHorizontalAlignmentRight];
         
         // Set the amount of space to appear between image and title
-        [_footerRightView setImageEdgeInsets:UIEdgeInsetsMake(0, kDetailContentLineSpacing, 0, 0)];
+        [_footerRightView setImageEdgeInsets:UIEdgeInsetsMake(0, kToolbarIconLabelSpacing, 0, 0)];
         [_footerRightView setTitleEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
         
         [_footerRightView addTarget:self action:@selector(didSelectContentRemote:) forControlEvents:UIControlEventTouchUpInside];
@@ -521,7 +523,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     if (_toolbar == nil) {
 
         CGRect frame = CGRectZero;
-        frame.size = CGSizeMake(self.bounds.size.width, kDetailBarButtonHeight);
+        frame.size = CGSizeMake(self.bounds.size.width, kToolbarButtonHeight);
         
         // initialize
         _toolbar = [[LFSContentToolbar alloc] initWithFrame:frame];
@@ -900,7 +902,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     
     CGFloat totalWidthInset = kDetailPadding.left + kDetailContentPaddingRight;
     CGFloat totalHeightInset = (kDetailPadding.bottom
-                                + kDetailBarButtonHeight
+                                + kToolbarButtonHeight
                                 + kDetailMinorVerticalSeparator
                                 + kDetailFooterHeight
                                 + kDetailMinorVerticalSeparator

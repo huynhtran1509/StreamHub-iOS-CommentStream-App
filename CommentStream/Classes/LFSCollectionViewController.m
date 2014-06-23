@@ -11,11 +11,12 @@
 
 #import <StreamHub-iOS-SDK/LFSClient.h>
 #import <AFNetworking/AFURLResponseSerialization.h>
+#import <UIImage+Resize/UIImage+Resize.h>
 
 #import <objc/runtime.h>
 
 #import "LFSViewResources.h"
-#import "UIImage+LFSColor.h"
+#import "UIImage+LFSUtils.h"
 
 #import "LFSConfig.h"
 #import "LFSAttributedTextCell.h"
@@ -29,6 +30,7 @@
 #import "LFSAppDelegate.h"
 
 #import "LFSAttributedLabelDelegate.h"
+#import "UIColor+CommentStream.h"
 
 @interface LFSCollectionViewController ()
 @property (nonatomic, strong) LFSContentCollection *content;
@@ -249,11 +251,7 @@ const static char kAttributedTextValueKey;
     // set system cache for URL data to 5MB
     [[NSURLCache sharedURLCache] setMemoryCapacity:1024*1024*5];
     
-    _placeholderImage = [UIImage imageWithColor:
-                         [UIColor colorWithRed:232.f / 255.f
-                                         green:236.f / 255.f
-                                          blue:239.f / 255.f
-                                         alpha:1.f]];
+    _placeholderImage = [UIImage imageWithColor:[UIColor colorForImagePlaceholder]];
     
     _operationQueue = [[NSOperationQueue alloc] init];
     [_operationQueue setMaxConcurrentOperationCount:8];
@@ -741,10 +739,7 @@ const static char kAttributedTextValueKey;
         if (!cell) {
             cell = [[LFSDeletedCell alloc]
                     initWithReuseIdentifier:kDeletedCellReuseIdentifier];
-            [cell.imageView setBackgroundColor:[UIColor colorWithRed:(217.f/255.f)
-                                                               green:(217.f/255.f)
-                                                                blue:(217.f/255.f)
-                                                               alpha:1.f]];
+            [cell.imageView setBackgroundColor:[UIColor colorForCellSelectionBackground]];
             [cell.imageView setImage:[UIImage imageNamed:@"Trash"]];
             [cell.imageView setContentMode:UIViewContentModeCenter];
             [cell.textLabel setFont:[UIFont italicSystemFontOfSize:12.f]];
@@ -804,45 +799,6 @@ const static char kAttributedTextValueKey;
                            icon:nil]];
 }
 
-
-UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
-{
-    // scale down image with Aspect Fill
-    CGRect targetRect;
-    targetRect.origin = CGPointZero;
-    if (contentMode == UIViewContentModeScaleAspectFill) {
-        CGSize currentSize = image.size;
-        if (currentSize.height * size.width > size.height * currentSize.width) {
-            // pick size.width
-            targetRect.size.width = size.width;
-            targetRect.size.height = (size.width / currentSize.width) * currentSize.height;
-        } else {
-            // pick size.height
-            targetRect.size.height = size.height;
-            targetRect.size.width = (size.height / currentSize.height) * currentSize.width;
-        }
-    }
-    else if (contentMode == UIViewContentModeScaleToFill) {
-        targetRect.size = size;
-    }
-    else {
-        NSException* invalidContentMode =
-        [NSException exceptionWithName:@"LFSInvalidContentMode"
-                                reason:@"Invalid content mode for image rescaling"
-                              userInfo:nil];
-        @throw invalidContentMode;
-    }
-    
-    // don't call UIGraphicsBeginImageContext when supporting Retina,
-    // instead call UIGraphicsBeginImageContextWithOptions with zero
-    // for scale
-    UIGraphicsBeginImageContextWithOptions(size, YES, 0.f);
-    [image drawInRect:targetRect];
-    UIImage *processedImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return processedImage;
-}
-
 -(void)loadImageWithURL:(NSURL*)url
             scaleToSize:(CGSize)size
             contentMode:(UIViewContentMode)contentMode
@@ -854,10 +810,12 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     AFHTTPRequestOperation* operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
     [operation setResponseSerializer:[AFImageResponseSerializer serializer]];
-    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        UIImage *image = scaleImage(responseObject, size, contentMode);
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject)
+    {
+        UIImage *image = [(UIImage*)responseObject resizedImageWithContentMode:contentMode bounds:size interpolationQuality:kCGInterpolationDefault];
         success(operation, image);
-    } failure:failure];
+    }
+                                     failure:failure];
 
     [self.operationQueue addOperation:operation];
 }
@@ -886,19 +844,21 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                    scaleToSize:size
                      contentMode:contentMode
                        success:^(AFHTTPRequestOperation *operation, UIImage* image) {
+                           if (image != nil) {
 #ifdef CACHE_SCALED_IMAGES
-                           [_imageCache setObject:image forKey:key];
+                               [_imageCache setObject:image forKey:key];
 #endif
-                           // we are on the main thead here -- display the image
-                           NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
-                                                                       inSection:0];
-                           UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
-                           if (cell != nil && [cell isKindOfClass:[LFSAttributedTextCell class]])
-                           {
-                               // check for cell class (as it could have been deleted)
-                               // `cell' is true here only when cell is visible
-                               loadBlock((LFSAttributedTextCell*)cell, image);
-                               [cell setNeedsLayout];
+                               // we are on the main thead here -- display the image
+                               NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_content indexOfKey:contentId]
+                                                                           inSection:0];
+                               UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
+                               if (cell != nil && [cell isKindOfClass:[LFSAttributedTextCell class]])
+                               {
+                                   // check for cell class (as it could have been deleted)
+                                   // `cell' is true here only when cell is visible
+                                   loadBlock((LFSAttributedTextCell*)cell, image);
+                                   [cell setNeedsLayout];
+                               }
                            }
                        }
                        failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -923,20 +883,20 @@ UIImage* scaleImage(UIImage *image, CGSize size, UIViewContentMode contentMode)
                  contentId:content.idString
                   cacheKey:author.idString
                scaleToSize:kCellImageViewSize
-               contentMode:UIViewContentModeScaleToFill
+               contentMode:UIViewContentModeScaleAspectFit
                  loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
      {
          [cell.imageView setImage:image];
      }];
     
-    LFSOembed *attachment = content.firstOembed;
-    if (content.firstOembed.contentAttachmentThumbnailUrlString != nil) {
-        [self loadImageWithURL:[NSURL URLWithString:content.firstOembed.contentAttachmentThumbnailUrlString]
+    NSString *imageURLString = content.firstOembed.contentAttachmentThumbnailUrlString;
+    if (imageURLString != nil) {
+        [self loadImageWithURL:[NSURL URLWithString:imageURLString]
              forAttributedCell:cell
                      contentId:content.idString
-                      cacheKey:attachment.thumbnailUrlString
+                      cacheKey:imageURLString
                    scaleToSize:kAttachmentImageViewSize
-                   contentMode:UIViewContentModeScaleAspectFill
+                   contentMode:UIViewContentModeScaleAspectFit
                      loadBlock:^(LFSAttributedTextCell *cell, UIImage *image)
          {
              [cell setAttachmentImage:image];

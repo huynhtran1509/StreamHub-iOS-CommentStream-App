@@ -184,6 +184,7 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
 @synthLazyWithNull(NSDictionary, annotations, self.content, @"annotations")
 @synthLazyWithNull(NSArray, childContent, _object, @"childContent")
 
+@synthLazyWithNull(NSArray, attachments, self.content, @"attachments")
 @synthLazyWithNull(NSString, idString, self.content, @"id")
 @synthLazyWithNull(NSString, targetId, self.content, @"targetId")
 @synthLazyWithNull(NSString, parentId, self.content, @"parentId")
@@ -214,6 +215,15 @@ NSUInteger addVisibleMessagesToStack(NSMutableArray *stack, id root)
                         }
                     }
                 }
+            }
+        }
+        else if (self.attachments != nil && self.attachments.count > 0) {
+            LFSOembed *oembed = [[LFSOembed alloc] initWithObject:[self.attachments objectAtIndex:0u]];
+            LFSOembedType oembedType = oembed.oembedType;
+            if (oembedType == LFSOembedTypePhoto ||
+                oembedType == LFSOembedTypeVideo ||
+                oembedType == LFSOembedTypeRich) {
+                _firstOembed = oembed;
             }
         }
     }

@@ -9,16 +9,22 @@
 #import <math.h>
 #import <QuartzCore/QuartzCore.h>
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "UIColor+CommentStream.h"
 
 #import "LFSWriteCommentView.h"
 #import "UILabel+Trim.h"
+
+static const CGFloat kToolbarIconLabelSpacing = 8.0f;
+static const CGFloat kToolbarButtonHeight = 44.0f;
+
+static const CGFloat kToolbarButtonWidth = 120.0f;
 
 static const UIEdgeInsets kDetailPadding = {
     .top=15.0f, .left=15.0f, .bottom=15.0f, .right=15.0f
 };
 
 static const UIEdgeInsets kPostContentInset = {
-    .top=75.f, .left=7.f, .bottom=20.f, .right=5.f
+    .top=75.f, .left=7.f, .bottom=200.f, .right=5.f
 };
 
 // header font settings
@@ -47,6 +53,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 //static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 
+static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f };
+
 @interface LFSWriteCommentView ()
 
 // UIView-specific
@@ -55,6 +63,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 @property (readonly, nonatomic) UIImageView *headerAttributeTopImageView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
+
+@property (readonly, nonatomic) UIButton *button1;
 
 @end
 
@@ -65,6 +75,61 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 #pragma mark - Properties
 
 @synthesize profileLocal = _profileLocal;
+
+#pragma mark - Create toolbar
+
+- (UIToolbar*)createInputToolbar
+{
+    UIToolbar* numberToolbar = [[UIToolbar alloc] init];
+    numberToolbar.items = [NSArray arrayWithObjects:
+                           [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                           [[UIBarButtonItem alloc]
+                            initWithCustomView:self.button1],
+                           [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                           nil];
+    [numberToolbar sizeToFit];
+    return numberToolbar;
+}
+
+-(void)didSelectAction:(id)sender {
+    if (sender == self.button1) {
+        [self.delegate didClickAddPhotoButton];
+    }
+}
+
+#pragma mark -
+@synthesize button1 = _button1;
+- (UIButton*)button1
+{
+    if (_button1 == nil) {
+        
+        CGRect frame = CGRectMake(0.f, 0.f,
+                                  kToolbarButtonWidth,
+                                  kToolbarButtonHeight);
+        // initialize
+        _button1 = [[UIButton alloc] initWithFrame:frame];
+        
+        // configure
+        [_button1.titleLabel setFont:[UIFont boldSystemFontOfSize:14.f]];
+        [_button1 setTitleColor:[UIColor colorForToolbarButtonNormal]
+                       forState:UIControlStateNormal];
+        [_button1 setTitleColor:[UIColor colorForToolbarButtonHighlighted]
+                       forState:UIControlStateHighlighted];
+        
+        // Set the amount of space to appear between image and title
+        _button1.imageEdgeInsets = UIEdgeInsetsMake(0, kToolbarIconLabelSpacing, 0, 0);
+        _button1.titleEdgeInsets = UIEdgeInsetsMake(0, 2 * kToolbarIconLabelSpacing, 0, 0);
+        
+        [_button1 setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+        
+        [_button1 addTarget:self action:@selector(didSelectAction:)
+           forControlEvents:UIControlEventTouchUpInside];
+        
+        // do not add to superview...
+    }
+    return _button1;
+}
+
 
 #pragma mark -
 @synthesize headerImageView = _headerImageView;
@@ -143,6 +208,46 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     }
     return _headerAttributeTopView;
 }
+
+#pragma mark -
+
+-(void)fixAttachmentImageViewFrame
+{
+    CGFloat x = (self.textView.frame.size.width - kAttachmentImageViewSize.width) / 2.f;
+    CGFloat y = self.textView.contentSize.height - kPostContentInset.bottom + (kPostContentInset.bottom - kAttachmentImageViewSize.height) / 2.f;
+    CGRect frame;
+    frame.size = kAttachmentImageViewSize;
+    frame.origin = CGPointMake(x, y);
+    if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+        // TODO: verify that this is needed
+        // iOS6
+        frame.origin.y -= kPostContentInset.top;
+        frame.origin.x -= kPostContentInset.left;
+    }
+    // initialize
+    [self.attachmentImageView setFrame:frame];
+}
+
+@synthesize attachmentImageView = _attachmentImageView;
+- (UIImageView*)attachmentImageView
+{
+    if (_attachmentImageView == nil) {
+        // initialize
+        _attachmentImageView = [[UIImageView alloc] init];
+        
+        [self fixAttachmentImageViewFrame];
+        
+        // configure
+        [_attachmentImageView
+         setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
+        [_attachmentImageView setContentMode:UIViewContentModeScaleToFill];
+        
+        // add to superview
+        [self.textView addSubview:_attachmentImageView];
+    }
+    return _attachmentImageView;
+}
+
 
 #pragma mark -
 @synthesize headerAttributeTopImageView = _headerAttributeTopImageView;
@@ -419,6 +524,8 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         CGFloat new_offset = MAX((caret_rect.origin.y + caret_rect.size.height) - visible_rect.size.height - textView.contentInset.top,  -textView.contentInset.top);
         [textView setContentOffset:CGPointMake(0, new_offset) animated:NO];
     }
+    
+    [self fixAttachmentImageViewFrame];
 }
 
 #pragma mark - Lifecycle
@@ -489,14 +596,39 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     [self moveTextViewForKeyboard:aNotification up:NO];
 }
 
+-(void)onInit
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
+
+    [self.button1 setTitle:@"Add Photo" forState:UIControlStateNormal];
+    [self.button1 setImage:[UIImage imageNamed:@"AddPhoto"] forState:UIControlStateNormal];
+    
+    [self.textView setInputAccessoryView:[self createInputToolbar]];
+}
+
+-(void)onDealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillShowNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillHideNotification
+                                                  object:nil];
+}
+
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
         // Initialization code
         [self resetFields];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+        [self onInit];
     }
     return self;
 }
@@ -507,8 +639,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     if (self) {
         // Initialization code
         [self resetFields];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+        [self onInit];
         _previousViewHeight = frame.size.height;
     }
     return self;
@@ -518,13 +649,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 {
     [_textView setDelegate:nil];
     [self resetFields];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIKeyboardWillShowNotification
-                                                  object:nil];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIKeyboardWillHideNotification
-                                                  object:nil];
+    [self onDealloc];
 }
 
 -(void)resetFields
