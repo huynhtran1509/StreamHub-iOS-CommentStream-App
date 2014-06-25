@@ -196,7 +196,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
                             success:^(id JSON, NSURL *localurl)
               {
                   NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, originalImage, localurl);
-                  [self addImageWithInfo:dictionary];
+                  [self addMediaWithInfo:dictionary];
                   [FPMBProgressHUD hideAllHUDsForView:self.view animated:YES];
                   _pauseKeyboard = NO;
                   [self.writeCommentView.textView becomeFirstResponder];
@@ -230,7 +230,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
                            success:^(id JSON, NSURL *localurl)
              {
                  NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, originalImage, localurl);
-                 [self addImageWithInfo:dictionary];
+                 [self addMediaWithInfo:dictionary];
                  [FPMBProgressHUD hideAllHUDsForView:self.view animated:YES];
                  _pauseKeyboard = NO;
                  [self.writeCommentView.textView becomeFirstResponder];
@@ -267,9 +267,9 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 #pragma mark - FPPickerDelegate
 
--(void)addImageWithInfo:(NSDictionary*)info
+-(void)addMediaWithInfo:(NSDictionary*)info
 {
-    NSString *urlString = [NSString stringWithFormat:@"http://media.fyre.co/%@",
+    NSString *urlString = [@"http://media.fyre.co/" stringByAppendingString:
                            [info objectForKey:FPPickerControllerKey]];
     LFSOembedType oembedType = attachmentCodeFromUTType([info objectForKey:FPPickerControllerMediaType]);
     LFSOembed *oembed = [LFSOembed oembedWithUrl:urlString
@@ -283,7 +283,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 -(void)FPPickerController:(FPPickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    [self addImageWithInfo:info];
+    [self addMediaWithInfo:info];
     [self dismissViewControllerAnimated:NO completion:^{
         [self.writeCommentView.textView becomeFirstResponder];
     }];

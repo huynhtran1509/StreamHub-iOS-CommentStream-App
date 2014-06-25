@@ -41,7 +41,16 @@ LFSOembedType attachmentCodeFromUTType(NSString* uttypeString)
 {
     // this function converts from UTType (e.g. "public.movie")
     // to type used in Livefyre API.
-    if ([uttypeString isEqualToString:(NSString*)kUTTypeImage]) {
+    if ([uttypeString isEqualToString:(NSString*)kUTTypeImage]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeJPEG]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeGIF]
+        || [uttypeString isEqualToString:(NSString*)kUTTypePNG]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeJPEG2000]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeTIFF]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeBMP]
+        || [uttypeString isEqualToString:(NSString*)kUTTypeICO]
+        )
+    {
         return LFSOembedTypePhoto;
     }
     else if ([uttypeString isEqualToString:(NSString*)kUTTypeMovie]) {
