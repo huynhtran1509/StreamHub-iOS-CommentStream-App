@@ -27,7 +27,7 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>Filepicker API Key</key>
-	<string>AYNlO8P2PT6qnCfo9eCw2z</string>
+	<string>[INSERT YOUR FILEPICKER API KEY HERE]</string>
 	<key>Filepicker Parameters</key>
 	<dict>
 		<key>metadata</key>

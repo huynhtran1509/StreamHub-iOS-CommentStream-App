@@ -447,6 +447,13 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 #pragma mark - Utility methods
 
+-(void)clearContent
+{
+    [self.attachments removeAllObjects];
+    [self.writeCommentView.attachmentImageView setImage:nil];
+    [self.writeCommentView.textView setText:@""];
+}
+
 -(NSString*)processReplyText:(NSString*)replyText
 {
     if (_authorHandles == nil) {
@@ -503,7 +510,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
                           ? [self processReplyText:textView.text]
                           : textView.text);
         
-        [textView setText:@""];
+        [self clearContent];
         
         id<LFSPostViewControllerDelegate> collectionViewController = nil;
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {

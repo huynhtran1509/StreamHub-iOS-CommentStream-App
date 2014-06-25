@@ -29,6 +29,8 @@
 
 @property (nonatomic, strong) UIActionSheet *actionSheet;
 
+-(void)clearContent;
+
 @end
 
 
