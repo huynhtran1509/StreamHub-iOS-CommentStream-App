@@ -21,24 +21,6 @@
 		</dict>
 		<dict>
 			<key>_name</key>
-			<string>Social Soccer 2</string>
-			<key>articleId</key>
-			<string>labs_demo_soccer_2</string>
-		</dict>
-		<dict>
-			<key>_name</key>
-			<string>Social Basketball 2</string>
-			<key>articleId</key>
-			<string>labs_demo_basketball_2</string>
-		</dict>
-		<dict>
-			<key>_name</key>
-			<string>Social Football 2</string>
-			<key>articleId</key>
-			<string>labs_demo_football_2</string>
-		</dict>
-		<dict>
-			<key>_name</key>
 			<string>JavaScript tweets</string>
 			<key>environment</key>
 			<string>t402.livefyre.com</string>
@@ -51,7 +33,7 @@
 		</dict>
 		<dict>
 			<key>_name</key>
-			<string>~Writable</string>
+			<string>~Writable (user)</string>
 			<key>environment</key>
 			<string>livefyre.com</string>
 			<key>network</key>
@@ -65,29 +47,17 @@
 		</dict>
 		<dict>
 			<key>_name</key>
-			<string>UAT / ModQ test</string>
+			<string>~Writable (mod)</string>
 			<key>environment</key>
-			<string>t402.livefyre.com</string>
-			<key>network</key>
 			<string>livefyre.com</string>
+			<key>network</key>
+			<string>labs.fyre.co</string>
 			<key>siteId</key>
-			<string>303613</string>
+			<string>320568</string>
 			<key>articleId</key>
-			<string>215</string>
+			<string>custom-1379372287037</string>
 			<key>lftoken</key>
-			<string>eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAibGl2ZWZ5cmUuY29tIiwgImV4cGlyZXMiOiAxMzg1MTQyMDYxLjQ1Mjk4NSwgInVzZXJfaWQiOiAiX3VwMTk0MzM2NjAifQ.ZsqHhNd1PersuB378CP8x5IkgoUG4Uqsiffi2tjsJPY</string>
-		</dict>
-		<dict>
-			<key>_name</key>
-			<string>UAT / Prickle</string>
-			<key>environment</key>
-			<string>t402.livefyre.com</string>
-			<key>network</key>
-			<string>livefyre.com</string>
-			<key>siteId</key>
-			<string>303613</string>
-			<key>articleId</key>
-			<string>225</string>
+			<string>eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkb21haW4iOiAibGFicy5meXJlLmNvIiwgImV4cGlyZXMiOiAxMDE0MDM3Mjg1MTIuNTk0MTYsICJ1c2VyX2lkIjogImRlbW8wIn0.0u1odupwow0tzBFhNWYG1Vk8URLncMHYQCBhjjdBBL8</string>
 		</dict>
 		<dict>
 			<key>_name</key>
