@@ -18,7 +18,9 @@
 @property (nonatomic, strong) UITextView *textView;
 @property (nonatomic, assign) id<LFSWriteCommentViewDelegate>delegate;
 
-@property (readonly, nonatomic) UIImageView *attachmentImageView;
+@property (nonatomic, assign) UIImage *attachmentImage;
+-(void)setAttachmentImageWithURL:(NSURL*)url;
+
 @end
 
 

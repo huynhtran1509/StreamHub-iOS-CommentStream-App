@@ -23,8 +23,12 @@ static const UIEdgeInsets kDetailPadding = {
     .top=15.0f, .left=15.0f, .bottom=15.0f, .right=15.0f
 };
 
+static const UIEdgeInsets kDetailPadding2 = {
+    .top=20.0f, .left=20.0f, .bottom=27.0f, .right=20.0f
+};
+
 static const UIEdgeInsets kPostContentInset = {
-    .top=75.f, .left=7.f, .bottom=200.f, .right=5.f
+    .top=75.f, .left=7.f, .bottom=20.f, .right=5.f
 };
 
 // header font settings
@@ -53,8 +57,6 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 //static const CGFloat kDetailRemoteButtonHeight = 20.0f;
 
 
-static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f };
-
 @interface LFSWriteCommentView ()
 
 // UIView-specific
@@ -63,9 +65,11 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
 @property (readonly, nonatomic) UIImageView *headerAttributeTopImageView;
 @property (readonly, nonatomic) UILabel *headerTitleView;
 @property (readonly, nonatomic) UILabel *headerSubtitleView;
+@property (readonly, nonatomic) UIImageView *attachmentImageView;
 
 @property (readonly, nonatomic) UIButton *button1;
 
+@property (nonatomic, assign) UIEdgeInsets textContentInset;
 @end
 
 @implementation LFSWriteCommentView {
@@ -75,6 +79,27 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
 #pragma mark - Properties
 
 @synthesize profileLocal = _profileLocal;
+
+@dynamic attachmentImage;
+-(UIImage*)attachmentImage
+{
+    return self.attachmentImageView.image;
+}
+
+-(void)setAttachmentImage:(UIImage *)attachmentImage
+{
+    [self adjustViewsForAttachmentSize:attachmentImage.size];
+    [self.attachmentImageView setImage:attachmentImage];
+}
+
+-(void)setAttachmentImageWithURL:(NSURL *)url
+{
+    __weak typeof(self) weakSelf = self;
+    [self.attachmentImageView setImageWithURL:url completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType)
+    {
+        [weakSelf setAttachmentImage:image];
+    }];
+}
 
 #pragma mark - Create toolbar
 
@@ -211,23 +236,6 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
 
 #pragma mark -
 
--(void)fixAttachmentImageViewFrame
-{
-    CGFloat x = (self.textView.frame.size.width - kAttachmentImageViewSize.width) / 2.f;
-    CGFloat y = self.textView.contentSize.height - kPostContentInset.bottom + (kPostContentInset.bottom - kAttachmentImageViewSize.height) / 2.f;
-    CGRect frame;
-    frame.size = kAttachmentImageViewSize;
-    frame.origin = CGPointMake(x, y);
-    if (![_textView respondsToSelector:@selector(setTextContainerInset:)]) {
-        // TODO: verify that this is needed
-        // iOS6
-        frame.origin.y -= kPostContentInset.top;
-        frame.origin.x -= kPostContentInset.left;
-    }
-    // initialize
-    [self.attachmentImageView setFrame:frame];
-}
-
 @synthesize attachmentImageView = _attachmentImageView;
 - (UIImageView*)attachmentImageView
 {
@@ -235,12 +243,12 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
         // initialize
         _attachmentImageView = [[UIImageView alloc] init];
         
-        [self fixAttachmentImageViewFrame];
+        //[self fixAttachmentImageViewFrame];
         
         // configure
         [_attachmentImageView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
-        [_attachmentImageView setContentMode:UIViewContentModeScaleToFill];
+        [_attachmentImageView setContentMode:UIViewContentModeScaleAspectFit];
         
         // add to superview
         [self.textView addSubview:_attachmentImageView];
@@ -345,6 +353,59 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
         [self.textView addSubview:_headerSubtitleView];
     }
     return _headerSubtitleView;
+}
+
+#pragma mark - Layout
+
+-(CGPoint)attachmentOriginForImageSize:(CGSize)size
+{
+    CGFloat x;
+    CGFloat availableWidth = self.bounds.size.width - kDetailPadding2.left - kDetailPadding2.right;
+    
+    if (size.width < availableWidth) {
+        x = (self.bounds.size.width - size.width) / 2.f;
+    }
+    else {
+        x = kDetailPadding2.left;
+    }
+    
+    // now set origin
+    CGFloat y = self.textView.contentSize.height + self.textView.frame.origin.y - self.textContentInset.bottom + kDetailPadding2.top;
+    
+    return CGPointMake(x, y);
+}
+
+-(void)adjustViewsForAttachmentSize:(CGSize)size
+{
+    CGFloat availableWidth = self.bounds.size.width - kDetailPadding2.left - kDetailPadding2.right;
+    CGRect attachmentFrame = self.attachmentImageView.frame;
+    
+    if (size.width < availableWidth) {
+        attachmentFrame.size = size;
+    }
+    else {
+        // preserve aspect ratio
+        attachmentFrame.size = CGSizeMake(availableWidth,
+                                          availableWidth * size.height / size.width);
+    }
+    attachmentFrame.origin = [self attachmentOriginForImageSize:size];
+    
+    // increase text content insets to fit image view
+    UIEdgeInsets inset = kPostContentInset;
+    inset.bottom += (attachmentFrame.size.height + kDetailPadding.top + kDetailPadding.bottom);
+    [self setTextContentInset:inset];
+    
+    [self.attachmentImageView setFrame:attachmentFrame];
+}
+
+-(void)fixAttachmentImageViewFrame
+{
+    UIImageView *attachmentImageView = self.attachmentImageView;
+    if (attachmentImageView.image != nil) {
+        CGRect frame = attachmentImageView.frame;
+        frame.origin =[self attachmentOriginForImageSize:attachmentImageView.image.size];
+        [attachmentImageView setFrame:frame];
+    }
 }
 
 #pragma mark - Private overrides
@@ -481,6 +542,30 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
 }
 
 #pragma mark -
+
+@dynamic textContentInset;
+-(UIEdgeInsets)textContentInset
+{
+    if ([_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+        // iOS7
+        return _textView.textContainerInset;
+    } else {
+        // iOS6
+        return _textView.contentInset;
+    }
+}
+
+-(void)setTextContentInset:(UIEdgeInsets)inset
+{
+    if ([_textView respondsToSelector:@selector(setTextContainerInset:)]) {
+        // iOS7
+        [_textView setTextContainerInset:inset];
+    } else {
+        // iOS6
+        [_textView setContentInset:UIEdgeInsetsMake(inset.top, 0.f, inset.bottom, 0.f)];
+    }
+}
+
 @synthesize textView = _textView;
 -(UITextView*)textView
 {
@@ -490,13 +575,7 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
         
         [_textView setBackgroundColor:[UIColor whiteColor]];
         
-        if ([_textView respondsToSelector:@selector(setTextContainerInset:)]) {
-            // iOS7
-            [_textView setTextContainerInset:kPostContentInset];
-        } else {
-            // iOS6
-            [_textView setContentInset:UIEdgeInsetsMake(kPostContentInset.top, 0.f, kPostContentInset.bottom, 0.f)];
-        }
+        [self setTextContentInset:kPostContentInset];
         [_textView setFont:[UIFont fontWithName:kPostContentFontName size:kPostContentFontSize]];
         [_textView setUserInteractionEnabled:YES];
         [_textView setScrollEnabled:YES];
@@ -528,9 +607,9 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
     [self fixAttachmentImageViewFrame];
 }
 
-#pragma mark - Lifecycle
+#pragma mark - Keyboard
 
-+(CGRect)screenBounds
+CGRect mainScreenBounds()
 {
     UIScreen *screen = [UIScreen mainScreen];
     CGRect screenRect = screen.bounds;
@@ -565,7 +644,7 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
     CGRect keyboardFrame = [self convertRect:keyboardEndFrame toView:nil];
     
     // calculate overlap height
-    CGRect screenBounds = [[self class] screenBounds];
+    CGRect screenBounds = mainScreenBounds();
     
     // view frame bottom minus keyboard top
     CGFloat overlapHeight = viewFrame.origin.y + viewFrame.size.height - (screenBounds.size.height - keyboardFrame.size.height);
@@ -596,6 +675,7 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
     [self moveTextViewForKeyboard:aNotification up:NO];
 }
 
+#pragma mark - Lifecycle
 -(void)onInit
 {
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -622,6 +702,16 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
                                                   object:nil];
 }
 
+-(void)resetFields
+{
+    _headerImageView = nil;
+    _headerTitleView = nil;
+    
+    _profileLocal = nil;
+}
+
+
+#pragma mark -
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
@@ -650,14 +740,6 @@ static const CGSize  kAttachmentImageViewSize = { .width=150.0f, .height=150.0f 
     [_textView setDelegate:nil];
     [self resetFields];
     [self onDealloc];
-}
-
--(void)resetFields
-{
-    _headerImageView = nil;
-    _headerTitleView = nil;
-    
-    _profileLocal = nil;
 }
 
 
