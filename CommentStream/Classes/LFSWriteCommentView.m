@@ -243,8 +243,6 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
         // initialize
         _attachmentImageView = [[UIImageView alloc] init];
         
-        //[self fixAttachmentImageViewFrame];
-        
         // configure
         [_attachmentImageView
          setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin)];
