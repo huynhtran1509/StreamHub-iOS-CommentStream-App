@@ -169,8 +169,10 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 -(void)FPPickerController:(FPPickerController *)picker didPickMediaWithInfo:(NSDictionary *)info
 {
-    UIImage *thumbnail = [info objectForKey:FPPickerControllerThumbnailImage];
-    [self.writeCommentView setAttachmentImage:thumbnail];
+    // TODO: upload thumbnail to Filepicker
+    //
+    //UIImage *thumbnail = [info objectForKey:FPPickerControllerThumbnailImage];
+    //[self.writeCommentView setAttachmentImage:thumbnail];
 }
 
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info

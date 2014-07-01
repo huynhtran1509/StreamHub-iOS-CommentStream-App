@@ -401,7 +401,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     UIImageView *attachmentImageView = self.attachmentImageView;
     if (attachmentImageView.image != nil) {
         CGRect frame = attachmentImageView.frame;
-        frame.origin =[self attachmentOriginForImageSize:attachmentImageView.image.size];
+        frame.origin = [self attachmentOriginForImageSize:attachmentImageView.image.size];
         [attachmentImageView setFrame:frame];
     }
 }
