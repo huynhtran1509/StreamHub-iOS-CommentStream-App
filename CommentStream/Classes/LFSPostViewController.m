@@ -7,7 +7,6 @@
 //
 
 #import <StreamHub-iOS-SDK/LFSWriteClient.h>
-#import <SDWebImage/UIImageView+WebCache.h>
 #import <FilepickerSDK/FPConstants.h>
 #import <FilepickerSDK/FPLibrary.h>
 #import <FilepickerSDK/FPMBProgressHUD.h>
@@ -59,6 +58,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 @implementation LFSPostViewController {
     NSDictionary *_authorHandles;
     BOOL _pauseKeyboard;
+    BOOL _statusBarHidden;
 }
 
 #pragma mark - Properties
@@ -166,6 +166,15 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 }
 
 #pragma mark - UIImagePickerControllerDelegate
+
+-(void)FPPickerController:(FPPickerController *)picker didPickMediaWithInfo:(NSDictionary *)info
+{
+    // TODO: upload thumbnail to Filepicker
+    //
+    //UIImage *thumbnail = [info objectForKey:FPPickerControllerThumbnailImage];
+    //[self.writeCommentView setAttachmentImage:thumbnail];
+}
+
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
@@ -196,7 +205,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
                             success:^(id JSON, NSURL *localurl)
               {
                   NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, originalImage, localurl);
-                  [self addImageWithInfo:dictionary];
+                  [self addMediaWithInfo:dictionary];
                   [FPMBProgressHUD hideAllHUDsForView:self.view animated:YES];
                   _pauseKeyboard = NO;
                   [self.writeCommentView.textView becomeFirstResponder];
@@ -230,7 +239,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
                            success:^(id JSON, NSURL *localurl)
              {
                  NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, originalImage, localurl);
-                 [self addImageWithInfo:dictionary];
+                 [self addMediaWithInfo:dictionary];
                  [FPMBProgressHUD hideAllHUDsForView:self.view animated:YES];
                  _pauseKeyboard = NO;
                  [self.writeCommentView.textView becomeFirstResponder];
@@ -267,10 +276,16 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 #pragma mark - FPPickerDelegate
 
--(void)addImageWithInfo:(NSDictionary*)info
+-(void)addMediaWithInfo:(NSDictionary*)info
 {
-    NSString *urlString = [NSString stringWithFormat:@"http://media.fyre.co/%@",
-                           [info objectForKey:FPPickerControllerKey]];
+    NSString *urlString;
+    NSString *imageKey = [info objectForKey:FPPickerControllerKey];
+    if (imageKey != nil) {
+        urlString = [@"http://media.fyre.co/" stringByAppendingString:imageKey];
+    } else {
+        urlString = [info objectForKey:FPPickerControllerRemoteURL];
+    }
+    
     LFSOembedType oembedType = attachmentCodeFromUTType([info objectForKey:FPPickerControllerMediaType]);
     LFSOembed *oembed = [LFSOembed oembedWithUrl:urlString
                                             link:urlString
@@ -278,12 +293,18 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
                                             type:oembedType];
     
     [self.attachments addObject:[oembed object]];
-    [self.writeCommentView.attachmentImageView setImageWithURL:[NSURL URLWithString:urlString]];
+    
+    UIImage *originalImage = [info objectForKey:FPPickerControllerOriginalImage];
+    if (originalImage != nil) {
+        [self.writeCommentView setAttachmentImage:originalImage];
+    } else {
+        [self.writeCommentView setAttachmentImageWithURL:[NSURL URLWithString:urlString]];
+    }
 }
 
 -(void)FPPickerController:(FPPickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    [self addImageWithInfo:info];
+    [self addMediaWithInfo:info];
     [self dismissViewControllerAnimated:NO completion:^{
         [self.writeCommentView.textView becomeFirstResponder];
     }];
@@ -447,6 +468,13 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 #pragma mark - Utility methods
 
+-(void)clearContent
+{
+    [self.attachments removeAllObjects];
+    [self.writeCommentView setAttachmentImage:nil];
+    [self.writeCommentView.textView setText:@""];
+}
+
 -(NSString*)processReplyText:(NSString*)replyText
 {
     if (_authorHandles == nil) {
@@ -502,8 +530,6 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
         NSString *text = (self.replyToContent
                           ? [self processReplyText:textView.text]
                           : textView.text);
-        
-        [textView setText:@""];
         
         id<LFSPostViewControllerDelegate> collectionViewController = nil;
         if ([self.delegate respondsToSelector:@selector(collectionViewController)]) {

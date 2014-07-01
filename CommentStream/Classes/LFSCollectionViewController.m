@@ -952,6 +952,7 @@ const static char kAttributedTextValueKey;
     [self.postViewController setCollectionId:self.collectionId];
     [self.postViewController setAvatarImage:self.placeholderImage];
     [self.postViewController setUser:self.user];
+    [self.postViewController clearContent];
     
     [self.navigationController presentViewController:self.postViewController
                                             animated:YES
