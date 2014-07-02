@@ -197,6 +197,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
              hud.mode = FPMBProgressHUDModeDeterminate;
          });
          
+         // Upload full-size image
          ALAssetRepresentation *representation = [asset defaultRepresentation];
          UIImage *image = [UIImage imageWithCGImage:[representation fullScreenImage]];
          [FPLibrary uploadAsset:asset withOptions:nil shouldUpload:YES
@@ -220,10 +221,11 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
               hud.progress = progress;
           }];
          
-         
-         // Now upload the thumbnail
+         // Upload the thumbnail
          UIImage *thumbnail = [UIImage imageWithCGImage:[asset aspectRatioThumbnail]];
-         [self addAndUploadThumbnail:thumbnail scale:1.f];
+         if (thumbnail) {
+            [self addAndUploadThumbnail:thumbnail scale:1.f];
+         }
          
      } failureBlock:nil];
 }
@@ -338,20 +340,27 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     [oembed setObjectsAndKeysFromDictionary:@{
                                               @"thumbnail_width": [NSNumber numberWithUnsignedInteger:(NSUInteger)(scale * thumbnail.size.width)],
                                               @"thumbnail_height": [NSNumber numberWithUnsignedInteger:(NSUInteger)(scale * thumbnail.size.height)]}];
-    [FPLibrary uploadImage:thumbnail ofMimetype:@"image/*" withOptions:nil shouldUpload:YES
-                   success:^(id JSON, NSURL *localurl)
-     {
-         NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, thumbnail, localurl);
-         [self addOembedThumbnailInfo:dictionary];
-     }
-                   failure:nil
-                  progress:nil];
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 0.01 * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
+                   ^(void)
+                   {
+                       [FPLibrary uploadImage:thumbnail ofMimetype:@"image/*" withOptions:nil shouldUpload:YES
+                                      success:^(id JSON, NSURL *localurl)
+                        {
+                            NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, thumbnail, localurl);
+                            [self addOembedThumbnailInfo:dictionary];
+                        }
+                                      failure:nil
+                                     progress:nil];
+                   });
 }
 
 -(void)FPPickerController:(FPPickerController *)picker didPickMediaWithInfo:(NSDictionary *)info
 {
     UIImage *thumbnail = [info objectForKey:FPPickerControllerThumbnailImage];
-    [self addAndUploadThumbnail:thumbnail scale:2.f];
+    if (thumbnail) {
+        [self addAndUploadThumbnail:thumbnail scale:2.f];
+    }
 }
 
 -(void)FPPickerController:(FPPickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
