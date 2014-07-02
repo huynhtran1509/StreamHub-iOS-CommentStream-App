@@ -37,11 +37,6 @@ extern LFSOembedType attachmentCodeFromUTType(NSString* uttypeString);
 
 -(id)initWithObject:(id)object;
 
-+(instancetype)oembedWithUrl:(NSString*)urlString
-                        link:(NSString*)linkUrlString
-                providerName:(NSString*)providerName
-                      type:(LFSOembedType)oembedType;
-
 @property (nonatomic, readonly) id object;
 
 // provider

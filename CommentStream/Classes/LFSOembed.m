@@ -74,20 +74,6 @@ LFSOembedType attachmentCodeFromUTType(NSString* uttypeString)
 }
 
 #pragma mark - Lifecycle
-+(instancetype)oembedWithUrl:(NSString*)urlString
-                        link:(NSString*)linkUrlString
-                providerName:(NSString*)providerName
-                        type:(LFSOembedType)oembedType
-{
-    NSParameterAssert(oembedType < LFS_OEMBED_TYPES_LENGTH);
-    NSDictionary *object = @{@"url": urlString,
-                             @"link": linkUrlString,
-                             @"provider_name": providerName,
-                             @"type": LFSOembedTypes[oembedType]};
-    
-    return [[self alloc] initWithObject:object];
-}
-
 -(id)initWithObject:(id)object
 {
     // check if object is of appropriate type
