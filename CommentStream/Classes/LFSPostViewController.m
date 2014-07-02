@@ -344,7 +344,10 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
     dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
                    ^(void)
                    {
-                       [FPLibrary uploadImage:thumbnail ofMimetype:@"image/*" withOptions:nil shouldUpload:YES
+                       [FPLibrary uploadImage:thumbnail
+                                   ofMimetype:@"image/jpeg"
+                                  withOptions:nil
+                                 shouldUpload:YES
                                       success:^(id JSON, NSURL *localurl)
                         {
                             NSDictionary *dictionary = FPDictionaryFromJSONInfoPhoto(JSON, thumbnail, localurl);
