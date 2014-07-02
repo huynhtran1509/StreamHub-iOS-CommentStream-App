@@ -12,7 +12,7 @@ pod 'StreamHub-iOS-SDK', '~> 0.3.6'
 pod 'FilepickerSDK', '~> 2.7.3'
 #pod 'FilepickerSDK', :path => '../../../ios-picker/'
 
-pod 'APAsyncDictionary', '~> 0.1.0a'
+pod 'LFAsyncDictionary', '~> 0.1.0a'
 #pod 'LFAsyncDictionary', :path => '../../../APAsyncDictionary/'
 
 #pod 'Reveal-iOS-SDK'
