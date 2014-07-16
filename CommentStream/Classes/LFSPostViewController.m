@@ -11,7 +11,7 @@
 #import <FilepickerSDK/FPLibrary.h>
 #import <FilepickerSDK/FPMBProgressHUD.h>
 #import <AssetsLibrary/ALAssetsLibrary.h>
-#import <APAsyncDictionary/APAsyncDictionary.h>
+#import <LFAsyncDictionary/APAsyncDictionary.h>
 
 #import "UIImagePickerController+StatusBarHidden.h"
 #import "LFSPostViewController.h"
