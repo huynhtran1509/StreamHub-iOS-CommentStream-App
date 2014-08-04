@@ -15,7 +15,7 @@ do the following (assuming you keep your projects in `~/dev` directory):
     cd ~/dev
     git clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git
     cd StreamHub-iOS-Example-App
-    pod repo add escherba https://github.com/escherba/Specs.git
+    pod repo add livefyre https://github.com/Livefyre/cocoapods.git
     pod install
     open CommentStream.xcworkspace
 
