@@ -13,9 +13,9 @@ simply by running `gem install cocoapods` and `pod setup`. Once installed,
 do the following (assuming you keep your projects in `~/dev` directory):
 
     cd ~/dev
-    git clone https://github.com/Livefyre/StreamHub-iOS-Example-App.git
-    cd StreamHub-iOS-Example-App
-    pod repo add escherba https://github.com/escherba/Specs.git
+    git clone https://github.com/Livefyre/StreamHub-iOS-CommentStream-App.git
+    cd StreamHub-iOS-CommentStream-App
+    pod repo add livefyre https://github.com/Livefyre/cocoapods.git
     pod install
     open CommentStream.xcworkspace
 
