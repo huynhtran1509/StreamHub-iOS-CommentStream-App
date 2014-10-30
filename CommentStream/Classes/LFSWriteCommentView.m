@@ -95,7 +95,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
 -(void)setAttachmentImageWithURL:(NSURL *)url
 {
     __weak typeof(self) weakSelf = self;
-    [self.attachmentImageView setImageWithURL:url completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType)
+    [self.attachmentImageView sd_setImageWithURL:url completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *url)
     {
         [weakSelf setAttachmentImage:image];
     }];
@@ -535,7 +535,7 @@ static const CGFloat kDetailRemoteButtonWidth = 20.0f;
     }
     
     // layout avatar view
-    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
+    [self.headerImageView sd_setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
                          placeholderImage:profileLocal.icon];
 }
 

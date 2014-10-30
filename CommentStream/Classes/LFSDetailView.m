@@ -802,7 +802,7 @@ static const CGFloat kDetailHeaderAccessoryRightAlpha = 0.618f;
     }
 
     // layout avatar view
-    [self.headerImageView setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
+    [self.headerImageView sd_setImageWithURL:[NSURL URLWithString:profileLocal.iconURLString]
                          placeholderImage:profileLocal.icon];
 }
 

@@ -197,8 +197,8 @@ static NSString* const kCurrentUserId = @"_up19433660@livefyre.com";
             __weak UIImageView* weakAttachmentView = attachmentView;
             
             // TODO: ask JS about desired behavior on image download failure
-            [attachmentView setImageWithURL:[NSURL URLWithString:oembed.urlString]
-                                  completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType)
+            [attachmentView sd_setImageWithURL:[NSURL URLWithString:oembed.urlString]
+                                  completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *url)
             {
                 // find out image size here and re-layout view
                 [weakAttachmentView setImage:image];
