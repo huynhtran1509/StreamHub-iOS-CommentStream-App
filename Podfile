@@ -1,3 +1,6 @@
+source 'git@github.com:Livefyre/cocoapods.git'
+source 'https://github.com/CocoaPods/Specs.git'
+
 platform :ios, '6.0'
 xcodeproj 'CommentStream.xcodeproj'
 
@@ -6,7 +9,7 @@ pod 'SDWebImage', '~> 3.7.0'
 pod 'AFHTTPRequestOperationLogger', '~> 2.0.0'
 pod 'OHAttributedLabel', '~> 3.5.3'
 
-pod 'StreamHub-iOS-SDK', '~> 0.3.6'
+pod 'StreamHub-iOS-SDK', :git => 'https://github.com/Livefyre/StreamHub-iOS-SDK.git'
 #pod 'StreamHub-iOS-SDK', :path => '../../'
 
 pod 'FilepickerSDK', '~> 2.7.3'
