@@ -1,7 +1,9 @@
 source 'https://github.com/Livefyre/cocoapods.git'
 source 'https://github.com/CocoaPods/Specs.git'
 
-platform :ios, '6.0'
+platform :ios, "8.0"
+
+pod 'AFNetworking', '~> 2.0'
 xcodeproj 'CommentStream.xcodeproj'
 
 pod 'UIImage+Resize', '~> 0.0.1'
@@ -12,7 +14,8 @@ pod 'OHAttributedLabel', '~> 3.5.3'
 pod 'StreamHub-iOS-SDK', :git => 'https://github.com/Livefyre/StreamHub-iOS-SDK.git'
 #pod 'StreamHub-iOS-SDK', :path => '../../'
 
-pod 'FilepickerSDK', '~> 2.7.3'
+#pod 'FilepickerSDK', '~> 2.7.3'
+pod 'FPPicker'
 #pod 'FilepickerSDK', :path => '../../../ios-picker/'
 
 pod 'LFAsyncDictionary', '~> 0.1.0a'

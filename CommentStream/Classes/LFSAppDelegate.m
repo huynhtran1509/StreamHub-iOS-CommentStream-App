@@ -15,7 +15,7 @@
 #endif
 
 #import <OHAttributedLabel/OHAttributedLabel.h>
-
+#import <FPPicker/FPPicker.h>
 #import "LFSAppDelegate.h"
 #import "LFSAttributedTextCell.h"
 
@@ -122,6 +122,13 @@ typedef NS_ENUM(NSUInteger, kTwitterAppState) {
     
     return urlString;
 }
+
+
++ (void)initialize
+{
+    [FPConfig sharedInstance].APIKey = @"AYNlO8P2PT6qnCfo9eCw2z" ;
+}
+
 
 #pragma mark - Lifecycle
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
