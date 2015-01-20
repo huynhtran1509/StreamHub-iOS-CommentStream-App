@@ -616,13 +616,8 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
             collectionViewController = [self.delegate collectionViewController];
         }
         
-        NSMutableArray *oembedArray = [NSMutableArray array];
-        [_oembeds enumerateKeysAndObjectsUsingBlock:^(id key, APAsyncDictionary *obj, BOOL *stop) {
-            // Clone all oembed objects into regular dictionaries because our
-            // thread-safe dictionary object does not support JSONKit serialization
-            [oembedArray addObject:[obj underlyingDictionary]];
-        }];
-        
+//        NSData *jsonData1 = [NSJSONSerialization dataWithJSONObject:oembedArray options:0 error:NULL];
+//        NSString *oembedArrayjson = [[NSString alloc] initWithData:jsonData1 encoding:NSUTF8StringEncoding];
         [self.writeClient postContent:text
                       withAttachments:oembedArray
                          inCollection:self.collectionId
@@ -669,23 +664,28 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 
 
-- (void)FPPickerController:(FPPickerController *)pickerController didFinishPickingMediaWithInfo:(NSDictionary *)info
-{
-    // Handle accordingly
-    //        UIImage *originalImage = [info objectForKey:@"FPPickerControllerRemoteURL"];
-    NSURL *urlString=[info objectForKey:@"FPPickerControllerRemoteURL"];
-    //    NSURL *url=[NSURL URLWithString:urlString];
+- (void)FPPickerController:(FPPickerController *)pickerController didFinishPickingMediaWithInfo:(FPMediaInfo *)info{
+
+    NSURL *urlString=info.remoteURL;
     [self.writeCommentView setAttachmentImageWithURL:urlString];
     if(pickerController){
         [pickerController dismissViewControllerAnimated:YES completion:nil];
     }
     [self.writeCommentView.textView becomeFirstResponder];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
     
+    NSString *thumbnail_url=[NSString stringWithFormat:@"%@",info.remoteURL];
+    NSString *type=@"photo";
+    NSString *provider_name=@"LivefyreFilePicker";
+    NSString *url=[NSString stringWithFormat:@"%@",info.remoteURL];
+    
+    NSDictionary *oemdedDict=[[NSDictionary alloc]initWithObjectsAndKeys:thumbnail_url,@"thumbnail_url",type,@"type",provider_name,@"provider_name",url,@"url", nil];
+    
+    oembedArray=[[NSMutableArray alloc]initWithObjects:oemdedDict, nil];
 }
 
 - (void)FPPickerControllerDidCancel:(FPPickerController *)pickerController
 {
-    // Handle accordingly
     [pickerController dismissViewControllerAnimated:YES completion:nil];
     [self.writeCommentView.textView becomeFirstResponder];
     
@@ -693,7 +693,7 @@ static NSString* const kPhotoActionsArray[LFS_PHOTO_ACTIONS_LENGTH] =
 
 #pragma mark - FPSaveController Delegate Methods
 
-- (void)FPSaveController:(FPSaveController *)saveController didFinishSavingMediaWithInfo:(NSDictionary *)info
+- (void)FPSaveController:(FPSaveController *)saveController didFinishSavingMediaWithInfo:(FPMediaInfo *)info
 {
     // Handle accordingly
 }

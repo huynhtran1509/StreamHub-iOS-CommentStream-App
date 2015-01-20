@@ -16,7 +16,10 @@
 
 @protocol LFSPostViewControllerDelegate;
 
-@interface LFSPostViewController : UIViewController <LFSWriteCommentViewDelegate, UIActionSheetDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, FPPickerDelegate,FPSaveDelegate>
+@interface LFSPostViewController : UIViewController <LFSWriteCommentViewDelegate, UIActionSheetDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, FPPickerControllerDelegate, FPSaveControllerDelegate>{
+    NSMutableArray *oembedArray;
+
+}
 
 @property (nonatomic, copy) NSDictionary *collection;
 @property (nonatomic, copy) NSString *collectionId;
