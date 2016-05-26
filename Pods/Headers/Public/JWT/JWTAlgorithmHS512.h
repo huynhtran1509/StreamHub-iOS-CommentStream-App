@@ -1,0 +1,1 @@
+../../../JWT/JWT/JWTAlgorithmHS512.h

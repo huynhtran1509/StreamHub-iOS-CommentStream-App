@@ -1,0 +1,86 @@
+PODS:
+  - AFHTTPRequestOperationLogger (2.0.0):
+    - AFNetworking/NSURLConnection (= 2.3.1)
+  - AFNetworking (2.3.1):
+    - AFNetworking/NSURLConnection (= 2.3.1)
+    - AFNetworking/NSURLSession (= 2.3.1)
+    - AFNetworking/Reachability (= 2.3.1)
+    - AFNetworking/Security (= 2.3.1)
+    - AFNetworking/Serialization (= 2.3.1)
+    - AFNetworking/UIKit (= 2.3.1)
+  - AFNetworking/NSURLConnection (2.3.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/NSURLSession (2.3.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (2.3.1)
+  - AFNetworking/Security (2.3.1)
+  - AFNetworking/Serialization (2.3.1)
+  - AFNetworking/UIKit (2.3.1):
+    - AFNetworking/NSURLConnection
+    - AFNetworking/NSURLSession
+  - Base64 (1.0.1)
+  - FilepickerSDK (2.7.3):
+    - FilepickerSDK/core (= 2.7.3)
+    - FilepickerSDK/no-arc (= 2.7.3)
+    - LFJSONKit (~> 1.6a)
+  - FilepickerSDK/core (2.7.3):
+    - LFJSONKit (~> 1.6a)
+  - FilepickerSDK/no-arc (2.7.3):
+    - LFJSONKit (~> 1.6a)
+  - JWT (1.1.0):
+    - Base64 (~> 1.0.1)
+  - LFAsyncDictionary (0.1.0a)
+  - LFJSONKit (1.6a)
+  - NSString-Hashes (1.2.2)
+  - OHAttributedLabel (3.5.5)
+  - SDWebImage (3.7.6):
+    - SDWebImage/Core (= 3.7.6)
+  - SDWebImage/Core (3.7.6)
+  - StreamHub-iOS-SDK (0.3.10):
+    - LFJSONKit (~> 1.6a)
+    - StreamHub-iOS-SDK/core (= 0.3.10)
+  - StreamHub-iOS-SDK/core (0.3.10):
+    - AFNetworking (~> 2.0)
+    - Base64 (= 1.0.1)
+    - JWT (= 1.1.0)
+    - LFJSONKit (~> 1.6a)
+    - NSString-Hashes (= 1.2.2)
+  - UIImage+Resize (0.0.1)
+
+DEPENDENCIES:
+  - AFHTTPRequestOperationLogger (~> 2.0.0)
+  - FilepickerSDK (~> 2.7.3)
+  - LFAsyncDictionary (~> 0.1.0a)
+  - OHAttributedLabel (~> 3.5.3)
+  - SDWebImage (~> 3.7.6)
+  - StreamHub-iOS-SDK (from `https://github.com/Livefyre/StreamHub-iOS-SDK.git`)
+  - UIImage+Resize (~> 0.0.1)
+
+EXTERNAL SOURCES:
+  StreamHub-iOS-SDK:
+    :git: https://github.com/Livefyre/StreamHub-iOS-SDK.git
+
+CHECKOUT OPTIONS:
+  StreamHub-iOS-SDK:
+    :commit: 4d398c96b2fc61bef1fd7a7330fe0bb3a41326bb
+    :git: https://github.com/Livefyre/StreamHub-iOS-SDK.git
+
+SPEC CHECKSUMS:
+  AFHTTPRequestOperationLogger: d5167e56438af3103e9a6ab6f28bf9a19db5ecd1
+  AFNetworking: 05b9f6e3aa5ac45bc383b4bb108ef338080a26c7
+  Base64: 4924bf3ca6fa559a5161ef717291bd450eb7bd1a
+  FilepickerSDK: d3dfc7b44a988610ffa1502a14489dd655af7bc9
+  JWT: 86275cf698c9434cbf2ee496c280967a028f70f7
+  LFAsyncDictionary: d5834c24972c1e4ca11f122a426c1ca4aef9b375
+  LFJSONKit: 5852f264c705b6240aec911c1e2dab92905dccf4
+  NSString-Hashes: c3848d809e92650e4fb17db5d8cc4bd2aa1eaddd
+  OHAttributedLabel: 9b2eb99323dee6b3a81ef3bc8e98b084117bca2d
+  SDWebImage: c325cf02c30337336b95beff20a13df489ec0ec9
+  StreamHub-iOS-SDK: 4f753f65dbeb8b74ab8691b394adbec8d3cd0fe8
+  UIImage+Resize: b2507094fbda9b645c1caae08df7ace3d5dc39f6
+
+COCOAPODS: 0.39.0

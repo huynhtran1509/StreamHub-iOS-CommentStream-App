@@ -1,0 +1,51 @@
+{
+  "name": "StreamHub-iOS-SDK",
+  "version": "0.3.10",
+  "summary": "A client library for Livefyre's API",
+  "description": "StreamHub-iOS is the official Livefyre SDK for building real-time native iOS apps that interact with Livefyre services. With it, you can easily create apps that obtain user-generated content sourced by Livefye, poll for updates, and create or modify content.",
+  "homepage": "https://github.com/Livefyre/StreamHub-iOS-SDK",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "JJ Weber": "jj@livefyre.com",
+    "Eugene Scherba": "escherba@livefyre.com"
+  },
+  "platforms": {
+    "ios": "6.0"
+  },
+  "ios": {
+    "prefix_header_file": "LFSClient/LFSClient-Prefix.pch"
+  },
+  "source": {
+    "git": "https://github.com/Livefyre/StreamHub-iOS-SDK.git",
+    "tag": "0.3.8"
+  },
+  "dependencies": {
+    "LFJSONKit": [
+      "~> 1.6a"
+    ]
+  },
+  "subspecs": [
+    {
+      "name": "core",
+      "source_files": "LFSClient/**/*.{h,m}",
+      "requires_arc": true,
+      "dependencies": {
+        "AFNetworking": [
+          "~> 2.0"
+        ],
+        "JWT": [
+          "1.1.0"
+        ],
+        "Base64": [
+          "1.0.1"
+        ],
+        "NSString-Hashes": [
+          "1.2.2"
+        ]
+      }
+    }
+  ]
+}

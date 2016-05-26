@@ -1,0 +1,1 @@
+../../../StreamHub-iOS-SDK/LFSClient/Classes/LFSStreamClient.h
